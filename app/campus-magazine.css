@@ -1,0 +1,992 @@
+.campusMagazine {
+  display: grid;
+  gap: 22px;
+  margin-top: 28px;
+  padding: clamp(22px,3vw,38px);
+  overflow: hidden;
+  border: 1px solid #e3e3df;
+  border-radius: 24px;
+  color: #181818;
+  background: #fafaf8;
+  box-shadow: 0 24px 70px rgba(25,25,25,.08);
+}
+
+.magazineHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 26px;
+}
+
+.magazineHeader > div:first-child > span,
+.magazineIssueForm header span {
+  color: #8b1f23;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .2em;
+}
+
+.magazineHeader h2 {
+  margin: 9px 0 0;
+  font: 500 clamp(31px,4.5vw,56px)/.95 Georgia,serif;
+  letter-spacing: -.05em;
+}
+
+.magazineHeader p {
+  max-width: 590px;
+  margin: 12px 0 0;
+  color: #757575;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.magazineHeaderActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.magazineHeaderActions select,
+.magazineHeaderActions button,
+.magazineToolbar button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid #d7d7d3;
+  border-radius: 9px;
+  color: #3f3f3d;
+  background: #fff;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.magazineHeaderActions .primary {
+  border-color: #202020;
+  color: #fff;
+  background: #202020;
+}
+
+.magazineStatus {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #e1d0c4;
+  border-radius: 10px;
+  color: #78523d;
+  background: #fff7f1;
+  font-size: 8px;
+}
+
+.magazineEdition {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 15px 0;
+  border-top: 1px solid #dcdcd8;
+  border-bottom: 1px solid #dcdcd8;
+}
+
+.magazineEdition span {
+  color: #9b292d;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.magazineEdition h3 {
+  margin: 5px 0;
+  font: 500 22px Georgia,serif;
+}
+
+.magazineEdition p {
+  margin: 0;
+  color: #777;
+  font-size: 8px;
+}
+
+.magazineEdition em {
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.magazineEdition .published {
+  color: #33704c;
+  background: #e8f3eb;
+}
+
+.magazineEdition .draft {
+  color: #865c2c;
+  background: #f8ebd7;
+}
+
+.magazineToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 13px;
+  border: 1px solid #deded9;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.magazineToolbar > span {
+  color: #666;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.magazineToolbar > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.magazineToolbar button {
+  min-height: 33px;
+  font-size: 7px;
+}
+
+.magazineToolbar .publishButton {
+  border-color: #242424;
+  color: #fff;
+  background: #242424;
+}
+
+.magazineToolbar .draftButton {
+  color: #7d5028;
+  background: #fff3e3;
+}
+
+.magazineIssueForm {
+  display: grid;
+  gap: 16px;
+  padding: 19px;
+  border: 1px solid #deded9;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.magazineIssueForm > header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.magazineIssueForm h3 {
+  margin: 5px 0 0;
+  font: 500 19px Georgia,serif;
+}
+
+.magazineIssueForm header button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ddd;
+  border-radius: 9px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.magazineIssueForm > div {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 12px;
+}
+
+.magazineIssueForm label {
+  display: grid;
+  gap: 6px;
+}
+
+.magazineIssueForm label > span {
+  color: #666;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.magazineIssueForm .wide {
+  grid-column: 1/-1;
+}
+
+.magazineIssueForm input,
+.magazineIssueForm textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px;
+  border: 1px solid #d8d8d4;
+  border-radius: 9px;
+  outline: none;
+  color: #292929;
+  background: #fff;
+  font: inherit;
+  font-size: 9px;
+}
+
+.magazineIssueForm > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.magazineIssueForm > footer button {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid #d8d8d4;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.magazineIssueForm > footer button:last-child {
+  border-color: #222;
+  color: #fff;
+  background: #222;
+}
+
+.magazinePresentation {
+  display: grid;
+  grid-template-columns: 46px minmax(0,1fr) 46px;
+  align-items: center;
+  gap: 18px;
+  min-height: 760px;
+  padding: clamp(60px,8vw,125px) clamp(18px,4vw,54px);
+  overflow: hidden;
+  border: 1px solid #efefec;
+  background: #f5f5f3;
+  perspective: 2400px;
+}
+
+.magazineArrow {
+  width: 46px;
+  height: 62px;
+  border: 1px solid #d6d6d2;
+  border-radius: 12px;
+  color: #333;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 8px 22px rgba(0,0,0,.07);
+  font: 29px Georgia,serif;
+  cursor: pointer;
+}
+
+.magazineArrow:disabled {
+  cursor: default;
+  opacity: .25;
+}
+
+.magazineBook {
+  position: relative;
+  width: 100%;
+  max-width: 1080px;
+  min-height: 555px;
+  margin: auto;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 24px 18px rgba(0,0,0,.18));
+}
+
+.magazineSpread {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  min-height: 555px;
+  overflow: hidden;
+  border-radius: 5px 9px 9px 5px;
+  transform-style: preserve-3d;
+  background: #fff;
+}
+
+.magazineSpine {
+  position: absolute;
+  z-index: 20;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 24px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.08),
+      rgba(255,255,255,.75),
+      rgba(0,0,0,.13)
+    );
+  filter: blur(3px);
+}
+
+.magazinePageEdges {
+  position: absolute;
+  z-index: 10;
+  top: 7px;
+  bottom: -7px;
+  width: 8px;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #ddd 0,
+      #fff 1px,
+      #cfcfcf 2px
+    );
+}
+
+.magazinePageEdges.left {
+  left: -7px;
+}
+
+.magazinePageEdges.right {
+  right: -7px;
+}
+
+.magazineEditorialPage {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 555px;
+  flex-direction: column;
+  padding: 28px 31px 22px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.magazineLeftPage {
+  border-right: 1px solid #e5e5e2;
+  transform-origin: right center;
+}
+
+.magazineRightPage {
+  transform-origin: left center;
+}
+
+.editorialRunningHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 19px;
+  color: #6f6f6b;
+}
+
+.editorialRunningHeader span {
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.editorialRunningHeader small {
+  font-size: 6px;
+}
+
+.editorialLeftMedia {
+  display: grid;
+  min-height: 235px;
+  gap: 13px;
+  margin: 19px 0 20px;
+}
+
+.editorialLeftMedia.count-2 {
+  grid-template-columns: 1.05fr .95fr;
+}
+
+.editorialLeftMedia figure,
+.editorialGallery figure {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  background: #eee;
+}
+
+.editorialLeftMedia img,
+.editorialGallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorialLeftMedia figcaption,
+.editorialGallery figcaption {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  left: 5px;
+  padding: 4px 5px;
+  color: #fff;
+  background: rgba(0,0,0,.55);
+  font-size: 5px;
+}
+
+.editorialPhotoEmpty {
+  display: grid;
+  min-height: 235px;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  border: 1px solid #e5e5e1;
+  color: #8b8b86;
+  text-align: center;
+  background: #f5f5f3;
+}
+
+.editorialPhotoEmpty span {
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.editorialPhotoEmpty strong {
+  max-width: 220px;
+  font: 500 16px Georgia,serif;
+}
+
+.magazineLeftPage > h3 {
+  margin: 0 0 12px;
+  font: 500 clamp(20px,2vw,29px)/1.05 Arial,sans-serif;
+  letter-spacing: -.045em;
+}
+
+.editorialLeftStory,
+.editorialRightStory {
+  color: #4f4f4c;
+  font-size: 7px;
+  line-height: 1.55;
+  text-align: justify;
+  white-space: pre-line;
+  column-count: 2;
+  column-gap: 15px;
+}
+
+.editorialGallery {
+  display: grid;
+  min-height: 325px;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  grid-template-rows: repeat(3,1fr);
+  gap: 10px;
+  margin: 19px 0;
+}
+
+.editorialGallery figure:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.editorialGallery figure:nth-child(2) {
+  grid-row: span 2;
+}
+
+.editorialGallery figure:nth-child(3) {
+  grid-column: span 1;
+}
+
+.editorialGallery figure:nth-child(4) {
+  grid-column: span 2;
+}
+
+.editorialGallery.gallery-1 figure:first-child {
+  grid-column: 1/-1;
+  grid-row: 1/-1;
+}
+
+.editorialGallery.gallery-2 figure:first-child,
+.editorialGallery.gallery-2 figure:nth-child(2) {
+  grid-column: auto;
+  grid-row: 1/-1;
+}
+
+.editorialPullQuote {
+  grid-column: 1/-1;
+  grid-row: 1/-1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 30px;
+  color: #8f2529;
+  text-align: center;
+  background:
+    linear-gradient(145deg,#fff3f0,#f5e5e1);
+}
+
+.editorialPullQuote span {
+  height: 35px;
+  font: 58px/.8 Georgia,serif;
+}
+
+.editorialPullQuote strong {
+  max-width: 300px;
+  font: 500 18px/1.35 Georgia,serif;
+}
+
+.editorialPageNumber {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 1px solid #e6e6e3;
+  color: #858581;
+  font-size: 5px;
+  font-weight: 800;
+  letter-spacing: .09em;
+}
+
+.magazineBook.turn-next .magazineRightPage {
+  z-index: 8;
+  animation: editorialTurnNext .78s cubic-bezier(.45,.05,.2,1);
+}
+
+.magazineBook.turn-previous .magazineLeftPage {
+  z-index: 8;
+  animation: editorialTurnPrevious .78s cubic-bezier(.45,.05,.2,1);
+}
+
+@keyframes editorialTurnNext {
+  0% {
+    transform: rotateY(0);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+  }
+
+  48% {
+    transform: rotateY(-88deg);
+    box-shadow: -28px 5px 30px rgba(0,0,0,.2);
+    filter: brightness(.7);
+  }
+
+  52% {
+    transform: rotateY(88deg);
+    filter: brightness(.72);
+  }
+
+  100% {
+    transform: rotateY(0);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+  }
+}
+
+@keyframes editorialTurnPrevious {
+  0% {
+    transform: rotateY(0);
+  }
+
+  48% {
+    transform: rotateY(88deg);
+    box-shadow: 28px 5px 30px rgba(0,0,0,.2);
+    filter: brightness(.7);
+  }
+
+  52% {
+    transform: rotateY(-88deg);
+    filter: brightness(.72);
+  }
+
+  100% {
+    transform: rotateY(0);
+  }
+}
+
+.magazineSpread.editing {
+  grid-template-columns: .9fr 1.1fr;
+  min-height: 555px;
+}
+
+.magazineEditorMedia,
+.magazineEditorCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 30px;
+}
+
+.magazineEditorMedia {
+  border-right: 1px solid #e3e3df;
+  background: #f5f5f3;
+}
+
+.magazineEditorMedia > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.magazineEditorMedia header span,
+.magazineEditorCopy > span {
+  color: #8e2529;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.magazineEditorMedia header strong {
+  color: #777;
+  font-size: 7px;
+}
+
+.magazineEditorThumbnails {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 8px;
+}
+
+.magazineEditorThumbnails figure {
+  position: relative;
+  min-height: 82px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  background: #eee;
+}
+
+.magazineEditorThumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.magazineEditorThumbnails figure button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(145,42,42,.9);
+  cursor: pointer;
+}
+
+.magazineEditorThumbnails .pending {
+  display: grid;
+  place-items: center;
+  padding: 7px;
+  color: #777;
+  font-size: 6px;
+  text-align: center;
+}
+
+.magazineMultiUpload {
+  display: grid;
+  min-height: 130px;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  margin-top: 15px;
+  border: 1px dashed #bbb;
+  color: #555;
+  background: #fff;
+  text-align: center;
+  cursor: pointer;
+}
+
+.magazineMultiUpload strong {
+  font: 500 16px Georgia,serif;
+}
+
+.magazineMultiUpload small {
+  color: #888;
+  font-size: 7px;
+}
+
+.magazineMultiUpload input {
+  display: none;
+}
+
+.magazineMultiUpload > span {
+  padding: 7px 10px;
+  border-radius: 7px;
+  color: #fff;
+  background: #252525;
+  font-size: 7px;
+  font-weight: 850;
+}
+
+.magazineEditorCopy {
+  background: #fff;
+}
+
+.headlineInput {
+  width: 100%;
+  margin: 27px 0 15px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid #d7d7d3;
+  outline: 0;
+  color: #222;
+  background: transparent;
+  font: 500 clamp(25px,3vw,39px)/1 Arial,sans-serif;
+  letter-spacing: -.04em;
+}
+
+.magazineEditorCopy textarea {
+  width: 100%;
+  min-height: 230px;
+  padding: 12px;
+  border: 1px solid #d9d9d5;
+  border-radius: 9px;
+  outline: none;
+  color: #454543;
+  background: #fafaf8;
+  font: 9px/1.7 Arial,sans-serif;
+  resize: vertical;
+}
+
+.magazineEditorCopy > input:not(.headlineInput) {
+  min-height: 39px;
+  margin-top: 10px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d5;
+  border-radius: 8px;
+  font-size: 8px;
+}
+
+.magazineEditorCopy footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.magazineEditorCopy footer button {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #d7d7d3;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 7px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.magazineEditorCopy footer button:last-child {
+  border-color: #222;
+  color: #fff;
+  background: #222;
+}
+
+.magazineEditorCopy footer .delete {
+  color: #994a48;
+  background: #fff4f3;
+}
+
+.magazinePagination {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.magazinePagination > button {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #d5d5d1;
+  border-radius: 8px;
+  color: #444;
+  background: #fff;
+  font-size: 7px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.magazinePagination > button:disabled {
+  opacity: .3;
+}
+
+.magazinePagination > div {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.magazinePagination > div button {
+  width: 27px;
+  height: 27px;
+  border: 0;
+  border-radius: 50%;
+  color: #666;
+  background: transparent;
+  font-size: 7px;
+  cursor: pointer;
+}
+
+.magazinePagination > div button.active {
+  color: #fff;
+  background: #222;
+}
+
+.magazinePagination > span {
+  color: #777;
+  font-size: 7px;
+}
+
+.magazineEmpty {
+  display: grid;
+  min-height: 280px;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  padding: 30px;
+  border: 1px dashed #d3d3ce;
+  background: #fff;
+  text-align: center;
+}
+
+.magazineEmpty i {
+  display: grid;
+  width: 52px;
+  height: 66px;
+  place-items: center;
+  border: 1px solid #bbb;
+  color: #8e2529;
+  font: 20px Georgia,serif;
+}
+
+.magazineEmpty h3 {
+  margin: 5px 0 0;
+  font: 500 20px Georgia,serif;
+}
+
+.magazineEmpty p {
+  margin: 0;
+  color: #777;
+  font-size: 8px;
+}
+
+.magazineEmpty button {
+  min-height: 35px;
+  margin-top: 7px;
+  padding: 0 12px;
+  border: 1px solid #222;
+  border-radius: 8px;
+  color: #fff;
+  background: #222;
+  font-size: 7px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.magazineLoading {
+  min-height: 360px;
+  place-items: center;
+  color: #777;
+}
+
+@media (max-width: 900px) {
+  .magazinePresentation {
+    min-height: 650px;
+    padding: 60px 16px;
+  }
+
+  .magazineBook,
+  .magazineSpread,
+  .magazineEditorialPage {
+    min-height: 500px;
+  }
+
+  .magazineEditorialPage {
+    padding: 22px;
+  }
+
+  .editorialLeftMedia {
+    min-height: 205px;
+  }
+
+  .editorialGallery {
+    min-height: 285px;
+  }
+}
+
+@media (max-width: 720px) {
+  .magazineHeader,
+  .magazineEdition,
+  .magazineToolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .magazinePresentation {
+    display: block;
+    min-height: 0;
+    padding: 20px 0;
+    background: transparent;
+  }
+
+  .magazineArrow,
+  .magazineSpine,
+  .magazinePageEdges {
+    display: none;
+  }
+
+  .magazineSpread,
+  .magazineSpread.editing {
+    grid-template-columns: 1fr;
+  }
+
+  .magazineEditorialPage {
+    min-height: 520px;
+    border: 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .magazineEditorMedia {
+    border-right: 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .magazinePagination {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .magazinePagination > div,
+  .magazinePagination > span {
+    grid-column: 1/-1;
+  }
+
+  .magazineIssueForm > div {
+    grid-template-columns: 1fr;
+  }
+
+  .magazineIssueForm .wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .campusMagazine {
+    padding: 18px 13px;
+    border-radius: 18px;
+  }
+
+  .magazineHeaderActions,
+  .magazineHeaderActions select,
+  .magazineHeaderActions button,
+  .magazineToolbar > div,
+  .magazineToolbar button {
+    width: 100%;
+  }
+
+  .editorialLeftStory,
+  .editorialRightStory {
+    column-count: 1;
+    font-size: 8px;
+  }
+
+  .editorialGallery {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  .magazineEditorThumbnails {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magazineBook.turn-next .magazineRightPage,
+  .magazineBook.turn-previous .magazineLeftPage {
+    animation: none !important;
+  }
+}

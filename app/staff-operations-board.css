@@ -1,0 +1,1118 @@
+.staffOperationsBoard {
+  display: grid;
+  gap: 18px;
+  margin: 0 0 30px;
+  padding: 25px;
+  border: 1px solid rgba(47, 57, 72, .1);
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      145deg,
+      #fffdfa,
+      #f7f3ed
+    );
+  box-shadow:
+    0 18px 55px
+    rgba(56, 45, 34, .07);
+}
+
+.staffOperationsHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.staffOperationsHeader > div:first-child > span,
+.staffOperationsForm header span {
+  display: block;
+  margin-bottom: 7px;
+  color: #8a623d;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .17em;
+}
+
+.staffOperationsHeader h3 {
+  margin: 0;
+  color: #2d251f;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size:
+    clamp(
+      21px,
+      2.3vw,
+      29px
+    );
+  line-height: 1.1;
+}
+
+.staffOperationsHeader p {
+  max-width: 620px;
+  margin: 8px 0 0;
+  color: #7a7067;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.staffOperationsHeaderActions {
+  display: flex;
+  flex: none;
+  gap: 9px;
+}
+
+.staffOperationsHeaderActions button {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.staffOperationsRefresh {
+  border: 1px solid #ddd3c7;
+  color: #685a4d;
+  background: rgba(255, 255, 255, .7);
+}
+
+.staffOperationsCreate {
+  border: 1px solid #273b54;
+  color: #fff;
+  background: #273b54;
+}
+
+.staffOperationsMetrics {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+  gap: 10px;
+}
+
+.staffOperationsMetrics button {
+  display: grid;
+  gap: 6px;
+  min-height: 74px;
+  padding: 13px 15px;
+  border: 1px solid #e5ddd4;
+  border-radius: 13px;
+  color: inherit;
+  background: rgba(255, 255, 255, .65);
+  text-align: left;
+  cursor: pointer;
+}
+
+.staffOperationsMetrics button.active {
+  border-color: #a99279;
+  background: #fff;
+  box-shadow:
+    0 8px 22px
+    rgba(67, 51, 35, .07);
+}
+
+.staffOperationsMetrics button.overdue strong {
+  color: #9b4141;
+}
+
+.staffOperationsMetrics strong {
+  color: #332a23;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.staffOperationsMetrics span {
+  color: #8c8176;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: .1em;
+}
+
+.staffOperationsForm {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid #ddd1c3;
+  border-radius: 17px;
+  background: rgba(255, 255, 255, .78);
+}
+
+.staffOperationsForm > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.staffOperationsForm h4 {
+  margin: 0;
+  color: #342920;
+  font-size: 15px;
+}
+
+.staffOperationsForm header small {
+  color: #988b7e;
+  font-size: 7px;
+}
+
+.staffOperationsFormGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 13px;
+}
+
+.staffOperationsFormGrid label {
+  display: grid;
+  gap: 7px;
+}
+
+.staffOperationsFormGrid label > span {
+  color: #675c51;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.staffOperationsWide {
+  grid-column: 1 / -1;
+}
+
+.staffOperationsFormGrid input,
+.staffOperationsFormGrid select,
+.staffOperationsFormGrid textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #ded5cc;
+  border-radius: 10px;
+  outline: none;
+  color: #352d26;
+  background: #fff;
+  font: inherit;
+  font-size: 9px;
+}
+
+.staffOperationsFormGrid textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.staffOperationsFormGrid input:focus,
+.staffOperationsFormGrid select:focus,
+.staffOperationsFormGrid textarea:focus {
+  border-color: #9e8061;
+  box-shadow:
+    0 0 0 3px
+    rgba(158, 128, 97, .1);
+}
+
+.staffOperationsForm > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 15px;
+  border-top: 1px solid #ebe4dc;
+}
+
+.staffOperationsForm > footer p {
+  margin: 0;
+  color: #91867b;
+  font-size: 8px;
+}
+
+.staffOperationsForm > footer > div {
+  display: flex;
+  gap: 8px;
+}
+
+.staffOperationsForm > footer button {
+  min-height: 37px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.staffOperationsForm > footer button:first-child {
+  border: 1px solid #ded5cb;
+  color: #73675c;
+  background: #fff;
+}
+
+.staffOperationsForm > footer button:last-child {
+  border: 1px solid #273b54;
+  color: #fff;
+  background: #273b54;
+}
+
+.staffOperationsToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.staffOperationsFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.staffOperationsFilters button {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #83776c;
+  background: transparent;
+  font-size: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.staffOperationsFilters button.active {
+  border-color: #d7c9ba;
+  color: #5d4937;
+  background: #fff;
+}
+
+.staffOperationsToolbar > label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 210px;
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid #dfd6cd;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.staffOperationsToolbar > label > span {
+  color: #998b7e;
+}
+
+.staffOperationsToolbar input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #3d342c;
+  background: transparent;
+  font-size: 9px;
+}
+
+.staffOperationsStatus {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #e4d6c6;
+  border-radius: 10px;
+  color: #795f46;
+  background: #fff8ef;
+  font-size: 8px;
+}
+
+.staffOperationsGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 13px;
+}
+
+.staffOperationCard {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 294px;
+  flex-direction: column;
+  padding: 17px;
+  overflow: hidden;
+  border: 1px solid #e2d9d0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .86);
+  box-shadow:
+    0 8px 24px
+    rgba(67, 51, 36, .035);
+  transition:
+    transform 170ms ease,
+    box-shadow 170ms ease,
+    border-color 170ms ease;
+}
+
+.staffOperationCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 17px;
+  width: 38px;
+  height: 2px;
+  border-radius: 999px;
+  background: #8d9aaa;
+}
+
+.staffOperationCard.priority-high::before {
+  background: #bd7a37;
+}
+
+.staffOperationCard.priority-critical::before {
+  background: #ad4343;
+}
+
+.staffOperationCard.overdue {
+  border-color: #e3c3c0;
+}
+
+.staffOperationCard:hover {
+  transform: translateY(-2px);
+  border-color: #cfc0b0;
+  box-shadow:
+    0 14px 32px
+    rgba(67, 51, 36, .07);
+}
+
+.staffOperationCard > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.staffOperationCard > header > span {
+  color: #7e6c5b;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.staffOperationCard > header em {
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #687689;
+  background: #eef1f4;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.staffOperationCard.priority-high > header em {
+  color: #8b5d2d;
+  background: #f9eedf;
+}
+
+.staffOperationCard.priority-critical > header em {
+  color: #914343;
+  background: #faeaea;
+}
+
+.staffOperationCard h4 {
+  margin: 16px 0 8px;
+  color: #332a23;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.staffOperationCard > p {
+  display: -webkit-box;
+  margin: 0 0 15px;
+  overflow: hidden;
+  color: #81766c;
+  font-size: 8px;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.staffOperationOwnership {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.staffOperationOwnership > span {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 9px;
+  border-radius: 9px;
+  background: #f7f4f0;
+}
+
+.staffOperationOwnership small,
+.staffOperationDue small,
+.staffOperationControls label > span {
+  color: #9a8f84;
+  font-size: 6px;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.staffOperationOwnership strong {
+  overflow: hidden;
+  color: #5a4d41;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.staffOperationDue {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  padding: 9px;
+  border: 1px solid #e8e1da;
+  border-radius: 9px;
+}
+
+.staffOperationDue > i {
+  color: #887867;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.staffOperationDue > span {
+  display: grid;
+  gap: 3px;
+}
+
+.staffOperationDue strong {
+  color: #67594c;
+  font-size: 8px;
+}
+
+.staffOperationDue.upcoming {
+  border-color: #e6d1af;
+  background: #fff9ee;
+}
+
+.staffOperationDue.overdue {
+  border-color: #e8c5c1;
+  background: #fff4f3;
+}
+
+.staffOperationDue.overdue small,
+.staffOperationDue.overdue strong {
+  color: #984848;
+}
+
+.staffOperationControls {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.staffOperationControls label {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 5px;
+}
+
+.staffOperationControls select {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid #dfd6cd;
+  border-radius: 8px;
+  color: #5f5246;
+  background: #fff;
+  font-size: 8px;
+}
+
+.staffOperationClaim {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #c8d5e2;
+  border-radius: 8px;
+  color: #355b82;
+  background: #f2f7fb;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.staffOperationCard > footer {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px solid #eee8e2;
+}
+
+.staffOperationCard > footer a,
+.staffOperationCard > footer button {
+  display: inline-flex;
+  min-height: 31px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 7px;
+  font-weight: 850;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.staffOperationCard > footer a {
+  border: 1px solid #d9d0c7;
+  color: #655646;
+  background: #fff;
+}
+
+.staffOperationAi {
+  border: 1px solid #ccd9e6;
+  color: #365f87;
+  background: #f3f7fb;
+}
+
+.staffOperationDelete {
+  width: 31px;
+  margin-left: auto;
+  padding: 0 !important;
+  border: 1px solid #ead8d5;
+  color: #9c5752;
+  background: #fff7f6;
+  font-size: 12px !important;
+}
+
+.staffOperationsEmpty {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 110px;
+  padding: 18px;
+  border: 1px dashed #d9cec3;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, .5);
+}
+
+.staffOperationsEmpty > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  place-items: center;
+  border-radius: 12px;
+  color: #3f7356;
+  background: #eaf5ee;
+  font-weight: 900;
+}
+
+.staffOperationsEmpty strong {
+  color: #51463c;
+  font-size: 10px;
+}
+
+.staffOperationsEmpty p {
+  margin: 5px 0 0;
+  color: #94887d;
+  font-size: 8px;
+}
+
+.staffOperationsLoading {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 13px;
+}
+
+.staffOperationsLoading span {
+  min-height: 240px;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      100deg,
+      #f0ece7 25%,
+      #faf8f5 42%,
+      #f0ece7 58%
+    );
+  background-size:
+    220% 100%;
+  animation:
+    staffOperationsPulse
+    1.4s
+    linear
+    infinite;
+}
+
+@keyframes staffOperationsPulse {
+  to {
+    background-position:
+      -220% 0;
+  }
+}
+
+@media (max-width: 1100px) {
+  .staffOperationsGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+@media (max-width: 760px) {
+  .staffOperationsMetrics {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .staffOperationsToolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .staffOperationsToolbar > label {
+    width: 100%;
+  }
+
+  .staffOperationsFormGrid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .staffOperationsWide {
+    grid-column: auto;
+  }
+
+  .staffOperationsGrid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .staffOperationsLoading {
+    grid-template-columns:
+      1fr;
+  }
+
+  .staffOperationsLoading span:nth-child(n + 2) {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .staffOperationsBoard {
+    padding: 18px 14px;
+    border-radius: 17px;
+  }
+
+  .staffOperationsHeader {
+    flex-direction: column;
+  }
+
+  .staffOperationsHeaderActions {
+    width: 100%;
+  }
+
+  .staffOperationsHeaderActions button {
+    flex: 1;
+  }
+
+  .staffOperationsForm > header,
+  .staffOperationsForm > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .staffOperationsForm > footer > div {
+    width: 100%;
+  }
+
+  .staffOperationsForm > footer button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staffOperationCard {
+    transition: none !important;
+  }
+
+  .staffOperationCard:hover {
+    transform: none;
+  }
+
+  .staffOperationsLoading span {
+    animation: none !important;
+  }
+}
+
+
+/* STAFF TASK ACTIVITY TIMELINE V1 */
+
+.staffOperationTimelineButton {
+  position: relative;
+  gap: 6px;
+  border: 1px solid #ddd4ca;
+  color: #66574a;
+  background: #fff;
+}
+
+.staffOperationTimelineButton > span {
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  padding: 0 4px;
+  border-radius: 999px;
+  color: #6d5b4b;
+  background: #f1ece6;
+  font-size: 6px;
+}
+
+.staffOperationTimelineButton > em {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  min-width: 17px;
+  height: 17px;
+  place-items: center;
+  padding: 0 4px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  color: #fff;
+  background: #a44949;
+  font-size: 6px;
+  font-style: normal;
+}
+
+.staffTaskTimeline {
+  display: grid;
+  gap: 13px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #ded5cc;
+  border-radius: 13px;
+  background: #fbf9f6;
+}
+
+.staffTaskTimeline > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.staffTaskTimeline > header > div {
+  display: grid;
+  gap: 3px;
+}
+
+.staffTaskTimeline > header span {
+  color: #987657;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.staffTaskTimeline > header strong {
+  color: #45382d;
+  font-size: 10px;
+}
+
+.staffTaskTimeline > header > button {
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  border: 1px solid #ddd3c9;
+  border-radius: 8px;
+  color: #786959;
+  background: #fff;
+  cursor: pointer;
+}
+
+.staffTaskTimelineList {
+  display: grid;
+  max-height: 330px;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.staffTaskTimelineList > article {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    26px
+    minmax(0, 1fr);
+  gap: 9px;
+  padding: 9px 0;
+}
+
+.staffTaskTimelineList > article:not(:last-child) {
+  border-bottom: 1px solid #ebe4dd;
+}
+
+.staffTaskTimelineList > article > i {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 8px;
+  color: #526b84;
+  background: #eaf0f5;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.staffTaskTimelineList > article > div {
+  min-width: 0;
+}
+
+.staffTaskTimelineList article header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.staffTaskTimelineList article header strong {
+  color: #514438;
+  font-size: 8px;
+}
+
+.staffTaskTimelineList article header span {
+  color: #9b8d80;
+  font-size: 6px;
+}
+
+.staffTaskTimelineList article p {
+  margin: 5px 0;
+  color: #74685d;
+  font-size: 8px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.staffTaskTimelineList article a {
+  display: inline-flex;
+  margin: 2px 0 5px;
+  color: #376b99;
+  font-size: 7px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.staffTaskTimelineList article small {
+  display: block;
+  color: #a1978e;
+  font-size: 6px;
+}
+
+.staffTaskTimelineLoading,
+.staffTaskTimelineEmpty {
+  margin: 0;
+  padding: 15px;
+  border-radius: 10px;
+  color: #93877c;
+  background: #f4f0eb;
+  font-size: 8px;
+  text-align: center;
+}
+
+.staffTaskCommentForm {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(135px, .55fr)
+    auto;
+  align-items: end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e7dfd7;
+}
+
+.staffTaskCommentForm label {
+  display: grid;
+  gap: 5px;
+}
+
+.staffTaskCommentForm label > span {
+  color: #87786a;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.staffTaskCommentForm textarea,
+.staffTaskCommentForm input {
+  width: 100%;
+  min-height: 37px;
+  padding: 9px;
+  border: 1px solid #ddd3c9;
+  border-radius: 8px;
+  outline: none;
+  color: #4d4238;
+  background: #fff;
+  font: inherit;
+  font-size: 8px;
+}
+
+.staffTaskCommentForm textarea {
+  resize: vertical;
+}
+
+.staffTaskCommentForm button {
+  min-height: 37px;
+  padding: 0 11px;
+  border: 1px solid #293f58;
+  border-radius: 8px;
+  color: #fff;
+  background: #293f58;
+  font-size: 7px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.staffCompletionLayer {
+  position: fixed;
+  z-index: 7000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.staffCompletionBackdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(13, 20, 29, .58);
+  backdrop-filter: blur(7px);
+}
+
+.staffCompletionDialog {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(480px, 100%);
+  gap: 13px;
+  padding: 23px;
+  border: 1px solid rgba(255, 255, 255, .6);
+  border-radius: 19px;
+  background: #fffdf9;
+  box-shadow:
+    0 28px 90px
+    rgba(10, 18, 28, .28);
+}
+
+.staffCompletionDialog > span {
+  color: #9b5550;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.staffCompletionDialog h4 {
+  margin: 0;
+  color: #332820;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 21px;
+}
+
+.staffCompletionDialog p {
+  margin: 0;
+  color: #7f7368;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.staffCompletionDialog textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px;
+  border: 1px solid #ddd2c6;
+  border-radius: 10px;
+  outline: none;
+  color: #443a31;
+  background: #fff;
+  font: inherit;
+  font-size: 9px;
+  resize: vertical;
+}
+
+.staffCompletionDialog textarea:focus {
+  border-color: #a88869;
+  box-shadow:
+    0 0 0 3px
+    rgba(168, 136, 105, .11);
+}
+
+.staffCompletionDialog footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.staffCompletionDialog footer button {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.staffCompletionDialog footer button:first-child {
+  border: 1px solid #ded5cb;
+  color: #776a5e;
+  background: #fff;
+}
+
+.staffCompletionDialog footer button:last-child {
+  border: 1px solid #293f58;
+  color: #fff;
+  background: #293f58;
+}
+
+@media (max-width: 680px) {
+  .staffTaskCommentForm {
+    grid-template-columns:
+      1fr;
+  }
+
+  .staffTaskCommentForm button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staffCompletionBackdrop {
+    backdrop-filter: none;
+  }
+}

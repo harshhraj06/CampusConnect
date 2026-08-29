@@ -1,0 +1,438 @@
+.unifiedNotificationCenter {
+  position: absolute;
+  z-index: 5200;
+  top: calc(100% + 13px);
+  right: 0;
+  display: grid;
+  width: min(520px, calc(100vw - 28px));
+  max-height: min(720px, calc(100vh - 95px));
+  overflow: hidden;
+  border: 1px solid rgba(43, 55, 70, .13);
+  border-radius: 20px;
+  color: #24334a;
+  background:
+    radial-gradient(
+      circle at 100% 0,
+      rgba(55, 103, 165, .09),
+      transparent 25%
+    ),
+    #fffdf9;
+  box-shadow:
+    0 28px 90px
+    rgba(18, 29, 43, .22);
+}
+
+.unifiedNotificationHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 20px 15px;
+  border-bottom: 1px solid #e9e4de;
+}
+
+.unifiedNotificationHeader > div > span {
+  display: block;
+  margin-bottom: 6px;
+  color: #4778aa;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.unifiedNotificationHeader h3 {
+  margin: 0;
+  color: #1d2d43;
+  font-size: 20px;
+  line-height: 1.1;
+  letter-spacing: -.025em;
+}
+
+.unifiedNotificationHeader p {
+  margin: 6px 0 0;
+  color: #89929f;
+  font-size: 8px;
+}
+
+.unifiedNotificationHeader > button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #e1ddd7;
+  border-radius: 10px;
+  color: #7a818a;
+  background: rgba(255, 255, 255, .8);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.unifiedNotificationFilters {
+  display: flex;
+  gap: 6px;
+  padding: 11px 14px;
+  overflow-x: auto;
+  border-bottom: 1px solid #ece7e1;
+  scrollbar-width: none;
+}
+
+.unifiedNotificationFilters::-webkit-scrollbar {
+  display: none;
+}
+
+.unifiedNotificationFilters button {
+  display: inline-flex;
+  min-height: 30px;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #7b828c;
+  background: transparent;
+  font-size: 7px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.unifiedNotificationFilters button.active {
+  border-color: #cfd9e5;
+  color: #315c88;
+  background: #f0f5fa;
+}
+
+.unifiedNotificationFilters button span {
+  display: grid;
+  min-width: 17px;
+  height: 17px;
+  place-items: center;
+  padding: 0 4px;
+  border-radius: 999px;
+  color: inherit;
+  background: rgba(54, 91, 130, .09);
+  font-size: 6px;
+}
+
+.unifiedNotificationStatus {
+  margin: 10px 14px 0;
+  padding: 9px 10px;
+  border: 1px solid #ead8ca;
+  border-radius: 9px;
+  color: #805f48;
+  background: #fff6ed;
+  font-size: 7px;
+}
+
+.unifiedNotificationList {
+  min-height: 180px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.unifiedNotificationItem {
+  border-bottom: 1px solid #eee9e3;
+  background: rgba(255, 255, 255, .7);
+}
+
+.unifiedNotificationItem.unread {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(235, 243, 251, .92),
+      rgba(255, 255, 255, .88)
+    );
+}
+
+.unifiedNotificationItem.priority-critical {
+  box-shadow:
+    inset 3px 0 0
+    #a84646;
+}
+
+.unifiedNotificationItem.priority-high {
+  box-shadow:
+    inset 3px 0 0
+    #b67c36;
+}
+
+.unifiedNotificationMain {
+  display: grid;
+  grid-template-columns:
+    38px
+    minmax(0, 1fr)
+    16px;
+  align-items: flex-start;
+  gap: 11px;
+  width: 100%;
+  padding: 14px 15px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 150ms ease;
+}
+
+.unifiedNotificationMain:hover {
+  background: rgba(255, 255, 255, .72);
+}
+
+.unifiedNotificationMain > i {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 11px;
+  color: #315f8d;
+  background: #e8f0f8;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.unifiedNotificationMain > span {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.unifiedNotificationMeta {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.unifiedNotificationMeta b {
+  overflow: hidden;
+  color: #65758a;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unifiedNotificationMeta small {
+  flex: none;
+  color: #9ba3ad;
+  font-size: 6px;
+}
+
+.unifiedNotificationMain > span > strong {
+  overflow: hidden;
+  color: #25364d;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unifiedNotificationMain p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #7c8795;
+  font-size: 7px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.unifiedNotificationMain > strong {
+  align-self: center;
+  color: #a1a8b0;
+  font-size: 11px;
+}
+
+.unifiedNotificationBadges {
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.unifiedNotificationBadges em {
+  padding: 4px 6px;
+  border-radius: 999px;
+  color: #617187;
+  background: #edf1f5;
+  font-size: 6px;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.unifiedNotificationBadges em.priority {
+  color: #8a5e2f;
+  background: #faedda;
+}
+
+.unifiedNotificationBadges em.acknowledgement {
+  color: #984848;
+  background: #fbeaea;
+}
+
+.unifiedNotificationBadges em.acknowledged {
+  color: #3f7556;
+  background: #e8f4ec;
+}
+
+.unifiedNotificationItem > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  padding: 0 15px 11px 64px;
+}
+
+.unifiedNotificationItem > footer a,
+.unifiedNotificationItem > footer button {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border: 1px solid #d7dfe8;
+  border-radius: 8px;
+  color: #39658f;
+  background: #f5f8fb;
+  font-size: 6px;
+  font-weight: 850;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.unifiedNotificationLoading {
+  display: grid;
+  gap: 8px;
+  padding: 13px;
+}
+
+.unifiedNotificationLoading span {
+  min-height: 76px;
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      100deg,
+      #f0eeeb 25%,
+      #faf9f7 43%,
+      #f0eeeb 60%
+    );
+  background-size: 220% 100%;
+  animation:
+    unifiedNotificationLoading
+    1.35s linear infinite;
+}
+
+@keyframes unifiedNotificationLoading {
+  to {
+    background-position:
+      -220% 0;
+  }
+}
+
+.unifiedNotificationEmpty {
+  display: grid;
+  min-height: 230px;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  padding: 24px;
+  text-align: center;
+}
+
+.unifiedNotificationEmpty i {
+  display: grid;
+  width: 45px;
+  height: 45px;
+  place-items: center;
+  border-radius: 14px;
+  color: #3e7858;
+  background: #e8f5ed;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.unifiedNotificationEmpty strong {
+  color: #37465a;
+  font-size: 10px;
+}
+
+.unifiedNotificationEmpty p {
+  margin: 0;
+  color: #939ba5;
+  font-size: 7px;
+}
+
+.unifiedNotificationFooter {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 15px;
+  border-top: 1px solid #e8e3dd;
+  background: #faf8f5;
+}
+
+.unifiedNotificationFooter > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #728278;
+  font-size: 7px;
+}
+
+.unifiedNotificationFooter > span i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #49b978;
+}
+
+.unifiedNotificationFooter button {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid #d7dfe7;
+  border-radius: 8px;
+  color: #3e6285;
+  background: #fff;
+  font-size: 7px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.unifiedNotificationFooter button:disabled {
+  cursor: default;
+  opacity: .48;
+}
+
+@media (max-width: 620px) {
+  .unifiedNotificationCenter {
+    position: fixed;
+    top: 72px;
+    right: 10px;
+    bottom: 82px;
+    left: 10px;
+    width: auto;
+    max-height: none;
+    border-radius: 18px;
+  }
+
+  .unifiedNotificationList {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unifiedNotificationMain {
+    transition: none !important;
+  }
+
+  .unifiedNotificationLoading span {
+    animation: none !important;
+  }
+}

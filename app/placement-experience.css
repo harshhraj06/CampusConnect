@@ -1,0 +1,314 @@
+.placementExperience{display:grid;grid-template-columns:minmax(0,1fr) 286px;gap:18px;align-items:start;animation:placementRise .3s ease both}
+.placementMain{min-width:0}
+.placementToolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:13px}
+.placementFilters{display:flex;gap:6px;padding:3px;border:1px solid #e2e7ef;border-radius:10px;background:#fff;box-shadow:0 5px 16px #1d2c4608}
+.placementFilters button{min-height:31px;border:0;border-radius:7px;background:transparent;color:#69768a;padding:0 11px;font-size:9px;font-weight:800;transition:.18s}
+.placementFilters button:hover{color:#3159d9;background:#f4f7ff}
+.placementFilters button.selected{background:#1d2b46;color:#fff;box-shadow:0 5px 12px #1d2b4628}
+.placementSearch{display:flex;align-items:center;gap:7px;width:min(285px,42%);height:38px;border:1px solid #dfe5ee;border-radius:10px;background:#fff;padding:0 10px;color:#8792a3;box-shadow:0 5px 16px #1d2c4608;transition:.18s}
+.placementSearch:focus-within{border-color:#3159d9;box-shadow:0 0 0 3px #3159d912}
+.placementSearch>span{font-size:17px;line-height:1;transform:rotate(-12deg)}
+.placementSearch input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#26344a;font-size:9px}
+.placementSearch input::placeholder{color:#99a3b2}
+.placementSearch button{display:grid;place-items:center;width:20px;height:20px;border:0;border-radius:50%;background:#eef1f6;color:#6e7b8f;font-size:13px}
+.placementResultMeta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 1px 12px}
+.placementResultMeta p{margin:0}
+.placementResultMeta p b,.placementResultMeta p span{display:block}
+.placementResultMeta p b{color:#2b394f;font-size:10px}
+.placementResultMeta p span{margin-top:3px;color:#8994a4;font-size:8px}
+.placementResultMeta>span{color:#8d97a7;font-size:8px}
+.placementCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.placementCard{position:relative;min-width:0;border:1px solid #e2e7ee;border-radius:14px;background:#fff;padding:17px;box-shadow:0 9px 25px #16233a0b;overflow:hidden;transition:.22s}
+.placementCard:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:#3159d9;opacity:0;transition:.22s}
+.placementCard:hover{border-color:#cfd9ec;transform:translateY(-3px);box-shadow:0 16px 34px #16233a14}
+.placementCard:hover:before{opacity:1}
+.placementCardTop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.placementCompanyLogo{display:grid;place-items:center;flex:none;width:39px;height:39px;border:1px solid #dce3ef;border-radius:11px;background:linear-gradient(145deg,#fff,#f1f5fc);color:#2548b7;font-style:normal;font-size:10px;font-weight:900;letter-spacing:-.03em;box-shadow:0 6px 14px #1b29400b}
+.placementCardBadges{display:flex;align-items:center;gap:7px}
+.placementCardBadges mark{border-radius:999px;background:#e9f8f2;color:#167553;padding:5px 8px;font-size:7px;font-weight:850}
+.placementCardBadges button{display:grid;place-items:center;width:29px;height:29px;border:1px solid #dfe5ed;border-radius:8px;background:#fff;color:#8b96a6;font-size:17px;line-height:1;transition:.18s}
+.placementCardBadges button:hover,.placementCardBadges button.saved{border-color:#f1c466;background:#fff9e8;color:#c8890a}
+.placementCardTitle{margin-top:14px}
+.placementCardTitle>span{color:#8591a2;font-size:7px}
+.placementCardTitle h3{min-height:32px;margin:5px 0 3px;color:#202e45;font-size:13px;line-height:1.3;letter-spacing:-.01em}
+.placementCardTitle p{margin:0;color:#657287;font-size:9px;font-weight:750}
+.placementTags,.placementSkills{display:flex;flex-wrap:wrap;gap:5px}
+.placementTags{margin-top:12px}
+.placementTags span{border:1px solid #e1e6ee;border-radius:999px;background:#f8f9fc;color:#677489;padding:4px 7px;font-size:7px;font-weight:700}
+.placementDetails{display:grid;grid-template-columns:1.1fr .9fr;gap:8px;margin-top:13px}
+.placementDetails p{margin:0;border-radius:8px;background:#f6f8fc;padding:9px 10px}
+.placementDetails span,.placementDetails b{display:block}
+.placementDetails span{color:#8a95a5;font-size:7px;text-transform:uppercase;letter-spacing:.05em}
+.placementDetails b{margin-top:4px;color:#2c394d;font-size:9px}
+.placementEligibility{margin:11px 0 0;color:#778396;font-size:8px;line-height:1.45}
+.placementEligibility b{color:#4a586d}
+.placementSkills{min-height:22px;margin-top:9px}
+.placementSkills span{border-radius:5px;background:#edf2ff;color:#3159d9;padding:4px 6px;font-size:7px;font-weight:750}
+.placementActions{display:grid;grid-template-columns:1fr 1.08fr;gap:7px;margin-top:14px;padding-top:13px;border-top:1px solid #ebeff4}
+.placementActions button{min-height:34px;border-radius:8px;font-size:8px;font-weight:850;transition:.18s}
+.placementSecondary{border:1px solid #d8e0eb;background:#fff;color:#425068}
+.placementSecondary:hover{border-color:#3159d9;color:#3159d9;background:#f6f8ff}
+.placementPrimary{border:1px solid #3159d9;background:#3159d9;color:#fff;box-shadow:0 8px 18px #3159d921}
+.placementPrimary:hover{background:#2449bd;transform:translateY(-1px)}
+.placementPrimary:disabled{border-color:#cde4d9;background:#eaf8f2;color:#157553;box-shadow:none;cursor:default;transform:none}
+.placementEmpty{min-height:330px;display:grid;place-content:center;justify-items:center;border:1px dashed #ced7e5;border-radius:14px;background:#fff;text-align:center;padding:30px}
+.placementEmpty i{display:grid;place-items:center;width:45px;height:45px;border-radius:50%;background:#edf2ff;color:#3159d9;font-style:normal;font-size:21px}
+.placementEmpty h3{margin:14px 0 5px;font-size:13px}
+.placementEmpty p{margin:0;color:#7c8798;font-size:9px}
+.placementEmpty button{margin-top:17px;border:0;border-radius:8px;background:#3159d9;color:#fff;padding:9px 12px;font-size:8px;font-weight:850}
+.placementJourney{position:sticky;top:78px;border:1px solid #dfe5ee;border-radius:14px;background:#fff;padding:19px;box-shadow:0 10px 27px #17243b0d;overflow:hidden}
+.placementJourney:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,#3159d9,#7191f2)}
+.journeyHeader{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.journeyHeader>span{color:#3159d9;font-size:7px;font-weight:900;letter-spacing:.14em}
+.journeyHeader>b{color:#23324a;font-size:29px;line-height:1}
+.journeyHeader b small{color:#8b95a5;font-size:9px}
+.journeyProgress{height:6px;margin-top:11px;border-radius:999px;background:#e9edf4;overflow:hidden}
+.journeyProgress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#3159d9,#6385ed);transition:width .45s ease}
+.placementJourney>p{margin:12px 0 15px;color:#6d7a8e;font-size:8px;line-height:1.6}
+.journeyStats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:12px 0;border-top:1px solid #edf0f5;border-bottom:1px solid #edf0f5;text-align:center}
+.journeyStats span:not(:last-child){border-right:1px solid #edf0f5}
+.journeyStats b,.journeyStats small{display:block}
+.journeyStats b{color:#26354d;font-size:15px}
+.journeyStats small{margin-top:3px;color:#8a95a5;font-size:6px;text-transform:uppercase}
+.journeyChecklist{display:grid;gap:12px;margin:16px 0}
+.journeyChecklist>span{display:flex;align-items:center;gap:9px;color:#778397}
+.journeyChecklist>span>i{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1px solid #d9e0ea;border-radius:50%;background:#f8f9fb;color:#8e98a7;font-style:normal;font-size:8px;font-weight:850}
+.journeyChecklist>span.done>i{border-color:#bfe7d7;background:#eaf8f2;color:#167553}
+.journeyChecklist b,.journeyChecklist small{display:block}
+.journeyChecklist b{color:#3d4a5f;font-size:8px}
+.journeyChecklist small{margin-top:3px;color:#929cab;font-size:7px;font-weight:500}
+.journeyPractice,.journeyApplications{width:100%;min-height:38px;display:flex;align-items:center;justify-content:space-between;border-radius:8px;padding:0 11px;font-size:8px;font-weight:850}
+.journeyPractice{border:0;background:#3159d9;color:#fff;box-shadow:0 9px 20px #3159d927}
+.journeyPractice:hover{background:#2449bd}
+.journeyApplications{margin-top:7px;border:1px solid #dce3ed;background:#fff;color:#40506a}
+.journeyApplications:hover{border-color:#3159d9;color:#3159d9;background:#f6f8ff}
+.journeyPrivacy{display:block;margin-top:11px;color:#9aa3b1;font-size:6px;text-align:center}
+
+.placementOverlay,.assessmentOverlay{position:fixed;inset:0;z-index:210;background:#101a2d75;backdrop-filter:blur(3px);animation:placementFade .18s ease both}
+.jobDrawer{position:absolute;inset:0 0 0 auto;width:min(560px,92vw);display:flex;flex-direction:column;background:#fff;box-shadow:-24px 0 70px #101a2d38;animation:drawerIn .26s ease both}
+.jobDrawerHead{display:grid;grid-template-columns:44px minmax(0,1fr) 34px;gap:12px;align-items:start;padding:22px;border-bottom:1px solid #e7ebf1}
+.jobDrawerHead .placementCompanyLogo{width:44px;height:44px}
+.jobDrawerHead>div{min-width:0}
+.jobDrawerHead span{color:#3159d9;font-size:7px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.jobDrawerHead h2{margin:5px 0 3px;color:#1e2c43;font-size:19px;line-height:1.25}
+.jobDrawerHead p{margin:0;color:#758195;font-size:9px}
+.jobDrawerHead>button,.aptitudeModal>header>button{display:grid;place-items:center;width:32px;height:32px;border:1px solid #e0e5ed;border-radius:9px;background:#f8f9fb;color:#69768a;font-size:19px;line-height:1}
+.jobDrawerBody{flex:1;overflow:auto;padding:21px 23px;overscroll-behavior:contain}
+.jobDrawerHighlights{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.jobDrawerHighlights p{margin:0;border:1px solid #e2e7ef;border-radius:9px;background:#fafbfc;padding:11px}
+.jobDrawerHighlights span,.jobDrawerHighlights b{display:block}
+.jobDrawerHighlights span{color:#8994a5;font-size:7px;text-transform:uppercase;letter-spacing:.05em}
+.jobDrawerHighlights b{margin-top:5px;color:#26344a;font-size:9px}
+.jobMatchBanner{display:flex;align-items:center;gap:11px;margin-top:13px;border-radius:9px;background:#eaf8f2;padding:12px}
+.jobMatchBanner b{flex:none;border-radius:999px;background:#fff;color:#167553;padding:6px 8px;font-size:8px}
+.jobMatchBanner span{color:#3d725f;font-size:8px;line-height:1.45}
+.jobDrawerBody>section{padding-top:20px}
+.jobDrawerBody>section h3{margin:0 0 8px;color:#26344a;font-size:11px}
+.jobDrawerBody>section>p{margin:0;color:#667489;font-size:9px;line-height:1.75}
+.jobDrawerSkills{display:flex;flex-wrap:wrap;gap:7px}
+.jobDrawerSkills span{border:1px solid #dce5f5;border-radius:7px;background:#f3f6ff;color:#3159d9;padding:7px 9px;font-size:8px;font-weight:750}
+.jobRounds{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.jobRounds li{position:relative;display:flex;gap:10px;padding-bottom:13px}
+.jobRounds li:not(:last-child):before{content:"";position:absolute;top:23px;bottom:0;left:11px;width:1px;background:#dce3ed}
+.jobRounds li>i{position:relative;z-index:1;display:grid;place-items:center;flex:none;width:23px;height:23px;border-radius:50%;background:#edf2ff;color:#3159d9;font-style:normal;font-size:7px;font-weight:900}
+.jobRounds b,.jobRounds small{display:block}
+.jobRounds b{color:#354258;font-size:8px}
+.jobRounds small{margin-top:4px;color:#8a95a5;font-size:7px}
+.jobEligibilityBox{display:flex;align-items:center;gap:11px;margin-top:5px;border:1px solid #cce9dc;border-radius:10px;background:#f0faf6;padding:13px}
+.jobEligibilityBox>span{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#16805a;color:#fff;font-size:10px}
+.jobEligibilityBox p{margin:0}
+.jobEligibilityBox b,.jobEligibilityBox small{display:block}
+.jobEligibilityBox b{color:#205b47;font-size:9px}
+.jobEligibilityBox small{margin-top:4px;color:#57806f;font-size:7px;line-height:1.45}
+.jobDrawerFooter{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px;padding:15px 22px;border-top:1px solid #e5eaf1;background:#fff}
+.jobDrawerFooter button{min-height:42px;border-radius:8px;font-size:9px;font-weight:850}
+.jobDrawerFooter button:first-child{border:1px solid #dce3ed;background:#fff;color:#59677c}
+.jobDrawerFooter button:first-child.saved{border-color:#f0ca77;background:#fff9e8;color:#bd7e00}
+.jobDrawerFooter button:last-child{border:0;background:#3159d9;color:#fff;box-shadow:0 9px 20px #3159d927}
+.jobDrawerFooter button:last-child:disabled{background:#eaf8f2;color:#167553;box-shadow:none;cursor:default}
+
+.assessmentOverlay{display:grid;place-items:center;padding:22px;overflow:auto}
+.aptitudeModal{width:min(760px,100%);max-height:min(760px,calc(100vh - 44px));overflow:auto;border-radius:16px;background:#fff;box-shadow:0 28px 90px #101a2d52;animation:modalIn .24s ease both}
+.aptitudeModal>header{display:flex;align-items:center;justify-content:space-between;padding:19px 22px;border-bottom:1px solid #e6eaf1}
+.aptitudeModal>header span{color:#3159d9;font-size:7px;font-weight:900;letter-spacing:.14em}
+.aptitudeModal>header h2{margin:4px 0 0;color:#202e45;font-size:18px}
+.assessmentMeta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 24px 9px}
+.assessmentMeta p,.assessmentMeta span{margin:0;color:#7b8798;font-size:8px}
+.assessmentMeta p{color:#3159d9;font-weight:850}
+.assessmentProgress{height:5px;margin:0 24px;border-radius:999px;background:#e9edf4;overflow:hidden}
+.assessmentProgress i{display:block;height:100%;border-radius:inherit;background:#3159d9;transition:width .25s ease}
+.assessmentQuestion{padding:25px 38px 22px}
+.assessmentQuestion>span{color:#8792a3;font-size:7px;font-weight:850;letter-spacing:.1em}
+.assessmentQuestion h3{min-height:48px;margin:9px 0 18px;color:#202e45;font-size:17px;line-height:1.45}
+.assessmentOptions{display:grid;gap:9px}
+.assessmentOptions button{display:grid;grid-template-columns:31px minmax(0,1fr) 20px;gap:10px;align-items:center;min-height:48px;border:1px solid #dfe5ee;border-radius:10px;background:#fff;color:#425067;padding:8px 12px;text-align:left;font-size:10px;transition:.18s}
+.assessmentOptions button:hover{border-color:#aebee0;background:#f8faff}
+.assessmentOptions button.selected{border-color:#3159d9;background:#f1f5ff;color:#2549b9;box-shadow:0 0 0 2px #3159d90d}
+.assessmentOptions button i{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;background:#f0f2f6;color:#647187;font-style:normal;font-size:8px;font-weight:850}
+.assessmentOptions button.selected i{background:#3159d9;color:#fff}
+.assessmentOptions button b{text-align:right;color:#3159d9}
+.assessmentFooter{display:grid;grid-template-columns:100px 1fr 100px;gap:10px;align-items:center;padding:14px 22px;border-top:1px solid #e7ebf1;background:#fbfcfe}
+.assessmentFooter>button{height:35px;border:1px solid #dce2eb;border-radius:8px;background:#fff;color:#4d5b70;font-size:8px;font-weight:850}
+.assessmentFooter>button:last-child{border-color:#3159d9;background:#3159d9;color:#fff}
+.assessmentFooter>button:disabled{opacity:.42;cursor:not-allowed}
+.assessmentFooter>span{display:flex;justify-content:center;gap:5px}
+.assessmentFooter>span button{display:grid;place-items:center;width:24px;height:24px;border:1px solid #dfe4ec;border-radius:50%;background:#fff;color:#8993a3;font-size:7px}
+.assessmentFooter>span button.answered{border-color:#b8c8eb;color:#3159d9}
+.assessmentFooter>span button.active{border-color:#3159d9;background:#3159d9;color:#fff}
+.assessmentHint{margin:0;padding:0 22px 13px;background:#fbfcfe;color:#a26a1a;font-size:7px;text-align:right}
+.assessmentResult{padding:22px}
+.resultScore{display:grid;justify-items:center;border-radius:13px;background:#eef3ff;padding:22px;color:#3159d9;text-align:center}
+.resultScore.excellent{background:#eaf8f2;color:#167553}
+.resultScore.practice{background:#fff5e7;color:#ac6a0d}
+.resultScore>span{font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.resultScore>b{margin-top:7px;font-size:48px;line-height:1}
+.resultScore b small{font-size:13px;opacity:.65}
+.resultScore p{max-width:420px;margin:9px 0 0;font-size:9px;line-height:1.55}
+.resultBreakdown{margin-top:18px}
+.resultBreakdown h3{margin:0 0 8px;color:#2a384e;font-size:11px}
+.resultBreakdown>div{display:flex;gap:10px;padding:10px 4px;border-bottom:1px solid #edf0f4}
+.resultBreakdown>div>i{display:grid;place-items:center;flex:none;width:22px;height:22px;border-radius:50%;background:#eaf8f2;color:#167553;font-style:normal;font-size:8px;font-weight:900}
+.resultBreakdown>div.incorrect>i{background:#fff1e9;color:#c2602d}
+.resultBreakdown p{margin:0}
+.resultBreakdown b,.resultBreakdown small{display:block}
+.resultBreakdown b{color:#3c495e;font-size:8px}
+.resultBreakdown small{margin-top:4px;color:#7d8999;font-size:7px;line-height:1.5}
+.resultActions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.resultActions button{min-height:37px;border-radius:8px;padding:0 13px;font-size:8px;font-weight:850}
+.resultActions button:first-child{border:1px solid #dce2eb;background:#fff;color:#536176}
+.resultActions button:last-child{border:0;background:#3159d9;color:#fff}
+.previousScore{display:block;margin-top:10px;color:#8c96a5;font-size:7px;text-align:right}
+@keyframes placementRise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes placementFade{from{opacity:0}to{opacity:1}}
+@keyframes drawerIn{from{transform:translateX(40px);opacity:.5}to{transform:translateX(0);opacity:1}}
+@keyframes modalIn{from{transform:translateY(12px) scale(.985);opacity:.5}to{transform:translateY(0) scale(1);opacity:1}}
+@media(max-width:1080px){.placementExperience{grid-template-columns:minmax(0,1fr) 260px}.placementCards{grid-template-columns:1fr}}
+@media(max-width:880px){.placementExperience{grid-template-columns:1fr}.placementJourney{position:relative;top:auto;grid-row:1}.journeyStats{max-width:430px}.journeyChecklist{grid-template-columns:1fr 1fr}.journeyPractice,.journeyApplications{max-width:360px}}
+@media(max-width:620px){.placementToolbar{align-items:stretch;flex-direction:column}.placementFilters{display:grid;grid-template-columns:repeat(3,1fr)}.placementSearch{width:100%}.placementResultMeta p span{display:none}.placementCards{grid-template-columns:1fr}.placementJourney{padding:17px}.journeyChecklist{grid-template-columns:1fr}.jobDrawer{width:100%}.jobDrawerHead{padding:17px}.jobDrawerBody{padding:17px}.jobDrawerHighlights{grid-template-columns:1fr}.jobMatchBanner{align-items:flex-start;flex-direction:column}.jobDrawerFooter{padding:12px 16px}.assessmentOverlay{padding:0;align-items:end}.aptitudeModal{width:100%;max-height:94vh;border-radius:16px 16px 0 0}.assessmentQuestion{padding:21px 18px}.assessmentQuestion h3{font-size:15px}.assessmentMeta{padding-right:18px;padding-left:18px}.assessmentProgress{margin-right:18px;margin-left:18px}.assessmentFooter{grid-template-columns:78px 1fr 78px;padding:12px}.assessmentFooter>span{gap:3px}.assessmentFooter>span button{width:21px;height:21px}.assessmentResult{padding:17px}}
+@media(max-width:390px){.placementFilters button{padding:0 5px;font-size:8px}.placementCard{padding:15px}.placementDetails{grid-template-columns:1fr}.placementActions{grid-template-columns:1fr}.jobDrawerFooter{grid-template-columns:1fr}.assessmentFooter{grid-template-columns:1fr 1fr}.assessmentFooter>span{grid-column:1/-1;grid-row:1}.assessmentFooter>button:nth-child(1){grid-column:1}.assessmentFooter>button:last-child{grid-column:2}.resultActions{display:grid;grid-template-columns:1fr 1fr}}
+
+/* Phase 5: Contextual career intelligence */
+.placementCareerAiActions {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.8fr) minmax(420px, 1.7fr);
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 14px;
+  padding: 17px;
+  border: 1px solid #dce3e0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8faf9, #f3f6f5);
+  box-shadow: 0 8px 24px rgba(42,65,57,0.04);
+}
+
+.placementCareerAiActions > div > span {
+  color: #71877f;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.placementCareerAiActions > div h3 {
+  margin: 6px 0 5px;
+  color: #293f38;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.placementCareerAiActions > div p {
+  margin: 0;
+  color: #7d8985;
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.placementCareerAiActions nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.placementCareerAiActions nav > button {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 31px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid #dfe5e2;
+  border-radius: 11px;
+  color: #415c53;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.placementCareerAiActions nav > button:hover {
+  border-color: #aebfb8;
+  background: #fbfdfc;
+  transform: translateY(-1px);
+}
+
+.placementCareerAiActions nav > button > i {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: #48675e;
+  background: #eaf0ed;
+  font-style: normal;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.placementCareerAiActions nav span,
+.placementCareerAiActions nav b,
+.placementCareerAiActions nav small {
+  min-width: 0;
+  display: block;
+}
+
+.placementCareerAiActions nav b {
+  overflow: hidden;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placementCareerAiActions nav small {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #8b9692;
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placementCareerAiActions nav strong {
+  color: #84938e;
+  font-size: 11px;
+}
+
+@media (max-width: 1180px) {
+  .placementCareerAiActions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .placementCareerAiActions nav {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placementCareerAiActions nav > button {
+    transition: none !important;
+  }
+
+  .placementCareerAiActions nav > button:hover {
+    transform: none;
+  }
+}
+

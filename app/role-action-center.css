@@ -1,0 +1,602 @@
+.roleActionCenter {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  margin: 0 0 28px;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(39, 55, 80, .1);
+  border-radius: 22px;
+  background:
+    radial-gradient(
+      circle at 95% 0,
+      rgba(65, 112, 184, .09),
+      transparent 28%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, .98),
+      rgba(246, 249, 253, .96)
+    );
+  box-shadow:
+    0 20px 55px
+    rgba(26, 43, 70, .075);
+}
+
+.roleActionCenter::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 24px;
+  width: 62px;
+  height: 3px;
+  border-radius: 0 0 999px 999px;
+  background:
+    linear-gradient(
+      90deg,
+      #264f82,
+      #77a9e4
+    );
+}
+
+.roleActionCenterHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.roleActionCenterHeader > div:first-child {
+  min-width: 0;
+}
+
+.roleActionCenterHeader > div:first-child > span {
+  display: block;
+  margin-bottom: 7px;
+  color: #35689d;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.roleActionCenterHeader h3 {
+  margin: 0;
+  color: #17263d;
+  font-size: clamp(20px, 2.2vw, 29px);
+  font-weight: 720;
+  line-height: 1.1;
+  letter-spacing: -.035em;
+}
+
+.roleActionCenterHeader p {
+  max-width: 620px;
+  margin: 8px 0 0;
+  color: #748196;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.roleActionCenterHeaderActions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.roleActionCenterDate {
+  color: #7d899a;
+  font-size: 8px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.roleActionCenterHeaderActions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  color: #334d6c;
+  background: rgba(255, 255, 255, .84);
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.roleActionCenterHeaderActions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #b9c9dc;
+  background: #fff;
+}
+
+.roleActionCenterHeaderActions button:disabled {
+  cursor: wait;
+  opacity: .6;
+}
+
+.roleActionCenterHeaderActions button i {
+  font-size: 13px;
+  font-style: normal;
+}
+
+.roleActionCenterSummary {
+  display: grid;
+  grid-template-columns:
+    max-content
+    max-content
+    minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+  min-height: 58px;
+  padding: 11px 15px;
+  border: 1px solid #e5eaf1;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .72);
+}
+
+.roleActionCenterSummary > div {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.roleActionCenterSummary strong {
+  color: #203551;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.roleActionCenterSummary span {
+  color: #8792a2;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: .11em;
+}
+
+.roleActionCenterSummary > p {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0;
+  color: #8390a1;
+  font-size: 8px;
+}
+
+.roleActionCenterSummary > p i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #43b979;
+  box-shadow:
+    0 0 0 5px
+    rgba(67, 185, 121, .09);
+}
+
+.roleActionGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 13px;
+}
+
+.roleActionCard {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 220px;
+  flex-direction: column;
+  padding: 17px;
+  overflow: hidden;
+  border: 1px solid #e3e8ef;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .9);
+  box-shadow:
+    0 9px 26px
+    rgba(28, 46, 74, .04);
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease;
+}
+
+.roleActionCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 17px;
+  width: 35px;
+  height: 2px;
+  border-radius: 999px;
+  background: #7c9dc2;
+}
+
+.roleActionCard.urgent::before {
+  background: #b04e4e;
+}
+
+.roleActionCard.attention::before {
+  background: #b98538;
+}
+
+.roleActionCard.information::before {
+  background: #467aa9;
+}
+
+.roleActionCard:hover {
+  transform: translateY(-2px);
+  border-color: #cfdae7;
+  box-shadow:
+    0 15px 34px
+    rgba(28, 46, 74, .075);
+}
+
+.roleActionCard.read {
+  background: rgba(251, 252, 254, .85);
+}
+
+.roleActionCard > header {
+  display: grid;
+  grid-template-columns:
+    34px
+    minmax(0, 1fr)
+    auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.roleActionIcon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  color: #315f8d;
+  background: #edf4fb;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.roleActionCard.urgent .roleActionIcon {
+  color: #914141;
+  background: #fbeeee;
+}
+
+.roleActionCard.attention .roleActionIcon {
+  color: #936827;
+  background: #fbf3e6;
+}
+
+.roleActionCard > header > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.roleActionCard > header > div > span {
+  overflow: hidden;
+  color: #586b83;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.roleActionCard > header small {
+  color: #9aa3af;
+  font-size: 7px;
+}
+
+.roleActionCard > header em {
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #46719c;
+  background: #edf4fa;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.roleActionCard.urgent > header em {
+  color: #934646;
+  background: #fbecec;
+}
+
+.roleActionCard.attention > header em {
+  color: #8e6428;
+  background: #fcf1df;
+}
+
+.roleActionCard h4 {
+  margin: 17px 0 8px;
+  color: #1e3049;
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -.02em;
+}
+
+.roleActionCard > p {
+  margin: 0 0 18px;
+  color: #7b8798;
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.roleActionCard > footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: auto;
+}
+
+.roleActionCard > footer button {
+  min-height: 34px;
+  border-radius: 9px;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.roleActionOpen {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid #233f63;
+  color: #fff;
+  background: #233f63;
+}
+
+.roleActionOpen span {
+  font-size: 11px;
+}
+
+.roleActionAi {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 11px;
+  border: 1px solid #d5dfeb;
+  color: #315b85;
+  background: #f5f8fc;
+}
+
+.roleActionAi > span {
+  color: #4c81b7;
+}
+
+.roleActionDismiss {
+  width: 34px;
+  margin-left: auto;
+  padding: 0;
+  border: 1px solid #e4e8ed;
+  color: #939ca8;
+  background: #fff;
+  font-size: 13px !important;
+}
+
+.roleActionCard > footer button:hover {
+  filter: brightness(.97);
+}
+
+.roleActionCenterLoading {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 13px;
+}
+
+.roleActionCenterLoading span {
+  min-height: 150px;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      100deg,
+      #f2f5f8 25%,
+      #fafbfc 40%,
+      #f2f5f8 55%
+    );
+  background-size:
+    220% 100%;
+  animation:
+    roleActionLoading
+    1.4s
+    linear
+    infinite;
+}
+
+@keyframes roleActionLoading {
+  to {
+    background-position:
+      -220% 0;
+  }
+}
+
+.roleActionCenterEmpty {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 105px;
+  padding: 18px;
+  border: 1px dashed #d4dde8;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, .55);
+}
+
+.roleActionCenterEmpty > span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  place-items: center;
+  border-radius: 12px;
+  color: #397255;
+  background: #eaf6ee;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.roleActionCenterEmpty strong {
+  color: #263a52;
+  font-size: 11px;
+}
+
+.roleActionCenterEmpty p {
+  margin: 5px 0 0;
+  color: #818d9d;
+  font-size: 8px;
+}
+
+.roleActionCenterStatus {
+  margin: 0;
+  color: #8a6250;
+  font-size: 8px;
+}
+
+.roleActionCenterFootnote {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e9edf2;
+}
+
+.roleActionCenterFootnote > span {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  color: #4d725e;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.roleActionCenterFootnote > span i {
+  display: grid;
+  width: 19px;
+  height: 19px;
+  place-items: center;
+  border-radius: 6px;
+  color: #397354;
+  background: #eaf5ee;
+  font-size: 8px;
+  font-style: normal;
+}
+
+.roleActionCenterFootnote p {
+  max-width: 650px;
+  margin: 0;
+  color: #929aa6;
+  font-size: 7px;
+  line-height: 1.55;
+  text-align: right;
+}
+
+@media (max-width: 900px) {
+  .roleActionGrid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .roleActionCenterLoading {
+    grid-template-columns:
+      1fr;
+  }
+
+  .roleActionCenterLoading span:nth-child(n + 2) {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .roleActionCenter {
+    padding: 19px 15px;
+    border-radius: 17px;
+  }
+
+  .roleActionCenterHeader {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .roleActionCenterHeaderActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .roleActionCenterSummary {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .roleActionCenterSummary > p {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    padding-top: 9px;
+    border-top: 1px solid #edf0f4;
+  }
+
+  .roleActionCard {
+    min-height: 0;
+  }
+
+  .roleActionCard > footer {
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr)
+      34px;
+  }
+
+  .roleActionCard > footer button {
+    justify-content: center;
+  }
+
+  .roleActionDismiss {
+    margin-left: 0;
+  }
+
+  .roleActionCenterFootnote {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .roleActionCenterFootnote p {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roleActionCenterLoading span {
+    animation: none !important;
+  }
+
+  .roleActionCard,
+  .roleActionCenterHeaderActions button {
+    transition: none !important;
+  }
+
+  .roleActionCard:hover {
+    transform: none;
+  }
+}
