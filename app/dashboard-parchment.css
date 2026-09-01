@@ -3793,3 +3793,157 @@ html body .shell:has(.studentDashboard)
  */
 
 /* CAMPUSCONNECT EXECUTIVE LIGHT STUDENT DASHBOARD: END */
+
+/* STUDENT REFERENCE BACKGROUND AND RAIL: START */
+
+/*
+ * Only the student dashboard page background,
+ * workspace header and notice rail are changed.
+ */
+
+/* Warm ivory background from the reference */
+
+html body
+.shell:has(.studentDashboard)
+.workspace {
+  background:
+    #fbf8f2 !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.content {
+  background:
+    #fbf8f2 !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.workspaceHeader {
+  border-bottom:
+    1px solid #e8e2d9 !important;
+  background:
+    #fffdf9 !important;
+  box-shadow:
+    0 4px 18px
+    rgba(27, 42, 58, .035) !important;
+}
+
+/* Professional notice rail */
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeRail {
+  overflow: hidden !important;
+  border:
+    1px solid #dfe5ea !important;
+  background:
+    #ffffff !important;
+  box-shadow:
+    0 13px 34px
+    rgba(29, 44, 61, .075) !important;
+}
+
+/* Dark navy label area */
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeRailHead {
+  border-right:
+    3px solid #c68a3b !important;
+  color:
+    #ffffff !important;
+  background:
+    linear-gradient(
+      145deg,
+      #142a43,
+      #0c1d31
+    ) !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeRailHead strong {
+  color:
+    #ffffff !important;
+}
+
+/* Blue important label and green live signal */
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticePulse {
+  color:
+    #8eb8e3 !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticePulse i {
+  background:
+    #39bd7b !important;
+  box-shadow:
+    0 0 0 5px
+    rgba(57, 189, 123, .13) !important;
+}
+
+/* White notice content area */
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeViewport,
+html body
+.shell:has(.studentDashboard)
+.importantNoticeTrack,
+html body
+.shell:has(.studentDashboard)
+.importantNoticeItem {
+  background:
+    #ffffff !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeItem {
+  border-color:
+    #e4e9ed !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeIcon {
+  color:
+    #79512c !important;
+  background:
+    #f8f0e5 !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeCopy strong {
+  color:
+    #25394c !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeCopy p,
+html body
+.shell:has(.studentDashboard)
+.importantNoticeAuthor {
+  color:
+    #778593 !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.importantNoticeLink {
+  border-color:
+    #cbd6df !important;
+  color:
+    #274963 !important;
+  background:
+    #ffffff !important;
+}
+
+/* STUDENT REFERENCE BACKGROUND AND RAIL: END */
