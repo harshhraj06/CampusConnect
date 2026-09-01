@@ -3349,3 +3349,52 @@ html body .proRoleDashboard .staffOperationsEmpty {
 }
 
 /* CAMPUSCONNECT ALL ROLE ANTIQUE DASHBOARD: END */
+
+/* CAMPUS SEVA NOTIFICATIONS: START */
+
+html body .notificationItem > i.seva {
+  border: 1px solid #b98447;
+  color: #fff8e6;
+  background:
+    linear-gradient(
+      145deg,
+      #a76a2e,
+      #683715
+    );
+  box-shadow:
+    0 7px 16px
+    rgba(92, 49, 18, .18);
+}
+
+html body .notificationItem.unread:has(> i.seva) {
+  border-color:
+    rgba(159, 98, 37, .34);
+  background:
+    linear-gradient(
+      135deg,
+      #fffaf0,
+      #f5e2bc
+    );
+}
+
+html body aside nav button em {
+  display: grid;
+  min-width: 19px;
+  height: 19px;
+  place-items: center;
+  margin-left: auto;
+  padding: 0 5px;
+  border: 1px solid
+    rgba(255, 255, 255, .28);
+  border-radius: 999px;
+  color: #fff9e9;
+  background: #a76025;
+  box-shadow:
+    0 5px 11px
+    rgba(95, 49, 16, .18);
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+/* CAMPUS SEVA NOTIFICATIONS: END */

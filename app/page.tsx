@@ -36,6 +36,7 @@ import {
 import {GradeCalculator, openGradeCalculator} from "./grade-calculator";
 import {ProfessionalRoleDashboard} from "./professional-role-dashboard";
 import {CampusSevaKendra} from "./campus-seva-kendra";
+import {useCampusSevaNotifications} from "./campus-seva-notifications";
 import {CampusAboutScroll} from "./campus-about-scroll";
 
 import StudentPerformanceTracker from "./student-performance-tracker";
@@ -45,7 +46,7 @@ type Role = "Student" | "Faculty" | "Placement Cell" | "Coordinator" | "Voluntee
 type Screen = "welcome" | "auth" | "dashboard";
 type AuthMode = "login" | "register" | "forgot" | "reset";
 type NotificationFilter = "all" | "unread";
-type NotificationKind = "placement" | "academic" | "resume" | "network" | "campus";
+type NotificationKind = "placement" | "academic" | "resume" | "network" | "campus" | "seva";
 
 const viewLabel = (view: View) =>
   view === "Campus"
@@ -380,6 +381,7 @@ const notificationIcons: Record<NotificationKind, string> = {
   resume: "R",
   network: "N",
   campus: "C",
+  seva: "S",
 };
 
 export default function Home() {
@@ -398,6 +400,13 @@ export default function Home() {
   const [notificationFilter, setNotificationFilter] = useState<NotificationFilter>("all");
   const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
   const [liveNotifications, setLiveNotifications] = useState<CampusNotification[]>([]);
+  const sevaNotifications =
+    useCampusSevaNotifications({
+      profileEmail:
+        profile.email,
+      role,
+    });
+
   const [unifiedExternalUnreadCount, setUnifiedExternalUnreadCount] = useState(0);
   const [checkingSession, setCheckingSession] = useState(() => Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
@@ -815,8 +824,25 @@ export default function Home() {
   const roleNav = navByRole[role];
   const status = sidebarStatus[role];
   const actions = headerActions[role];
-  const roleNotifications = liveNotifications;
+  const roleNotifications:
+    CampusNotification[] = [
+      ...sevaNotifications,
+      ...liveNotifications,
+    ].slice(
+      0,
+      40
+    );
   const unreadCount = roleNotifications.filter(item => !readNotificationIds.includes(item.id)).length;
+  const sevaUnreadCount =
+    roleNotifications.filter(
+      item =>
+        item.target ===
+          "Seva Kendra" &&
+        !readNotificationIds.includes(
+          item.id
+        )
+    ).length;
+
   const profileFields = [
     profile.name,
     profile.department,
@@ -904,7 +930,13 @@ export default function Home() {
   setV(n);
   setSidebarOpen(false);
   setNotificationsOpen(false);
-}} key={n === "Campus" ? "Campus Life" : n}><i>{i}</i>{viewLabel(n)}{n === "Placements" && <em>8</em>}</button>)}
+}} key={n === "Campus" ? "Campus Life" : n}><i>{i}</i>{viewLabel(n)}{n === "Placements" && <em>8</em>}{n === "Seva Kendra" && sevaUnreadCount > 0 && (
+  <em>
+    {sevaUnreadCount > 99
+      ? "99+"
+      : sevaUnreadCount}
+  </em>
+)}</button>)}
         </nav>
         {role === "Student" ? (
           <div className="sidebarProfileProgress">
