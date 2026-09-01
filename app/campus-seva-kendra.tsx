@@ -1,5 +1,7 @@
 "use client";
 
+import CampusSevaResolutionPass from "./campus-seva-resolution-pass";
+
 import {
   useCallback,
   useEffect,
@@ -2321,6 +2323,36 @@ CampusSevaKendra({
                       }
                     </p>
                   </section>
+                )}
+
+                {(
+                  selectedRequest.status ===
+                    "Approved" ||
+                  selectedRequest.status ===
+                    "Resolved"
+                ) && (
+                  <CampusSevaResolutionPass
+                    requestId={
+                      selectedRequest.id
+                    }
+                    requestStatus={
+                      selectedRequest.status
+                    }
+                    canFulfill={
+                      canProcess
+                    }
+                    onFulfilled={
+                      async () => {
+                        await loadRequests(
+                          true
+                        );
+
+                        await loadDetails(
+                          selectedRequest.id
+                        );
+                      }
+                    }
+                  />
                 )}
 
                 <section className="campusSevaConversation">

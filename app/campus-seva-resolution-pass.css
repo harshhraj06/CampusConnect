@@ -1,0 +1,397 @@
+.sevaPassCard {
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid #d2b788;
+  border-radius: 18px;
+  color: #37271a;
+  background:
+    linear-gradient(
+      145deg,
+      #fffaf0,
+      #f2dfbd
+    );
+  box-shadow:
+    0 18px 45px
+    rgba(69, 43, 18, .10);
+}
+
+.sevaPassCard.loading,
+.sevaPassCard.unavailable {
+  padding: 24px;
+  color: #75624f;
+}
+
+.sevaPassCard.unavailable strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #4a3320;
+}
+
+.sevaPassCard.unavailable p {
+  margin: 0;
+}
+
+.sevaPassHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px;
+  border-bottom: 1px solid #dbc39c;
+}
+
+.sevaPassHeader span,
+.sevaPassCopy > span,
+.sevaScannerDesk header > span {
+  color: #88572c;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.sevaPassHeader h3 {
+  margin: 7px 0 5px;
+  font: 600 25px Georgia, serif;
+}
+
+.sevaPassHeader p {
+  margin: 0;
+  color: #766858;
+  font-size: 10px;
+}
+
+.sevaPassHeader > strong {
+  padding: 8px 11px;
+  border: 1px solid #b8d6c5;
+  border-radius: 999px;
+  color: #2f7151;
+  background: #effeff9f2;
+  font-size: 8px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.sevaPassHeader > strong[data-state="Used"] {
+  border-color: #c7d0dc;
+  color: #526579;
+  background: #f1f4f8;
+}
+
+.sevaPassHeader > strong[data-state="Expired"],
+.sevaPassHeader > strong[data-state="Revoked"] {
+  border-color: #e0bcb5;
+  color: #9a453d;
+  background: #fff2f0;
+}
+
+.sevaPassIdentity {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid #dbc39c;
+  background: rgba(255, 252, 245, .62);
+}
+
+.sevaPassIdentity > div {
+  min-width: 0;
+  padding: 14px 20px;
+  border-right: 1px solid #dbc39c;
+}
+
+.sevaPassIdentity > div:last-child {
+  border-right: 0;
+}
+
+.sevaPassIdentity span {
+  display: block;
+  margin-bottom: 5px;
+  color: #92734e;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.sevaPassIdentity strong {
+  display: block;
+  overflow: hidden;
+  color: #39271a;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sevaPassBody {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    260px;
+  gap: 24px;
+  padding: 22px;
+}
+
+.sevaPassCopy h4 {
+  margin: 8px 0;
+  font: 600 20px Georgia, serif;
+}
+
+.sevaPassCopy > p {
+  margin: 0;
+  color: #6f6254;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.sevaPassCopy dl {
+  display: grid;
+  gap: 9px;
+  margin: 18px 0;
+}
+
+.sevaPassCopy dl > div {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 12px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(133, 91, 48, .18);
+}
+
+.sevaPassCopy dt {
+  color: #8a725a;
+  font-size: 8px;
+}
+
+.sevaPassCopy dd {
+  margin: 0;
+  color: #3a2b20;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.sevaPassCopy dd small {
+  display: block;
+  margin-top: 3px;
+  color: #8c7e70;
+  font-weight: 500;
+}
+
+.sevaPassDownload,
+.sevaScannerStart {
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid #294961;
+  border-radius: 10px;
+  color: #fff;
+  background:
+    linear-gradient(
+      135deg,
+      #315873,
+      #213c53
+    );
+  font-size: 8px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.sevaPassDownload:disabled {
+  opacity: .55;
+}
+
+.sevaPassQr {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  padding: 17px;
+  border: 1px solid #cfb17f;
+  border-radius: 15px;
+  background: rgba(255, 252, 246, .86);
+  text-align: center;
+}
+
+.sevaPassQr canvas {
+  width: min(210px, 100%) !important;
+  height: auto !important;
+  border: 7px solid #fff;
+  box-shadow:
+    0 9px 25px
+    rgba(62, 38, 16, .12);
+}
+
+.sevaPassQr strong {
+  margin-top: 12px;
+  font: 600 14px Georgia, serif;
+}
+
+.sevaPassQr p {
+  max-width: 190px;
+  margin: 6px 0 0;
+  color: #7d6c5a;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.sevaPassMessage,
+.sevaPassError {
+  margin: 0 22px 18px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 9px;
+}
+
+.sevaPassMessage {
+  color: #2e6b4c;
+  background: #eaf6ee;
+}
+
+.sevaPassError {
+  color: #9c433b;
+  background: #fff0ee;
+}
+
+.sevaScannerDesk {
+  padding: 22px;
+  border-top: 1px solid #d5bc94;
+  background: rgba(255, 250, 239, .76);
+}
+
+.sevaScannerDesk header h4 {
+  margin: 7px 0 5px;
+  font: 600 20px Georgia, serif;
+}
+
+.sevaScannerDesk header p {
+  margin: 0 0 15px;
+  color: #756757;
+  font-size: 9px;
+}
+
+.sevaScannerCamera {
+  max-width: 520px;
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid #d2b88c;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.sevaScannerStop {
+  margin-top: 9px;
+  padding: 9px 13px;
+  border: 1px solid #c7a77a;
+  border-radius: 8px;
+  color: #6c4623;
+  background: #fffaf1;
+  cursor: pointer;
+}
+
+.sevaManualVerify {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.sevaManualVerify input {
+  min-width: 0;
+  height: 41px;
+  padding: 0 11px;
+  border: 1px solid #d1b98f;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  font-size: 8px;
+}
+
+.sevaManualVerify button {
+  padding: 0 15px;
+  border: 1px solid #8a5a2b;
+  border-radius: 9px;
+  color: #fff;
+  background: #74451f;
+  font-size: 8px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.sevaVerificationResult {
+  margin-top: 15px;
+  padding: 16px;
+  border: 1px solid #bfd7c7;
+  border-radius: 12px;
+  background: #eff8f2;
+}
+
+.sevaVerificationResult[data-state="Invalid"],
+.sevaVerificationResult[data-state="Expired"],
+.sevaVerificationResult[data-state="Revoked"] {
+  border-color: #e1bbb5;
+  background: #fff1ef;
+}
+
+.sevaVerificationResult > span {
+  color: #48785f;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.sevaVerificationResult h4 {
+  margin: 7px 0;
+  font: 600 17px Georgia, serif;
+}
+
+.sevaVerificationResult p {
+  margin: 4px 0;
+  color: #6c6257;
+  font-size: 9px;
+}
+
+.sevaVerificationResult b {
+  display: block;
+  margin-top: 10px;
+  font-size: 9px;
+}
+
+.sevaVerificationResult button {
+  min-height: 39px;
+  margin-top: 13px;
+  padding: 0 14px;
+  border: 1px solid #286044;
+  border-radius: 9px;
+  color: #fff;
+  background: #347455;
+  font-size: 8px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.sevaPassClosed {
+  padding: 13px 22px;
+  border-top: 1px solid #d8c09a;
+  color: #755f49;
+  background: rgba(241, 229, 207, .76);
+  font-size: 8px;
+}
+
+@media (max-width: 760px) {
+  .sevaPassHeader {
+    flex-direction: column;
+  }
+
+  .sevaPassIdentity {
+    grid-template-columns: 1fr;
+  }
+
+  .sevaPassIdentity > div {
+    border-right: 0;
+    border-bottom: 1px solid #dbc39c;
+  }
+
+  .sevaPassBody {
+    grid-template-columns: 1fr;
+  }
+
+  .sevaManualVerify {
+    grid-template-columns: 1fr;
+  }
+}
