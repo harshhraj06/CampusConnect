@@ -35,6 +35,8 @@ import {
 } from "recharts";
 import {GradeCalculator, openGradeCalculator} from "./grade-calculator";
 import {ProfessionalRoleDashboard} from "./professional-role-dashboard";
+import {CampusSevaKendra} from "./campus-seva-kendra";
+import {CampusAboutScroll} from "./campus-about-scroll";
 
 import StudentPerformanceTracker from "./student-performance-tracker";
 
@@ -91,6 +93,8 @@ const nav: [View, string][] = [
   ["Academics", "▦"],
   ["Faculty Directory", "♙"],
   ["Activity Center", "✦"],
+  ["Seva Kendra", "✉"],
+  ["About CampusConnect", "≋"],
   ["Profile", "◌"],
 ];
 
@@ -111,6 +115,8 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Campus", "◇"],
     ["Faculty Directory", "♙"],
     ["Activity Center", "✦"],
+    ["Seva Kendra", "✉"],
+    ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
 
@@ -127,6 +133,8 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Campus", "◇"],
     ["Faculty Directory", "♙"],
     ["Activity Center", "✦"],
+    ["Seva Kendra", "✉"],
+    ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
 
@@ -140,6 +148,8 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Activity Center", "✦"],
     ["Network", "◎"],
     ["Faculty Directory", "♙"],
+    ["Seva Kendra", "✉"],
+    ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
 
@@ -152,6 +162,8 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Groups", "◉"],
     ["Faculty Directory", "♙"],
     ["Activity Center", "✦"],
+    ["Seva Kendra", "✉"],
+    ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
 
@@ -172,6 +184,8 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Campus", "◇"],
     ["Activity Center", "✦"],
     ["Faculty Directory", "♙"],
+    ["Seva Kendra", "✉"],
+    ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
 };
@@ -376,6 +390,7 @@ export default function Home() {
   const [jobs, setJobs] = useState<PlacementJob[]>([]);
   const [v, setV] = useState<View>("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarProfilePromptVisible, setSidebarProfilePromptVisible] = useState(true);
   const [applied, setApplied] = useState<string[]>([]);
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
     const [score, setScore] = useState(0);
@@ -801,14 +816,7 @@ export default function Home() {
   const status = sidebarStatus[role];
   const actions = headerActions[role];
   const roleNotifications = liveNotifications;
-  const unreadCount =
-    roleNotifications.filter(
-      item =>
-        !readNotificationIds.includes(
-          item.id
-        )
-    ).length +
-    unifiedExternalUnreadCount;
+  const unreadCount = roleNotifications.filter(item => !readNotificationIds.includes(item.id)).length;
   const profileFields = [
     profile.name,
     profile.department,
@@ -1283,6 +1291,17 @@ export default function Home() {
             <CampusMagazine profile={profile} />
           )}
 
+          {v === "Seva Kendra" && (
+            <CampusSevaKendra
+              profile={profile}
+            />
+          )}
+          {v === "About CampusConnect" && (
+            <CampusAboutScroll
+              viewerName={profile.name}
+              viewerRole={role}
+            />
+          )}
           {v === "Profile" && <ProfilePage profile={profile} onProfileChange={next => { setProfile(next); setRole(next.role); }} onSignOut={signOut}/>}
           {isCampusModuleView(v) && <CampusModule view={v} profile={profile} onProfileChange={nextProfile => {
   setProfile(current => ({
@@ -14907,6 +14926,8 @@ function Event({d, title}: {d: string; title: string}) {
 }
 
 function subtitle(v: View, role: Role) {
+  if (v === "Seva Kendra") return "Submit and track official campus requests through a secure role-based service desk.";
+  if (v === "About CampusConnect") return "Open the ancient Patra to discover the story, mission and developer behind CampusConnect.";
   if (isCampusModuleView(v)) return campusModuleSubtitle(v, role);
   const copy: Record<Role, Partial<Record<View, string>>> = {
     Faculty: {Dashboard: "Classes, mentoring priorities and academic activity in one view.", Placements: "Verified opportunities and preparation activity.", Network: "Collaborate with students, faculty and campus communities.", Resume: "Student resume guidance and review tools.", Academics: "Manage classes, attendance, resources and mentoring actions.", Campus: "Events, official notices and faculty participation."},

@@ -8,7 +8,9 @@ import CampusGlobalDataSearch from "./campus-global-data-search";
 type Role = ModuleProfile["role"];
 export type SearchTarget = "Dashboard" | "My Campus" | "Campus AI" | "Placements" | "Network" | "Resume" | "Academics" | "Campus" | CampusModuleView
   | "Activity Center"
-  | "Faculty Directory";
+  | "Faculty Directory"
+  | "About CampusConnect"
+  | "Seva Kendra";
 type SearchCategory = "Academics" | "Career" | "Community" | "Campus" | "Workspace";
 type SearchItem = {
   id: string;
@@ -46,6 +48,28 @@ const searchCategories: ("All" | SearchCategory)[] = ["All", "Academics", "Caree
 
 const searchItems: SearchItem[] = [
   {id: "dashboard", title: "Open dashboard", description: "Return to your role overview and priority actions.", category: "Workspace", target: "Dashboard", icon: "⌂", keywords: "home overview metrics priorities", roles: everyRole},
+  {
+    id: "campus-seva-kendra",
+    title: "Campus Seva Kendra",
+    description: "Submit, track and resolve official campus requests through a secure digital Patra.",
+    category: "Workspace",
+    target: "Seva Kendra",
+    icon: "✉",
+    keywords: "seva request complaint grievance bonafide leave attendance correction id card permission patra service desk",
+    roles: everyRole,
+    badge: "Live",
+  },
+  {
+    id: "about-campusconnect",
+    title: "About CampusConnect",
+    description: "Open the ancient Patra and discover the CampusConnect story and developer.",
+    category: "Workspace",
+    target: "About CampusConnect",
+    icon: "≋",
+    keywords: "about developer harsh raj founder mission technology campusconnect patra scroll",
+    roles: everyRole,
+    badge: "Patra",
+  },
   {id: "my-campus", title: "My Campus", description: "Open your authenticated CampusConnect AI workspace and role-based campus intelligence tools.", category: "Workspace", target: "My Campus", icon: "◇", keywords: "my campus authenticated ai workspace role intelligence assistant", roles: everyRole, badge: "AI"},
   {id: "campus-ai", title: "Campus AI", description: "Ask Campus AI questions using only records authorized for your authenticated CampusConnect role.", category: "Workspace", target: "Campus AI", icon: "✦", keywords: "campus ai assistant authenticated role intelligence advisor", roles: everyRole, badge: "AI"},
   {id: "announcements", title: "Campus announcements", description: "Read verified academic, placement and campus notices.", category: "Campus", target: "Announcements", icon: "▣", keywords: "notice circular update official emergency", roles: everyRole, badge: "Verified"},

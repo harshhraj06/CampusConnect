@@ -65,3 +65,4 @@ supabase/.temp/
 supabase/migration-backups/
 supabase/migrations-backup-*/
 app/old-professional-role-dashboard.txt
+app/page.tsx.broken-*

@@ -1,0 +1,1188 @@
+.campusSeva {
+  display: grid;
+  gap: 20px;
+  color: #432b19;
+  font-family: Arial,sans-serif;
+}
+
+.campusSevaHero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center;
+  gap: 25px;
+  min-height: 225px;
+  padding: clamp(28px,4vw,48px);
+  overflow: hidden;
+  border: 1px solid rgba(117,71,29,.5);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 82% 20%,rgba(255,255,255,.5),transparent 24%),
+    repeating-linear-gradient(0deg,rgba(102,58,22,.025) 0 1px,transparent 1px 4px),
+    linear-gradient(135deg,#fff7e3,#efd29a);
+  box-shadow:
+    inset 0 0 0 4px rgba(255,250,235,.45),
+    0 18px 40px rgba(76,43,17,.12);
+}
+
+.campusSevaHero::after {
+  content: "पत्र";
+  position: absolute;
+  right: 27%;
+  bottom: -50px;
+  color: rgba(111,62,22,.045);
+  font: 700 190px Georgia,serif;
+  transform: rotate(-9deg);
+  pointer-events: none;
+}
+
+.campusSevaHeroSeal {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 94px;
+  height: 94px;
+  place-content: center;
+  border: 2px solid #744017;
+  border-radius: 50%;
+  color: #f8e7bd;
+  background: radial-gradient(circle at 35% 28%,#b56e31,#633113 70%);
+  box-shadow:
+    0 0 0 8px rgba(131,76,30,.12),
+    0 13px 25px rgba(73,38,14,.2);
+  text-align: center;
+}
+
+.campusSevaHeroSeal span {
+  font: 650 25px Georgia,serif;
+}
+
+.campusSevaHeroSeal small {
+  margin-top: 3px;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.campusSevaHeroCopy {
+  position: relative;
+  z-index: 2;
+}
+
+.campusSevaHeroCopy > span,
+.campusSevaDescription > span,
+.campusSevaFacts span,
+.campusSevaAttachments header span,
+.campusSevaResolution span,
+.campusSevaConversation header > span,
+.campusSevaTimeline > header span,
+.campusSevaStaffDesk > span {
+  color: #955a21;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.campusSevaHeroCopy h2 {
+  margin: 9px 0;
+  color: #422916;
+  font: 650 clamp(35px,5vw,56px)/1 Georgia,serif;
+  letter-spacing: -.045em;
+}
+
+.campusSevaHeroCopy p {
+  max-width: 650px;
+  margin: 0;
+  color: #775f47;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.campusSevaHeroCopy > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 15px;
+  color: #6f7659;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.campusSevaHeroCopy > div i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ca66e;
+  box-shadow: 0 0 0 5px rgba(76,166,110,.11);
+}
+
+.campusSevaCreate {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-width: 205px;
+  min-height: 68px;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 17px;
+  border: 1px solid #673612;
+  border-radius: 13px;
+  color: #fff8e7;
+  background: linear-gradient(135deg,#9f6226,#653411);
+  box-shadow: 0 14px 27px rgba(82,43,15,.22);
+  text-align: left;
+  cursor: pointer;
+}
+
+.campusSevaCreate > i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  font-style: normal;
+  font-size: 18px;
+}
+
+.campusSevaCreate span {
+  display: grid;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.campusSevaCreate small {
+  color: #dfc6a4;
+  font-size: 7px;
+  font-weight: 500;
+}
+
+.campusSevaMessage {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center;
+  gap: 11px;
+  min-height: 47px;
+  padding: 8px 13px;
+  border: 1px solid;
+  border-radius: 11px;
+}
+
+.campusSevaMessage.success {
+  border-color: #b9d7c4;
+  color: #32654a;
+  background: #edf8f1;
+}
+
+.campusSevaMessage.error {
+  border-color: #e3bbb5;
+  color: #91473e;
+  background: #fff1ee;
+}
+
+.campusSevaMessage > span {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.75);
+  font-weight: 900;
+}
+
+.campusSevaMessage p {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.campusSevaMessage button {
+  border: 0;
+  color: inherit;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.campusSevaMetrics {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 13px;
+}
+
+.campusSevaMetrics article {
+  min-height: 130px;
+  padding: 20px;
+  border: 1px solid rgba(117,72,30,.38);
+  border-radius: 14px;
+  background: linear-gradient(145deg,#fffaf0,#efd8aa);
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.38),
+    0 10px 25px rgba(75,43,18,.08);
+}
+
+.campusSevaMetrics span {
+  color: #8e5a28;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.campusSevaMetrics strong {
+  display: block;
+  margin-top: 13px;
+  color: #452a17;
+  font: 650 35px Georgia,serif;
+}
+
+.campusSevaMetrics p {
+  margin: 7px 0 0;
+  color: #806b53;
+  font-size: 8px;
+}
+
+.campusSevaWorkspace {
+  overflow: hidden;
+  border: 1px solid rgba(116,70,28,.4);
+  border-radius: 17px;
+  background: rgba(255,249,233,.88);
+  box-shadow: 0 15px 34px rgba(73,42,17,.09);
+}
+
+.campusSevaToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px;
+  border-bottom: 1px solid rgba(116,70,28,.2);
+  background: rgba(239,213,164,.46);
+}
+
+.campusSevaTabs,
+.campusSevaFilters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.campusSevaTabs button {
+  min-height: 39px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #745b43;
+  background: transparent;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.campusSevaTabs button.active {
+  border-color: #754219;
+  color: #fff8e8;
+  background: linear-gradient(135deg,#956027,#673714);
+}
+
+.campusSevaTabs button span {
+  margin-left: 7px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.14);
+  font-size: 7px;
+}
+
+.campusSevaFilters label {
+  display: flex;
+  min-width: 235px;
+  min-height: 39px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid rgba(116,70,28,.3);
+  border-radius: 9px;
+  background: #fffaf0;
+}
+
+.campusSevaFilters input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #50321e;
+  background: transparent;
+  font-size: 8px;
+}
+
+.campusSevaFilters select,
+.campusSevaRefresh {
+  min-height: 39px;
+  padding: 0 10px;
+  border: 1px solid rgba(116,70,28,.3);
+  border-radius: 9px;
+  color: #5a3a22;
+  background: #fffaf0;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.campusSevaRefresh {
+  cursor: pointer;
+}
+
+.campusSevaList {
+  display: grid;
+  gap: 9px;
+  padding: 14px;
+}
+
+.campusSevaRequest {
+  display: grid;
+  grid-template-columns: 48px minmax(0,1.4fr) minmax(145px,.55fr) auto 25px;
+  align-items: center;
+  gap: 14px;
+  min-height: 100px;
+  padding: 15px;
+  border: 1px solid rgba(119,72,29,.25);
+  border-radius: 12px;
+  color: #482d1b;
+  background: #fffaf0;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease,box-shadow 160ms ease,border-color 160ms ease;
+}
+
+.campusSevaRequest:hover {
+  border-color: #ad7135;
+  transform: translateY(-2px);
+  box-shadow: 0 11px 24px rgba(75,43,18,.1);
+}
+
+.campusSevaRequestMark {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid #a56b31;
+  border-radius: 12px;
+  color: #fff6e1;
+  background: linear-gradient(145deg,#a96a2b,#6b3814);
+  font: 650 13px Georgia,serif;
+}
+
+.campusSevaRequestCopy > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.campusSevaRequestCopy span,
+.campusSevaRequestRoute span {
+  color: #9a6e40;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.campusSevaRequestCopy em {
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: #6f593f;
+  background: #efe3cb;
+  font-size: 6px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.campusSevaRequestCopy em[data-priority="Urgent"] {
+  color: #99463e;
+  background: #ffeae6;
+}
+
+.campusSevaRequestCopy h3 {
+  margin: 7px 0 4px;
+  color: #452a17;
+  font: 650 16px Georgia,serif;
+}
+
+.campusSevaRequestCopy p,
+.campusSevaRequestRoute small {
+  margin: 0;
+  color: #88745e;
+  font-size: 7px;
+}
+
+.campusSevaRequestRoute {
+  display: grid;
+  gap: 5px;
+}
+
+.campusSevaRequestRoute strong {
+  color: #5b3a22;
+  font-size: 8px;
+}
+
+.campusSevaStatus {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 1px solid #d7c9ad;
+  border-radius: 999px;
+  color: #755e44;
+  background: #f5eddd;
+  font-size: 7px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.campusSevaStatus i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a98b61;
+}
+
+.campusSevaStatus[data-status="Under Review"],
+.campusSevaStatus[data-status="Changes Required"] {
+  border-color: #dfbf83;
+  color: #885b20;
+  background: #fff3d8;
+}
+
+.campusSevaStatus[data-status="Under Review"] i,
+.campusSevaStatus[data-status="Changes Required"] i {
+  background: #d49432;
+}
+
+.campusSevaStatus[data-status="Approved"],
+.campusSevaStatus[data-status="Resolved"] {
+  border-color: #b9d8c4;
+  color: #3e7354;
+  background: #ebf7ef;
+}
+
+.campusSevaStatus[data-status="Approved"] i,
+.campusSevaStatus[data-status="Resolved"] i {
+  background: #4fa66e;
+}
+
+.campusSevaStatus[data-status="Rejected"] {
+  border-color: #e2bbb5;
+  color: #914a42;
+  background: #fff0ed;
+}
+
+.campusSevaStatus[data-status="Rejected"] i {
+  background: #c65d52;
+}
+
+.campusSevaArrow {
+  color: #9b6734;
+  font-size: 15px;
+}
+
+.campusSevaEmpty {
+  display: grid;
+  min-height: 330px;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  padding: 30px;
+  text-align: center;
+}
+
+.campusSevaEmpty > i {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  place-items: center;
+  border: 1px solid #b78650;
+  border-radius: 50%;
+  color: #8c5521;
+  background: #f4e2bd;
+  font: normal 17px Georgia,serif;
+}
+
+.campusSevaEmpty h3 {
+  margin: 7px 0 0;
+  color: #482d1a;
+  font: 650 22px Georgia,serif;
+}
+
+.campusSevaEmpty p {
+  margin: 0;
+  color: #85715c;
+  font-size: 8px;
+}
+
+.campusSevaEmpty button {
+  min-height: 38px;
+  margin-top: 8px;
+  padding: 0 13px;
+  border: 1px solid #754117;
+  border-radius: 9px;
+  color: #fff8e8;
+  background: #754117;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.campusSevaLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.campusSevaBackdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(48,30,17,.68);
+  backdrop-filter: blur(7px);
+}
+
+.campusSevaForm,
+.campusSevaDetail {
+  position: relative;
+  z-index: 2;
+  width: min(780px,100%);
+  max-height: calc(100dvh - 36px);
+  overflow: auto;
+  border: 1px solid #8d5725;
+  border-radius: 19px;
+  background:
+    repeating-linear-gradient(0deg,rgba(105,61,25,.025) 0 1px,transparent 1px 4px),
+    linear-gradient(145deg,#fff9e8,#efd5a0);
+  box-shadow:
+    inset 0 0 0 5px rgba(255,251,238,.44),
+    0 35px 100px rgba(38,22,11,.32);
+}
+
+.campusSevaForm > header {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center;
+  gap: 17px;
+  padding: 25px;
+  border-bottom: 1px solid rgba(113,66,27,.25);
+}
+
+.campusSevaFormSeal {
+  display: grid;
+  width: 55px;
+  height: 55px;
+  place-items: center;
+  border-radius: 50%;
+  color: #f8e7bd;
+  background: #713b16;
+  font: 650 17px Georgia,serif;
+}
+
+.campusSevaForm header span,
+.campusSevaForm label > span {
+  color: #955b24;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.campusSevaForm header h2 {
+  margin: 6px 0 4px;
+  color: #432916;
+  font: 650 28px Georgia,serif;
+}
+
+.campusSevaForm header p {
+  margin: 0;
+  color: #816a51;
+  font-size: 8px;
+}
+
+.campusSevaForm header > button,
+.campusSevaDetailHeader > button {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(112,65,25,.35);
+  border-radius: 50%;
+  color: #603917;
+  background: #fff8e7;
+  font-size: 21px;
+  cursor: pointer;
+}
+
+.campusSevaFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 14px;
+  padding: 25px;
+}
+
+.campusSevaFormGrid label {
+  display: grid;
+  gap: 7px;
+}
+
+.campusSevaFormGrid .wide {
+  grid-column: 1/-1;
+}
+
+.campusSevaForm input,
+.campusSevaForm select,
+.campusSevaForm textarea,
+.campusSevaConversation textarea,
+.campusSevaStaffDesk textarea,
+.campusSevaStaffDesk select {
+  width: 100%;
+  border: 1px solid rgba(117,70,28,.34);
+  border-radius: 9px;
+  outline: none;
+  color: #4c301d;
+  background: rgba(255,251,240,.93);
+  font: 9px Arial,sans-serif;
+}
+
+.campusSevaForm input,
+.campusSevaForm select,
+.campusSevaStaffDesk select {
+  min-height: 43px;
+  padding: 0 11px;
+}
+
+.campusSevaForm textarea {
+  min-height: 145px;
+  padding: 12px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.campusSevaFormGrid label > small {
+  color: #9a846d;
+  font-size: 7px;
+  text-align: right;
+}
+
+.campusSevaUpload input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.campusSevaUpload > div {
+  display: grid;
+  min-height: 105px;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 1px dashed #b4834b;
+  border-radius: 11px;
+  background: rgba(255,250,235,.6);
+  cursor: pointer;
+}
+
+.campusSevaUpload i {
+  font-style: normal;
+  font-size: 20px;
+}
+
+.campusSevaUpload strong {
+  color: #57371f;
+  font-size: 9px;
+}
+
+.campusSevaUpload small {
+  color: #927b63;
+  font-size: 7px;
+}
+
+.campusSevaForm > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 18px 25px 25px;
+}
+
+.campusSevaForm > footer button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid #b69267;
+  border-radius: 9px;
+  color: #5d3a21;
+  background: #fffaf0;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.campusSevaForm > footer button:last-child {
+  border-color: #6d3a14;
+  color: #fff8e8;
+  background: linear-gradient(135deg,#965c23,#663512);
+}
+
+.campusSevaDetail {
+  width: min(1180px,100%);
+}
+
+.campusSevaDetailHeader {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 27px;
+  border-bottom: 1px solid rgba(113,66,27,.23);
+}
+
+.campusSevaDetailHeader > div:first-child > span {
+  color: #945a22;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.campusSevaDetailHeader h2 {
+  margin: 7px 0 4px;
+  color: #432916;
+  font: 650 27px Georgia,serif;
+}
+
+.campusSevaDetailHeader p {
+  margin: 0;
+  color: #85705a;
+  font-size: 8px;
+}
+
+.campusSevaDetailBody {
+  display: grid;
+  grid-template-columns: minmax(0,1.45fr) minmax(270px,.55fr);
+}
+
+.campusSevaDetailMain {
+  display: grid;
+  gap: 17px;
+  padding: 25px;
+  border-right: 1px solid rgba(113,66,27,.2);
+}
+
+.campusSevaDescription,
+.campusSevaResolution,
+.campusSevaAttachments,
+.campusSevaConversation {
+  padding: 19px;
+  border: 1px solid rgba(116,69,28,.27);
+  border-radius: 12px;
+  background: rgba(255,250,236,.66);
+}
+
+.campusSevaDescription p,
+.campusSevaResolution p {
+  margin: 11px 0 0;
+  color: #654b35;
+  font: 11px/1.75 Georgia,serif;
+  white-space: pre-wrap;
+}
+
+.campusSevaFacts {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 9px;
+}
+
+.campusSevaFacts > div {
+  display: grid;
+  min-height: 95px;
+  align-content: center;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid rgba(116,69,28,.27);
+  border-radius: 10px;
+  background: rgba(255,250,236,.62);
+}
+
+.campusSevaFacts strong {
+  color: #50301b;
+  font-size: 9px;
+}
+
+.campusSevaFacts small {
+  color: #8d7862;
+  font-size: 7px;
+}
+
+.campusSevaAttachments header,
+.campusSevaConversation > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.campusSevaAttachments header small,
+.campusSevaConversation header > small {
+  color: #927c65;
+  font-size: 7px;
+}
+
+.campusSevaAttachments > button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid rgba(116,69,28,.2);
+  border-radius: 9px;
+  color: #55351e;
+  background: #fffaf0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.campusSevaAttachments button > i {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 8px;
+  background: #f1d6a6;
+  font-style: normal;
+}
+
+.campusSevaAttachments button > span {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+}
+
+.campusSevaAttachments strong {
+  font-size: 8px;
+}
+
+.campusSevaAttachments small {
+  color: #917b65;
+  font-size: 7px;
+}
+
+.campusSevaAttachments b {
+  font-size: 7px;
+}
+
+.campusSevaComment {
+  display: grid;
+  grid-template-columns: 36px minmax(0,1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.campusSevaComment > i {
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff8e8;
+  background: #784317;
+  font-style: normal;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.campusSevaComment header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.campusSevaComment header strong {
+  color: #4e301b;
+  font-size: 8px;
+}
+
+.campusSevaComment header span {
+  padding: 3px 5px;
+  border-radius: 999px;
+  color: #8a5b29;
+  background: #f1ddba;
+  font-size: 6px;
+}
+
+.campusSevaComment header small {
+  margin-left: auto;
+  color: #9a8773;
+  font-size: 6px;
+}
+
+.campusSevaComment p {
+  margin: 6px 0 0;
+  color: #725c46;
+  font-size: 8px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.campusSevaNoComments {
+  padding: 24px 0;
+  color: #98836d;
+  font-size: 8px;
+  text-align: center;
+}
+
+.campusSevaConversation form {
+  display: grid;
+  gap: 8px;
+  margin-top: 17px;
+}
+
+.campusSevaConversation textarea {
+  min-height: 85px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.campusSevaConversation form button {
+  min-height: 37px;
+  justify-self: end;
+  padding: 0 11px;
+  border: 1px solid #754117;
+  border-radius: 8px;
+  color: #fff8e8;
+  background: #754117;
+  font-size: 7px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.campusSevaTimeline {
+  padding: 25px 20px;
+  background: rgba(229,197,139,.23);
+}
+
+.campusSevaTimeline > header h3 {
+  margin: 7px 0 20px;
+  color: #492d19;
+  font: 650 20px Georgia,serif;
+}
+
+.campusSevaTimelineItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: 15px minmax(0,1fr);
+  gap: 8px;
+  padding-bottom: 20px;
+}
+
+.campusSevaTimelineItem::after {
+  content: "";
+  position: absolute;
+  top: 13px;
+  bottom: 0;
+  left: 5px;
+  width: 1px;
+  background: rgba(125,76,31,.28);
+}
+
+.campusSevaTimelineItem > i {
+  position: relative;
+  z-index: 2;
+  width: 11px;
+  height: 11px;
+  margin-top: 2px;
+  border: 2px solid #f3ddaf;
+  border-radius: 50%;
+  background: #945a21;
+  box-shadow: 0 0 0 2px #945a21;
+}
+
+.campusSevaTimelineItem strong {
+  color: #53331e;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.campusSevaTimelineItem p {
+  margin: 4px 0;
+  color: #806a54;
+  font-size: 7px;
+}
+
+.campusSevaTimelineItem small {
+  color: #a18c75;
+  font-size: 6px;
+}
+
+.campusSevaStaffDesk {
+  display: grid;
+  gap: 11px;
+  margin-top: 10px;
+  padding: 16px;
+  border: 1px solid rgba(110,63,24,.35);
+  border-radius: 12px;
+  background: rgba(255,249,232,.77);
+}
+
+.campusSevaStaffDesk label {
+  display: grid;
+  gap: 6px;
+}
+
+.campusSevaStaffDesk label > span {
+  color: #8f5b27;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.campusSevaStaffDesk textarea {
+  min-height: 95px;
+  padding: 9px;
+  resize: vertical;
+}
+
+.campusSevaClaim,
+.campusSevaSaveDecision {
+  min-height: 38px;
+  border: 1px solid #6f3d16;
+  border-radius: 8px;
+  color: #fff8e8;
+  background: linear-gradient(135deg,#955c24,#653411);
+  font-size: 7px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.campusSevaClaim {
+  color: #67401f;
+  background: #fff9e9;
+}
+
+@media (max-width: 980px) {
+  .campusSevaHero {
+    grid-template-columns: auto minmax(0,1fr);
+  }
+
+  .campusSevaCreate {
+    grid-column: 1/-1;
+    width: 100%;
+  }
+
+  .campusSevaMetrics {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  .campusSevaToolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .campusSevaFilters {
+    flex-wrap: wrap;
+  }
+
+  .campusSevaFilters label {
+    flex: 1;
+  }
+
+  .campusSevaRequest {
+    grid-template-columns: 48px minmax(0,1fr) auto;
+  }
+
+  .campusSevaRequestRoute {
+    display: none;
+  }
+
+  .campusSevaStatus {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .campusSevaArrow {
+    grid-column: 3;
+    grid-row: 1/3;
+  }
+
+  .campusSevaDetailBody {
+    grid-template-columns: 1fr;
+  }
+
+  .campusSevaDetailMain {
+    border-right: 0;
+    border-bottom: 1px solid rgba(113,66,27,.2);
+  }
+}
+
+@media (max-width: 620px) {
+  .campusSevaHero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .campusSevaHeroSeal {
+    justify-self: center;
+  }
+
+  .campusSevaHeroCopy > div {
+    justify-content: center;
+  }
+
+  .campusSevaMetrics,
+  .campusSevaFacts,
+  .campusSevaFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .campusSevaFormGrid .wide {
+    grid-column: auto;
+  }
+
+  .campusSevaFilters,
+  .campusSevaFilters label,
+  .campusSevaFilters select,
+  .campusSevaRefresh {
+    width: 100%;
+  }
+
+  .campusSevaRequest {
+    grid-template-columns: 42px minmax(0,1fr);
+  }
+
+  .campusSevaStatus {
+    grid-column: 2;
+  }
+
+  .campusSevaArrow {
+    display: none;
+  }
+
+  .campusSevaDetailHeader {
+    grid-template-columns: minmax(0,1fr) auto;
+  }
+
+  .campusSevaDetailHeader .campusSevaStatus {
+    grid-column: 1;
+  }
+
+  .campusSevaDetailHeader > button {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campusSevaRequest,
+  .campusSevaCreate {
+    transition: none;
+  }
+
+  .campusSevaRequest:hover {
+    transform: none;
+  }
+}
