@@ -82,149 +82,167 @@ type ScannerController = {
 };
 
 
+
 const pdfStyles =
   StyleSheet.create({
     page: {
       padding: 34,
-      color: "#342619",
-      backgroundColor: "#f8eedb",
+      color: "#162638",
+      backgroundColor: "#ffffff",
       fontFamily: "Helvetica",
-      fontSize: 10,
-      lineHeight: 1.5,
+      fontSize: 9,
+      lineHeight: 1.35,
     },
 
     border: {
-      minHeight: "100%",
-      padding: 24,
-      borderWidth: 2,
-      borderColor: "#7a4b20",
+      padding: 25,
+      borderWidth: 1,
+      borderColor: "#b9c3cd",
+      backgroundColor: "#ffffff",
     },
 
     header: {
-      paddingBottom: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: "#c8a774",
+      paddingBottom: 18,
+      borderBottomWidth: 2,
+      borderBottomColor: "#173b5e",
     },
 
     eyebrow: {
-      color: "#8b5a2b",
-      fontSize: 8,
-      letterSpacing: 2,
+      color: "#52677a",
+      fontSize: 7,
+      fontFamily: "Helvetica-Bold",
+      letterSpacing: 2.1,
     },
 
     title: {
-      marginTop: 7,
-      color: "#352214",
-      fontFamily: "Times-Roman",
-      fontSize: 25,
+      marginTop: 10,
+      color: "#142b42",
+      fontFamily: "Helvetica-Bold",
+      fontSize: 20,
+      lineHeight: 1.15,
     },
 
     subtitle: {
-      marginTop: 4,
-      color: "#6f604f",
-      fontSize: 9,
+      marginTop: 9,
+      color: "#687785",
+      fontSize: 8.5,
+      lineHeight: 1.35,
     },
 
     identityRow: {
       display: "flex",
       flexDirection: "row",
-      marginTop: 18,
+      marginTop: 14,
     },
 
     identityBox: {
       width: "50%",
+      minHeight: 62,
       padding: 11,
       borderWidth: 1,
-      borderColor: "#d8c09a",
-      backgroundColor: "#fffaf0",
+      borderColor: "#d4dbe1",
+      backgroundColor: "#ffffff",
     },
 
     label: {
-      marginBottom: 4,
-      color: "#8b6a42",
-      fontSize: 7,
-      letterSpacing: 1.3,
+      marginBottom: 6,
+      color: "#607487",
+      fontFamily: "Helvetica-Bold",
+      fontSize: 6.7,
+      letterSpacing: 1.25,
     },
 
     value: {
-      color: "#342619",
-      fontSize: 11,
+      color: "#172b3d",
+      fontFamily: "Helvetica-Bold",
+      fontSize: 10,
+      lineHeight: 1.3,
     },
 
     section: {
-      marginTop: 15,
-      padding: 12,
+      marginTop: 12,
+      padding: 11,
       borderWidth: 1,
-      borderColor: "#d9c5a5",
-      backgroundColor: "#fffaf1",
+      borderColor: "#d8dee4",
+      backgroundColor: "#ffffff",
     },
 
     sectionTitle: {
-      marginBottom: 6,
-      color: "#805126",
-      fontSize: 8,
-      letterSpacing: 1.4,
+      marginBottom: 7,
+      color: "#526b80",
+      fontFamily: "Helvetica-Bold",
+      fontSize: 6.8,
+      letterSpacing: 1.3,
     },
 
     sectionText: {
-      color: "#4f4336",
-      fontSize: 10,
+      color: "#354657",
+      fontSize: 9,
+      lineHeight: 1.45,
     },
 
     approvalRow: {
       display: "flex",
       flexDirection: "row",
-      marginTop: 15,
+      marginTop: 13,
     },
 
     approvalCopy: {
-      width: "66%",
-      paddingRight: 15,
+      width: "68%",
+      paddingRight: 13,
     },
 
     qrBox: {
-      width: "34%",
+      width: "32%",
       alignItems: "center",
+      justifyContent: "center",
       padding: 10,
       borderWidth: 1,
-      borderColor: "#bd9562",
+      borderColor: "#cbd4dc",
       backgroundColor: "#ffffff",
     },
 
     qr: {
-      width: 112,
-      height: 112,
+      width: 104,
+      height: 104,
     },
 
     qrCaption: {
-      marginTop: 6,
-      color: "#6f5a42",
-      fontSize: 7,
+      marginTop: 7,
+      color: "#60707e",
+      fontSize: 6.4,
+      lineHeight: 1.35,
       textAlign: "center",
     },
 
     status: {
-      marginTop: 12,
-      padding: 9,
-      color: "#ffffff",
-      backgroundColor: "#315d49",
-      fontSize: 9,
+      marginTop: 13,
+      padding: 8,
+      borderWidth: 1,
+      borderColor: "#173b5e",
+      color: "#173b5e",
+      backgroundColor: "#ffffff",
+      fontFamily: "Helvetica-Bold",
+      fontSize: 7.5,
+      letterSpacing: 1,
       textAlign: "center",
     },
 
     footer: {
-      marginTop: 18,
+      marginTop: 15,
       paddingTop: 10,
       borderTopWidth: 1,
-      borderTopColor: "#c8a774",
-      color: "#7a6c5d",
-      fontSize: 7,
+      borderTopColor: "#d4dbe1",
+      color: "#6d7c89",
+      fontSize: 6.4,
+      lineHeight: 1.4,
       textAlign: "center",
     },
   });
 
 
 function passDate(
+
   value: string | null
 ) {
   if (!value) {

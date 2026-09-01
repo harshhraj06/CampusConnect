@@ -395,3 +395,157 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* PROFESSIONAL WHITE SEVA PASS: START */
+
+.sevaPassCard {
+  border-color: #cbd4dc !important;
+  color: #172b3d !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 18px 45px
+    rgba(20, 43, 66, .09) !important;
+}
+
+.sevaPassHeader,
+.sevaPassIdentity,
+.sevaPassBody,
+.sevaPassCopy,
+.sevaPassQr,
+.sevaScannerDesk,
+.sevaPassClosed,
+.sevaVerificationResult {
+  background: #ffffff !important;
+}
+
+.sevaPassHeader {
+  border-bottom-color: #d5dde4 !important;
+}
+
+.sevaPassHeader span,
+.sevaPassCopy > span,
+.sevaScannerDesk header > span {
+  color: #526d84 !important;
+}
+
+.sevaPassHeader h3,
+.sevaPassCopy h4,
+.sevaScannerDesk header h4 {
+  color: #142b42 !important;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif !important;
+  font-weight: 750 !important;
+}
+
+.sevaPassHeader p,
+.sevaPassCopy > p,
+.sevaScannerDesk header p {
+  color: #687785 !important;
+}
+
+.sevaPassHeader > strong {
+  border-color: #afc9bb !important;
+  color: #286348 !important;
+  background: #ffffff !important;
+}
+
+.sevaPassIdentity {
+  border-bottom-color: #d5dde4 !important;
+}
+
+.sevaPassIdentity > div {
+  border-color: #d5dde4 !important;
+}
+
+.sevaPassIdentity span {
+  color: #63798d !important;
+}
+
+.sevaPassIdentity strong {
+  color: #172b3d !important;
+}
+
+.sevaPassCopy dl > div {
+  border-top-color: #dce2e7 !important;
+}
+
+.sevaPassCopy dt {
+  color: #70818f !important;
+}
+
+.sevaPassCopy dd {
+  color: #24394b !important;
+}
+
+.sevaPassQr {
+  border-color: #cbd5dd !important;
+  box-shadow:
+    0 10px 28px
+    rgba(24, 52, 77, .06) !important;
+}
+
+.sevaPassQr canvas {
+  border-color: #ffffff !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 7px 21px
+    rgba(22, 48, 71, .10) !important;
+}
+
+.sevaPassQr strong {
+  color: #17344e !important;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif !important;
+}
+
+.sevaPassDownload,
+.sevaScannerStart {
+  border-color: #173b5e !important;
+  color: #ffffff !important;
+  background:
+    linear-gradient(
+      135deg,
+      #244e70,
+      #173650
+    ) !important;
+  box-shadow:
+    0 9px 21px
+    rgba(24, 55, 81, .15) !important;
+}
+
+.sevaScannerDesk {
+  border-top-color: #d4dde4 !important;
+}
+
+.sevaScannerCamera,
+.sevaManualVerify input {
+  border-color: #cbd5dd !important;
+  background: #ffffff !important;
+}
+
+.sevaManualVerify button {
+  border-color: #173b5e !important;
+  background: #173b5e !important;
+}
+
+.sevaVerificationResult {
+  border-color: #9fc4ad !important;
+}
+
+.sevaVerificationResult[data-state="Invalid"],
+.sevaVerificationResult[data-state="Expired"],
+.sevaVerificationResult[data-state="Revoked"] {
+  border-color: #d7aaa4 !important;
+  background: #ffffff !important;
+}
+
+.sevaPassClosed {
+  border-top-color: #d6dee5 !important;
+  color: #647583 !important;
+}
+
+/* PROFESSIONAL WHITE SEVA PASS: END */
