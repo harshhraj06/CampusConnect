@@ -384,6 +384,79 @@ const notificationIcons: Record<NotificationKind, string> = {
   seva: "S",
 };
 
+function SidebarProfileReminder({
+  completion,
+  onOpenProfile,
+}: {
+  completion: number;
+  onOpenProfile: () => void;
+}) {
+  const [
+    dismissed,
+    setDismissed,
+  ] = useState(false);
+
+  if (
+    dismissed ||
+    completion >= 100
+  ) {
+    return null;
+  }
+
+  return (
+    <div className="sidebarProfileProgress">
+      <button
+        type="button"
+        className="sidebarProfileDismiss"
+        aria-label="Dismiss profile reminder"
+        title="Dismiss"
+        onClick={() =>
+          setDismissed(true)
+        }
+      >
+        ×
+      </button>
+
+      <span className="sidebarProfileIcon">
+        ◆
+      </span>
+
+      <strong>
+        Complete your profile
+      </strong>
+
+      <p>
+        Add your skills & interests to get
+        better recommendations.
+      </p>
+
+      <div className="sidebarProfileBar">
+        <span
+          style={{
+            width:
+              `${Math.min(
+                100,
+                completion
+              )}%`,
+          }}
+        />
+      </div>
+
+      <small>
+        {completion}% Complete
+      </small>
+
+      <button
+        type="button"
+        onClick={onOpenProfile}
+      >
+        Complete now →
+      </button>
+    </div>
+  );
+}
+
+
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("welcome");
   const [role, setRole] = useState<Role>("Student");
@@ -939,29 +1012,10 @@ export default function Home() {
 )}</button>)}
         </nav>
         {role === "Student" ? (
-          <div className="sidebarProfileProgress">
-            <span className="sidebarProfileIcon">◆</span>
-
-            <strong>Complete your profile</strong>
-
-            <p>
-              Add your skills & interests to get better recommendations.
-            </p>
-
-            <div className="sidebarProfileBar">
-              <span
-                style={{
-                  width: `${Math.min(100, sidebarProfileCompletion)}%`,
-                }}
-              />
-            </div>
-
-            <small>{sidebarProfileCompletion}% Complete</small>
-
-            <button onClick={() => setV("Profile")}>
-              Complete now →
-            </button>
-          </div>
+          <SidebarProfileReminder
+            completion={sidebarProfileCompletion}
+            onOpenProfile={() => setV("Profile")}
+          />
         ) : (
           <div className="strength">
             <b>{status.value}</b>
