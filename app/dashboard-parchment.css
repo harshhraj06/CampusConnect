@@ -3947,3 +3947,205 @@ html body
 }
 
 /* STUDENT REFERENCE BACKGROUND AND RAIL: END */
+
+/* PROFESSIONAL WHITE STUDENT BLOCKS: START */
+
+/*
+ * White cards on the reference warm-ivory background.
+ * The book, sidebar, festival banner and notice rail
+ * are intentionally not targeted.
+ */
+
+/* Slightly deeper page background for clear separation */
+
+html body
+.shell:has(.studentDashboard)
+.workspace,
+html body
+.shell:has(.studentDashboard)
+.content {
+  background:
+    #f7f4ee !important;
+}
+
+/* Main professional dashboard blocks */
+
+html body
+.shell:has(.studentDashboard)
+:is(
+  .dashboardTopBar,
+  .dashboardStatCard,
+  .dashboardPanel,
+  .studentIntelligenceCard,
+  .studentPriorityCenter,
+  .advancedProfileReadiness,
+  .dashboardHeroFocus
+) {
+  border:
+    1px solid
+    #d9e0e5 !important;
+  background:
+    #ffffff !important;
+  box-shadow:
+    0 12px 31px
+    rgba(29, 47, 64, .075) !important;
+}
+
+/* Remove old beige decorative card layers */
+
+html body
+.shell:has(.studentDashboard)
+.dashboardStatCard::after {
+  opacity:
+    0 !important;
+}
+
+/* Clear professional headings */
+
+html body
+.shell:has(.studentDashboard)
+:is(
+  .dashboardPanel,
+  .dashboardStatCard,
+  .studentIntelligenceCard,
+  .studentPriorityCenter,
+  .advancedProfileReadiness,
+  .dashboardHeroFocus
+)
+:is(
+  h2,
+  h3,
+  h4,
+  strong
+) {
+  color:
+    #1e3041 !important;
+}
+
+/* Corporate labels */
+
+html body
+.shell:has(.studentDashboard)
+:is(
+  .dashboardPanel,
+  .dashboardStatCard,
+  .studentIntelligenceCard,
+  .studentPriorityCenter,
+  .advancedProfileReadiness
+)
+:is(
+  header > span,
+  header > small,
+  dt
+) {
+  color:
+    #5b7185 !important;
+}
+
+/* Secondary copy */
+
+html body
+.shell:has(.studentDashboard)
+:is(
+  .dashboardPanel,
+  .dashboardStatCard,
+  .studentIntelligenceCard,
+  .studentPriorityCenter,
+  .advancedProfileReadiness,
+  .dashboardHeroFocus
+)
+:is(
+  p,
+  small
+) {
+  color:
+    #74818c !important;
+}
+
+/* Inner information and metric blocks */
+
+html body
+.shell:has(.studentDashboard)
+.advancedReadinessFacts span,
+html body
+.shell:has(.studentDashboard)
+.studentPrioritySummary > div,
+html body
+.shell:has(.studentDashboard)
+.studentIntelligenceMetrics i,
+html body
+.shell:has(.studentDashboard)
+.studentOverallSignal {
+  border:
+    1px solid
+    #e0e6eb !important;
+  background:
+    #f8fafc !important;
+  box-shadow:
+    none !important;
+}
+
+/* Priority rows */
+
+html body
+.shell:has(.studentDashboard)
+.studentPriorityItem {
+  border-color:
+    #e2e7eb !important;
+  background:
+    #ffffff !important;
+}
+
+html body
+.shell:has(.studentDashboard)
+.studentPriorityItem:hover {
+  background:
+    #f8fafc !important;
+}
+
+/* Professional empty-state icons */
+
+html body
+.shell:has(.studentDashboard)
+.dashboardPanel
+:is(
+  .dashboardEmptyIcon,
+  .emptyIcon
+) {
+  border-color:
+    #d4e0ed !important;
+  color:
+    #3d65ca !important;
+  background:
+    #eef4ff !important;
+}
+
+/* Consistent blue links and actions inside panels */
+
+html body
+.shell:has(.studentDashboard)
+.dashboardPanel
+:is(
+  a,
+  header button
+) {
+  color:
+    #315a8c !important;
+}
+
+/* Cleaner dividers */
+
+html body
+.shell:has(.studentDashboard)
+:is(
+  .dashboardPanel,
+  .studentIntelligenceCard,
+  .studentPriorityCenter,
+  .advancedProfileReadiness
+)
+hr {
+  border-color:
+    #e3e8ec !important;
+}
+
+/* PROFESSIONAL WHITE STUDENT BLOCKS: END */
