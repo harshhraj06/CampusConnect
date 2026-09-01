@@ -3402,1250 +3402,394 @@ html body aside nav button em {
 /* CAMPUSCONNECT EXECUTIVE LIGHT STUDENT DASHBOARD: START */
 
 /*
- * Executive light UI for the Student dashboard only.
- * Book and sidebar selectors are intentionally excluded.
+ * Warm professional student workspace.
+ * Book, sidebar and festival banner are intentionally untouched.
  */
 
-html body .shell:has(.studentDashboard) {
-  --executive-navy: #172a43;
-  --executive-blue: #245d96;
-  --executive-blue-light: #edf4fb;
-  --executive-text: #24364c;
-  --executive-muted: #718095;
-  --executive-line: #dce4ed;
-  --executive-surface: #ffffff;
-  --executive-canvas: #f4f7fa;
-  --executive-success: #3b8b63;
-  background:
-    linear-gradient(
-      145deg,
-      #f7f9fc,
-      #eef3f7
-    ) !important;
-}
-
-/* Main workspace—sidebar remains unchanged. */
-
-html body
-.shell:has(.studentDashboard)
-.workspace {
-  background:
-    linear-gradient(
-      145deg,
-      #f7f9fc,
-      #f1f5f8
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.workspaceHeader {
-  border-bottom:
-    1px solid
-    #dce4ec !important;
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      .96
-    ) !important;
-  box-shadow:
-    0 5px 22px
-    rgba(
-      27,
-      47,
-      72,
-      .06
-    ) !important;
-  backdrop-filter:
-    blur(18px) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.content {
+html body .shell:has(.studentDashboard) .workspace {
   background:
     radial-gradient(
-      circle at 82% 4%,
-      rgba(
-        53,
-        105,
-        158,
-        .06
-      ),
-      transparent 25%
+      circle at 8% 5%,
+      rgba(199, 156, 91, .12),
+      transparent 27%
     ),
     linear-gradient(
-      180deg,
-      #f8fafc,
-      #f2f6f9
+      145deg,
+      #f3ebdc 0%,
+      #faf5eb 48%,
+      #efe5d4 100%
     ) !important;
 }
 
-/* Professional dashboard introduction bar. */
-
-html body
-.shell:has(.studentDashboard)
-.dashboardTopBar,
-html body
-.shell:has(.studentDashboard)
-.professionalHeading {
-  border:
-    1px solid
-    var(--executive-line) !important;
-  border-radius:
-    16px !important;
+html body .shell:has(.studentDashboard) .workspaceHeader {
+  border-bottom:
+    1px solid #d8c5a5 !important;
   background:
     linear-gradient(
       135deg,
-      #ffffff,
-      #f5f8fb
+      #f5e8ce,
+      #fff9ed 48%,
+      #ead7b5
     ) !important;
   box-shadow:
-    0 10px 30px
-    rgba(
-      28,
-      48,
-      73,
-      .07
-    ) !important;
+    0 8px 28px
+    rgba(76, 50, 24, .07) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.dashboardGreeting,
-html body
-.shell:has(.studentDashboard)
-.campusPageHeading h1 {
-  color:
-    var(--executive-navy) !important;
-  text-shadow:
-    none !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.campusIdentityLine span,
-html body
-.shell:has(.studentDashboard)
-.campusIdentityLine small,
-html body
-.shell:has(.studentDashboard)
-.dashboardMetaRow span {
-  color:
-    var(--executive-muted) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardGreetingSub {
-  color:
-    #69798d !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardHeaderSecondary {
-  border:
-    1px solid
-    #d6e0ea !important;
-  color:
-    var(--executive-text) !important;
+html body .shell:has(.studentDashboard) .content {
   background:
-    #ffffff !important;
-  box-shadow:
-    0 6px 16px
-    rgba(
-      33,
-      55,
-      80,
-      .06
+    linear-gradient(
+      160deg,
+      rgba(255, 250, 240, .88),
+      rgba(239, 228, 208, .78)
     ) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.dashboardHeaderPrimary {
-  border-color:
-    #173b62 !important;
-  color:
-    #ffffff !important;
+/* Top greeting panel */
+
+html body .shell:has(.studentDashboard) .dashboardTopBar {
+  border:
+    1px solid #d5bd96 !important;
   background:
     linear-gradient(
       135deg,
-      #245d96,
-      #173b62
+      #fff9ec,
+      #f0dfc1
     ) !important;
   box-shadow:
-    0 10px 22px
-    rgba(
-      31,
-      78,
-      126,
-      .2
-    ) !important;
+    0 13px 34px
+    rgba(76, 50, 24, .08) !important;
 }
 
-/* =========================================================
-   CAMPUS NOTICE RAIL — COMPLETELY WHITE
-========================================================= */
+/* Campus notice rail remains clean white */
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .importantNoticeRail {
-  overflow:
-    hidden !important;
   border:
-    1px solid
-    #dbe3ec !important;
-  border-radius:
-    14px !important;
+    1px solid #ded7cb !important;
   background:
     #ffffff !important;
   box-shadow:
-    0 9px 26px
-    rgba(
-      28,
-      48,
-      73,
-      .07
-    ) !important;
+    0 12px 32px
+    rgba(53, 42, 29, .07) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.importantNoticeRail::before,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeRail::after,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeRailHead::before,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeRailHead::after {
-  display:
-    none !important;
-}
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .importantNoticeRailHead {
   border-right:
-    1px solid
-    #e1e7ee !important;
+    1px solid #e8e2d8 !important;
   color:
-    var(--executive-text) !important;
+    #34291f !important;
   background:
     #ffffff !important;
-  box-shadow:
-    none !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.importantNoticePulse {
-  color:
-    #66778c !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.importantNoticePulse i {
-  background:
-    #42a873 !important;
-  box-shadow:
-    0 0 0 5px
-    rgba(
-      66,
-      168,
-      115,
-      .11
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .importantNoticeRailHead strong {
   color:
-    var(--executive-navy) !important;
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif !important;
+    #34291f !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.importantNoticeViewport,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeTrack,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeItem {
+html body .shell:has(.studentDashboard)
+.importantNoticePulse {
   color:
-    var(--executive-text) !important;
+    #825f34 !important;
+}
+
+html body .shell:has(.studentDashboard)
+.importantNoticeViewport,
+html body .shell:has(.studentDashboard)
+.importantNoticeTrack,
+html body .shell:has(.studentDashboard)
+.importantNoticeItem {
   background:
     #ffffff !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .importantNoticeItem {
   border-color:
-    #e3e9ef !important;
-  box-shadow:
-    none !important;
+    #ece5da !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.importantNoticeIcon {
-  border:
-    1px solid
-    #d9e4ef !important;
-  color:
-    var(--executive-blue) !important;
-  background:
-    var(
-      --executive-blue-light
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.importantNoticeCopy small {
-  color:
-    #728196 !important;
-}
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .importantNoticeCopy strong {
   color:
-    var(--executive-navy) !important;
+    #26374a !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .importantNoticeCopy p,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeAuthor,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeAuthor b {
+html body .shell:has(.studentDashboard)
+.importantNoticeAuthor {
   color:
-    #718095 !important;
+    #707884 !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.importantNoticeLink,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeAcknowledge,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeAction {
-  border:
-    1px solid
-    #cfdae5 !important;
-  color:
-    var(--executive-blue) !important;
-  background:
-    #f8fafc !important;
-  box-shadow:
-    none !important;
-}
+/* Main student hero */
 
-/* Student dashboard canvas. */
-
-html body
-.shell:has(.studentDashboard)
-.studentDashboard {
-  gap:
-    22px !important;
-  color:
-    var(--executive-text) !important;
-  background:
-    transparent !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.studentDashboard > section:not(
-  .advancedDashboardHero
-):not(
-  .dashboardFestivalBanner
-) {
-  border-color:
-    var(--executive-line);
-}
-
-/* Main hero surface.
- * Dimensions and internal book artwork remain untouched.
- */
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .advancedDashboardHero {
   border:
-    1px solid
-    #d8e2eb !important;
-  border-radius:
-    20px !important;
-  color:
-    var(--executive-text) !important;
+    1px solid #cfb58d !important;
   background:
-    radial-gradient(
-      circle at 78% 12%,
-      rgba(
-        48,
-        105,
-        163,
-        .08
-      ),
-      transparent 26%
-    ),
     linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #f6f9fc 55%,
-      #edf3f8 100%
+      140deg,
+      #fff9ed 0%,
+      #f5e5c9 54%,
+      #ead4ad 100%
     ) !important;
   box-shadow:
-    0 18px 45px
-    rgba(
-      28,
-      48,
-      72,
-      .09
-    ) !important;
+    0 22px 55px
+    rgba(74, 48, 20, .11) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .advancedDashboardHero::before {
-  border-color:
-    rgba(
-      42,
-      86,
-      130,
-      .12
-    ) !important;
   background:
-    linear-gradient(
-      90deg,
-      rgba(
-        35,
-        92,
-        148,
-        .035
-      ),
-      transparent
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, .54),
+      transparent 68%
     ) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.advancedDashboardEyebrow,
-html body
-.shell:has(.studentDashboard)
-.advancedDashboardEyebrow > span,
-html body
-.shell:has(.studentDashboard)
-.advancedDashboardEyebrow > small {
+html body .shell:has(.studentDashboard)
+.advancedDashboardHeroMain {
   color:
-    #66788d !important;
+    #30261d !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.advancedDashboardEyebrow i {
-  background:
-    #3f9d70 !important;
+html body .shell:has(.studentDashboard)
+.advancedDashboardEyebrow {
+  color:
+    #73542f !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .advancedDashboardHero h2 {
   color:
-    var(--executive-navy) !important;
-  text-shadow:
-    none !important;
+    #322419 !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .advancedDashboardHeroMain > p {
   color:
-    #6b7b8e !important;
+    #6e6254 !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.advancedDashboardMeta {
-  color:
-    #53677f !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.advancedDashboardMeta em,
-html body
-.shell:has(.studentDashboard)
-.advancedDashboardMeta span {
-  color:
-    #53677f !important;
-}
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardHeroFocus {
   border:
-    1px solid
-    #dce5ee !important;
-  border-left:
-    3px solid
-    var(--executive-blue) !important;
-  color:
-    var(--executive-text) !important;
+    1px solid #d9c39f !important;
   background:
-    rgba(
-      255,
-      255,
-      255,
-      .9
-    ) !important;
+    rgba(255, 251, 242, .82) !important;
   box-shadow:
-    0 9px 23px
-    rgba(
-      29,
-      50,
-      75,
-      .07
-    ) !important;
+    0 10px 25px
+    rgba(72, 47, 22, .06) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.dashboardHeroFocus strong {
-  color:
-    var(--executive-navy) !important;
-}
+/* Profile readiness */
 
-html body
-.shell:has(.studentDashboard)
-.dashboardHeroFocus p {
-  color:
-    var(--executive-muted) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.referencePrimaryButton {
-  border-color:
-    #173b62 !important;
-  color:
-    #ffffff !important;
-  background:
-    linear-gradient(
-      135deg,
-      #245d96,
-      #173b62
-    ) !important;
-  box-shadow:
-    0 10px 22px
-    rgba(
-      31,
-      78,
-      126,
-      .18
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.referenceSecondaryButton {
-  border:
-    1px solid
-    #d3dee8 !important;
-  color:
-    var(--executive-text) !important;
-  background:
-    #ffffff !important;
-  box-shadow:
-    0 7px 17px
-    rgba(
-      30,
-      51,
-      75,
-      .06
-    ) !important;
-}
-
-/* Profile readiness. */
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .advancedProfileReadiness {
   border:
-    1px solid
-    #d8e2eb !important;
-  color:
-    var(--executive-text) !important;
+    1px solid #d2bb96 !important;
   background:
-    rgba(
-      255,
-      255,
-      255,
-      .95
+    linear-gradient(
+      155deg,
+      #fffaf0,
+      #f2e2c7
     ) !important;
   box-shadow:
-    0 14px 34px
-    rgba(
-      28,
-      48,
-      72,
-      .09
-    ) !important;
+    0 18px 40px
+    rgba(71, 47, 22, .09) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.advancedProfileReadiness small,
-html body
-.shell:has(.studentDashboard)
-.advancedReadinessCopy p {
-  color:
-    var(--executive-muted) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .advancedReadinessCopy h3,
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardReadinessRing strong {
   color:
-    var(--executive-navy) !important;
+    #38291d !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.advancedReadinessFacts > *,
-html body
-.shell:has(.studentDashboard)
-.referenceProfileReadiness button {
-  border-color:
-    #d9e3ec !important;
+html body .shell:has(.studentDashboard)
+.advancedReadinessCopy p {
   color:
-    var(--executive-text) !important;
+    #756858 !important;
+}
+
+html body .shell:has(.studentDashboard)
+.advancedReadinessFacts span {
+  border:
+    1px solid #dac5a4 !important;
   background:
-    #f7f9fc !important;
+    rgba(255, 251, 243, .74) !important;
 }
 
-/* Metric cards. */
+/* Metrics and professional dashboard cards */
 
-html body
-.shell:has(.studentDashboard)
-.studentDashboardStats {
-  gap:
-    14px !important;
-}
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardStatCard,
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardPanel {
   border:
-    1px solid
-    var(--executive-line) !important;
-  border-radius:
-    16px !important;
-  color:
-    var(--executive-text) !important;
-  background:
-    #ffffff !important;
-  box-shadow:
-    0 10px 28px
-    rgba(
-      28,
-      48,
-      72,
-      .07
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardStatCard::before {
+    1px solid #d7c4a6 !important;
   background:
     linear-gradient(
-      90deg,
-      var(--executive-blue),
-      #67a2d8
+      150deg,
+      #fffaf0,
+      #f5e8d2
     ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardStatCard::after {
-  border-color:
-    rgba(
-      37,
-      94,
-      151,
-      .07
-    ) !important;
-  background:
-    rgba(
-      37,
-      94,
-      151,
-      .025
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardStatCard:hover,
-html body
-.shell:has(.studentDashboard)
-.dashboardPanel:hover {
-  border-color:
-    #bbcddd !important;
   box-shadow:
-    0 16px 35px
-    rgba(
-      28,
-      48,
-      72,
-      .11
-    ) !important;
-  transform:
-    translateY(-2px);
+    0 15px 36px
+    rgba(65, 45, 25, .08) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardStatIcon {
   border:
-    1px solid
-    #d4e2ee !important;
+    1px solid #cfaa72 !important;
   color:
-    var(--executive-blue) !important;
+    #76501f !important;
   background:
-    var(
-      --executive-blue-light
-    ) !important;
+    #f8e5c4 !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardStatCard strong,
-html body
-.shell:has(.studentDashboard)
-.dashboardPanel h2,
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardPanel h3 {
   color:
-    var(--executive-navy) !important;
+    #30261e !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardStatCard small,
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardStatCard p,
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardPanel p,
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .dashboardPanel small {
   color:
-    var(--executive-muted) !important;
+    #756b5e !important;
 }
 
-/* Intelligence card. */
+/* Intelligence panel */
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .studentIntelligenceCard {
   border:
-    1px solid
-    #d9e3ec !important;
-  border-radius:
-    18px !important;
-  color:
-    var(--executive-text) !important;
+    1px solid #cfb58e !important;
   background:
-    radial-gradient(
-      circle at 88% 10%,
-      rgba(
-        41,
-        99,
-        157,
-        .08
-      ),
-      transparent 29%
-    ),
-    #ffffff !important;
+    linear-gradient(
+      140deg,
+      #fff9ed,
+      #efdfc3
+    ) !important;
   box-shadow:
-    0 14px 36px
-    rgba(
-      28,
-      48,
-      72,
-      .08
-    ) !important;
+    0 20px 48px
+    rgba(65, 43, 21, .09) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.studentIntelligenceMark {
-  border-color:
-    #c9d9e7 !important;
-  color:
-    var(--executive-blue) !important;
-  background:
-    var(
-      --executive-blue-light
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.studentIntelligenceIdentity small,
-html body
-.shell:has(.studentDashboard)
-.studentIntelligencePriority > span {
-  color:
-    #64768b !important;
-}
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .studentIntelligencePriority h3,
-html body
-.shell:has(.studentDashboard)
-.studentOverallSignal strong,
-html body
-.shell:has(.studentDashboard)
-.studentIntelligenceMetrics strong {
+html body .shell:has(.studentDashboard)
+.studentOverallSignal strong {
   color:
-    var(--executive-navy) !important;
+    #312419 !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .studentIntelligencePriority p,
-html body
-.shell:has(.studentDashboard)
-.studentOverallSignal p,
-html body
-.shell:has(.studentDashboard)
-.studentIntelligenceMetrics span {
+html body .shell:has(.studentDashboard)
+.studentIntelligenceIdentity small {
   color:
-    var(--executive-muted) !important;
+    #756858 !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.studentIntelligenceRing {
-  border-color:
-    var(--executive-blue)
-    #e2e9ef
-    #e2e9ef
-    #79a9d2 !important;
-  color:
-    var(--executive-navy) !important;
-  background:
-    #ffffff !important;
-}
+/* Priority centre */
 
-html body
-.shell:has(.studentDashboard)
-.studentOverallSignal,
-html body
-.shell:has(.studentDashboard)
-.studentIntelligenceMetrics i {
-  border-color:
-    #dce4ec !important;
-  color:
-    var(--executive-text) !important;
-  background:
-    #f7f9fb !important;
-}
-
-/* Priority and attention centre. */
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .studentPriorityCenter {
   border:
-    1px solid
-    #d9e3ec !important;
-  border-radius:
-    18px !important;
-  color:
-    var(--executive-text) !important;
+    1px solid #d1ba95 !important;
   background:
-    #ffffff !important;
-  box-shadow:
-    0 14px 36px
-    rgba(
-      28,
-      48,
-      72,
-      .08
+    linear-gradient(
+      145deg,
+      #fffaf0,
+      #f1e2c9
     ) !important;
+  box-shadow:
+    0 18px 44px
+    rgba(65, 43, 22, .08) !important;
 }
 
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .studentPriorityHeader,
-html body
-.shell:has(.studentDashboard)
-.studentPriorityFooter {
-  border-color:
-    #e0e7ee !important;
-  background:
-    #f8fafc !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.studentPriorityHeader h2,
-html body
-.shell:has(.studentDashboard)
-.studentPriorityContent strong {
-  color:
-    var(--executive-navy) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.studentPriorityHeader p,
-html body
-.shell:has(.studentDashboard)
-.studentPriorityContent span,
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .studentPriorityFooter,
-html body
-.shell:has(.studentDashboard)
-.studentPriorityMeta small {
-  color:
-    var(--executive-muted) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
+html body .shell:has(.studentDashboard)
 .studentPriorityItem {
   border-color:
-    #e0e7ee !important;
-  background:
-    #ffffff !important;
+    #dfceb2 !important;
 }
 
-html body
-.shell:has(.studentDashboard)
-.studentPriorityItem:hover {
+html body .shell:has(.studentDashboard)
+.studentPriorityHeader h2,
+html body .shell:has(.studentDashboard)
+.studentPriorityContent strong {
+  color:
+    #32261c !important;
+}
+
+html body .shell:has(.studentDashboard)
+.studentPriorityHeader p,
+html body .shell:has(.studentDashboard)
+.studentPriorityContent span,
+html body .shell:has(.studentDashboard)
+.studentPriorityFooter {
+  color:
+    #756a5c !important;
+}
+
+/* Professional controls */
+
+html body .shell:has(.studentDashboard)
+.referencePrimaryButton,
+html body .shell:has(.studentDashboard)
+.studentIntelligenceActionRow button {
   border-color:
-    #bfd0df !important;
-  background:
-    #f8fafc !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.studentPriorityIcon {
-  border-color:
-    #d5e1ec !important;
-  color:
-    var(--executive-blue) !important;
-  background:
-    var(
-      --executive-blue-light
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.studentPrioritySummary > div {
-  border-color:
-    #dde5ed !important;
-  background:
-    #ffffff !important;
-}
-
-/* Festival banner converted from black to executive white. */
-
-html body
-.shell:has(.studentDashboard)
-.dashboardFestivalBanner {
-  overflow:
-    hidden !important;
-  border:
-    1px solid
-    #d9e2eb !important;
-  border-radius:
-    20px !important;
-  color:
-    var(--executive-text) !important;
-  background:
-    #ffffff !important;
-  box-shadow:
-    0 16px 38px
-    rgba(
-      28,
-      48,
-      72,
-      .09
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardFestivalBody {
-  color:
-    var(--executive-text) !important;
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff,
-      #f3f7fa
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardFestivalBody > span {
-  color:
-    var(--executive-blue) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardFestivalBody h2 {
-  color:
-    var(--executive-navy) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardFestivalBody p,
-html body
-.shell:has(.studentDashboard)
-.dashboardFestivalBody small {
-  color:
-    var(--executive-muted) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-.dashboardFestivalFooter a,
-html body
-.shell:has(.studentDashboard)
-.dashboardFestivalFooter button {
-  border-color:
-    #d5e0e9 !important;
-  color:
-    var(--executive-blue) !important;
-  background:
-    #ffffff !important;
-}
-
-/* Inline all-role celebration banner. */
-
-html body
-.shell:has(.studentDashboard)
-section[data-all-role-festival="true"] {
-  border:
-    1px solid
-    #d9e2eb !important;
-  color:
-    var(--executive-text) !important;
-  background:
-    #ffffff !important;
-  box-shadow:
-    0 16px 38px
-    rgba(
-      28,
-      48,
-      72,
-      .09
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-section[data-all-role-festival="true"]
-> div:last-child {
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff,
-      #f3f7fa
-    ) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-section[data-all-role-festival="true"]
-h2 {
-  color:
-    var(--executive-navy) !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-section[data-all-role-festival="true"]
-p,
-html body
-.shell:has(.studentDashboard)
-section[data-all-role-festival="true"]
-span,
-html body
-.shell:has(.studentDashboard)
-section[data-all-role-festival="true"]
-small {
-  color:
-    var(--executive-muted) !important;
-  opacity:
-    1 !important;
-}
-
-html body
-.shell:has(.studentDashboard)
-section[data-all-role-festival="true"]
-a,
-html body
-.shell:has(.studentDashboard)
-section[data-all-role-festival="true"]
-button {
-  border-color:
-    #d4dfe9 !important;
-  color:
-    var(--executive-blue) !important;
-  background:
-    #ffffff !important;
-}
-
-/* Floating student tools use the executive palette. */
-
-html body:has(.studentDashboard)
-.campusAiLauncher,
-html body:has(.studentDashboard)
-.campusGradeLauncher {
-  border:
-    1px solid
-    #244f7c !important;
+    #243c56 !important;
   color:
     #ffffff !important;
   background:
     linear-gradient(
       135deg,
-      #2b659e,
-      #183d64
+      #304f6e,
+      #1f354d
     ) !important;
   box-shadow:
-    0 12px 27px
-    rgba(
-      28,
-      74,
-      119,
-      .22
-    ) !important;
+    0 10px 24px
+    rgba(31, 53, 77, .17) !important;
 }
 
-/* Consistent focus states. */
-
-html body
-.shell:has(.studentDashboard)
-.studentDashboard button:focus-visible,
-html body
-.shell:has(.studentDashboard)
-.importantNoticeRail button:focus-visible {
-  outline:
-    3px solid
-    rgba(
-      43,
-      101,
-      158,
-      .23
-    ) !important;
-  outline-offset:
-    2px !important;
+html body .shell:has(.studentDashboard)
+.referenceSecondaryButton {
+  border:
+    1px solid #cbb38c !important;
+  color:
+    #3e3428 !important;
+  background:
+    #fffaf1 !important;
 }
 
-/* Mobile keeps existing layout and only changes surface spacing. */
-
-@media (max-width: 720px) {
-  html body
-  .shell:has(.studentDashboard)
-  .content {
-    padding-right:
-      13px !important;
-    padding-left:
-      13px !important;
-  }
-
-  html body
-  .shell:has(.studentDashboard)
-  .importantNoticeRail {
-    margin-right:
-      13px !important;
-    margin-left:
-      13px !important;
-  }
-
-  html body
-  .shell:has(.studentDashboard)
-  .advancedDashboardHero,
-  html body
-  .shell:has(.studentDashboard)
-  .studentIntelligenceCard,
-  html body
-  .shell:has(.studentDashboard)
-  .studentPriorityCenter {
-    border-radius:
-      15px !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html body
-  .shell:has(.studentDashboard)
-  .dashboardStatCard,
-  html body
-  .shell:has(.studentDashboard)
-  .dashboardPanel,
-  html body
-  .shell:has(.studentDashboard)
-  .studentPriorityItem {
-    transition:
-      none !important;
-  }
-
-  html body
-  .shell:has(.studentDashboard)
-  .dashboardStatCard:hover,
-  html body
-  .shell:has(.studentDashboard)
-  .dashboardPanel:hover {
-    transform:
-      none !important;
-  }
-}
+/*
+ * No festival-banner selectors here.
+ * No book selectors here.
+ * No sidebar selectors here.
+ */
 
 /* CAMPUSCONNECT EXECUTIVE LIGHT STUDENT DASHBOARD: END */
