@@ -8237,3 +8237,36 @@
     transition: none;
   }
 }
+
+
+/* EVENT EDIT INLINE ERROR: START */
+
+.eventEditInlineError {
+  display: grid;
+  gap: 5px;
+
+  margin: 4px 0 16px;
+  padding: 13px 15px;
+
+  border: 1px solid #e6b9ae;
+  border-radius: 10px;
+
+  color: #863b31;
+  background: #fff7f5;
+
+  box-shadow:
+    0 7px 18px rgba(113, 43, 31, .06);
+}
+
+.eventEditInlineError strong {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.eventEditInlineError span {
+  color: #76524b;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+/* EVENT EDIT INLINE ERROR: END */

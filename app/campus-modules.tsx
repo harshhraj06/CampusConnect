@@ -531,7 +531,7 @@ function validateEventSchedule(
       deadline.getTime() <=
         Date.now()
     ) {
-      return "Registration deadline must be in the future when publishing a new event.";
+      return "Registration deadline must be in the future for a published event.";
     }
   }
 
@@ -641,6 +641,9 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
 
   const [savingEdit, setSavingEdit] =
     useState(false);
+
+  const [eventEditError, setEventEditError] =
+    useState("");
 
   const [form, setForm] = useState({
     title: "",
@@ -1314,7 +1317,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     const client = getSupabaseClient();
 
     if (!client) {
-      return setStatus(
+      return rejectEventEdit(
         "CampusConnect is not connected to Supabase."
       );
     }
@@ -1677,6 +1680,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     setEditEventBanner(null);
     setEditingEvent(item);
     setSelectedEvent(null);
+    setEventEditError("");
     setStatus("");
   };
 
@@ -1687,27 +1691,35 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
 
     if (!editingEvent) return;
 
+    setEventEditError("");
+
+    const rejectEventEdit = (
+      message: string
+    ) => {
+      setEventEditError(message);
+      setStatus(message);
+    };
+
     if (
       !eventEditForm.title.trim() ||
       !eventEditForm.short_description.trim() ||
       !eventEditForm.event_date
     ) {
-      return setStatus(
+      return rejectEventEdit(
         "Event title, short description and start date are required."
       );
     }
 
+    const scheduleError =
+      validateEventSchedule(
+        eventEditForm
+      );
 
-const scheduleError =
-  validateEventSchedule(
-    eventEditForm
-  );
-
-if (scheduleError) {
-  return setStatus(
-    scheduleError
-  );
-}
+    if (scheduleError) {
+      return rejectEventEdit(
+        scheduleError
+      );
+    }
 
     const client = getSupabaseClient();
 
@@ -1898,11 +1910,13 @@ if (scheduleError) {
         "Event updated successfully."
       );
     } catch (error) {
-      setStatus(
+      const message =
         error instanceof Error
           ? error.message
-          : "Unable to update event."
-      );
+          : "Unable to update event.";
+
+      setEventEditError(message);
+      setStatus(message);
     } finally {
       setSavingEdit(false);
     }
@@ -5255,6 +5269,7 @@ const registrationClosed =
             <form
               className="moduleForm campusEditForm"
               onSubmit={saveEventEdit}
+              noValidate
             >
               <FormHeading
                 title="Edit campus event"
@@ -5584,6 +5599,20 @@ const registrationClosed =
                 </label>
               </div>
 
+              {eventEditError && (
+                <div
+                  className="eventEditInlineError"
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  <strong>Unable to update event</strong>
+
+                  <span>
+                    {eventEditError}
+                  </span>
+                </div>
+              )}
+
               <div className="formActions">
                 <button
                   type="button"
@@ -5596,11 +5625,12 @@ const registrationClosed =
                 </button>
 
                 <button
+                  type="submit"
                   className="primary"
                   disabled={savingEdit}
                 >
                   {savingEdit
-                    ? "Saving..."
+                    ? "Updating..."
                     : "Update event"}
                 </button>
               </div>
