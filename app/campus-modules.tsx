@@ -443,6 +443,128 @@ function formatAttachmentSize(bytes: number) {
 
 const emptyAnnouncements: Announcement[] = [];
 
+
+/* EVENT SCHEDULE VALIDATION: START */
+
+type EventScheduleInput = {
+  event_date: string;
+  end_date?: string | null;
+  registration_deadline?: string | null;
+  capacity?: string | number | null;
+  status?: string;
+};
+
+
+function validateEventSchedule(
+  value: EventScheduleInput
+) {
+  const eventStart =
+    new Date(
+      value.event_date
+    );
+
+  if (
+    Number.isNaN(
+      eventStart.getTime()
+    )
+  ) {
+    return "Enter a valid event start date and time.";
+  }
+
+  if (
+    value.status ===
+      "Published" &&
+    eventStart.getTime() <=
+      Date.now()
+  ) {
+    return "A published event must start in the future.";
+  }
+
+  if (value.end_date) {
+    const eventEnd =
+      new Date(
+        value.end_date
+      );
+
+    if (
+      Number.isNaN(
+        eventEnd.getTime()
+      )
+    ) {
+      return "Enter a valid event end date and time.";
+    }
+
+    if (
+      eventEnd.getTime() <=
+      eventStart.getTime()
+    ) {
+      return "Event end date must be after the start date.";
+    }
+  }
+
+  if (
+    value.registration_deadline
+  ) {
+    const deadline =
+      new Date(
+        value.registration_deadline
+      );
+
+    if (
+      Number.isNaN(
+        deadline.getTime()
+      )
+    ) {
+      return "Enter a valid registration deadline.";
+    }
+
+    if (
+      deadline.getTime() >
+      eventStart.getTime()
+    ) {
+      return "Registration deadline must be before the event starts.";
+    }
+
+    if (
+      value.status ===
+        "Published" &&
+      deadline.getTime() <=
+        Date.now()
+    ) {
+      return "Registration deadline must be in the future when publishing a new event.";
+    }
+  }
+
+  if (
+    value.capacity !==
+      null &&
+    value.capacity !==
+      undefined &&
+    String(
+      value.capacity
+    ).trim()
+  ) {
+    const capacity =
+      Number(
+        value.capacity
+      );
+
+    if (
+      !Number.isInteger(
+        capacity
+      ) ||
+      capacity <= 0
+    ) {
+      return "Event capacity must be a positive whole number.";
+    }
+  }
+
+  return "";
+}
+
+/* EVENT SCHEDULE VALIDATION: END */
+
+
 function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
   const [items, setItems] = useState<Announcement[]>(emptyAnnouncements);
   const [events, setEvents] = useState<CampusEvent[]>([]);
@@ -1575,6 +1697,18 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
       );
     }
 
+
+const scheduleError =
+  validateEventSchedule(
+    eventEditForm
+  );
+
+if (scheduleError) {
+  return setStatus(
+    scheduleError
+  );
+}
+
     const client = getSupabaseClient();
 
     if (!client) {
@@ -2127,6 +2261,18 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
       );
     }
 
+
+const scheduleError =
+  validateEventSchedule(
+    eventForm
+  );
+
+if (scheduleError) {
+  return setStatus(
+    scheduleError
+  );
+}
+
     const client = getSupabaseClient();
 
     if (!client) {
@@ -2612,36 +2758,106 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
         item.status === "Going"
     );
 
-  const registrationClosed = (item: CampusEvent) => {
-    if (item.status !== "Published") return true;
+
+const registrationClosedReason =
+  (
+    item:
+      CampusEvent
+  ) => {
+    if (
+      item.allow_campus_registration ===
+        false
+    ) {
+      return "Campus registration disabled";
+    }
 
     if (
-      item.registration_deadline &&
-      new Date(item.registration_deadline).getTime() <
+      item.status !==
+        "Published"
+    ) {
+      return "Event not published";
+    }
+
+    const eventStart =
+      new Date(
+        item.event_date
+      ).getTime();
+
+    if (
+      Number.isNaN(
+        eventStart
+      )
+    ) {
+      return "Invalid event date";
+    }
+
+    if (
+      eventStart <=
         Date.now()
     ) {
-      return true;
+      return "Event already started";
+    }
+
+    if (
+      item.registration_deadline
+    ) {
+      const deadline =
+        new Date(
+          item.registration_deadline
+        ).getTime();
+
+      if (
+        Number.isNaN(
+          deadline
+        )
+      ) {
+        return "Invalid registration deadline";
+      }
+
+      if (
+        deadline >
+        eventStart
+      ) {
+        return "Invalid deadline · Edit event";
+      }
+
+      if (
+        deadline <=
+        Date.now()
+      ) {
+        return "Registration deadline passed";
+      }
     }
 
     const going =
-      eventGoingRegistrations(item.id).length;
+      eventGoingRegistrations(
+        item.id
+      ).length;
 
     if (
       item.capacity != null &&
       item.capacity > 0 &&
-      going >= item.capacity
+      going >=
+        item.capacity
     ) {
-      return true;
+      return "Event full";
     }
 
-    if (
-      new Date(item.event_date).getTime() < Date.now()
-    ) {
-      return true;
-    }
-
-    return false;
+    return "";
   };
+
+
+const registrationClosed =
+  (
+    item:
+      CampusEvent
+  ) =>
+    Boolean(
+      registrationClosedReason(
+        item
+      )
+    );
+
 
   const registerForEvent = async (item: CampusEvent) => {
     if (profile.role !== "Student") return;
@@ -5744,10 +5960,9 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
                                 selectedEvent.id
                                   ? "Registering..."
                                   : closed
-                                  ? capacity > 0 &&
-                                    going >= capacity
-                                    ? "Event full"
-                                    : "Registration closed"
+                                  ? registrationClosedReason(
+                                      selectedEvent
+                                    )
                                   : "Register for event →"}
                               </button>
                             )}
