@@ -215,6 +215,24 @@ const pdfStyles =
       textAlign: "center",
     },
 
+    codeLabel: {
+      marginTop: 9,
+      color: "#607487",
+      fontFamily: "Helvetica-Bold",
+      fontSize: 6.2,
+      letterSpacing: 1.1,
+      textAlign: "center",
+    },
+
+    codeValue: {
+      marginTop: 4,
+      color: "#142b42",
+      fontFamily: "Helvetica-Bold",
+      fontSize: 12,
+      letterSpacing: 1.8,
+      textAlign: "center",
+    },
+
     status: {
       marginTop: 13,
       padding: 8,
@@ -279,9 +297,11 @@ function passUid(
 function ResolutionPassPdf({
   pass,
   qrImage,
+  manualCode,
 }: {
   pass: ResolutionPass;
   qrImage: string;
+  manualCode: string;
 }) {
   const fulfilmentPerson =
     pass.used_by_name
@@ -461,6 +481,14 @@ function ResolutionPassPdf({
                 Scan only through the authorized
                 CampusConnect office scanner.
               </Text>
+
+              <Text style={pdfStyles.codeLabel}>
+                OFFICE VERIFICATION CODE
+              </Text>
+
+              <Text style={pdfStyles.codeValue}>
+                {manualCode || "UNAVAILABLE"}
+              </Text>
             </View>
           </View>
 
@@ -563,10 +591,32 @@ CampusSevaResolutionPass({
     useState(false);
 
   const [
-    manualToken,
-    setManualToken,
+    manualCode,
+    setManualCode,
   ] =
     useState("");
+
+  const [
+    manualRequestNumber,
+    setManualRequestNumber,
+  ] =
+    useState("");
+
+  const [
+    manualCodeInput,
+    setManualCodeInput,
+  ] =
+    useState("");
+
+  const [
+    verificationMethod,
+    setVerificationMethod,
+  ] =
+    useState<
+      "qr" |
+      "code" |
+      null
+    >(null);
 
   const [
     scannedToken,
@@ -639,10 +689,58 @@ CampusSevaResolutionPass({
 
           setPass(null);
         } else {
-          setPass(
+          const nextPass =
             data as
-              ResolutionPass | null
+              ResolutionPass | null;
+
+          setPass(
+            nextPass
           );
+
+          if (nextPass) {
+            setManualRequestNumber(
+              nextPass.request_number
+            );
+
+            const {
+              data:
+                codeData,
+              error:
+                codeError,
+            } =
+              await client.rpc(
+                "get_campus_service_resolution_manual_code",
+                {
+                  p_request_id:
+                    requestId,
+                }
+              );
+
+            if (codeError) {
+              console.error(
+                "[Campus Seva office code]",
+                codeError
+              );
+
+              setManualCode("");
+            } else {
+              const nextCode =
+                typeof codeData ===
+                  "string"
+                  ? codeData
+                  : "";
+
+              setManualCode(
+                nextCode
+              );
+
+              setManualCodeInput(
+                nextCode
+              );
+            }
+          } else {
+            setManualCode("");
+          }
         }
 
         setLoading(false);
@@ -711,6 +809,7 @@ CampusSevaResolutionPass({
             <ResolutionPassPdf
               pass={pass}
               qrImage={qrImage}
+              manualCode={manualCode}
             />
           ).toBlob();
 
@@ -831,8 +930,8 @@ CampusSevaResolutionPass({
           result
         );
 
-        setManualToken(
-          token
+        setVerificationMethod(
+          "qr"
         );
 
         setMessage(
@@ -842,6 +941,105 @@ CampusSevaResolutionPass({
         );
       },
       []
+    );
+
+
+
+  const verifyCode =
+    useCallback(
+      async () => {
+        const requestNumber =
+          manualRequestNumber
+            .trim()
+            .toUpperCase();
+
+        const code =
+          manualCodeInput
+            .trim()
+            .toUpperCase();
+
+        if (
+          !requestNumber ||
+          !code
+        ) {
+          setError(
+            "Enter both the Request UID and Office Code."
+          );
+
+          return;
+        }
+
+        const client =
+          getSupabaseClient();
+
+        if (!client) {
+          return;
+        }
+
+        setError("");
+        setMessage(
+          "Verifying office code…"
+        );
+
+        const {
+          data,
+          error:
+            verificationError,
+        } =
+          await client.rpc(
+            "verify_campus_service_resolution_code",
+            {
+              p_request_number:
+                requestNumber,
+              p_code:
+                code,
+            }
+          ).maybeSingle();
+
+        if (
+          verificationError
+        ) {
+          setError(
+            verificationError.message
+          );
+
+          setMessage("");
+          return;
+        }
+
+        if (!data) {
+          setError(
+            "The Request UID or Office Code is invalid."
+          );
+
+          setMessage("");
+          return;
+        }
+
+        const result =
+          data as
+            VerificationResult;
+
+        setScanResult(
+          result
+        );
+
+        setScannedToken("");
+
+        setVerificationMethod(
+          "code"
+        );
+
+        setMessage(
+          result.valid
+            ? `Office code verified: ${result.verification_state}.`
+            : "The Request UID or Office Code is invalid."
+        );
+      },
+      [
+        manualCodeInput,
+        manualRequestNumber,
+      ]
     );
 
 
@@ -936,14 +1134,34 @@ CampusSevaResolutionPass({
     };
 
 
+
   const fulfilPass =
     async () => {
       if (
-        !scannedToken ||
         !scanResult?.valid ||
         scanResult
           .verification_state !==
-          "Ready"
+          "Ready" ||
+        !verificationMethod
+      ) {
+        return;
+      }
+
+      if (
+        verificationMethod ===
+          "qr" &&
+        !scannedToken
+      ) {
+        return;
+      }
+
+      if (
+        verificationMethod ===
+          "code" &&
+        (
+          !manualRequestNumber.trim() ||
+          !manualCodeInput.trim()
+        )
       ) {
         return;
       }
@@ -959,17 +1177,47 @@ CampusSevaResolutionPass({
       setError("");
       setMessage("");
 
-      const {
-        error:
-          fulfilError,
-      } =
-        await client.rpc(
-          "fulfill_campus_service_resolution_pass",
-          {
-            p_token:
-              scannedToken,
-          }
-        );
+      let fulfilError:
+        {
+          message: string;
+        } |
+        null =
+          null;
+
+      if (
+        verificationMethod ===
+          "code"
+      ) {
+        const result =
+          await client.rpc(
+            "fulfill_campus_service_resolution_code",
+            {
+              p_request_number:
+                manualRequestNumber
+                  .trim()
+                  .toUpperCase(),
+              p_code:
+                manualCodeInput
+                  .trim()
+                  .toUpperCase(),
+            }
+          );
+
+        fulfilError =
+          result.error;
+      } else {
+        const result =
+          await client.rpc(
+            "fulfill_campus_service_resolution_pass",
+            {
+              p_token:
+                scannedToken,
+            }
+          );
+
+        fulfilError =
+          result.error;
+      }
 
       if (fulfilError) {
         setError(
@@ -977,12 +1225,19 @@ CampusSevaResolutionPass({
         );
       } else {
         setMessage(
-          "Service fulfilled successfully. The QR is now permanently marked as used."
+          "Service fulfilled successfully. This pass cannot be used again."
         );
 
-        await verifyToken(
-          scannedToken
-        );
+        if (
+          verificationMethod ===
+            "code"
+        ) {
+          await verifyCode();
+        } else {
+          await verifyToken(
+            scannedToken
+          );
+        }
 
         await loadPass();
 
@@ -993,7 +1248,8 @@ CampusSevaResolutionPass({
     };
 
 
-  if (loading) {
+  if (loading)
+ {
     return (
       <section className="sevaPassCard loading">
         Loading secure Resolution Pass…
@@ -1179,6 +1435,17 @@ CampusSevaResolutionPass({
             One-time office QR
           </strong>
 
+          <div className="sevaPassManualCode">
+            <span>
+              OFFICE VERIFICATION CODE
+            </span>
+
+            <b>
+              {manualCode ||
+                "Unavailable"}
+            </b>
+          </div>
+
           <p>
             Carry this PDF and your college ID
             to the assigned office.
@@ -1243,38 +1510,76 @@ CampusSevaResolutionPass({
               </button>
             </>
           )}
-
           <div className="sevaManualVerify">
-            <input
-              value={
-                manualToken
-              }
-              onChange={
-                event =>
-                  setManualToken(
-                    event.target
-                      .value
-                  )
-              }
-              placeholder="Paste QR token if the camera is unavailable"
-            />
+            <label>
+              <span>
+                REQUEST UID
+              </span>
+
+              <input
+                value={
+                  manualRequestNumber
+                }
+                onChange={
+                  event =>
+                    setManualRequestNumber(
+                      event.target
+                        .value
+                        .toUpperCase()
+                    )
+                }
+                placeholder="CC-SEVA-..."
+              />
+            </label>
+
+            <label>
+              <span>
+                OFFICE CODE
+              </span>
+
+              <input
+                value={
+                  manualCodeInput
+                }
+                onChange={
+                  event =>
+                    setManualCodeInput(
+                      event.target
+                        .value
+                        .toUpperCase()
+                        .replace(
+                          /[^A-F0-9-]/g,
+                          ""
+                        )
+                        .slice(
+                          0,
+                          9
+                        )
+                    )
+                }
+                maxLength={
+                  9
+                }
+                placeholder="7A3F-91C2"
+              />
+            </label>
 
             <button
               type="button"
-              onClick={() =>
-                verifyToken(
-                  manualToken
-                )
+              onClick={
+                verifyCode
               }
               disabled={
-                !manualToken.trim()
+                !manualRequestNumber.trim() ||
+                !manualCodeInput.trim()
               }
             >
-              Verify
+              Verify code
             </button>
           </div>
 
           {scanResult && (
+
             <article
               className="sevaVerificationResult"
               data-state={

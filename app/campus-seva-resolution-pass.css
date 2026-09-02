@@ -549,3 +549,77 @@
 }
 
 /* PROFESSIONAL WHITE SEVA PASS: END */
+
+/* SEVA SHORT OFFICE CODE UI: START */
+
+.sevaPassManualCode {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px 8px;
+  border-top: 1px solid #d7dfe6;
+  border-bottom: 1px solid #d7dfe6;
+  background: #ffffff;
+}
+
+.sevaPassManualCode span {
+  color: #64798c;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.sevaPassManualCode b {
+  margin-top: 6px;
+  color: #173650;
+  font-size: 18px;
+  letter-spacing: .13em;
+}
+
+.sevaManualVerify {
+  display: grid !important;
+  grid-template-columns:
+    minmax(0, 1.35fr)
+    minmax(145px, .65fr)
+    auto !important;
+  align-items: end;
+  gap: 9px !important;
+}
+
+.sevaManualVerify label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sevaManualVerify label > span {
+  color: #60778b;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.sevaManualVerify input {
+  width: 100%;
+}
+
+.sevaManualVerify label:nth-child(2) input {
+  color: #173650;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-align: center;
+}
+
+.sevaManualVerify > button {
+  min-height: 41px;
+}
+
+@media (max-width: 760px) {
+  .sevaManualVerify {
+    grid-template-columns:
+      1fr !important;
+  }
+}
+
+/* SEVA SHORT OFFICE CODE UI: END */
