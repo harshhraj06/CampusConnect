@@ -838,15 +838,361 @@ export default function Home() {
   }, [screen]);
 
   useEffect(() => {
-    let active = true; const client = getSupabaseClient(); if (!client || !profile.email) return;
-    Promise.all([client.from("announcements").select("id,title,body,category,created_at").order("created_at", {ascending: false}).limit(20), client.from("placement_applications").select("id,company,role_title,status,updated_at").order("updated_at", {ascending: false}).limit(10)]).then(([announcements, applications]) => {
-      if (!active) return;
-      const items: CampusNotification[] = [];
-      for (const row of announcements.data || []) items.push({id:`announcement-${row.id}`,kind: row.category === "Placement" ? "placement" : "academic",label: row.category,title: row.title,message: row.body,time: friendlyRelative(String(row.created_at)),target:"Announcements"});
-      if (role === "Student") for (const row of applications.data || []) items.push({id:`application-${row.id}`,kind:"placement",label:"Application",title:`${row.company} · ${row.role_title}`,message:`Application status: ${row.status}`,time:friendlyRelative(String(row.updated_at)),target:"Applications"});
-      setLiveNotifications(items.slice(0, 30));
-    }); return () => { active = false; };
-  }, [profile.email, role]);
+    let active = true;
+
+    const client =
+      getSupabaseClient();
+
+    if (
+      !client ||
+      !profile.email
+    ) {
+      return;
+    }
+
+    const loadLiveNotifications =
+      async () => {
+        const [
+          announcements,
+          applications,
+          campusEvents,
+        ] =
+          await Promise.all([
+            client
+              .from("announcements")
+              .select(
+                "id,title,body,category,created_at"
+              )
+              .order(
+                "created_at",
+                {
+                  ascending: false,
+                }
+              )
+              .limit(20),
+
+            client
+              .from(
+                "placement_applications"
+              )
+              .select(
+                "id,company,role_title,status,updated_at"
+              )
+              .order(
+                "updated_at",
+                {
+                  ascending: false,
+                }
+              )
+              .limit(10),
+
+            client
+              .from("campus_events")
+              .select(
+                [
+                  "id",
+                  "title",
+                  "short_description",
+                  "category",
+                  "event_date",
+                  "created_at",
+                  "audience_department",
+                  "audience_year",
+                  "status",
+                ].join(",")
+              )
+              .eq(
+                "status",
+                "Published"
+              )
+              .gte(
+                "event_date",
+                new Date()
+                  .toISOString()
+              )
+              .order(
+                "event_date",
+                {
+                  ascending: true,
+                }
+              )
+              .limit(20),
+          ]);
+
+        if (!active) {
+          return;
+        }
+
+        const notificationRows:
+          Array<{
+            timestamp: number;
+            item:
+              CampusNotification;
+          }> = [];
+
+
+        for (
+          const row of
+          announcements.data ||
+          []
+        ) {
+          notificationRows.push({
+            timestamp:
+              new Date(
+                String(
+                  row.created_at
+                )
+              ).getTime(),
+
+            item: {
+              id:
+                `announcement-${row.id}`,
+
+              kind:
+                row.category ===
+                  "Placement"
+                  ? "placement"
+                  : "academic",
+
+              label:
+                row.category,
+
+              title:
+                row.title,
+
+              message:
+                row.body,
+
+              time:
+                friendlyRelative(
+                  String(
+                    row.created_at
+                  )
+                ),
+
+              target:
+                "Announcements",
+            },
+          });
+        }
+
+
+        if (
+          role ===
+          "Student"
+        ) {
+          for (
+            const row of
+            applications.data ||
+            []
+          ) {
+            notificationRows.push({
+              timestamp:
+                new Date(
+                  String(
+                    row.updated_at
+                  )
+                ).getTime(),
+
+              item: {
+                id:
+                  `application-${row.id}`,
+
+                kind:
+                  "placement",
+
+                label:
+                  "Application",
+
+                title:
+                  `${row.company} · ${row.role_title}`,
+
+                message:
+                  `Application status: ${row.status}`,
+
+                time:
+                  friendlyRelative(
+                    String(
+                      row.updated_at
+                    )
+                  ),
+
+                target:
+                  "Applications",
+              },
+            });
+          }
+        }
+
+
+        for (
+          const row of
+          (campusEvents.data || []) as unknown as Array<{
+            id: string;
+            title: string;
+            short_description: string | null;
+            category: string | null;
+            event_date: string;
+            created_at: string | null;
+            audience_department: string | null;
+            audience_year: string | null;
+          }>
+        ) {
+          const department =
+            String(
+              row.audience_department ||
+              "All"
+            );
+
+          const year =
+            String(
+              row.audience_year ||
+              "All"
+            );
+
+          const departmentMatches =
+            department ===
+              "All" ||
+            department ===
+              profile.department;
+
+          const yearMatches =
+            year ===
+              "All" ||
+            year ===
+              profile.year;
+
+          if (
+            !departmentMatches ||
+            !yearMatches
+          ) {
+            continue;
+          }
+
+          notificationRows.push({
+            timestamp:
+              new Date(
+                String(
+                  row.created_at ||
+                  row.event_date
+                )
+              ).getTime(),
+
+            item: {
+              id:
+                `event-${row.id}`,
+
+              kind:
+                "campus",
+
+              label:
+                row.category ||
+                "Event",
+
+              title:
+                row.title,
+
+              message:
+                row.short_description ||
+                `Upcoming event starts ${
+                  friendlyRelative(
+                    String(
+                      row.event_date
+                    )
+                  )
+                }.`,
+
+              time:
+                friendlyRelative(
+                  String(
+                    row.created_at ||
+                    row.event_date
+                  )
+                ),
+
+              target:
+                "Announcements",
+            },
+          });
+        }
+
+
+        setLiveNotifications(
+          notificationRows
+            .sort(
+              (a, b) =>
+                b.timestamp -
+                a.timestamp
+            )
+            .slice(0, 30)
+            .map(
+              row =>
+                row.item
+            )
+        );
+      };
+
+
+    void loadLiveNotifications();
+
+
+    const channel =
+      client
+        .channel(
+          "campus-live-notifications"
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table:
+              "announcements",
+          },
+          () => {
+            void loadLiveNotifications();
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table:
+              "placement_applications",
+          },
+          () => {
+            void loadLiveNotifications();
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table:
+              "campus_events",
+          },
+          () => {
+            void loadLiveNotifications();
+          }
+        )
+        .subscribe();
+
+
+    return () => {
+      active = false;
+
+      void client.removeChannel(
+        channel
+      );
+    };
+  }, [
+    profile.email,
+    profile.department,
+    profile.year,
+    role,
+  ]);
 
   useEffect(() => {
     const navigate = (event: Event) => { const target = (event as CustomEvent<string>).detail; if (target) setV(target as View); };

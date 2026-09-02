@@ -73,10 +73,8 @@ const canManageEventRole = (role: Role) =>
 
 const canCheckInEventRole = (role: Role) =>
   hasCampusRole(role, [
-    "Faculty",
-    "Coordinator",
     "Volunteer",
-    "Placement Cell",
+    "Coordinator",
     "Main Admin",
   ]);
 
@@ -452,6 +450,7 @@ type EventScheduleInput = {
   registration_deadline?: string | null;
   capacity?: string | number | null;
   status?: string;
+  allow_campus_registration?: boolean;
 };
 
 
@@ -471,13 +470,35 @@ function validateEventSchedule(
     return "Enter a valid event start date and time.";
   }
 
+  const now = Date.now();
+
+  /*
+   * Published events may be:
+   * 1. Upcoming
+   * 2. Currently in progress
+   *
+   * Only reject an event when its start time has already passed
+   * AND there is no future end time keeping the event active.
+   */
   if (
-    value.status ===
-      "Published" &&
-    eventStart.getTime() <=
-      Date.now()
+    value.status === "Published" &&
+    eventStart.getTime() <= now
   ) {
-    return "A published event must start in the future.";
+    const eventEndTime = value.end_date
+      ? new Date(value.end_date).getTime()
+      : Number.NaN;
+
+    const eventIsCurrentlyRunning =
+      Number.isFinite(eventEndTime) &&
+      eventEndTime > now;
+
+    if (!eventIsCurrentlyRunning) {
+      return (
+        "This event start time has already passed. " +
+        "Choose a future start time, add a future end time for an event currently in progress, " +
+        "or save it as Draft."
+      );
+    }
   }
 
   if (value.end_date) {
@@ -503,6 +524,7 @@ function validateEventSchedule(
   }
 
   if (
+    value.allow_campus_registration !== false &&
     value.registration_deadline
   ) {
     const deadline =
@@ -531,7 +553,7 @@ function validateEventSchedule(
       deadline.getTime() <=
         Date.now()
     ) {
-      return "Registration deadline must be in the future for a published event.";
+      return "Registration has already closed. Choose a future registration deadline before the event starts, or turn off CampusConnect registration.";
     }
   }
 
@@ -1110,6 +1132,47 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     }
   };
 
+  const loadEventOperationsRoster = async (
+    eventId: string
+  ) => {
+    const client = getSupabaseClient();
+
+    if (!client || !eventId) return;
+
+    const {data, error} = await client.rpc(
+      "get_event_operations_roster",
+      {
+        p_event_id: eventId,
+      }
+    );
+
+    if (error) {
+      console.error(
+        "Unable to load event operations roster:",
+        error
+      );
+
+      return;
+    }
+
+    const roster =
+      (data || []) as EventRegistration[];
+
+    setEventRegistrations(current => {
+      const otherEvents =
+        current.filter(
+          row =>
+            row.event_id !== eventId
+        );
+
+      return [
+        ...otherEvents,
+        ...roster,
+      ];
+    });
+  };
+
+
   const loadEvents = async () => {
     const client = getSupabaseClient();
     if (!client) return;
@@ -1128,6 +1191,35 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
 
     setEvents((data || []) as CampusEvent[]);
   };
+
+  useEffect(() => {
+    if (!selectedEvent) return;
+
+    const operationalRole =
+      canCheckInEventRole(profile.role);
+
+    const ownsEvent =
+      Boolean(
+        currentUserId &&
+        selectedEvent.created_by ===
+          currentUserId
+      );
+
+    if (
+      operationalRole ||
+      profile.role === "Main Admin" ||
+      ownsEvent
+    ) {
+      void loadEventOperationsRoster(
+        selectedEvent.id
+      );
+    }
+  }, [
+    selectedEvent?.id,
+    currentUserId,
+    profile.role,
+  ]);
+
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -1317,7 +1409,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     const client = getSupabaseClient();
 
     if (!client) {
-      return rejectEventEdit(
+      return setStatus(
         "CampusConnect is not connected to Supabase."
       );
     }
@@ -1856,6 +1948,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
           eventEditForm.status,
 
         registration_deadline:
+          eventEditForm.allow_campus_registration &&
           eventEditForm.registration_deadline
             ? new Date(
                 eventEditForm.registration_deadline
@@ -1863,6 +1956,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
             : null,
 
         capacity:
+          eventEditForm.allow_campus_registration &&
           eventEditForm.capacity
             ? Number(eventEditForm.capacity)
             : null,
@@ -2379,6 +2473,7 @@ if (scheduleError) {
           eventForm.status,
 
         registration_deadline:
+          eventForm.allow_campus_registration &&
           eventForm.registration_deadline
             ? new Date(
                 eventForm.registration_deadline
@@ -2386,6 +2481,7 @@ if (scheduleError) {
             : null,
 
         capacity:
+          eventForm.allow_campus_registration &&
           eventForm.capacity
             ? Number(eventForm.capacity)
             : null,
@@ -3113,10 +3209,10 @@ const registrationClosed =
 
     try {
       const {data, error} = await client.rpc(
-        "check_in_event_attendee",
+        "check_in_event_pass",
         {
           p_event_id: item.id,
-          p_check_in_code: code,
+          p_pass_value: code,
         }
       );
 
@@ -3125,15 +3221,20 @@ const registrationClosed =
       const result = data as {
         success?: boolean;
         already_checked_in?: boolean;
+        code?: string;
+        message?: string;
         student_name?: string;
         department?: string;
         graduation_year?: string;
         checked_in_at?: string;
+        check_in_method?: string;
+        valid_from?: string;
       };
 
-      if (!result.success) {
+      if (!result?.success) {
         throw new Error(
-          "Unable to verify this event pass."
+          result?.message ||
+            "Unable to verify this event pass."
         );
       }
 
@@ -3147,11 +3248,27 @@ const registrationClosed =
 
       await loadEventRegistrations();
     } catch (error) {
-      setCheckInMessage(
+      const message =
         error instanceof Error
           ? error.message
-          : "Unable to check in attendee."
+          : (
+              error &&
+              typeof error === "object" &&
+              "message" in error
+            )
+          ? String(
+              (error as {message?: unknown})
+                .message ||
+                "Unable to check in attendee."
+            )
+          : "Unable to check in attendee.";
+
+      console.error(
+        "CampusConnect event check-in failed:",
+        error
       );
+
+      setCheckInMessage(message);
     } finally {
       setCheckInBusy(false);
     }
@@ -5245,6 +5362,89 @@ const registrationClosed =
         </div>
       )}
 
+      {/* EVENT CAMERA SCANNER MODAL: START */}
+
+      {scannerOpen &&
+        selectedEvent &&
+        canCheckInEventRole(profile.role) && (
+          <div
+            className="eventScannerScrim"
+            role="presentation"
+            onClick={() =>
+              setScannerOpen(false)
+            }
+          >
+            <section
+              className="eventScannerModal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="event-scanner-title"
+              onClick={event =>
+                event.stopPropagation()
+              }
+            >
+              <header>
+                <div>
+                  <span>SECURE EVENT CHECK-IN</span>
+
+                  <h2 id="event-scanner-title">
+                    Scan attendee pass
+                  </h2>
+
+                  <p>
+                    {
+                      selectedEvent.title
+                    }
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setScannerOpen(false)
+                  }
+                  aria-label="Close QR scanner"
+                >
+                  ×
+                </button>
+              </header>
+
+              <div
+                id="campus-event-qr-reader"
+                className="eventScannerViewport"
+              />
+
+              {scannerError && (
+                <p
+                  className="eventScannerError"
+                  role="alert"
+                >
+                  {scannerError}
+                </p>
+              )}
+
+              <footer>
+                <small>
+                  Hold the complete QR inside the frame.
+                  Successful passes are checked in only once.
+                </small>
+
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() =>
+                    setScannerOpen(false)
+                  }
+                >
+                  Use manual code
+                </button>
+              </footer>
+            </section>
+          </div>
+        )}
+
+      {/* EVENT CAMERA SCANNER MODAL: END */}
+
       {editingEvent && (
         <div
           className="eventModalScrim"
@@ -5450,6 +5650,7 @@ const registrationClosed =
                     <input
                       type="number"
                       min="1"
+                      disabled={!eventEditForm.allow_campus_registration}
                       value={eventEditForm.capacity}
                       onChange={event =>
                         setEventEditForm({
@@ -5463,6 +5664,7 @@ const registrationClosed =
                   <Field label="Registration deadline">
                     <input
                       type="datetime-local"
+                      disabled={!eventEditForm.allow_campus_registration}
                       value={
                         eventEditForm.registration_deadline
                       }
@@ -6002,10 +6204,10 @@ const registrationClosed =
                               <section className="eventPassSection">
                                 <div className="eventPassHeading">
                                   <div>
-                                    <span>YOUR EVENT PASS</span>
-                                    <h3>Ready for check-in</h3>
+                                    <span>DIGITAL EVENT PASS</span>
+                                    <h3>Your verified CampusConnect pass</h3>
                                     <p>
-                                      Show this QR code to event staff at the venue.
+                                      Keep this pass ready for secure entry at the venue.
                                     </p>
                                   </div>
 
@@ -6030,45 +6232,410 @@ const registrationClosed =
 
                                   return (
                                     <div className="eventPassCard">
-                                      <div className="eventPassQr">
-                                        <QRCodeSVG
-                                          value={registration.check_in_code}
-                                          size={180}
-                                          level="M"
-                                          includeMargin
-                                        />
-                                      </div>
+                                      <div className="eventPassTop">
+                                        <div className="eventPassBrand">
+                                          <div className="eventPassBrandMark">
+                                            CC
+                                          </div>
 
-                                      <div className="eventPassIdentity">
-                                        <span>REGISTERED ATTENDEE</span>
-
-                                        <h3>
-                                          {registration.student_name ||
-                                            profile.name}
-                                        </h3>
-
-                                        <p>
-                                          {registration.department ||
-                                            profile.department}
-                                          {" · "}
-                                          {registration.graduation_year ||
-                                            profile.year}
-                                        </p>
-
-                                        <div>
-                                          <small>EVENT</small>
-                                          <strong>
-                                            {selectedEvent.title}
-                                          </strong>
+                                          <div>
+                                            <span>CAMPUSCONNECT</span>
+                                            <strong>
+                                              Verified Event Pass
+                                            </strong>
+                                          </div>
                                         </div>
 
-                                        <div>
-                                          <small>STATUS</small>
-                                          <strong className="eventPassStatus">
+                                        <div
+                                          className={
+                                            registration.checked_in
+                                              ? "eventPassValidity checked"
+                                              : "eventPassValidity"
+                                          }
+                                        >
+                                          <i>
                                             {registration.checked_in
-                                              ? "✓ Checked in"
-                                              : "Valid pass"}
+                                              ? "✓"
+                                              : "●"}
+                                          </i>
+
+                                          <span>
+                                            {registration.checked_in
+                                              ? "CHECKED IN"
+                                              : "VALID PASS"}
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      {selectedEvent.banner_url && (
+                                        <div className="eventPassBanner">
+                                          <img
+                                            src={selectedEvent.banner_url}
+                                            alt=""
+                                          />
+
+                                          <div className="eventPassBannerShade" />
+
+                                          <div className="eventPassBannerContent">
+                                            <span>
+                                              {selectedEvent.category}
+                                            </span>
+
+                                            <h3>
+                                              {selectedEvent.title}
+                                            </h3>
+
+                                            <p>
+                                              {selectedEvent.organizer ||
+                                                "CampusConnect"}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {!selectedEvent.banner_url && (
+                                        <div className="eventPassEventHeader">
+                                          <span>
+                                            {selectedEvent.category}
+                                          </span>
+
+                                          <h3>
+                                            {selectedEvent.title}
+                                          </h3>
+
+                                          <p>
+                                            Hosted by{" "}
+                                            {selectedEvent.organizer ||
+                                              "CampusConnect"}
+                                          </p>
+                                        </div>
+                                      )}
+
+                                      <div className="eventPassBody">
+                                        <div className="eventPassMain">
+                                          <div className="eventPassAttendee">
+                                            <div className="eventPassAvatar">
+                                              {(registration.student_name ||
+                                                profile.name)
+                                                .split(/\s+/)
+                                                .filter(Boolean)
+                                                .slice(0, 2)
+                                                .map(name =>
+                                                  name
+                                                    .charAt(0)
+                                                    .toUpperCase()
+                                                )
+                                                .join("") || "ST"}
+                                            </div>
+
+                                            <div>
+                                              <span>
+                                                REGISTERED ATTENDEE
+                                              </span>
+
+                                              <h4>
+                                                {registration.student_name ||
+                                                  profile.name}
+                                              </h4>
+
+                                              <p>
+                                                {registration.department ||
+                                                  profile.department}
+                                                {" · "}
+                                                {registration.graduation_year ||
+                                                  profile.year}
+                                              </p>
+                                            </div>
+                                          </div>
+
+                                          <div className="eventPassDetails">
+                                            <div>
+                                              <span className="eventPassDetailIcon">
+                                                ◷
+                                              </span>
+
+                                              <p>
+                                                <small>
+                                                  DATE & TIME
+                                                </small>
+
+                                                <strong>
+                                                  {eventDateLabel(
+                                                    selectedEvent.event_date
+                                                  )}
+                                                </strong>
+
+                                                <em>
+                                                  {eventTimeLabel(
+                                                    selectedEvent.event_date
+                                                  )}
+                                                  {selectedEvent.end_date
+                                                    ? ` – ${eventTimeLabel(
+                                                        selectedEvent.end_date
+                                                      )}`
+                                                    : ""}
+                                                </em>
+                                              </p>
+                                            </div>
+
+                                            <div>
+                                              <span className="eventPassDetailIcon">
+                                                ◎
+                                              </span>
+
+                                              <p>
+                                                <small>VENUE</small>
+
+                                                <strong>
+                                                  {selectedEvent.venue ||
+                                                    "Venue to be announced"}
+                                                </strong>
+
+                                                <em>
+                                                  Campus event location
+                                                </em>
+                                              </p>
+                                            </div>
+
+                                            <div>
+                                              <span className="eventPassDetailIcon">
+                                                ◇
+                                              </span>
+
+                                              <p>
+                                                <small>ORGANIZER</small>
+
+                                                <strong>
+                                                  {selectedEvent.organizer ||
+                                                    "CampusConnect"}
+                                                </strong>
+
+                                                <em>
+                                                  Official event organizer
+                                                </em>
+                                              </p>
+                                            </div>
+
+                                            <div>
+                                              <span className="eventPassDetailIcon">
+                                                #
+                                              </span>
+
+                                              <p>
+                                                <small>PASS ID</small>
+
+                                                <strong>
+                                                  CC-
+                                                  {registration.id
+                                                    .replace(/-/g, "")
+                                                    .slice(0, 10)
+                                                    .toUpperCase()}
+                                                </strong>
+
+                                                <em>
+                                                  Unique attendee pass
+                                                </em>
+                                              </p>
+                                            </div>
+                                          </div>
+
+                                          <div className="eventPassSecurity">
+                                            <span>✓</span>
+
+                                            <p>
+                                              <strong>
+                                                Identity verified through CampusConnect
+                                              </strong>
+
+                                              <small>
+                                                This digital pass is linked to your
+                                                CampusConnect registration and cannot
+                                                be transferred.
+                                              </small>
+                                            </p>
+                                          </div>
+                                        </div>
+
+                                        <div className="eventPassQrColumn">
+                                          <div className="eventPassQrLabel">
+                                            <span>ENTRY QR</span>
+                                            <small>
+                                              Scan at check-in
+                                            </small>
+                                          </div>
+
+                                          <div className="eventPassQr">
+                                            <QRCodeSVG
+                                              value={
+                                                registration.check_in_code
+                                              }
+                                              size={190}
+                                              level="M"
+                                              includeMargin
+                                            />
+                                          </div>
+
+                                          <strong className="eventPassScanText">
+                                            Present this QR at entry
                                           </strong>
+
+                                          <span className="eventPassCode">
+                                            {registration.check_in_code
+                                              .slice(0, 18)
+                                              .toUpperCase()}
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      <div className="eventPassPerforation">
+                                        <span />
+                                        <i />
+                                        <span />
+                                      </div>
+
+                                      <div className="eventPassFooter">
+                                        <div>
+                                          <span>
+                                            CAMPUSCONNECT DIGITAL PASS
+                                          </span>
+
+                                          <small>
+                                            Issued{" "}
+                                            {friendlyDate(
+                                              registration.registered_at
+                                            )}
+                                          </small>
+                                        </div>
+
+                                        <p>
+                                          <i>✓</i>
+                                          Secure · Verified · Single attendee
+                                        </p>
+                                      </div>
+
+                                      <div className="eventPassActions">
+                                        <div>
+                                          <span>PASS ACTIONS</span>
+
+                                          <small>
+                                            Save your pass before arriving at the venue.
+                                          </small>
+                                        </div>
+
+                                        <div className="eventPassActionButtons">
+                                          <button
+                                            type="button"
+                                            className="eventPassActionButton"
+                                            onClick={() => {
+                                              const passId =
+                                                `CC-${registration.id
+                                                  .replace(/-/g, "")
+                                                  .slice(0, 10)
+                                                  .toUpperCase()}`;
+
+                                              void navigator.clipboard
+                                                .writeText(passId)
+                                                .then(() =>
+                                                  setStatus(
+                                                    "Event Pass ID copied."
+                                                  )
+                                                )
+                                                .catch(() =>
+                                                  setStatus(
+                                                    "Unable to copy Event Pass ID."
+                                                  )
+                                                );
+                                            }}
+                                          >
+                                            <span>⌘</span>
+                                            Copy Pass ID
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            className="eventPassActionButton primaryPassAction"
+                                            onClick={() => {
+                                              const pass =
+                                                document.querySelector(
+                                                  ".eventPassCard"
+                                                );
+
+                                              if (
+                                                !(pass instanceof HTMLElement)
+                                              ) {
+                                                setStatus(
+                                                  "Unable to prepare the Event Pass."
+                                                );
+                                                return;
+                                              }
+
+                                              const oldRoot =
+                                                document.getElementById(
+                                                  "campus-event-print-root"
+                                                );
+
+                                              oldRoot?.remove();
+
+                                              const printRoot =
+                                                document.createElement(
+                                                  "div"
+                                                );
+
+                                              printRoot.id =
+                                                "campus-event-print-root";
+
+                                              const passClone =
+                                                pass.cloneNode(
+                                                  true
+                                                ) as HTMLElement;
+
+                                              passClone
+                                                .querySelector(
+                                                  ".eventPassActions"
+                                                )
+                                                ?.remove();
+
+                                              printRoot.appendChild(
+                                                passClone
+                                              );
+
+                                              document.body.appendChild(
+                                                printRoot
+                                              );
+
+                                              const cleanup = () => {
+                                                printRoot.remove();
+
+                                                document.body.classList.remove(
+                                                  "campusEventPrintMode"
+                                                );
+
+                                                window.removeEventListener(
+                                                  "afterprint",
+                                                  cleanup
+                                                );
+                                              };
+
+                                              document.body.classList.add(
+                                                "campusEventPrintMode"
+                                              );
+
+                                              window.addEventListener(
+                                                "afterprint",
+                                                cleanup
+                                              );
+
+                                              window.setTimeout(
+                                                () => {
+                                                  window.print();
+                                                },
+                                                150
+                                              );
+                                            }}
+                                          >
+                                            <span>↓</span>
+                                            Print / Save PDF
+                                          </button>
                                         </div>
                                       </div>
                                     </div>
@@ -6079,7 +6646,237 @@ const registrationClosed =
                           </>
                         )}
 
-                        {canManageEvent(selectedEvent) && (
+                        {/* EVENT CHECK-IN PANEL: START */}
+
+                        {canCheckInEventRole(profile.role) && (
+                          <section className="eventCheckInPanel">
+                            <div className="eventCheckInHeader">
+                              <div>
+                                <span>AUTHORIZED EVENT CHECK-IN</span>
+
+                                <h3>
+                                  Verify attendee passes
+                                </h3>
+
+                                <p>
+                                  Scan the secure QR or enter the manual
+                                  pass code. Access is limited to volunteers,
+                                  coordinators and Main Admin.
+                                </p>
+                              </div>
+
+                              <button
+                                type="button"
+                                className="ghost"
+                                onClick={() => {
+                                  setShowCheckInPanel(
+                                    value => !value
+                                  );
+                                  setCheckInMessage("");
+                                }}
+                              >
+                                {showCheckInPanel
+                                  ? "Close scanner"
+                                  : "Open scanner"}
+                              </button>
+                            </div>
+
+                            {showCheckInPanel && (
+                              <div className="eventCheckInBody">
+                                <div className="eventCheckInStats">
+                                  <div>
+                                    <small>REGISTERED</small>
+
+                                    <strong>
+                                      {going}
+                                    </strong>
+                                  </div>
+
+                                  <div>
+                                    <small>CHECKED IN</small>
+
+                                    <strong>
+                                      {
+                                        eventGoingRegistrations(
+                                          selectedEvent.id
+                                        ).filter(
+                                          row => row.checked_in
+                                        ).length
+                                      }
+                                    </strong>
+                                  </div>
+
+                                  <div>
+                                    <small>WAITING</small>
+
+                                    <strong>
+                                      {
+                                        eventGoingRegistrations(
+                                          selectedEvent.id
+                                        ).filter(
+                                          row => !row.checked_in
+                                        ).length
+                                      }
+                                    </strong>
+                                  </div>
+                                </div>
+
+                                <div className="eventScannerActions">
+                                  <button
+                                    type="button"
+                                    className="primary"
+                                    disabled={checkInBusy}
+                                    onClick={() => {
+                                      setScannerError("");
+                                      setCheckInMessage("");
+                                      setScannerOpen(true);
+                                    }}
+                                  >
+                                    Scan attendee QR
+                                  </button>
+
+                                  <small>
+                                    Camera permission is required only while
+                                    the scanner is open.
+                                  </small>
+                                </div>
+
+                                <div className="eventCheckInEntry">
+                                  <input
+                                    value={checkInCode}
+                                    onChange={event =>
+                                      setCheckInCode(
+                                        event.target.value
+                                      )
+                                    }
+                                    onKeyDown={event => {
+                                      if (
+                                        event.key === "Enter" &&
+                                        !checkInBusy
+                                      ) {
+                                        event.preventDefault();
+
+                                        void checkInEventAttendee(
+                                          selectedEvent
+                                        );
+                                      }
+                                    }}
+                                    placeholder="Enter manual pass code"
+                                    aria-label="Event pass manual code"
+                                    autoComplete="off"
+                                  />
+
+                                  <button
+                                    type="button"
+                                    className="primary"
+                                    disabled={
+                                      checkInBusy ||
+                                      !checkInCode.trim()
+                                    }
+                                    onClick={() =>
+                                      void checkInEventAttendee(
+                                        selectedEvent
+                                      )
+                                    }
+                                  >
+                                    {checkInBusy
+                                      ? "Verifying..."
+                                      : "Verify and check in"}
+                                  </button>
+                                </div>
+
+                                {checkInMessage && (
+                                  <p
+                                    className="eventCheckInMessage"
+                                    role="status"
+                                    aria-live="polite"
+                                  >
+                                    {checkInMessage}
+                                  </p>
+                                )}
+
+                                <div className="eventRecentCheckIns">
+                                  <span>RECENT CHECK-INS</span>
+
+                                  {
+                                    eventGoingRegistrations(
+                                      selectedEvent.id
+                                    )
+                                      .filter(
+                                        row => row.checked_in
+                                      )
+                                      .slice()
+                                      .sort(
+                                        (a, b) =>
+                                          new Date(
+                                            b.checked_in_at ||
+                                            b.updated_at
+                                          ).getTime() -
+                                          new Date(
+                                            a.checked_in_at ||
+                                            a.updated_at
+                                          ).getTime()
+                                      )
+                                      .slice(0, 5)
+                                      .map(registration => (
+                                        <div
+                                          className="eventRecentCheckInRow"
+                                          key={registration.id}
+                                        >
+                                          <span>✓</span>
+
+                                          <p>
+                                            <b>
+                                              {
+                                                registration.student_name ||
+                                                "Student"
+                                              }
+                                            </b>
+
+                                            <small>
+                                              {
+                                                registration.department ||
+                                                "CampusConnect"
+                                              }
+                                              {" · "}
+                                              {
+                                                registration.graduation_year ||
+                                                "Student"
+                                              }
+                                            </small>
+                                          </p>
+
+                                          <time>
+                                            {friendlyDate(
+                                              registration.checked_in_at ||
+                                              registration.updated_at
+                                            )}
+                                          </time>
+                                        </div>
+                                      ))
+                                  }
+
+                                  {
+                                    eventGoingRegistrations(
+                                      selectedEvent.id
+                                    ).filter(
+                                      row => row.checked_in
+                                    ).length === 0 && (
+                                      <small className="eventNoCheckIns">
+                                        No attendees have checked in yet.
+                                      </small>
+                                    )
+                                  }
+                                </div>
+                              </div>
+                            )}
+                          </section>
+                        )}
+
+                        {/* EVENT CHECK-IN PANEL: END */}
+
+                        {(canManageEvent(selectedEvent) ||
+                          canCheckInEventRole(profile.role)) && (
                           <div className="eventOrganizerRegistration">
                             <div>
                               <b>
@@ -6122,7 +6919,8 @@ const registrationClosed =
                         )}
 
                         {showAttendees &&
-                          canManageEvent(selectedEvent) && (
+                          (canManageEvent(selectedEvent) ||
+                            canCheckInEventRole(profile.role)) && (
                             <div className="eventAttendeeList">
                               {eventGoingRegistrations(
                                 selectedEvent.id
@@ -16104,13 +16902,19 @@ function Field({label, children}: {label: string; children: ReactNode}) { return
 function FormHeading({title, text}: {title: string; text: string}) { return <header className="formHeading"><div><span>CREATE</span><h3>{title}</h3><p>{text}</p></div></header>; }
 function FormActions({status, label, disabled}: {status: string; label: string; disabled?: boolean}) { return <div className="formActions"><span>{status}</span><button className="primary" disabled={disabled}>{label}</button></div>; }
 function StatusLine({text}: {text: string}) {
-  const isError =
-    text.startsWith("ERROR:");
+  const normalized = text.trim().toLowerCase();
 
-  const cleanText =
-    isError
-      ? text.replace(/^ERROR:\s*/, "")
-      : text;
+  const isError =
+    normalized.includes("unable") ||
+    normalized.includes("required") ||
+    normalized.includes("must ") ||
+    normalized.includes("already") ||
+    normalized.includes("invalid") ||
+    normalized.includes("not connected") ||
+    normalized.includes("sign in") ||
+    normalized.includes("expired") ||
+    normalized.includes("closed") ||
+    normalized.includes("choose a future");
 
   return (
     <p
@@ -16120,8 +16924,9 @@ function StatusLine({text}: {text: string}) {
           : "moduleStatus moduleStatusSuccess"
       }
       role={isError ? "alert" : "status"}
+      aria-live={isError ? "assertive" : "polite"}
     >
-      {isError ? "✕" : "✓"} {cleanText}
+      {isError ? "✕" : "✓"} {text}
     </p>
   );
 }

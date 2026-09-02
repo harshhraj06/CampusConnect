@@ -8270,3 +8270,1376 @@
 }
 
 /* EVENT EDIT INLINE ERROR: END */
+
+
+/* PROFESSIONAL EVENT STATUS FEEDBACK */
+
+.moduleStatus {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  width: fit-content;
+  max-width: 100%;
+
+  margin: 14px 0;
+  padding: 11px 14px;
+
+  border-radius: 12px;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.moduleStatusIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.moduleStatusSuccess {
+  color: #17633a;
+  background: #f0faf4;
+  border: 1px solid #ccebd8;
+}
+
+.moduleStatusSuccess .moduleStatusIcon {
+  color: #ffffff;
+  background: #258a54;
+}
+
+.moduleStatusError {
+  color: #8b2e2e;
+  background: #fff6f5;
+  border: 1px solid #f1d1cd;
+}
+
+.moduleStatusError .moduleStatusIcon {
+  color: #ffffff;
+  background: #c74a42;
+}
+
+@media (max-width: 640px) {
+  .moduleStatus {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+
+/* PROFESSIONAL CAMPUSCONNECT DIGITAL EVENT PASS */
+
+.eventPassSection {
+  overflow: hidden;
+}
+
+.eventPassCard {
+  position: relative;
+  display: block;
+  overflow: hidden;
+
+  margin-top: 18px;
+  padding: 0;
+
+  border: 1px solid #dfd2c1;
+  border-radius: 22px;
+
+  background: #fffdf9;
+
+  box-shadow:
+    0 24px 60px rgba(64, 45, 30, .10),
+    0 4px 14px rgba(64, 45, 30, .05);
+}
+
+.eventPassTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  padding: 17px 20px;
+
+  border-bottom: 1px solid #eee3d6;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fffdf9 0%,
+      #fbf4e9 100%
+    );
+}
+
+.eventPassBrand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.eventPassBrandMark {
+  display: grid;
+  place-items: center;
+
+  width: 37px;
+  height: 37px;
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #5c351d,
+      #8b552b
+    );
+
+  color: #fff;
+
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+
+  box-shadow:
+    0 7px 18px rgba(92, 53, 29, .18);
+}
+
+.eventPassBrand > div:last-child {
+  display: grid;
+  gap: 2px;
+}
+
+.eventPassBrand span {
+  color: #9d6c3d;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.eventPassBrand strong {
+  color: #37271d;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.eventPassValidity {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 7px 11px;
+
+  border: 1px solid #cce5d2;
+  border-radius: 999px;
+
+  background: #f0faf3;
+
+  color: #247044;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+
+.eventPassValidity i {
+  display: grid;
+  place-items: center;
+
+  width: 17px;
+  height: 17px;
+
+  border-radius: 50%;
+
+  background: #2e8b57;
+
+  color: #fff;
+
+  font-style: normal;
+  font-size: 8px;
+}
+
+.eventPassValidity.checked {
+  background: #f1f6ff;
+  border-color: #cfdbed;
+  color: #34577d;
+}
+
+.eventPassValidity.checked i {
+  background: #496f99;
+}
+
+.eventPassBanner {
+  position: relative;
+  min-height: 190px;
+  overflow: hidden;
+
+  background: #453124;
+}
+
+.eventPassBanner > img {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.eventPassBannerShade {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(30, 20, 14, .88) 0%,
+      rgba(30, 20, 14, .60) 48%,
+      rgba(30, 20, 14, .14) 100%
+    );
+}
+
+.eventPassBannerContent {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  min-height: 190px;
+
+  padding: 28px;
+}
+
+.eventPassBannerContent span,
+.eventPassEventHeader > span {
+  width: fit-content;
+
+  padding: 5px 9px;
+
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.11);
+
+  color: #fff6e8;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.eventPassBannerContent h3 {
+  max-width: 680px;
+
+  margin: 10px 0 4px;
+
+  color: #fff;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: clamp(24px, 4vw, 36px);
+  line-height: 1.05;
+}
+
+.eventPassBannerContent p {
+  margin: 0;
+
+  color: rgba(255,255,255,.78);
+
+  font-size: 10px;
+}
+
+.eventPassEventHeader {
+  padding: 26px 28px;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(133, 72, 22, .12),
+      transparent 36%
+    ),
+    linear-gradient(
+      135deg,
+      #4d3322,
+      #6d472a
+    );
+}
+
+.eventPassEventHeader > span {
+  display: inline-flex;
+}
+
+.eventPassEventHeader h3 {
+  max-width: 700px;
+
+  margin: 11px 0 5px;
+
+  color: #fff;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: clamp(24px, 4vw, 34px);
+}
+
+.eventPassEventHeader p {
+  margin: 0;
+
+  color: rgba(255,255,255,.72);
+
+  font-size: 9px;
+}
+
+.eventPassBody {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    245px;
+}
+
+.eventPassMain {
+  padding: 25px 27px;
+}
+
+.eventPassAttendee {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  padding-bottom: 21px;
+
+  border-bottom: 1px solid #eee4d9;
+}
+
+.eventPassAvatar {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  width: 48px;
+  height: 48px;
+
+  border: 1px solid #e6d5c0;
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f7ecdd,
+      #fffaf2
+    );
+
+  color: #74451f;
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.eventPassAttendee > div:last-child {
+  min-width: 0;
+}
+
+.eventPassAttendee span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #a36e3d;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.eventPassAttendee h4 {
+  margin: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  color: #38271c;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+.eventPassAttendee p {
+  margin: 3px 0 0;
+
+  color: #817266;
+
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.eventPassDetails {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  margin-top: 20px;
+}
+
+.eventPassDetails > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  min-width: 0;
+
+  padding: 13px;
+
+  border: 1px solid #eee2d4;
+  border-radius: 13px;
+
+  background: #fffaf4;
+}
+
+.eventPassDetailIcon {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  width: 29px;
+  height: 29px;
+
+  border-radius: 9px;
+
+  background: #f2e3d2;
+
+  color: #805127;
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.eventPassDetails p {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+
+  margin: 0;
+}
+
+.eventPassDetails small {
+  color: #a28e7c;
+
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .11em;
+}
+
+.eventPassDetails strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  color: #413126;
+
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.eventPassDetails em {
+  color: #948476;
+
+  font-size: 7px;
+  font-style: normal;
+}
+
+.eventPassSecurity {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  margin-top: 17px;
+  padding: 12px 13px;
+
+  border: 1px solid #d7e8dc;
+  border-radius: 12px;
+
+  background: #f4faf6;
+}
+
+.eventPassSecurity > span {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  width: 25px;
+  height: 25px;
+
+  border-radius: 50%;
+
+  background: #3d8959;
+
+  color: #fff;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.eventPassSecurity p {
+  display: grid;
+  gap: 2px;
+
+  margin: 0;
+}
+
+.eventPassSecurity strong {
+  color: #326147;
+
+  font-size: 8px;
+}
+
+.eventPassSecurity small {
+  color: #718378;
+
+  font-size: 7px;
+  line-height: 1.45;
+}
+
+.eventPassQrColumn {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 22px;
+
+  border-left: 1px dashed #dbc8b4;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff9f1,
+      #f9efe2
+    );
+}
+
+.eventPassQrColumn::before,
+.eventPassQrColumn::after {
+  content: "";
+
+  position: absolute;
+  left: -10px;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+
+  background: #fffdf9;
+}
+
+.eventPassQrColumn::before {
+  top: -10px;
+
+  border-bottom: 1px solid #dfd2c1;
+}
+
+.eventPassQrColumn::after {
+  bottom: -10px;
+
+  border-top: 1px solid #dfd2c1;
+}
+
+.eventPassQrLabel {
+  display: grid;
+  gap: 2px;
+
+  margin-bottom: 9px;
+
+  text-align: center;
+}
+
+.eventPassQrLabel span {
+  color: #815026;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.eventPassQrLabel small {
+  color: #998879;
+
+  font-size: 7px;
+}
+
+.eventPassQr {
+  display: grid;
+  place-items: center;
+
+  padding: 8px;
+
+  border: 1px solid #ded3c6;
+  border-radius: 15px;
+
+  background: #fff;
+
+  box-shadow:
+    0 9px 20px rgba(56, 39, 27, .06);
+}
+
+.eventPassQr svg {
+  display: block;
+
+  max-width: 100%;
+  height: auto;
+}
+
+.eventPassScanText {
+  margin-top: 10px;
+
+  color: #4b382c;
+
+  font-size: 8px;
+}
+
+.eventPassCode {
+  max-width: 190px;
+
+  margin-top: 5px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  color: #9c8877;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 6px;
+  letter-spacing: .07em;
+  white-space: nowrap;
+}
+
+.eventPassPerforation {
+  display: grid;
+  grid-template-columns:
+    9px
+    minmax(0, 1fr)
+    9px;
+  align-items: center;
+
+  height: 1px;
+}
+
+.eventPassPerforation span {
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
+  background: #fffdf9;
+}
+
+.eventPassPerforation span:first-child {
+  transform: translateX(-9px);
+}
+
+.eventPassPerforation span:last-child {
+  transform: translateX(0);
+}
+
+.eventPassPerforation i {
+  display: block;
+
+  border-top: 1px dashed #dfcebc;
+}
+
+.eventPassFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  padding: 14px 20px;
+
+  background: #faf3e9;
+}
+
+.eventPassFooter > div {
+  display: grid;
+  gap: 2px;
+}
+
+.eventPassFooter > div span {
+  color: #744921;
+
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.eventPassFooter > div small {
+  color: #978677;
+
+  font-size: 7px;
+}
+
+.eventPassFooter p {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  margin: 0;
+
+  color: #827267;
+
+  font-size: 7px;
+}
+
+.eventPassFooter p i {
+  display: grid;
+  place-items: center;
+
+  width: 17px;
+  height: 17px;
+
+  border-radius: 50%;
+
+  background: #e4f2e8;
+
+  color: #36784c;
+
+  font-style: normal;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+
+/* EVENT PASS RESPONSIVE */
+
+@media (max-width: 760px) {
+
+  .eventPassTop {
+    align-items: flex-start;
+  }
+
+  .eventPassBody {
+    grid-template-columns: 1fr;
+  }
+
+  .eventPassQrColumn {
+    border-top: 1px dashed #dbc8b4;
+    border-left: 0;
+  }
+
+  .eventPassQrColumn::before,
+  .eventPassQrColumn::after {
+    top: -10px;
+  }
+
+  .eventPassQrColumn::before {
+    left: -10px;
+  }
+
+  .eventPassQrColumn::after {
+    right: -10px;
+    left: auto;
+    bottom: auto;
+  }
+
+  .eventPassDetails {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .eventPassFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+@media (max-width: 520px) {
+
+  .eventPassCard {
+    border-radius: 17px;
+  }
+
+  .eventPassTop {
+    flex-direction: column;
+  }
+
+  .eventPassBanner,
+  .eventPassBannerContent {
+    min-height: 170px;
+  }
+
+  .eventPassBannerContent {
+    padding: 21px;
+  }
+
+  .eventPassMain {
+    padding: 20px;
+  }
+
+  .eventPassAttendee h4 {
+    font-size: 17px;
+  }
+
+  .eventPassDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .eventPassQrColumn {
+    padding: 24px 18px;
+  }
+}
+
+
+/* EVENT PASS PRINT */
+
+@media print {
+
+  .eventPassCard {
+    break-inside: avoid;
+
+    border: 1px solid #ccc;
+
+    box-shadow: none;
+  }
+
+  .eventPassQrColumn {
+    background: #fff;
+  }
+}
+
+
+
+/* EVENT PASS PROFESSIONAL ACTIONS */
+
+.eventPassActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  padding: 15px 20px;
+
+  border-top: 1px solid #eee3d7;
+
+  background: #fffdf9;
+}
+
+.eventPassActions > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.eventPassActions > div:first-child > span {
+  color: #7c4b25;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.eventPassActions > div:first-child > small {
+  color: #958579;
+
+  font-size: 7px;
+}
+
+.eventPassActionButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eventPassActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  min-height: 37px;
+
+  padding: 0 13px;
+
+  border: 1px solid #dfd0bf;
+  border-radius: 10px;
+
+  background: #fffaf3;
+
+  color: #684326;
+
+  font: inherit;
+  font-size: 8px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    background .18s ease;
+}
+
+.eventPassActionButton:hover {
+  transform: translateY(-1px);
+
+  border-color: #cbb294;
+
+  background: #fff;
+
+  box-shadow:
+    0 8px 18px rgba(75, 50, 30, .08);
+}
+
+.eventPassActionButton > span {
+  display: grid;
+  place-items: center;
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 6px;
+
+  background: #f2e5d6;
+
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.primaryPassAction {
+  border-color: #684225;
+
+  background: #684225;
+
+  color: #fff;
+}
+
+.primaryPassAction:hover {
+  border-color: #51311a;
+
+  background: #51311a;
+}
+
+.primaryPassAction > span {
+  background: rgba(255,255,255,.14);
+
+  color: #fff;
+}
+
+
+@media (max-width: 680px) {
+
+  .eventPassActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .eventPassActionButtons {
+    width: 100%;
+  }
+
+  .eventPassActionButton {
+    flex: 1;
+  }
+}
+
+
+@media (max-width: 460px) {
+
+  .eventPassActionButtons {
+    flex-direction: column;
+  }
+
+  .eventPassActionButton {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   EVENT PASS ONLY PRINT MODE
+========================================================= */
+
+@media print {
+
+  body.printingEventPass * {
+    visibility: hidden !important;
+  }
+
+  body.printingEventPass .eventPassCard,
+  body.printingEventPass .eventPassCard * {
+    visibility: visible !important;
+  }
+
+  body.printingEventPass .eventPassCard {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    max-width: none;
+
+    margin: 0 !important;
+
+    border: 1px solid #d5d5d5;
+    border-radius: 0;
+
+    background: #fff;
+
+    box-shadow: none !important;
+  }
+
+  body.printingEventPass .eventPassActions {
+    display: none !important;
+  }
+
+  body.printingEventPass .eventPassQrColumn {
+    background: #fff !important;
+  }
+
+  body.printingEventPass .eventPassBanner {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body.printingEventPass .eventPassTop,
+  body.printingEventPass .eventPassFooter,
+  body.printingEventPass .eventPassEventHeader,
+  body.printingEventPass .eventPassSecurity,
+  body.printingEventPass .eventPassDetails > div {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+}
+
+
+/* =========================================================
+   CAMPUSCONNECT EVENT PASS — RELIABLE PDF PRINT ROOT
+========================================================= */
+
+#campus-event-print-root {
+  display: none;
+}
+
+
+@media print {
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  body.campusEventPrintMode > * {
+    display: none !important;
+  }
+
+  body.campusEventPrintMode
+  > #campus-event-print-root {
+    display: block !important;
+
+    position: static !important;
+
+    width: 100% !important;
+    max-width: 190mm !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    background: #ffffff !important;
+  }
+
+  #campus-event-print-root,
+  #campus-event-print-root * {
+    box-sizing: border-box !important;
+
+    visibility: visible !important;
+  }
+
+  #campus-event-print-root
+  .eventPassCard {
+    display: block !important;
+
+    position: relative !important;
+
+    width: 100% !important;
+    max-width: 190mm !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid #d8cbbb !important;
+    border-radius: 14px !important;
+
+    background: #fffdf9 !important;
+
+    box-shadow: none !important;
+
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+
+    transform: none !important;
+  }
+
+  #campus-event-print-root
+  .eventPassActions {
+    display: none !important;
+  }
+
+  #campus-event-print-root
+  .eventPassTop {
+    display: flex !important;
+  }
+
+  #campus-event-print-root
+  .eventPassBody {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      210px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassMain {
+    display: block !important;
+
+    padding: 18px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassQrColumn {
+    display: flex !important;
+
+    min-width: 210px !important;
+
+    padding: 16px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassQr {
+    display: grid !important;
+
+    padding: 7px !important;
+
+    background: #ffffff !important;
+  }
+
+  #campus-event-print-root
+  .eventPassQr svg {
+    display: block !important;
+
+    width: 155px !important;
+    height: 155px !important;
+
+    max-width: 155px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassBanner {
+    display: block !important;
+
+    min-height: 135px !important;
+    height: 135px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassBannerContent {
+    display: flex !important;
+
+    min-height: 135px !important;
+
+    padding: 18px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassBannerContent h3 {
+    font-size: 24px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassEventHeader {
+    display: block !important;
+
+    padding: 18px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassDetails {
+    display: grid !important;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 8px !important;
+
+    margin-top: 13px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassDetails > div {
+    padding: 9px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassSecurity {
+    margin-top: 11px !important;
+    padding: 9px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassFooter {
+    display: flex !important;
+
+    padding: 10px 15px !important;
+  }
+
+  #campus-event-print-root
+  .eventPassPerforation {
+    display: grid !important;
+  }
+
+  #campus-event-print-root
+  .eventPassTop,
+  #campus-event-print-root
+  .eventPassBanner,
+  #campus-event-print-root
+  .eventPassEventHeader,
+  #campus-event-print-root
+  .eventPassQrColumn,
+  #campus-event-print-root
+  .eventPassFooter,
+  #campus-event-print-root
+  .eventPassSecurity,
+  #campus-event-print-root
+  .eventPassValidity,
+  #campus-event-print-root
+  .eventPassBrandMark,
+  #campus-event-print-root
+  .eventPassAvatar,
+  #campus-event-print-root
+  .eventPassDetails > div {
+    -webkit-print-color-adjust:
+      exact !important;
+
+    print-color-adjust:
+      exact !important;
+  }
+}
+
+
+
+/* CAMPUSCONNECT EVENT PASS — FORCE FIRST PRINT PAGE */
+
+@media print {
+
+  body.campusEventPrintMode {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+
+    overflow: visible !important;
+  }
+
+  body.campusEventPrintMode > *:not(#campus-event-print-root) {
+    display: none !important;
+
+    width: 0 !important;
+    height: 0 !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    position: absolute !important;
+  }
+
+  body.campusEventPrintMode
+  > #campus-event-print-root {
+    display: block !important;
+
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    z-index: 2147483647 !important;
+  }
+
+  #campus-event-print-root
+  .eventPassCard {
+    display: block !important;
+
+    position: relative !important;
+
+    width: 190mm !important;
+    max-width: 190mm !important;
+
+    margin: 0 auto !important;
+
+    page-break-before: avoid !important;
+    break-before: avoid-page !important;
+
+    page-break-after: avoid !important;
+    break-after: avoid-page !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid-page !important;
+  }
+
+}
