@@ -694,130 +694,353 @@ export function ActivityCenter({
 
       setLoading(true);
 
-      const [
-        clubResult,
-        sportResult,
-      ] =
-        await Promise.all([
-          client
-            .from("campus_clubs")
-            .select("*")
-            .neq(
-              "status",
-              "Archived"
+      /*
+       * Club directory performance:
+       *
+       * Do not make the directory wait for every private
+       * Storage URL to be generated.
+       *
+       * Club metadata is rendered immediately.
+       * Media is resolved afterwards in the background.
+       */
+
+      const keepImmediatelyRenderableMedia =
+        (
+          value:
+            string |
+            null |
+            undefined
+        ) => {
+
+          if (!value) {
+            return null;
+          }
+
+          /*
+           * External media URLs do not need Supabase signing.
+           */
+          if (
+            /^https?:\/\//i.test(
+              value
+            ) &&
+            !value.includes(
+              "/storage/v1/object/"
             )
-            .order(
-              "is_featured",
-              {
-                ascending: false,
-              }
-            )
-            .order(
-              "name",
-              {
-                ascending: true,
-              }
-            ),
+          ) {
+            return value;
+          }
 
-          client
-            .from("campus_sports")
-            .select("*")
-            .neq(
-              "status",
-              "Archived"
-            )
-            .order(
-              "is_featured",
-              {
-                ascending: false,
-              }
-            )
-            .order(
-              "name",
-              {
-                ascending: true,
-              }
-            ),
-        ]);
+          return null;
+        };
 
-      if (clubResult.error) {
-        console.error(
-          clubResult.error
-        );
 
-        setStatus(
-          clubResult.error.message
-        );
-      } else {
-        const rawRows =
-          (clubResult.data || []) as
-            Club[];
+      /*
+       * SPORTS LOAD INDEPENDENTLY
+       *
+       * A slow sports request must never block
+       * the club directory.
+       */
+      const sportTask =
+        (async () => {
 
-        console.log(
-          "[Activity Center] CLUB MEDIA FROM DATABASE",
-          rawRows.map(
-            club => ({
-              name:
-                club.name,
+          const sportResult =
+            await client
+              .from(
+                "campus_sports"
+              )
+              .select("*")
+              .neq(
+                "status",
+                "Archived"
+              )
+              .order(
+                "is_featured",
+                {
+                  ascending: false,
+                }
+              )
+              .order(
+                "name",
+                {
+                  ascending: true,
+                }
+              );
 
-              logo:
-                club.logo_url,
 
-              banner:
-                club.banner_url,
+          if (
+            sportResult.error
+          ) {
+            console.error(
+              "[Activity Center] sports load failed",
+              sportResult.error
+            );
 
-              video:
-                club.video_banner_url,
+            return;
+          }
 
-              poster:
-                club.poster_url,
-            })
-          )
-        );
 
-        const rows =
-          await Promise.all(
-            rawRows.map(
-              signClubMedia
+          const rawSports =
+            (
+              sportResult.data ||
+              []
+            ) as Sport[];
+
+
+          /*
+           * Render sport metadata immediately.
+           */
+          setSports(
+            rawSports.map(
+              sport => ({
+                ...sport,
+
+                logo_url:
+                  keepImmediatelyRenderableMedia(
+                    sport.logo_url
+                  ),
+
+                banner_url:
+                  keepImmediatelyRenderableMedia(
+                    sport.banner_url
+                  ),
+
+                poster_url:
+                  keepImmediatelyRenderableMedia(
+                    sport.poster_url
+                  ),
+              })
             )
           );
 
-        setClubs(rows);
+
+          /*
+           * Resolve Storage media in background.
+           */
+          void Promise.all(
+            rawSports.map(
+              signSportMedia
+            )
+          )
+            .then(
+              signedSports => {
+
+                const signedById =
+                  new Map(
+                    signedSports.map(
+                      sport => [
+                        sport.id,
+                        sport,
+                      ]
+                    )
+                  );
+
+
+                setSports(
+                  current =>
+                    current.map(
+                      sport =>
+                        signedById.get(
+                          sport.id
+                        ) ||
+                        sport
+                    )
+                );
+              }
+            )
+            .catch(
+              error => {
+
+                console.error(
+                  "[Activity Center] sport media preload failed",
+                  error
+                );
+
+              }
+            );
+
+        })();
+
+
+      try {
+
+        /*
+         * CLUB DIRECTORY QUERY
+         */
+        const clubResult =
+          await client
+            .from(
+              "campus_clubs"
+            )
+            .select("*")
+            .neq(
+              "status",
+              "Archived"
+            )
+            .order(
+              "is_featured",
+              {
+                ascending: false,
+              }
+            )
+            .order(
+              "name",
+              {
+                ascending: true,
+              }
+            );
+
+
+        if (
+          clubResult.error
+        ) {
+
+          console.error(
+            "[Activity Center] club load failed",
+            clubResult.error
+          );
+
+
+          setStatus(
+            clubResult.error.message
+          );
+
+          return;
+        }
+
+
+        const rawRows =
+          (
+            clubResult.data ||
+            []
+          ) as Club[];
+
+
+        /*
+         * Immediately render club metadata.
+         *
+         * Supabase-hosted media stays empty temporarily
+         * and falls back to the existing UI placeholder.
+         */
+        const immediateRows =
+          rawRows.map(
+            club => ({
+              ...club,
+
+              logo_url:
+                keepImmediatelyRenderableMedia(
+                  club.logo_url
+                ),
+
+              banner_url:
+                keepImmediatelyRenderableMedia(
+                  club.banner_url
+                ),
+
+              video_banner_url:
+                keepImmediatelyRenderableMedia(
+                  club.video_banner_url
+                ),
+
+              poster_url:
+                keepImmediatelyRenderableMedia(
+                  club.poster_url
+                ),
+            })
+          );
+
+
+        setClubs(
+          immediateRows
+        );
+
 
         setSelectedClubId(
           current =>
             current &&
-            rows.some(
+            rawRows.some(
               club =>
-                club.id === current
+                club.id ===
+                current
             )
               ? current
               : ""
         );
-      }
 
-      if (sportResult.error) {
-        console.error(
-          sportResult.error
-        );
-      } else {
-        const rawSports =
-          (sportResult.data || []) as
-            Sport[];
 
-        const signedSports =
-          await Promise.all(
-            rawSports.map(
-              signSportMedia
-            )
+        /*
+         * IMPORTANT:
+         *
+         * Club directory is usable now.
+         *
+         * Do not wait for Storage.
+         */
+        setLoading(false);
+
+
+        /*
+         * Resolve media in background.
+         */
+        void Promise.all(
+          rawRows.map(
+            signClubMedia
+          )
+        )
+          .then(
+            signedRows => {
+
+              const signedById =
+                new Map(
+                  signedRows.map(
+                    club => [
+                      club.id,
+                      club,
+                    ]
+                  )
+                );
+
+
+              /*
+               * Merge instead of replacing everything.
+               *
+               * This prevents a newly created or edited
+               * club from being overwritten if the
+               * background operation finishes later.
+               */
+              setClubs(
+                current =>
+                  current.map(
+                    club =>
+                      signedById.get(
+                        club.id
+                      ) ||
+                      club
+                  )
+              );
+
+            }
+          )
+          .catch(
+            error => {
+
+              console.error(
+                "[Activity Center] club media preload failed",
+                error
+              );
+
+            }
           );
 
-        setSports(
-          signedSports
-        );
+      } finally {
+
+        setLoading(false);
+
       }
 
-      setLoading(false);
+
+      /*
+       * Keep the independent sports task alive.
+       */
+      void sportTask;
     };
 
 

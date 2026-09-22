@@ -1,0 +1,988 @@
+/* ============================================================
+   CAMPUSCONNECT PREMIUM EVENT CREDENTIAL
+   ============================================================ */
+
+.eventCredentialScreen {
+  min-height: 100vh;
+  padding: 28px 18px 60px;
+  background: #e9e6e0;
+  color: #33251b;
+}
+
+
+.eventCredentialToolbar {
+  width: min(920px, 100%);
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+
+.eventCredentialToolbar > div {
+  display: grid;
+  gap: 2px;
+}
+
+
+.eventCredentialToolbar strong {
+  font-size: 13px;
+}
+
+
+.eventCredentialToolbar span {
+  color: #77706a;
+  font-size: 10px;
+}
+
+
+.eventCredentialToolbar button {
+  min-height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #663510;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   PAPER
+   ============================================================ */
+
+.eventCredentialPaper {
+  width: min(920px, 100%);
+  margin: auto;
+  overflow: hidden;
+  border: 1px solid #ead7bd;
+  background: #fffaf3;
+  box-shadow: 0 24px 80px rgba(57, 37, 22, .12);
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.eventCredentialTop {
+  min-height: 82px;
+  padding: 16px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #fffaf3;
+}
+
+
+.eventCredentialBrand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+
+.eventCredentialBrandLogo {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background:
+    linear-gradient(
+      145deg,
+      #b5651d,
+      #73370c
+    );
+  color: #ffffff;
+  box-shadow:
+    0 7px 15px
+    rgba(116, 56, 15, .2);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+
+.eventCredentialBrand > div:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+
+.eventCredentialBrand small {
+  color: #b65e1a;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+
+.eventCredentialBrand strong {
+  color: #37261a;
+  font-size: 14px;
+}
+
+
+.eventCredentialStatus {
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #efd19e;
+  border-radius: 999px;
+  background: #fff7e6;
+}
+
+
+.eventCredentialStatus > span {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #bf7b00;
+}
+
+
+.eventCredentialStatus > span::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+
+.eventCredentialStatus > div {
+  display: grid;
+  gap: 1px;
+}
+
+
+.eventCredentialStatus strong {
+  color: #9b6300;
+  font-size: 8px;
+  letter-spacing: .13em;
+}
+
+
+.eventCredentialStatus small {
+  color: #a88957;
+  font-size: 6px;
+}
+
+
+.eventCredentialStatus-used {
+  background: #eaf8f0;
+  border-color: #b9dfc7;
+}
+
+
+.eventCredentialStatus-used strong {
+  color: #167343;
+}
+
+
+.eventCredentialStatus-expired,
+.eventCredentialStatus-revoked,
+.eventCredentialStatus-cancelled,
+.eventCredentialStatus-event_cancelled {
+  background: #faece9;
+  border-color: #ebc0b9;
+}
+
+
+.eventCredentialStatus-expired strong,
+.eventCredentialStatus-revoked strong,
+.eventCredentialStatus-cancelled strong,
+.eventCredentialStatus-event_cancelled strong {
+  color: #9d4137;
+}
+
+
+/* ============================================================
+   EVENT HERO
+   ============================================================ */
+
+.eventCredentialHero {
+  min-height: 160px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+
+  background:
+    radial-gradient(
+      circle at 82% 24%,
+      rgba(220, 139, 48, .42),
+      transparent 23%
+    ),
+    radial-gradient(
+      circle at 65% 70%,
+      rgba(133, 66, 19, .6),
+      transparent 27%
+    ),
+    linear-gradient(
+      100deg,
+      #171410 0%,
+      #2b1c12 46%,
+      #6b3516 100%
+    );
+}
+
+
+.eventCredentialHero::before,
+.eventCredentialHero::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+
+.eventCredentialHero::before {
+  width: 260px;
+  height: 260px;
+  right: 35px;
+  bottom: -180px;
+  border: 30px solid rgba(231, 142, 53, .1);
+}
+
+
+.eventCredentialHero::after {
+  width: 130px;
+  height: 130px;
+  right: 190px;
+  top: -70px;
+  border: 20px solid rgba(255, 210, 132, .08);
+}
+
+
+.eventCredentialHeroOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(12, 10, 8, .82),
+      rgba(12, 10, 8, .28)
+    );
+}
+
+
+.eventCredentialHeroContent {
+  position: relative;
+  z-index: 2;
+  padding: 27px 30px;
+  color: #ffffff;
+}
+
+
+.eventCredentialCategory {
+  display: inline-flex;
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 229, 191, .48);
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  color: #f4d9b5;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .15em;
+}
+
+
+.eventCredentialHero h1 {
+  margin: 12px 0 4px;
+  max-width: 720px;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.06;
+}
+
+
+.eventCredentialHero p {
+  margin: 0 0 8px;
+  color: #f1d6b4;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 15px;
+}
+
+
+.eventCredentialHero small {
+  color: rgba(255,255,255,.65);
+  font-size: 8px;
+}
+
+
+/* ============================================================
+   BODY
+   ============================================================ */
+
+.eventCredentialBody {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    255px;
+}
+
+
+.eventCredentialMain {
+  min-width: 0;
+  padding: 26px 20px 20px;
+}
+
+
+.eventCredentialEntry {
+  padding: 20px 17px;
+  border-left: 1px solid #ecd9bf;
+  background: #fff5e7;
+}
+
+
+/* ============================================================
+   ATTENDEE
+   ============================================================ */
+
+.eventCredentialPerson {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  margin-bottom: 24px;
+}
+
+
+.eventCredentialAvatar {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d89b59;
+  border-radius: 14px;
+  background: #fffdf8;
+  color: #a45215;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+
+.eventCredentialPerson > div:last-child {
+  min-width: 0;
+}
+
+
+.eventCredentialPerson small {
+  color: #ad6429;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+
+.eventCredentialPerson h2 {
+  margin: 5px 0 3px;
+  color: #352217;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+
+.eventCredentialPerson p {
+  margin: 0;
+  color: #7d604c;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+
+.eventCredentialPerson > div > span {
+  display: block;
+  margin-top: 4px;
+  color: #a17e66;
+  font-size: 8px;
+}
+
+
+/* ============================================================
+   INFO CARDS
+   ============================================================ */
+
+.eventCredentialInfoGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 10px;
+}
+
+
+.eventCredentialInfoCard {
+  min-height: 78px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid #ebcfac;
+  border-radius: 12px;
+  background: #fff6e8;
+}
+
+
+.eventCredentialIcon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #ffe4be;
+  color: #b15e1e;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+
+.eventCredentialInfoCard > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+
+.eventCredentialInfoCard small {
+  color: #a65d2b;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+
+.eventCredentialInfoCard strong {
+  overflow: hidden;
+  color: #493326;
+  font-size: 9px;
+  text-overflow: ellipsis;
+}
+
+
+.eventCredentialInfoCard p {
+  margin: 0;
+  color: #a38b7a;
+  font-size: 6px;
+}
+
+
+.eventCredentialUid {
+  color: #b15c20 !important;
+  font-size: 8px !important;
+  letter-spacing: .02em;
+}
+
+
+/* ============================================================
+   VERIFIED
+   ============================================================ */
+
+.eventCredentialVerified {
+  margin-top: 11px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid #aadbbd;
+  border-radius: 11px;
+  background: #ebf8ef;
+}
+
+
+.eventCredentialVerified > div {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #09924f;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+
+.eventCredentialVerified p {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+}
+
+
+.eventCredentialVerified strong {
+  color: #237649;
+  font-size: 8px;
+}
+
+
+.eventCredentialVerified span {
+  color: #69967d;
+  font-size: 6px;
+  line-height: 1.45;
+}
+
+
+/* ============================================================
+   VALIDITY
+   ============================================================ */
+
+.eventCredentialValidity {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  border: 1px solid #eadac5;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+.eventCredentialValidity > div {
+  min-height: 55px;
+  padding: 11px 13px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+}
+
+
+.eventCredentialValidity > div + div {
+  border-left: 1px solid #eadac5;
+}
+
+
+.eventCredentialValidity small {
+  color: #9b6946;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+
+
+.eventCredentialValidity strong {
+  color: #604533;
+  font-size: 8px;
+}
+
+
+/* ============================================================
+   QR
+   ============================================================ */
+
+.eventCredentialQrBlock {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+
+.eventCredentialQrBlock > small,
+.eventCredentialManual > small,
+.eventCredentialBarcode > small {
+  color: #a85d28;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .17em;
+}
+
+
+.eventCredentialQrBlock > span {
+  margin-top: 3px;
+  color: #ae9079;
+  font-size: 6px;
+}
+
+
+.eventCredentialQrFrame {
+  width: 190px;
+  height: 190px;
+  margin: 14px auto 8px;
+  padding: 10px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e2bc8a;
+  border-radius: 14px;
+  background: #fffaf3;
+}
+
+
+.eventCredentialQrFrame canvas {
+  width: 168px !important;
+  height: 168px !important;
+  display: block;
+  image-rendering: pixelated;
+}
+
+
+.eventCredentialQrBlock > strong {
+  margin-top: 4px;
+  color: #664936;
+  font-size: 7px;
+}
+
+
+.eventCredentialSeparator {
+  height: 1px;
+  margin: 19px 0;
+  background: #ddbc93;
+}
+
+
+/* ============================================================
+   MANUAL CODE
+   ============================================================ */
+
+.eventCredentialManual {
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  text-align: center;
+}
+
+
+.eventCredentialManual > strong {
+  width: 100%;
+  padding: 10px 7px;
+  border: 1px solid #d7ab75;
+  border-radius: 9px;
+  background: #fffaf3;
+  color: #2f3e50;
+  font-family: monospace;
+  font-size: 18px;
+  letter-spacing: .08em;
+}
+
+
+.eventCredentialManual p,
+.eventCredentialBarcode p {
+  margin: 0;
+  color: #a58c79;
+  font-size: 6px;
+  line-height: 1.4;
+}
+
+
+/* ============================================================
+   BARCODE
+   ============================================================ */
+
+.eventCredentialBarcode {
+  margin-top: 18px;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+
+.eventCredentialBarcode > div {
+  width: 100%;
+  padding: 7px;
+  overflow: hidden;
+  border: 1px solid #e0c09a;
+  border-radius: 8px;
+  background: #fffaf3;
+}
+
+
+.eventCredentialBarcode canvas {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 55px;
+  background: #fffaf3;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.eventCredentialFooter {
+  min-height: 72px;
+  padding: 15px 25px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border-top: 1px dashed #deb987;
+  background: #fff6e9;
+}
+
+
+.eventCredentialSeal {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #6b3a16;
+  color: #f2c88d;
+  font-weight: 900;
+}
+
+
+.eventCredentialFooter > div:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+
+.eventCredentialFooter strong {
+  color: #9a5725;
+  font-size: 7px;
+  letter-spacing: .12em;
+}
+
+
+.eventCredentialFooter span {
+  color: #a58975;
+  font-size: 6px;
+}
+
+
+/* ============================================================
+   STATES
+   ============================================================ */
+
+.eventCredentialLoading,
+.eventCredentialError {
+  width: min(480px, 100%);
+  margin: 18vh auto;
+  text-align: center;
+}
+
+
+.eventCredentialErrorLogo {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 13px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: #74380e;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+  .eventCredentialScreen {
+    padding: 10px;
+  }
+
+
+  .eventCredentialBody {
+    grid-template-columns: 1fr;
+  }
+
+
+  .eventCredentialEntry {
+    border-top: 1px solid #ecd9bf;
+    border-left: 0;
+  }
+
+
+  .eventCredentialInfoGrid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .eventCredentialHero h1 {
+    font-size: 26px;
+  }
+
+}
+
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+
+@media print {
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+
+  html,
+  body {
+    width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+
+  .eventCredentialToolbar {
+    display: none !important;
+  }
+
+
+  .eventCredentialScreen {
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+
+  .eventCredentialPaper {
+    width: 100% !important;
+    max-width: 190mm !important;
+    margin: 0 auto !important;
+    border: 1px solid #ead7bd !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+
+  .eventCredentialPaper,
+  .eventCredentialPaper * {
+    visibility: visible !important;
+    opacity: 1 !important;
+    filter: none !important;
+    text-shadow: none !important;
+
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+
+  .eventCredentialTop {
+    min-height: 18mm !important;
+    padding: 3.5mm 6mm !important;
+  }
+
+
+  .eventCredentialHero {
+    min-height: 34mm !important;
+  }
+
+
+  .eventCredentialHeroContent {
+    padding: 6mm !important;
+  }
+
+
+  .eventCredentialHero h1 {
+    font-size: 23px !important;
+  }
+
+
+  .eventCredentialBody {
+    grid-template-columns:
+      minmax(0, 1fr)
+      52mm !important;
+  }
+
+
+  .eventCredentialMain {
+    padding: 5mm 4mm 4mm !important;
+  }
+
+
+  .eventCredentialEntry {
+    padding: 4mm 3mm !important;
+  }
+
+
+  .eventCredentialPerson {
+    margin-bottom: 4mm !important;
+  }
+
+
+  .eventCredentialInfoCard {
+    min-height: 16mm !important;
+    padding: 2.5mm !important;
+  }
+
+
+  .eventCredentialQrFrame {
+    width: 40mm !important;
+    height: 40mm !important;
+    padding: 2mm !important;
+  }
+
+
+  .eventCredentialQrFrame canvas {
+    display: block !important;
+    width: 35mm !important;
+    height: 35mm !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+
+  .eventCredentialBarcode canvas {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+
+  .eventCredentialFooter {
+    min-height: 14mm !important;
+    padding: 3mm 5mm !important;
+  }
+
+
+  .eventCredentialTop,
+  .eventCredentialHero,
+  .eventCredentialBody,
+  .eventCredentialMain,
+  .eventCredentialEntry,
+  .eventCredentialInfoGrid,
+  .eventCredentialVerified,
+  .eventCredentialValidity,
+  .eventCredentialQrBlock,
+  .eventCredentialManual,
+  .eventCredentialBarcode,
+  .eventCredentialFooter {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+}

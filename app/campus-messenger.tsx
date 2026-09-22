@@ -187,7 +187,64 @@ export default function CampusMessenger({
     useState<Record<string, CampusUser>>({});
 
   const [peopleTab, setPeopleTab] =
-    useState<"Friends" | "Requests" | "Sent">("Friends");
+    useState<
+      "Friends" |
+      "Requests" |
+      "Sent" |
+      "Removed"
+    >("Friends");
+
+
+  useEffect(() => {
+    const applyRequestedTab = (
+      requestedTab?: string | null
+    ) => {
+      if (
+        requestedTab === "Friends" ||
+        requestedTab === "Requests" ||
+        requestedTab === "Sent" ||
+        requestedTab === "Removed"
+      ) {
+        setPeopleTab(
+          requestedTab
+        );
+      }
+    };
+
+    applyRequestedTab(
+      window.sessionStorage
+        .getItem(
+          "campusconnect-messenger-people-tab"
+        )
+    );
+
+    window.sessionStorage
+      .removeItem(
+        "campusconnect-messenger-people-tab"
+      );
+
+    const handleOpenMessengerTab =
+      (event: Event) => {
+        const customEvent =
+          event as CustomEvent<string>;
+
+        applyRequestedTab(
+          customEvent.detail
+        );
+      };
+
+    window.addEventListener(
+      "campus-open-messenger-tab",
+      handleOpenMessengerTab
+    );
+
+    return () => {
+      window.removeEventListener(
+        "campus-open-messenger-tab",
+        handleOpenMessengerTab
+      );
+    };
+  }, []);
 
 
 
@@ -314,6 +371,21 @@ export default function CampusMessenger({
       [connections, currentUserId]
     );
 
+  const removedConnections =
+    useMemo(
+      () =>
+        connections.filter(
+          connection =>
+            connection.status === "Rejected" &&
+            (
+              connection.requester_id === currentUserId ||
+              connection.receiver_id === currentUserId
+            )
+        ),
+      [connections, currentUserId]
+    );
+
+
   const connectionOtherUserId = (
     connection: Connection
   ) =>
@@ -406,6 +478,251 @@ export default function CampusMessenger({
   useEffect(() => {
     void loadBaseData();
   }, []);
+
+
+  // =======================================================
+  // CAMPUSCONNECT MESSENGER — RELIABLE LIVE PRESENCE
+  // =======================================================
+
+  useEffect(() => {
+    if (!currentUserId) {
+      setOnlineUserIds(
+        new Set()
+      );
+
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const ONLINE_THRESHOLD_MS =
+      75_000;
+
+    // -----------------------------------------------------
+    // Write this user's heartbeat
+    // -----------------------------------------------------
+
+    const heartbeat =
+      async () => {
+        const now =
+          new Date().toISOString();
+
+        const {
+          error,
+        } =
+          await client
+            .from(
+              "chat_user_presence"
+            )
+            .upsert(
+              {
+                user_id:
+                  currentUserId,
+
+                last_seen_at:
+                  now,
+
+                updated_at:
+                  now,
+              },
+              {
+                onConflict:
+                  "user_id",
+              }
+            );
+
+        if (error) {
+          console.error(
+            "[Messenger Presence] Heartbeat failed:",
+            error
+          );
+        }
+      };
+
+    // -----------------------------------------------------
+    // Read currently-online users
+    // -----------------------------------------------------
+
+    const loadOnlineUsers =
+      async () => {
+        const cutoff =
+          new Date(
+            Date.now() -
+              ONLINE_THRESHOLD_MS
+          ).toISOString();
+
+        const {
+          data,
+          error,
+        } =
+          await client
+            .from(
+              "chat_user_presence"
+            )
+            .select(
+              "user_id,last_seen_at"
+            )
+            .gte(
+              "last_seen_at",
+              cutoff
+            );
+
+        if (cancelled) {
+          return;
+        }
+
+        if (error) {
+          console.error(
+            "[Messenger Presence] Read failed:",
+            error
+          );
+
+          return;
+        }
+
+        const next =
+          new Set<string>();
+
+        for (
+          const row
+          of data || []
+        ) {
+          if (
+            typeof row.user_id ===
+            "string"
+          ) {
+            next.add(
+              row.user_id
+            );
+          }
+        }
+
+        setOnlineUserIds(
+          next
+        );
+      };
+
+    // -----------------------------------------------------
+    // Initial presence
+    // -----------------------------------------------------
+
+    const initialize =
+      async () => {
+        await heartbeat();
+
+        if (!cancelled) {
+          await loadOnlineUsers();
+        }
+      };
+
+    void initialize();
+
+    // Keep ourselves alive.
+    const heartbeatTimer =
+      window.setInterval(
+        () => {
+          void heartbeat();
+        },
+        20_000
+      );
+
+    // Poll as a reliable fallback.
+    const refreshTimer =
+      window.setInterval(
+        () => {
+          void loadOnlineUsers();
+        },
+        10_000
+      );
+
+    // -----------------------------------------------------
+    // Realtime DB changes make status update immediately.
+    // Polling above remains the fallback.
+    // -----------------------------------------------------
+
+    const channel =
+      client
+        .channel(
+          `messenger-presence-db:${currentUserId}`
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table:
+              "chat_user_presence",
+          },
+          () => {
+            void loadOnlineUsers();
+          }
+        )
+        .subscribe();
+
+    // -----------------------------------------------------
+    // Refresh immediately when user returns to the app
+    // -----------------------------------------------------
+
+    const handleFocus =
+      () => {
+        void heartbeat();
+        void loadOnlineUsers();
+      };
+
+    const handleVisibility =
+      () => {
+        if (
+          document.visibilityState ===
+          "visible"
+        ) {
+          void heartbeat();
+          void loadOnlineUsers();
+        }
+      };
+
+    window.addEventListener(
+      "focus",
+      handleFocus
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibility
+    );
+
+    return () => {
+      cancelled = true;
+
+      window.clearInterval(
+        heartbeatTimer
+      );
+
+      window.clearInterval(
+        refreshTimer
+      );
+
+      window.removeEventListener(
+        "focus",
+        handleFocus
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibility
+      );
+
+      void client.removeChannel(
+        channel
+      );
+    };
+  }, [currentUserId]);
 
 
   const sendTypingSignal = () => {
@@ -959,48 +1276,278 @@ export default function CampusMessenger({
       const client =
         getSupabaseClient();
 
-      if (!client) return;
-
-      const existing =
-        connectionWith(user.id);
-
-      if (
-        existing &&
-        existing.status !== "Rejected"
-      ) {
+      if (!client || !currentUserId) {
         return setStatus(
-          `Connection status: ${existing.status}`
+          "Unable to send connection request right now."
         );
       }
 
-      const {data, error} =
-        await client
-          .from("chat_connections")
-          .insert({
-            requester_id:
-              currentUserId,
-            receiver_id:
-              user.id,
-            status: "Pending",
-          })
-          .select()
-          .single();
-
-      if (error) {
+      if (user.id === currentUserId) {
         return setStatus(
-          error.message
+          "You cannot connect with your own account."
         );
       }
 
-      setConnections(current => [
-        ...current,
-        data as Connection,
-      ]);
+      setBusy(true);
+      setStatus("");
 
-      setStatus(
-        `Connection request sent to ${user.full_name}.`
-      );
+      try {
+        /*
+         * Always ask Supabase for the current relationship.
+         *
+         * Do not rely only on the local `connections` state:
+         * another browser/user may have changed the relationship
+         * after this page loaded.
+         */
+        const {
+          data: relationshipRows,
+          error: relationshipError,
+        } =
+          await client
+            .from(
+              "chat_connections"
+            )
+            .select("*")
+            .or(
+              [
+                `and(requester_id.eq.${currentUserId},receiver_id.eq.${user.id})`,
+                `and(requester_id.eq.${user.id},receiver_id.eq.${currentUserId})`,
+              ].join(",")
+            );
+
+        if (relationshipError) {
+          throw relationshipError;
+        }
+
+        const relationships =
+          (
+            relationshipRows ||
+            []
+          ) as Connection[];
+
+        /*
+         * Prefer a live relationship over an old rejected one
+         * if historical reverse-direction rows happen to exist.
+         */
+        const existingAccepted =
+          relationships.find(
+            connection =>
+              connection.status ===
+              "Accepted"
+          );
+
+        if (existingAccepted) {
+          await loadBaseData();
+
+          return setStatus(
+            `You are already connected with ${user.full_name}.`
+          );
+        }
+
+
+        const existingPending =
+          relationships.find(
+            connection =>
+              connection.status ===
+              "Pending"
+          );
+
+        if (existingPending) {
+          await loadBaseData();
+          await loadIncomingRequests();
+
+          if (
+            existingPending.receiver_id ===
+            currentUserId
+          ) {
+            return setStatus(
+              `${user.full_name} has already sent you a connection request. Open Requests to accept it.`
+            );
+          }
+
+          return setStatus(
+            `Connection request to ${user.full_name} is already pending.`
+          );
+        }
+
+
+        const existingBlocked =
+          relationships.find(
+            connection =>
+              connection.status ===
+              "Blocked"
+          );
+
+        if (existingBlocked) {
+          await loadBaseData();
+
+          return setStatus(
+            "This connection cannot be requested right now."
+          );
+        }
+
+
+        /*
+         * Reuse an existing rejected row rather than INSERTING
+         * another row that could collide with the unique pair.
+         */
+        const rejectedRelationship =
+          relationships.find(
+            connection =>
+              connection.status ===
+              "Rejected" &&
+              connection.requester_id ===
+              currentUserId &&
+              connection.receiver_id ===
+              user.id
+          ) ||
+          relationships.find(
+            connection =>
+              connection.status ===
+              "Rejected"
+          );
+
+        if (rejectedRelationship) {
+          const {
+            data,
+            error,
+          } =
+            await client
+              .from(
+                "chat_connections"
+              )
+              .update({
+                status:
+                  "Pending",
+
+                updated_at:
+                  new Date().toISOString(),
+              })
+              .eq(
+                "id",
+                rejectedRelationship.id
+              )
+              .select()
+              .single();
+
+          if (error) {
+            throw error;
+          }
+
+          setConnections(current => {
+            const exists =
+              current.some(
+                item =>
+                  item.id ===
+                  rejectedRelationship.id
+              );
+
+            if (!exists) {
+              return [
+                ...current,
+                data as Connection,
+              ];
+            }
+
+            return current.map(
+              item =>
+                item.id ===
+                rejectedRelationship.id
+                  ? data as Connection
+                  : item
+            );
+          });
+
+          await loadBaseData();
+          await loadIncomingRequests();
+
+          setStatus(
+            `Connection request sent to ${user.full_name}.`
+          );
+
+          return;
+        }
+
+
+        /*
+         * No relationship exists in either direction.
+         * Only now is a fresh INSERT allowed.
+         */
+        const {
+          data,
+          error,
+        } =
+          await client
+            .from(
+              "chat_connections"
+            )
+            .insert({
+              requester_id:
+                currentUserId,
+
+              receiver_id:
+                user.id,
+
+              status:
+                "Pending",
+            })
+            .select()
+            .single();
+
+        if (error) {
+          /*
+           * A simultaneous request from another browser can
+           * still race between SELECT and INSERT.
+           *
+           * Refresh the authoritative state and show a friendly
+           * result instead of PostgreSQL's constraint message.
+           */
+          if (
+            error.code ===
+            "23505"
+          ) {
+            await loadBaseData();
+            await loadIncomingRequests();
+
+            return setStatus(
+              `A connection request or relationship with ${user.full_name} already exists.`
+            );
+          }
+
+          throw error;
+        }
+
+        setConnections(
+          current => [
+            ...current.filter(
+              item =>
+                item.id !==
+                data.id
+            ),
+            data as Connection,
+          ]
+        );
+
+        setStatus(
+          `Connection request sent to ${user.full_name}.`
+        );
+
+        await loadIncomingRequests();
+
+      } catch (error) {
+        console.error(
+          "Unable to send connection request:",
+          error
+        );
+
+        setStatus(
+          "Unable to send the connection request. Please try again."
+        );
+      } finally {
+        setBusy(false);
+      }
     };
+
 
   const acceptConnectionRequest =
     async (
@@ -1138,6 +1685,167 @@ export default function CampusMessenger({
           error instanceof Error
             ? error.message
             : "Unable to reject request."
+        );
+      } finally {
+        setBusy(false);
+      }
+    };
+
+
+  const removeFriend =
+    async (
+      connection: Connection,
+      user: CampusUser
+    ) => {
+      const client =
+        getSupabaseClient();
+
+      if (!client || !currentUserId) {
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          `Remove ${user.full_name} from your friends?`
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setBusy(true);
+      setStatus("");
+
+      try {
+        const {
+          data,
+          error,
+        } =
+          await client
+            .from("chat_connections")
+            .update({
+              status: "Rejected",
+              updated_at:
+                new Date().toISOString(),
+            })
+            .eq(
+              "id",
+              connection.id
+            )
+            .select()
+            .single();
+
+        if (error) {
+          throw error;
+        }
+
+        setConnections(
+          current =>
+            current.map(
+              item =>
+                item.id === connection.id
+                  ? data as Connection
+                  : item
+            )
+        );
+
+        setStatus(
+          `${user.full_name} was removed from your friends.`
+        );
+
+        setPeopleTab("Removed");
+
+        await loadBaseData();
+
+      } catch (error) {
+        console.error(
+          "Unable to remove friend:",
+          error
+        );
+
+        setStatus(
+          "Unable to remove this friend."
+        );
+      } finally {
+        setBusy(false);
+      }
+    };
+
+
+  const deleteRemovedPerson =
+    async (
+      connection: Connection,
+      user: CampusUser
+    ) => {
+      const client =
+        getSupabaseClient();
+
+      if (!client || !currentUserId) {
+        return;
+      }
+
+      if (
+        connection.status !== "Rejected"
+      ) {
+        return setStatus(
+          "Remove this person before deleting the relationship."
+        );
+      }
+
+      const confirmed =
+        window.confirm(
+          `Delete ${user.full_name} from Messenger connections?\n\nTheir CampusConnect account and old messages will not be deleted.`
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setBusy(true);
+      setStatus("");
+
+      try {
+        const {error} =
+          await client
+            .from("chat_connections")
+            .delete()
+            .eq(
+              "id",
+              connection.id
+            );
+
+        if (error) {
+          throw error;
+        }
+
+        setConnections(
+          current =>
+            current.filter(
+              item =>
+                item.id !== connection.id
+            )
+        );
+
+        setIncomingRequests(
+          current =>
+            current.filter(
+              item =>
+                item.id !== connection.id
+            )
+        );
+
+        setStatus(
+          `${user.full_name} was deleted from Messenger connections.`
+        );
+
+      } catch (error) {
+        console.error(
+          "Unable to delete person:",
+          error
+        );
+
+        setStatus(
+          "Unable to delete this person."
         );
       } finally {
         setBusy(false);
@@ -1356,6 +2064,60 @@ export default function CampusMessenger({
         setBusy(false);
       }
     };
+
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      !currentUserId
+    ) {
+      return;
+    }
+
+    const targetUserId =
+      window.sessionStorage.getItem(
+        "campusconnect-open-direct-chat"
+      );
+
+    if (!targetUserId) {
+      return;
+    }
+
+    const user =
+      connectionUsers[targetUserId];
+
+    if (!user) {
+      return;
+    }
+
+    const relationship =
+      connectionWith(targetUserId);
+
+    if (
+      !relationship ||
+      relationship.status !== "Accepted"
+    ) {
+      window.sessionStorage.removeItem(
+        "campusconnect-open-direct-chat"
+      );
+
+      setStatus(
+        "This connection is no longer available."
+      );
+
+      return;
+    }
+
+    window.sessionStorage.removeItem(
+      "campusconnect-open-direct-chat"
+    );
+
+    void startDirectChat(user);
+  }, [
+    currentUserId,
+    connectionUsers,
+    connections,
+  ]);
 
 
   const activeGroupMembers =
@@ -3502,6 +4264,55 @@ export default function CampusMessenger({
   ]);
 
 
+  useEffect(() => {
+    if (
+      !activeConversationId ||
+      !currentUserId
+    ) {
+      return;
+    }
+
+    const peerMember =
+      members.find(
+        member =>
+          member.conversation_id ===
+            activeConversationId &&
+          member.user_id !==
+            currentUserId
+      );
+
+    console.log(
+      "[CampusConnect Presence Debug]",
+      {
+        currentUserId,
+        activeConversationId,
+        peerUserId:
+          peerMember?.user_id || "",
+        conversationMembers:
+          members
+            .filter(
+              member =>
+                member.conversation_id ===
+                activeConversationId
+            )
+            .map(
+              member =>
+                member.user_id
+            ),
+        onlineUserIds:
+          Array.from(
+            onlineUserIds
+          ),
+      }
+    );
+  }, [
+    activeConversationId,
+    currentUserId,
+    members,
+    onlineUserIds,
+  ]);
+
+
   const directPeerId = (
     conversationId: string
   ) =>
@@ -3864,6 +4675,45 @@ export default function CampusMessenger({
       const filtered =
         conversations.filter(
           conversation => {
+
+            /*
+             * Direct chats are visible only while the other
+             * CampusConnect user is an accepted friend.
+             *
+             * This hides:
+             * - removed friends
+             * - deleted Messenger relationships
+             * - orphan "Private chat" rows
+             *
+             * Historical messages remain safely stored.
+             */
+            if (
+              conversation.conversation_type ===
+              "Direct"
+            ) {
+              const peer =
+                directPeer(
+                  conversation.id
+                );
+
+              if (!peer) {
+                return false;
+              }
+
+              const relationship =
+                connectionWith(
+                  peer.id
+                );
+
+              if (
+                !relationship ||
+                relationship.status !==
+                  "Accepted"
+              ) {
+                return false;
+              }
+            }
+
             if (!normalized) {
               return true;
             }
@@ -3918,7 +4768,42 @@ export default function CampusMessenger({
       members,
       connectionUsers,
       currentUserId,
+      connections,
     ]);
+
+
+  /*
+   * If the currently-open direct chat becomes hidden because
+   * the friend was removed/deleted, automatically leave it.
+   */
+  useEffect(() => {
+    if (!activeConversationId) {
+      return;
+    }
+
+    const stillVisible =
+      visibleConversations.some(
+        conversation =>
+          conversation.id ===
+          activeConversationId
+      );
+
+    if (stillVisible) {
+      return;
+    }
+
+    setShowConversationMenu(false);
+    setMessages([]);
+    setReplyingTo(null);
+
+    setActiveConversationId(
+      visibleConversations[0]?.id ||
+      ""
+    );
+  }, [
+    activeConversationId,
+    visibleConversations,
+  ]);
 
 
   return (
@@ -4051,6 +4936,26 @@ export default function CampusMessenger({
               </b>
             </button>
 
+            <button
+              type="button"
+              className={
+                peopleTab === "Removed"
+                  ? "active"
+                  : ""
+              }
+              onClick={() =>
+                setPeopleTab("Removed")
+              }
+            >
+              Removed
+
+              {removedConnections.length > 0 && (
+                <b>
+                  {removedConnections.length}
+                </b>
+              )}
+            </button>
+
           </div>
 
 
@@ -4074,44 +4979,75 @@ export default function CampusMessenger({
                   }
 
                   return (
-                    <button
-                      type="button"
-                      className="friendRow"
+                    <article
+                      className="friendRow friendRowWithActions"
                       key={connection.id}
-                      onClick={() =>
-                        void startDirectChat(
-                          user
-                        )
-                      }
                     >
 
-                      <MessengerUserAvatar
-                        name={user.full_name}
-                        src={user.avatar_url}
-                        className="friendAvatar"
-                      />
+                      <button
+                        type="button"
+                        className="friendMainAction"
+                        onClick={() =>
+                          void startDirectChat(
+                            user
+                          )
+                        }
+                      >
+                        <MessengerUserAvatar
+                          name={user.full_name}
+                          src={user.avatar_url}
+                          className="friendAvatar"
+                        />
 
-                      <span>
-                        <b>
-                          {user.full_name}
-                        </b>
+                        <span>
+                          <b>
+                            {user.full_name}
+                          </b>
 
-                        <small>
-                          {user.role}
-                          {" · "}
-                          {user.department}
-                        </small>
+                          <small>
+                            {user.role}
+                            {" · "}
+                            {user.department}
+                          </small>
 
-                        <em>
-                          {user.campus_uid}
-                        </em>
-                      </span>
+                          <em>
+                            {user.campus_uid}
+                          </em>
+                        </span>
+                      </button>
 
-                      <strong>
-                        Message
-                      </strong>
+                      <div className="friendRowActions">
 
-                    </button>
+                        <button
+                          type="button"
+                          className="friendMessageButton"
+                          disabled={busy}
+                          onClick={() =>
+                            void startDirectChat(
+                              user
+                            )
+                          }
+                        >
+                          Message
+                        </button>
+
+                        <button
+                          type="button"
+                          className="friendRemoveButton"
+                          disabled={busy}
+                          onClick={() =>
+                            void removeFriend(
+                              connection,
+                              user
+                            )
+                          }
+                        >
+                          Remove
+                        </button>
+
+                      </div>
+
+                    </article>
                   );
                 }
               )}
@@ -4318,6 +5254,108 @@ export default function CampusMessenger({
 
           </section>
         )}
+
+        {peopleTab === "Removed" && (
+          <div className="friendDirectory removedFriendDirectory">
+
+            {removedConnections.map(
+              connection => {
+                const userId =
+                  connectionOtherUserId(
+                    connection
+                  );
+
+                const user =
+                  connectionUsers[
+                    userId
+                  ];
+
+                if (!user) {
+                  return null;
+                }
+
+                return (
+                  <article
+                    className="removedFriendRow"
+                    key={connection.id}
+                  >
+                    <div className="removedFriendIdentity">
+
+                      <MessengerUserAvatar
+                        name={user.full_name}
+                        src={user.avatar_url}
+                        className="friendAvatar"
+                      />
+
+                      <span>
+                        <b>
+                          {user.full_name}
+                        </b>
+
+                        <small>
+                          {user.role}
+                          {" · "}
+                          {user.department}
+                        </small>
+
+                        <em>
+                          {user.campus_uid}
+                        </em>
+                      </span>
+
+                    </div>
+
+                    <div className="removedFriendActions">
+
+                      <button
+                        type="button"
+                        className="restoreConnectionButton"
+                        disabled={busy}
+                        onClick={() =>
+                          void sendConnectionRequest(
+                            user
+                          )
+                        }
+                      >
+                        Connect again
+                      </button>
+
+                      <button
+                        type="button"
+                        className="deletePersonButton"
+                        disabled={busy}
+                        onClick={() =>
+                          void deleteRemovedPerson(
+                            connection,
+                            user
+                          )
+                        }
+                      >
+                        Delete person
+                      </button>
+
+                    </div>
+
+                  </article>
+                );
+              }
+            )}
+
+            {!removedConnections.length && (
+              <div className="peopleEmpty">
+                <b>
+                  No removed people
+                </b>
+
+                <span>
+                  Removed friends will appear here.
+                </span>
+              </div>
+            )}
+
+          </div>
+        )}
+
 
         <div className="conversationList">
 

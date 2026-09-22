@@ -312,3 +312,600 @@
   }
 }
 
+
+
+/* =========================================================
+   CAMPUSCONNECT — STUDENT PLACEMENTS PROFESSIONAL V2
+   Clean career portal
+========================================================= */
+
+.placementExperience {
+  --placement-blue: #2563eb;
+  --placement-blue-dark: #1d4ed8;
+  --placement-navy: #0f172a;
+  --placement-text: #334155;
+  --placement-muted: #64748b;
+  --placement-border: #e2e8f0;
+  --placement-soft: #f8fafc;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px;
+  align-items: start;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* ---------- CAREER AI ---------- */
+
+.placementCareerAiActions {
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 10px 30px rgba(15, 23, 42, 0.04) !important;
+  padding: 20px !important;
+  margin-bottom: 18px !important;
+}
+
+.placementCareerAiActions > div > span {
+  color: var(--placement-blue) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.13em !important;
+}
+
+.placementCareerAiActions > div h3 {
+  margin: 7px 0 5px !important;
+  color: var(--placement-navy) !important;
+  font-size: 19px !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.025em !important;
+  font-family: inherit !important;
+}
+
+.placementCareerAiActions > div p {
+  color: var(--placement-muted) !important;
+  font-size: 11px !important;
+  line-height: 1.6 !important;
+}
+
+.placementCareerAiActions nav {
+  gap: 9px !important;
+}
+
+.placementCareerAiActions nav > button {
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 11px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease !important;
+}
+
+.placementCareerAiActions nav > button:hover {
+  border-color: #bfdbfe !important;
+  background: #f8fbff !important;
+  transform: translateY(-1px);
+}
+
+/* ---------- TOOLBAR ---------- */
+
+.placementToolbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  margin: 0 0 15px !important;
+}
+
+.placementFilters {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 4px !important;
+
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 11px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.placementFilters button {
+  min-height: 35px !important;
+  padding: 0 15px !important;
+
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+
+  color: var(--placement-muted) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+
+  transition:
+    color 150ms ease,
+    background 150ms ease !important;
+}
+
+.placementFilters button:hover {
+  color: var(--placement-navy) !important;
+  background: var(--placement-soft) !important;
+}
+
+.placementFilters button.selected {
+  background: var(--placement-navy) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 3px 8px rgba(15, 23, 42, 0.14) !important;
+}
+
+/* ---------- SEARCH ---------- */
+
+.placementSearch {
+  width: min(330px, 44%) !important;
+  height: 44px !important;
+
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 11px !important;
+  background: #ffffff !important;
+
+  padding: 0 13px !important;
+  box-shadow: none !important;
+}
+
+.placementSearch:focus-within {
+  border-color: #93c5fd !important;
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.08) !important;
+}
+
+.placementSearch input {
+  color: var(--placement-navy) !important;
+  font-size: 11px !important;
+}
+
+.placementSearch input::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* ---------- RESULT META ---------- */
+
+.placementResultMeta {
+  min-height: 42px;
+  margin: 0 2px 13px !important;
+}
+
+.placementResultMeta p b {
+  color: var(--placement-navy) !important;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+}
+
+.placementResultMeta p span,
+.placementResultMeta > span {
+  color: #94a3b8 !important;
+  font-size: 9px !important;
+}
+
+/* ---------- JOB GRID ---------- */
+
+.placementCards {
+  display: grid !important;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.placementCard {
+  position: relative !important;
+
+  min-width: 0 !important;
+  padding: 18px !important;
+
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 14px !important;
+
+  background: #ffffff !important;
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.02),
+    0 7px 22px rgba(15, 23, 42, 0.035) !important;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease !important;
+}
+
+.placementCard::before {
+  width: 3px !important;
+  background: var(--placement-blue) !important;
+}
+
+.placementCard:hover {
+  border-color: #bfdbfe !important;
+
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.07) !important;
+
+  transform: translateY(-2px) !important;
+}
+
+/* ---------- COMPANY ---------- */
+
+.placementCompanyLogo {
+  width: 42px !important;
+  height: 42px !important;
+
+  border: 1px solid #dbe5f2 !important;
+  border-radius: 10px !important;
+
+  background: #f8fafc !important;
+  color: var(--placement-blue) !important;
+
+  box-shadow: none !important;
+
+  font-size: 11px !important;
+  font-weight: 850 !important;
+}
+
+/* ---------- BADGES ---------- */
+
+.placementCardBadges mark {
+  padding: 5px 8px !important;
+
+  border-radius: 999px !important;
+
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+
+  font-size: 8px !important;
+  font-weight: 750 !important;
+}
+
+.placementCardBadges button {
+  width: 31px !important;
+  height: 31px !important;
+
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 8px !important;
+
+  background: #ffffff !important;
+  color: #94a3b8 !important;
+
+  box-shadow: none !important;
+}
+
+.placementCardBadges button:hover,
+.placementCardBadges button.saved {
+  border-color: #fde68a !important;
+  background: #fffbeb !important;
+  color: #d97706 !important;
+}
+
+/* ---------- TITLE ---------- */
+
+.placementCardTitle {
+  margin-top: 15px !important;
+}
+
+.placementCardTitle > span {
+  color: #94a3b8 !important;
+  font-size: 8px !important;
+}
+
+.placementCardTitle h3 {
+  min-height: auto !important;
+  margin: 5px 0 4px !important;
+
+  color: var(--placement-navy) !important;
+
+  font-family: inherit !important;
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.placementCardTitle p {
+  color: var(--placement-muted) !important;
+  font-size: 10px !important;
+  font-weight: 650 !important;
+}
+
+/* ---------- TAGS ---------- */
+
+.placementTags {
+  margin-top: 13px !important;
+  gap: 6px !important;
+}
+
+.placementTags span {
+  padding: 5px 8px !important;
+
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 6px !important;
+
+  background: var(--placement-soft) !important;
+  color: #475569 !important;
+
+  font-size: 8px !important;
+  font-weight: 650 !important;
+}
+
+/* ---------- DETAILS ---------- */
+
+.placementDetails {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  margin-top: 13px !important;
+}
+
+.placementDetails p {
+  padding: 10px 11px !important;
+
+  border: 1px solid #eef2f7 !important;
+  border-radius: 8px !important;
+
+  background: var(--placement-soft) !important;
+}
+
+.placementDetails span {
+  color: #94a3b8 !important;
+  font-size: 8px !important;
+  font-weight: 650 !important;
+}
+
+.placementDetails b {
+  margin-top: 4px !important;
+
+  color: var(--placement-navy) !important;
+  font-size: 10px !important;
+}
+
+/* ---------- SKILLS ---------- */
+
+.placementSkills {
+  gap: 5px !important;
+  margin-top: 10px !important;
+}
+
+.placementSkills span {
+  padding: 5px 7px !important;
+
+  border-radius: 6px !important;
+
+  background: #eff6ff !important;
+  color: #2563eb !important;
+
+  font-size: 8px !important;
+  font-weight: 700 !important;
+}
+
+/* ---------- ACTIONS ---------- */
+
+.placementActions {
+  gap: 8px !important;
+
+  margin-top: 15px !important;
+  padding-top: 14px !important;
+
+  border-top: 1px solid #edf1f5 !important;
+}
+
+.placementActions button {
+  min-height: 38px !important;
+
+  border-radius: 8px !important;
+
+  font-size: 9px !important;
+  font-weight: 750 !important;
+}
+
+.placementSecondary {
+  border: 1px solid var(--placement-border) !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+}
+
+.placementSecondary:hover {
+  border-color: #93c5fd !important;
+  background: #f8fbff !important;
+  color: var(--placement-blue) !important;
+}
+
+.placementPrimary {
+  border-color: var(--placement-blue) !important;
+  background: var(--placement-blue) !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    0 5px 12px rgba(37, 99, 235, 0.16) !important;
+}
+
+.placementPrimary:hover {
+  background: var(--placement-blue-dark) !important;
+  transform: none !important;
+}
+
+/* ---------- EMPTY STATE ---------- */
+
+.placementEmpty {
+  min-height: 230px !important;
+
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 14px !important;
+
+  background: #ffffff !important;
+
+  padding: 34px !important;
+}
+
+.placementEmpty i {
+  width: 42px !important;
+  height: 42px !important;
+
+  background: #eff6ff !important;
+  color: var(--placement-blue) !important;
+}
+
+.placementEmpty h3 {
+  margin: 13px 0 5px !important;
+
+  color: var(--placement-navy) !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+}
+
+.placementEmpty p {
+  color: var(--placement-muted) !important;
+  font-size: 10px !important;
+}
+
+.placementEmpty button {
+  margin-top: 15px !important;
+
+  border-radius: 8px !important;
+
+  background: var(--placement-blue) !important;
+
+  padding: 10px 14px !important;
+
+  font-size: 9px !important;
+}
+
+/* ---------- READINESS SIDEBAR ---------- */
+
+.placementJourney {
+  position: sticky !important;
+  top: 78px !important;
+
+  padding: 20px !important;
+
+  border: 1px solid var(--placement-border) !important;
+  border-radius: 15px !important;
+
+  background: #ffffff !important;
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.02),
+    0 10px 28px rgba(15, 23, 42, 0.045) !important;
+}
+
+.placementJourney::before {
+  height: 3px !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #60a5fa
+    ) !important;
+}
+
+.journeyHeader > span {
+  color: var(--placement-blue) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+}
+
+.journeyHeader > b {
+  color: var(--placement-navy) !important;
+}
+
+.journeyProgress {
+  background: #e8eef7 !important;
+}
+
+.journeyProgress i {
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #60a5fa
+    ) !important;
+}
+
+.placementJourney > p {
+  color: var(--placement-muted) !important;
+  font-size: 9px !important;
+  line-height: 1.6 !important;
+}
+
+.journeyStats {
+  border-color: #edf1f5 !important;
+}
+
+.journeyStats b {
+  color: var(--placement-navy) !important;
+}
+
+.journeyStats small {
+  color: #94a3b8 !important;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 1080px) {
+  .placementExperience {
+    grid-template-columns:
+      minmax(0, 1fr) 270px !important;
+  }
+
+  .placementCards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 880px) {
+  .placementExperience {
+    grid-template-columns: 1fr !important;
+  }
+
+  .placementJourney {
+    position: relative !important;
+    top: auto !important;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 620px) {
+  .placementToolbar {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  .placementFilters {
+    display: grid !important;
+    grid-template-columns:
+      repeat(3, 1fr) !important;
+  }
+
+  .placementSearch {
+    width: 100% !important;
+  }
+
+  .placementCards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .placementExperience *,
+  .placementExperience *::before,
+  .placementExperience *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

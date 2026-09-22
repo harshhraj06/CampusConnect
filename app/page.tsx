@@ -1,47 +1,382 @@
 "use client";
 
-import {CampusMagazine} from "./campus-magazine";
+import FacultyWorkspace from "./faculty-workspace";
+import FacultyTodayClasses from "./faculty-today-classes";
+import FacultyTeachingSchedule from "./faculty-teaching-schedule";
+import TimetableCoordinatorStudio from "./timetable-coordinator-studio";
+import TimetableDigitalBuilder from "./timetable-digital-builder";
+import TimetableCoordinatorAdmin from "./timetable-coordinator-admin";
+import FacultyDiary from "./faculty-diary";
+import FacultySyllabusProgress from "./faculty-syllabus-progress";
+
+import {
+  getOfflineTimetableFiles,
+  getOfflineTimetableSchedule,
+  saveOfflineTimetableFile,
+  saveOfflineTimetableSchedule,
+  timetableMimeType,
+} from "./offline-timetable-cache";
 
 
-import {CampusAI} from "./campus-ai";
-import ImportantNoticeRail from "./important-notice-rail";
-import {MyCampusRecruiterPreview} from "./my-campus-recruiters";
 
-import {ResumeStudio} from "./resume-studio";
+
+
+
+
+
+
+
 
 import Image from "next/image";
 import type {User} from "@supabase/supabase-js";
-import {useEffect, useState, type CSSProperties, type FormEvent, type ReactNode} from "react";
+import {lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode} from "react";
 import {getSupabaseClient} from "../lib/supabase";
-import {CampusModule, campusModuleSubtitle, isCampusModuleView, savePlacementApplication} from "./campus-modules";
+import FacultyWorkloadManager from "./faculty-workload-manager";
+import FacultyAvailabilityManager from "./faculty-availability-manager";
+import FacultyCoverageManager from "./faculty-coverage-manager";
+import FacultyCoverageControlCenter from "./faculty-coverage-control-center";
+import TimetableAutomationManager from "./timetable-automation-manager";
+import {
+  campusModuleSubtitle,
+  isCampusModuleView,
+  type CampusModuleView,
+  type CampusModuleRole,
+} from "./campus-module-routing";
+
+import type {
+  ModuleProfile,
+} from "./campus-modules";
 import {CampusSearch, type SearchTarget} from "./campus-search";
 import {
   UnifiedNotificationCenter,
   UnifiedNotificationWatcher,
 } from "./unified-notification-center";
-import {StudentPlacements, type PlacementJob} from "./placement-experience";
-import {ActivityCenter} from "./activity-center";
-import {FacultyDirectory} from "./faculty-directory";
-import {PlacementOperations} from "./placement-operations";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-} from "recharts";
+import type {PlacementJob} from "./placement-experience";
+
+
+
+
 import {GradeCalculator, openGradeCalculator} from "./grade-calculator";
-import {ProfessionalRoleDashboard} from "./professional-role-dashboard";
-import {CampusSevaKendra} from "./campus-seva-kendra";
+
+
 import {useCampusSevaNotifications} from "./campus-seva-notifications";
-import {CampusAboutScroll} from "./campus-about-scroll";
 
-import StudentPerformanceTracker from "./student-performance-tracker";
 
-type View = SearchTarget;
+
+
+
+
+
+
+
+
+const DashboardAttendanceChart = lazy(
+  async () => {
+    const module =
+      await import(
+        "./dashboard-attendance-chart"
+      );
+
+    return {
+      default:
+        module.DashboardAttendanceChart,
+    };
+  }
+);
+
+
+const ImportantNoticeRail = lazy(
+  () =>
+    import("./important-notice-rail")
+);
+
+const MyCampusRecruiterPreview = lazy(
+  async () => {
+    const module =
+      await import(
+        "./my-campus-recruiters"
+      );
+
+    return {
+      default:
+        module.MyCampusRecruiterPreview,
+    };
+  }
+);
+
+const ResumeStudio = lazy(
+  async () => {
+    const module =
+      await import("./resume-studio");
+
+    return {
+      default:
+        module.ResumeStudio,
+    };
+  }
+);
+
+const StudentPlacements = lazy(
+  async () => {
+    const module =
+      await import(
+        "./placement-experience"
+      );
+
+    return {
+      default:
+        module.StudentPlacements,
+    };
+  }
+);
+
+const PlacementOperations = lazy(
+  async () => {
+    const module =
+      await import(
+        "./placement-operations"
+      );
+
+    return {
+      default:
+        module.PlacementOperations,
+    };
+  }
+);
+
+const ProfessionalRoleDashboard = lazy(
+  async () => {
+    const module =
+      await import(
+        "./professional-role-dashboard"
+      );
+
+    return {
+      default:
+        module.ProfessionalRoleDashboard,
+    };
+  }
+);
+
+const CampusSevaKendra = lazy(
+  async () => {
+    const module =
+      await import(
+        "./campus-seva-kendra"
+      );
+
+    return {
+      default:
+        module.CampusSevaKendra,
+    };
+  }
+);
+
+const CampusAboutScroll = lazy(
+  async () => {
+    const module =
+      await import(
+        "./campus-about-scroll"
+      );
+
+    return {
+      default:
+        module.CampusAboutScroll,
+    };
+  }
+);
+
+const CollegeIdScanner = lazy(
+  () =>
+    import("./college-id-scanner")
+);
+
+const CampusAlumni = lazy(
+  async () => {
+    const module =
+      await import("./campus-alumni");
+
+    return {
+      default:
+        module.CampusAlumni,
+    };
+  }
+);
+
+const CampusMapBridge = lazy(
+  async () => {
+    const module =
+      await import(
+        "./campus-map-bridge"
+      );
+
+    return {
+      default:
+        module.CampusMapBridge,
+    };
+  }
+);
+
+const StudentCalendar = lazy(
+  () =>
+    import("./student-calendar")
+);
+
+
+const CampusMagazine = lazy(
+  async () => {
+    const module =
+      await import("./campus-magazine");
+
+    return {
+      default:
+        module.CampusMagazine,
+    };
+  }
+);
+
+const CampusAI = lazy(
+  async () => {
+    const module =
+      await import("./campus-ai");
+
+    return {
+      default:
+        module.CampusAI,
+    };
+  }
+);
+
+const ActivityCenter = lazy(
+  async () => {
+    const module =
+      await import("./activity-center");
+
+    return {
+      default:
+        module.ActivityCenter,
+    };
+  }
+);
+
+const FacultyDirectory = lazy(
+  async () => {
+    const module =
+      await import("./faculty-directory");
+
+    return {
+      default:
+        module.FacultyDirectory,
+    };
+  }
+);
+
+const NetworkProfessionalFeed = lazy(
+  async () => {
+    const module =
+      await import(
+        "./network-professional-feed"
+      );
+
+    return {
+      default:
+        module.NetworkProfessionalFeed,
+    };
+  }
+);
+
+const NetworkProfileModal = lazy(
+  async () => {
+    const module =
+      await import(
+        "./network-profile-modal"
+      );
+
+    return {
+      default:
+        module.NetworkProfileModal,
+    };
+  }
+);
+
+const StudentPerformanceTracker = lazy(
+  () =>
+    import(
+      "./student-performance-tracker"
+    )
+);
+
+
+const LazyCampusModule = lazy(
+  async () => {
+    const module =
+      await import("./campus-modules");
+
+    return {
+      default:
+        module.CampusModule,
+    };
+  }
+);
+
+function CampusModule(
+  props: {
+    view: CampusModuleView;
+    profile: ModuleProfile;
+
+    onProfileChange: (
+      profile: ModuleProfile
+    ) => void;
+
+    onOpenFacultyDiary?: () => void;
+    onOpenSyllabusProgress?: () => void;
+  }
+) {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="moduleLoading card"
+          role="status"
+        >
+          Loading workspace...
+        </div>
+      }
+    >
+      <LazyCampusModule
+        {...props}
+      />
+    </Suspense>
+  );
+}
+
+async function savePlacementApplication(
+  ...args: Parameters<
+    typeof import("./campus-modules")[
+      "savePlacementApplication"
+    ]
+  >
+) {
+  const module =
+    await import("./campus-modules");
+
+  return module
+    .savePlacementApplication(
+      ...args
+    );
+}
+
+
+type View =
+  | SearchTarget
+  | "Faculty Workspace"
+  | "My Batches"
+  | "Today's Classes"
+  | "My Teaching Schedule"
+  | "Faculty Diary"
+  | "Syllabus Progress"
+  | "Timetable Coordinator"
+  | "Timetable Assignment";
 type Role = "Student" | "Faculty" | "Placement Cell" | "Coordinator" | "Volunteer" | "Main Admin";
 type Screen = "welcome" | "auth" | "dashboard";
 type AuthMode = "login" | "register" | "forgot" | "reset";
@@ -51,7 +386,75 @@ type NotificationKind = "placement" | "academic" | "resume" | "network" | "campu
 const viewLabel = (view: View) =>
   view === "Campus"
     ? "Campus Life"
-    : view;
+    : view === "Calendar"
+      ? "Campus Calendar"
+      : view;
+
+const viewSlugs: Record<View, string> = {
+  Dashboard: "dashboard",
+  "Faculty Workspace": "faculty-workspace",
+  "My Batches": "faculty-batches",
+  "Today's Classes": "faculty-today",
+  "My Teaching Schedule": "faculty-teaching-schedule",
+  "Faculty Diary": "faculty-diary",
+  "Syllabus Progress": "faculty-syllabus-progress",
+  "Timetable Coordinator": "timetable-coordinator",
+  "Timetable Assignment": "timetable-assignment",
+  "My Campus": "my-campus",
+  "Campus Map": "campus-map",
+  "Campus AI": "campus-ai",
+  Placements: "placements",
+  Network: "network",
+  Resume: "resume",
+  Academics: "academics",
+  "Academic Control": "academic-control",
+  Calendar: "calendar",
+  Campus: "campus-life",
+  Alumni: "alumni",
+  "Activity Center": "activity-center",
+  "Faculty Directory": "faculty-directory",
+  "About CampusConnect": "about-campusconnect",
+  "Seva Kendra": "seva-kendra",
+  "College ID": "college-id",
+  Announcements: "announcements",
+  Assignments: "assignments",
+  Attendance: "attendance",
+  Learning: "learning",
+  Groups: "groups",
+  Marketplace: "marketplace",
+  "Notes & Tasks": "notes-tasks",
+  Profile: "profile",
+  Applications: "applications",
+  Analytics: "analytics",
+  Admin: "admin",
+};
+
+const viewBySlug = Object.fromEntries(
+  Object.entries(viewSlugs).map(([view, slug]) => [
+    slug,
+    view as View,
+  ])
+) as Record<string, View>;
+
+const viewFromPathname = (
+  pathname: string
+): View | null => {
+  const slug = pathname
+    .replace(/^\/+|\/+$/g, "")
+    .toLowerCase();
+
+  if (slug === "campus-ai") {
+    return "My Campus";
+  }
+
+  return slug
+    ? viewBySlug[slug] ?? null
+    : null;
+};
+
+const pathnameForView = (
+  view: View
+) => `/${viewSlugs[view]}`;
 type Profile = {
   name: string;
   email: string;
@@ -86,30 +489,39 @@ const nav: [View, string][] = [
   ["Campus", "◇"],
 
   ["Placements", "◈"],
+  ["Resume", "▤"],
   ["Applications", "▤"],
   ["Learning", "▶"],
   ["Groups", "◉"],
+  ["Marketplace", "♢"],
+  ["Notes & Tasks", "✎"],
   ["Network", "◎"],
-  ["Resume", "▤"],
   ["Academics", "▦"],
   ["Faculty Directory", "♙"],
   ["Activity Center", "✦"],
   ["Seva Kendra", "✉"],
+  ["College ID", "▥"],
   ["About CampusConnect", "≋"],
   ["Profile", "◌"],
 ];
-
 const navByRole: Record<Role, [View, string][]> = {
   Student: nav,
 
   Faculty: [
     ["Dashboard", "⌂"],
+    ["Faculty Workspace", "▦"],
+    ["Today's Classes", "◷"],
+    ["My Teaching Schedule", "▤"],
+    ["My Batches", "▤"],
+    ["Attendance", "◷"],
+    ["Faculty Diary", "✎"],
+    ["Syllabus Progress", "◫"],
+    ["Assignments", "✓"],
     ["My Campus", "◇"],
     ["Announcements", "▣"],
-    ["Assignments", "✓"],
-    ["Attendance", "◷"],
     ["Learning", "▶"],
     ["Groups", "◉"],
+    ["Notes & Tasks", "✎"],
     ["Academics", "▦"],
     ["Network", "◎"],
     ["Analytics", "▥"],
@@ -117,6 +529,7 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Faculty Directory", "♙"],
     ["Activity Center", "✦"],
     ["Seva Kendra", "✉"],
+    ["College ID", "▥"],
     ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
@@ -129,6 +542,7 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Announcements", "▣"],
     ["Learning", "▶"],
     ["Groups", "◉"],
+    ["Notes & Tasks", "✎"],
     ["Network", "◎"],
     ["Analytics", "▥"],
     ["Campus", "◇"],
@@ -140,16 +554,19 @@ const navByRole: Record<Role, [View, string][]> = {
   ],
 
   Coordinator: [
+    ["Timetable Coordinator", "▦"],
     ["Dashboard", "⌂"],
     ["My Campus", "◇"],
     ["Announcements", "▣"],
     ["Learning", "▶"],
     ["Groups", "◉"],
+    ["Notes & Tasks", "✎"],
     ["Campus", "◇"],
     ["Activity Center", "✦"],
     ["Network", "◎"],
     ["Faculty Directory", "♙"],
     ["Seva Kendra", "✉"],
+    ["College ID", "▥"],
     ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
@@ -178,14 +595,18 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Applications", "▤"],
     ["Learning", "▶"],
     ["Groups", "◉"],
+    ["Notes & Tasks", "✎"],
     ["Network", "◎"],
     ["Academics", "▦"],
+    ["Academic Control", "⚙"],
     ["Analytics", "▥"],
     ["Admin", "⚙"],
+    ["Timetable Assignment", "▦"],
     ["Campus", "◇"],
     ["Activity Center", "✦"],
     ["Faculty Directory", "♙"],
     ["Seva Kendra", "✉"],
+    ["College ID", "▥"],
     ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
@@ -458,12 +879,105 @@ function SidebarProfileReminder({
 
 
 export default function Home() {
+
+  /*
+   * Development-only attendance email delivery tester.
+   *
+   * The helper itself refuses to install in production and
+   * hard-codes dryRun: true.
+   */
   const [screen, setScreen] = useState<Screen>("welcome");
+  const [showOpeningAnimation, setShowOpeningAnimation] = useState(true);
+
+  useEffect(() => {
+    const animationFallback = window.setTimeout(() => {
+      setShowOpeningAnimation(false);
+    }, 5200);
+
+    return () => {
+      window.clearTimeout(animationFallback);
+    };
+  }, []);
   const [role, setRole] = useState<Role>("Student");
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [profile, setProfile] = useState<Profile>(emptyProfile);
   const [jobs, setJobs] = useState<PlacementJob[]>([]);
-  const [v, setV] = useState<View>("Dashboard");
+  const [v, setVState] = useState<View>("Dashboard");
+
+  // CampusConnect internal view history.
+  // Every normal setV(nextView) remembers the current view.
+  // goBack() consumes history without creating another entry.
+  const viewRef = useRef<View>("Dashboard");
+  const viewHistoryRef = useRef<View[]>([]);
+  const navigatingBackRef = useRef(false);
+
+  const setV = (next: View | ((current: View) => View)) => {
+    const current = viewRef.current;
+    const resolved =
+      typeof next === "function"
+        ? next(current)
+        : next;
+
+    if (resolved === current) {
+      return;
+    }
+
+    if (!navigatingBackRef.current) {
+      const history = viewHistoryRef.current;
+
+      if (history[history.length - 1] !== current) {
+        history.push(current);
+      }
+
+      if (history.length > 50) {
+        history.shift();
+      }
+    }
+
+    viewRef.current = resolved;
+
+    if (
+      typeof window !== "undefined" &&
+      screen === "dashboard"
+    ) {
+      window.history.pushState(
+        {campusConnectView: resolved},
+        "",
+        pathnameForView(resolved)
+      );
+    }
+
+    setVState(resolved);
+  };
+
+  const goBack = () => {
+    const history = viewHistoryRef.current;
+    const previous = history.pop();
+
+    if (!previous) {
+      return;
+    }
+
+    navigatingBackRef.current = true;
+    setVState(previous);
+    viewRef.current = previous;
+
+    window.history.back();
+
+    // Reset after this navigation cycle so subsequent navigation
+    // is recorded normally.
+    queueMicrotask(() => {
+      navigatingBackRef.current = false;
+    });
+
+    setSidebarOpen(false);
+    setNotificationsOpen(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarProfilePromptVisible, setSidebarProfilePromptVisible] = useState(true);
   const [applied, setApplied] = useState<string[]>([]);
@@ -594,6 +1108,11 @@ export default function Home() {
        * If that page is no longer available for this role,
        * safely return to Dashboard.
        */
+      const requestedView =
+        viewFromPathname(
+          window.location.pathname
+        );
+
       const savedView =
         window.localStorage.getItem(
           CAMPUSCONNECT_LAST_VIEW_KEY
@@ -606,24 +1125,34 @@ export default function Home() {
         ];
 
 
-      const savedViewIsAllowed =
-        savedView === "Dashboard" ||
-        (
-          savedView &&
-          roleViews.some(
-            ([viewName]) =>
-              viewName === savedView
-          )
-        );
+      const viewIsAllowed =
+        (candidate: View | null) =>
+          candidate === "Dashboard" ||
+          candidate === "Campus Map" ||
+          candidate === "Calendar" ||
+          candidate === "Alumni" ||
+          (
+            candidate &&
+            roleViews.some(
+              ([viewName]) =>
+                viewName === candidate
+            )
+          );
 
+      const initialView =
+        viewIsAllowed(requestedView)
+          ? requestedView!
+          : viewIsAllowed(savedView)
+            ? savedView!
+            : "Dashboard";
 
-      setV(
-        savedViewIsAllowed &&
-        savedView
-          ? savedView
-          : "Dashboard"
+      setV(initialView);
+
+      window.history.replaceState(
+        {campusConnectView: initialView},
+        "",
+        pathnameForView(initialView)
       );
-
 
       setScreen("dashboard");
     }).catch(() => {
@@ -690,10 +1219,65 @@ export default function Home() {
       v
     );
 
+    if (
+      window.location.pathname !==
+      pathnameForView(v)
+    ) {
+      window.history.replaceState(
+        {campusConnectView: v},
+        "",
+        pathnameForView(v)
+      );
+    }
+
   }, [
     v,
     screen,
   ]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const nextView =
+        viewFromPathname(
+          window.location.pathname
+        );
+
+      if (!nextView) {
+        return;
+      }
+
+      const history =
+        viewHistoryRef.current;
+
+      if (
+        history[history.length - 1] ===
+        nextView
+      ) {
+        history.pop();
+      }
+
+      navigatingBackRef.current = true;
+      viewRef.current = nextView;
+      setVState(nextView);
+      setSidebarOpen(false);
+      setNotificationsOpen(false);
+
+      queueMicrotask(() => {
+        navigatingBackRef.current = false;
+      });
+    };
+
+    window.addEventListener(
+      "popstate",
+      handlePopState
+    );
+
+    return () =>
+      window.removeEventListener(
+        "popstate",
+        handlePopState
+      );
+  }, []);
 
 
   useEffect(() => {
@@ -1222,6 +1806,100 @@ export default function Home() {
     setScreen("welcome");
   };
 
+  if (showOpeningAnimation) {
+    return (
+      <div
+        className="ccOpening"
+        role="dialog"
+        aria-label="CampusConnect opening animation"
+      >
+        <div
+          className="ccOpeningGrid"
+          aria-hidden="true"
+        />
+
+        <div
+          className="ccOpeningGlow ccOpeningGlowOne"
+          aria-hidden="true"
+        />
+
+        <div
+          className="ccOpeningGlow ccOpeningGlowTwo"
+          aria-hidden="true"
+        />
+
+        <main className="ccOpeningStage">
+
+<div className="ccOpeningLogoScene">
+            <span
+              className="ccOpeningOrbit ccOpeningOrbitOne"
+              aria-hidden="true"
+            />
+
+            <span
+              className="ccOpeningOrbit ccOpeningOrbitTwo"
+              aria-hidden="true"
+            />
+
+            <div className="ccOpeningLogoCard">
+              <img
+                src="/campusconnect-logo.png"
+                alt="CampusConnect logo"
+                width="116"
+                height="116"
+                className="ccOpeningLogo"
+              />
+            </div>
+          </div>
+
+          <div className="ccOpeningCopy">
+            <span className="ccOpeningEyebrow">
+              Your campus, connected
+            </span>
+
+            <h1 aria-label="CampusConnect">
+              <span className="ccOpeningLetter ccOpeningLetterDark" aria-hidden="true">C</span>
+              <span className="ccOpeningLetter ccOpeningLetterDark" aria-hidden="true">a</span>
+              <span className="ccOpeningLetter ccOpeningLetterDark" aria-hidden="true">m</span>
+              <span className="ccOpeningLetter ccOpeningLetterDark" aria-hidden="true">p</span>
+              <span className="ccOpeningLetter ccOpeningLetterDark" aria-hidden="true">u</span>
+              <span className="ccOpeningLetter ccOpeningLetterDark" aria-hidden="true">s</span>
+              <span className="ccOpeningLetter ccOpeningLetterBlue" aria-hidden="true">C</span>
+              <span className="ccOpeningLetter ccOpeningLetterBlue" aria-hidden="true">o</span>
+              <span className="ccOpeningLetter ccOpeningLetterBlue" aria-hidden="true">n</span>
+              <span className="ccOpeningLetter ccOpeningLetterBlue" aria-hidden="true">n</span>
+              <span className="ccOpeningLetter ccOpeningLetterBlue" aria-hidden="true">e</span>
+              <span className="ccOpeningLetter ccOpeningLetterBlue" aria-hidden="true">c</span>
+              <span className="ccOpeningLetter ccOpeningLetterBlue" aria-hidden="true">t</span>
+            </h1>
+
+            <p>
+              One intelligent workspace for your entire
+              campus journey.
+            </p>
+          </div>
+
+          <div
+            className="ccOpeningProgress"
+            aria-hidden="true"
+          >
+            <span />
+          </div>
+        </main>
+
+        <button
+          type="button"
+          className="ccOpeningSkip"
+          onClick={() => setShowOpeningAnimation(false)}
+          aria-label="Skip opening animation"
+        >
+          Skip
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    );
+  }
+
   if (checkingSession) return <LoadingScreen/>;
 
   if (screen === "welcome") {
@@ -1240,7 +1918,13 @@ export default function Home() {
 
   const initials = getInitials(profile.name);
   const firstName = profile.name.split(" ")[0];
-  const roleNav = navByRole[role];
+  const roleNav: [View, string][] = [
+    navByRole[role][0],
+    ["Campus Map", "⌖"],
+    ["Calendar", "▦"],
+    ["Alumni", "✦"],
+    ...navByRole[role].slice(1),
+  ];
   const status = sidebarStatus[role];
   const actions = headerActions[role];
   const roleNotifications:
@@ -1251,7 +1935,17 @@ export default function Home() {
       0,
       40
     );
-  const unreadCount = roleNotifications.filter(item => !readNotificationIds.includes(item.id)).length;
+  const localUnreadCount =
+    roleNotifications.filter(
+      item =>
+        !readNotificationIds.includes(
+          item.id
+        )
+    ).length;
+
+  const unreadCount =
+    localUnreadCount +
+    unifiedExternalUnreadCount;
   const sevaUnreadCount =
     roleNotifications.filter(
       item =>
@@ -1530,7 +2224,36 @@ export default function Home() {
           }}
         />
 
-        <div className="content">
+        <Suspense
+          fallback={
+            <div
+              className="moduleLoading card"
+              role="status"
+            >
+              Loading workspace...
+            </div>
+          }
+        >
+          <div className="content">
+          {v !== "Dashboard" && (
+            <div className="globalBackBar">
+              <button
+                type="button"
+                className="globalBackToDashboard"
+                onClick={goBack}
+                aria-label="Back"
+              >
+                <span className="globalBackIcon" aria-hidden="true">
+                  ←
+                </span>
+
+                <span className="globalBackCopy">
+                  <strong>Back</strong>
+                </span>
+              </button>
+            </div>
+          )}
+
           <div className={`heading professionalHeading ${v === "Dashboard" ? "dashboardTopBar" : ""}`}>
             <div className="headingMain">
               <div className="campusPageHeading">
@@ -1628,12 +2351,169 @@ export default function Home() {
               )}
             </>
           )}
+          {v === "Alumni" && (
+            <CampusAlumni role={role} />
+          )}
+
+          {v === "Campus Map" && (
+            <section
+              aria-label="RNS Campus Navigator"
+              style={{
+                overflow: "hidden",
+                minHeight: "900px",
+                border: "1px solid rgba(31, 78, 121, 0.16)",
+                borderRadius: "24px",
+                background: "#eaf2f7",
+                boxShadow:
+                  "0 22px 54px rgba(24, 54, 91, 0.14)",
+              }}
+            >
+              <CampusMapBridge
+                role={role}
+              />
+            </section>
+          )}
+
+          {v === "Calendar" && (
+            <StudentCalendar role={role} />
+          )}
+
           {v === "My Campus" && (
             <MyCampus
               profile={profile}
             />
           )}
-          {v === "Placements" && (role === "Placement Cell" ? <PlacementOperations profile={profile}/> : <StudentPlacements
+
+          {v === "Faculty Workspace" &&
+            role === "Faculty" && (
+              <FacultyWorkspace
+                mode="dashboard"
+                profile={profile}
+                onOpenMyBatches={() =>
+                  setV("My Batches")
+                }
+                onOpenTodayClasses={() =>
+                  setV("Today's Classes")
+                }
+                onOpenAttendance={() =>
+                  setV("Attendance")
+                }
+                onOpenSyllabusProgress={() =>
+                  setV("Syllabus Progress")
+                }
+                onOpenAssignments={() =>
+                  setV("Assignments")
+                }
+                onOpenLearning={() =>
+                  setV("Learning")
+                }
+                onOpenAcademics={() =>
+                  setV("Academics")
+                }
+              />
+            )}
+
+          {v === "My Batches" &&
+            role === "Faculty" && (
+              <FacultyWorkspace
+                mode="batches"
+                profile={profile}
+                onOpenMyBatches={() =>
+                  setV("My Batches")
+                }
+                onOpenTodayClasses={() =>
+                  setV("Today's Classes")
+                }
+                onOpenAttendance={() =>
+                  setV("Attendance")
+                }
+                onOpenSyllabusProgress={() =>
+                  setV("Syllabus Progress")
+                }
+                onOpenAssignments={() =>
+                  setV("Assignments")
+                }
+                onOpenLearning={() =>
+                  setV("Learning")
+                }
+                onOpenAcademics={() =>
+                  setV("Academics")
+                }
+              />
+            )}
+
+          {v === "Today's Classes" &&
+            role === "Faculty" && (
+              <FacultyTodayClasses
+                profile={profile}
+                onOpenAttendance={() =>
+                  setV("Attendance")
+                }
+                onOpenMyBatches={() =>
+                  setV("My Batches")
+                }
+                onOpenSyllabusProgress={() =>
+                  setV("Syllabus Progress")
+                }
+              />
+            )}
+
+          {v === "My Teaching Schedule" &&
+            role === "Faculty" && (
+              <FacultyTeachingSchedule
+                profile={profile}
+              />
+            )}
+
+
+          {v === "Faculty Diary" &&
+            role === "Faculty" && (
+              <FacultyDiary
+                profile={profile}
+                onOpenAttendance={() =>
+                  setV("Attendance")
+                }
+                onOpenTodayClasses={() =>
+                  setV("Today's Classes")
+                }
+              />
+            )}
+
+          {v === "Syllabus Progress" &&
+            role === "Faculty" && (
+              <FacultySyllabusProgress
+                profile={profile}
+                onOpenAttendance={() =>
+                  setV("Attendance")
+                }
+                onOpenDiary={() =>
+                  setV("Faculty Diary")
+                }
+              />
+            )}
+
+          {v === "Timetable Coordinator" &&
+            role === "Coordinator" && (
+              <>
+                <TimetableDigitalBuilder
+                  profile={profile}
+                />
+
+                <TimetableCoordinatorStudio
+                  profile={profile}
+                />
+              </>
+            )}
+
+
+
+
+          {v === "Timetable Assignment" &&
+            role === "Main Admin" && (
+              <TimetableCoordinatorAdmin
+                profile={profile}
+              />
+            )}{v === "Placements" && (role === "Placement Cell" ? <PlacementOperations profile={profile}/> : <StudentPlacements
           profile={profile}
             jobs={jobs}
             applied={applied}
@@ -1701,7 +2581,13 @@ export default function Home() {
           />)} 
           {v === "Network" && <Network profile={profile}/>} 
           {v === "Resume" && <Resume profile={profile} score={score} improve={() => setScore(current => Math.min(100, current + 6))}/>} 
-          {v === "Academics" && <Academics role={role} profile={profile}/>} 
+          {v === "Academics" && <Academics role={role} profile={profile}/>}
+          {v === "Academic Control" && (
+            <AcademicControl
+              role={role}
+              profile={profile}
+            />
+          )}
           {v === "Campus" && (
             <Campus
               profile={profile}
@@ -1723,6 +2609,10 @@ export default function Home() {
             <CampusMagazine profile={profile} />
           )}
 
+          {v === "College ID" && (
+            <CollegeIdScanner />
+          )}
+
           {v === "Seva Kendra" && (
             <CampusSevaKendra
               profile={profile}
@@ -1735,14 +2625,43 @@ export default function Home() {
             />
           )}
           {v === "Profile" && <ProfilePage profile={profile} onProfileChange={next => { setProfile(next); setRole(next.role); }} onSignOut={signOut}/>}
-          {isCampusModuleView(v) && <CampusModule view={v} profile={profile} onProfileChange={nextProfile => {
-  setProfile(current => ({
-    ...current,
-    ...nextProfile,
-  }));
-  setRole(nextProfile.role);
-}}/>}
+          {isCampusModuleView(v) && (
+            <CampusModule
+              view={v}
+              profile={profile}
+
+              onProfileChange={nextProfile => {
+                setProfile(current => ({
+                  ...current,
+                  ...nextProfile,
+                }));
+
+                setRole(
+                  nextProfile.role
+                );
+              }}
+
+              onOpenFacultyDiary={
+                role === "Faculty"
+                  ? () =>
+                      setV(
+                        "Faculty Diary"
+                      )
+                  : undefined
+              }
+
+              onOpenSyllabusProgress={
+                role === "Faculty"
+                  ? () =>
+                      setV(
+                        "Syllabus Progress"
+                      )
+                  : undefined
+              }
+            />
+          )}
         </div>
+        </Suspense>
         <footer>{roleNav.slice(0, 5).map(([n, i]) => <button className={v === n ? "active" : ""} onClick={() => {
   setV(n);
   setSidebarOpen(false);
@@ -2989,18 +3908,13 @@ function Dashboard({
             .eq("id", user.id)
             .maybeSingle(),
 
-          client
-            .from("attendance_records")
-            .select("id,subject,attended,total,updated_at")
-            .eq("student_id", user.id)
-            .order("subject"),
+          client.rpc(
+            "get_my_live_attendance_summary"
+          ),
 
-          client
-            .from("assignments")
-            .select("id,title,subject,due_at,kind,created_at")
-            .gte("due_at", new Date().toISOString())
-            .order("due_at", {ascending: true})
-            .limit(5),
+          client.rpc(
+            "get_my_assignments"
+          ),
 
           client
             .from("announcements")
@@ -3063,7 +3977,43 @@ function Dashboard({
           console.error(attendanceResult.error);
         } else {
           setAttendance(
-            (attendanceResult.data || []) as DashboardAttendance[]
+            (
+              attendanceResult.data ||
+              []
+            ).map(
+              (row: any) => ({
+                id:
+                  String(
+                    row.id ||
+                    row.subject ||
+                    ""
+                  ),
+
+                subject:
+                  String(
+                    row.subject ||
+                    "Subject"
+                  ),
+
+                attended:
+                  Number(
+                    row.attended_classes ||
+                    0
+                  ),
+
+                total:
+                  Number(
+                    row.counted_classes ||
+                    0
+                  ),
+
+                updated_at:
+                  String(
+                    row.updated_at ||
+                    ""
+                  ),
+              })
+            ) as DashboardAttendance[]
           );
         }
 
@@ -3097,7 +4047,7 @@ function Dashboard({
               id: `attendance-${item.id}`,
               type: "attendance",
               title: `${item.subject} attendance updated`,
-              meta: `${item.attended}/${item.total} classes attended`,
+              meta: `${Number(item.attended_classes || 0)}/${Number(item.counted_classes || 0)} classes attended`,
               created_at: item.updated_at || new Date().toISOString(),
               target: "Attendance",
             });
@@ -3162,7 +4112,12 @@ function Dashboard({
             new Date(a.created_at).getTime()
         );
 
-        setRecentActivity(activityItems.slice(0, 8));
+        setRecentActivity(
+          activityItems.slice(
+            0,
+            30
+          )
+        );
       } catch (error) {
         if (active) {
           setDashboardError(
@@ -3180,8 +4135,55 @@ function Dashboard({
 
     void loadDashboard();
 
+    const refreshDashboard =
+      () => {
+        if (
+          document.visibilityState ===
+          "visible"
+        ) {
+          void loadDashboard();
+        }
+      };
+
+    const refreshTimer =
+      window.setInterval(
+        () => {
+          if (
+            document.visibilityState ===
+            "visible"
+          ) {
+            void loadDashboard();
+          }
+        },
+        15000
+      );
+
+    window.addEventListener(
+      "focus",
+      refreshDashboard
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      refreshDashboard
+    );
+
     return () => {
       active = false;
+
+      window.clearInterval(
+        refreshTimer
+      );
+
+      window.removeEventListener(
+        "focus",
+        refreshDashboard
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        refreshDashboard
+      );
     };
   }, []);
 
@@ -3515,7 +4517,7 @@ function Dashboard({
 
   const safeSubjects = attendance.filter(item => {
     if (!item.total) return false;
-    return (item.attended / item.total) * 100 >= 75;
+    return (item.attended / item.total) * 100 >= 85;
   }).length;
 
   const dashboardAttendanceChart = attendance.map(item => ({
@@ -3529,7 +4531,7 @@ function Dashboard({
 
   const shortageSubjects = attendance.filter(item => {
     if (!item.total) return false;
-    return (item.attended / item.total) * 100 < 75;
+    return (item.attended / item.total) * 100 < 85;
   }).length;
 
   const firstName = studentName.split(" ")[0] || "Student";
@@ -3607,8 +4609,8 @@ function Dashboard({
           label: "Attendance signal",
           value: `${attendanceAverage}% overall`,
           note:
-            attendanceAverage >= 75
-              ? `${safeSubjects} subjects are currently at or above the 75% target.`
+            attendanceAverage >= 85
+              ? `${safeSubjects} subjects are currently at or above the 85% target.`
               : `${shortageSubjects} subjects currently need attendance attention.`,
         }
       : {
@@ -3881,6 +4883,7 @@ function Dashboard({
             <em><i/> Synced workspace</em>
           </div>
 
+
           <article className="dashboardHeroFocus" aria-live="polite">
             <header>
               <span>0{dashboardHeroSignalIndex + 1}</span>
@@ -4139,7 +5142,7 @@ function Dashboard({
           shortageSubjects > 0 ||
           (
             attendance.length > 0 &&
-            attendanceAverage < 75
+            attendanceAverage < 85
           )
         ) {
           intelligenceEyebrow =
@@ -4579,7 +5582,7 @@ function Dashboard({
 
           if (
             item.total > 0 &&
-            percentage < 75
+            percentage < 85
           ) {
 
             priorities.push({
@@ -4600,7 +5603,7 @@ function Dashboard({
                   : 90,
 
               title:
-                `${item.subject} attendance is below 75%`,
+                `${item.subject} attendance is below 85%`,
 
               meta:
                 `${item.attended}/${item.total} classes attended · Current attendance ${percentage}%`,
@@ -4996,7 +5999,44 @@ function Dashboard({
         };
 
 
-        return (
+        const priorityActionLabel = (
+            type:
+              StudentPriorityItem["type"]
+          ) => {
+
+            if (
+              type ===
+              "attendance"
+            ) {
+              return "Review attendance";
+            }
+
+            if (
+              type ===
+              "assignment"
+            ) {
+              return "Open assignment";
+            }
+
+            if (
+              type ===
+              "placement"
+            ) {
+              return "View opportunity";
+            }
+
+            if (
+              type ===
+              "profile"
+            ) {
+              return "Complete profile";
+            }
+
+            return "Track application";
+          };
+
+
+          return (
 
           <section className="studentPriorityCenter">
 
@@ -5007,7 +6047,7 @@ function Dashboard({
                 <div className="studentPriorityEyebrow">
 
                   <span>
-                    PRIORITY CENTER
+                    ACTION CENTER
                   </span>
 
                   <i />
@@ -5020,7 +6060,7 @@ function Dashboard({
 
 
                 <h2>
-                  What needs your attention
+                  Your next best actions
                 </h2>
 
                 <p>
@@ -5081,6 +6121,76 @@ function Dashboard({
 
             </header>
 
+            <section className="studentActionBrief">
+              <div className="studentActionBriefCopy">
+                <div className="studentActionBriefEyebrow">
+                  <span>
+                    TODAY'S BRIEF
+                  </span>
+
+                  <i />
+
+                  <small>
+                    Live priority summary
+                  </small>
+                </div>
+
+                <strong>
+                  {priorities.length
+                    ? `${priorities.length} ${
+                        priorities.length === 1
+                          ? "action"
+                          : "actions"
+                      } currently active`
+                    : "You're on track today"}
+                </strong>
+
+                <p>
+                  {criticalCount > 0
+                    ? `${criticalCount} critical ${
+                        criticalCount === 1
+                          ? "item needs"
+                          : "items need"
+                      } immediate attention.`
+                    : highCount > 0
+                    ? `${highCount} high-priority ${
+                        highCount === 1
+                          ? "item is"
+                          : "items are"
+                      } waiting.`
+                    : priorities.length
+                    ? "No critical issues. Continue with your highest-ranked action."
+                    : "No urgent academic or placement actions right now."}
+                </p>
+              </div>
+
+              {sortedPriorities[0] && (
+                <button
+                  type="button"
+                  className="studentActionBriefNext"
+                  onClick={() =>
+                    go(
+                      sortedPriorities[0].target
+                    )
+                  }
+                >
+                  <small>
+                    NEXT PRIORITY
+                  </small>
+
+                  <strong>
+                    {sortedPriorities[0].title}
+                  </strong>
+
+                  <span>
+                    {priorityActionLabel(
+                      sortedPriorities[0].type
+                    )} →
+                  </span>
+                </button>
+              )}
+            </section>
+
 
             {loading ? (
 
@@ -5091,7 +6201,7 @@ function Dashboard({
                 <div>
 
                   <strong>
-                    Analyzing your campus activity
+                    Building your action queue
                   </strong>
 
                   <p>
@@ -5175,7 +6285,9 @@ function Dashboard({
                         </b>
 
                         <small>
-                          Take action →
+                          {priorityActionLabel(
+                              item.type
+                            )} →
                         </small>
 
                       </span>
@@ -5198,7 +6310,7 @@ function Dashboard({
                 <div>
 
                   <strong>
-                    You're caught up
+                    No action needed right now
                   </strong>
 
                   <p>
@@ -5259,12 +6371,12 @@ function Dashboard({
 
                   <div
                     className={
-                      attendanceAverage >= 75
+                      attendanceAverage >= 85
                         ? "dashboardHealthStatus safe"
                         : "dashboardHealthStatus risk"
                     }
                   >
-                    {attendanceAverage >= 75
+                    {attendanceAverage >= 85
                       ? "On track"
                       : "Needs attention"}
                   </div>
@@ -5303,7 +6415,7 @@ function Dashboard({
 
                         <strong
                           className={
-                            percentage >= 75
+                            percentage >= 85
                               ? "dashboardGood"
                               : "dashboardRisk"
                           }
@@ -5361,80 +6473,9 @@ function Dashboard({
                   </div>
                 </div>
 
-                <div className="dashboardAttendanceChart">
-                  <ResponsiveContainer width="100%" height={290}>
-                    <BarChart
-                      data={dashboardAttendanceChart}
-                      margin={{
-                        top: 20,
-                        right: 15,
-                        bottom: 45,
-                        left: -12,
-                      }}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        vertical={false}
-                        stroke="#edf0f5"
-                      />
-
-                      <XAxis
-                        dataKey="subject"
-                        interval={0}
-                        angle={-14}
-                        textAnchor="end"
-                        height={65}
-                        tick={{
-                          fontSize: 9,
-                          fill: "#7c8798",
-                        }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-
-                      <YAxis
-                        domain={[0, 100]}
-                        tickFormatter={value => `${value}%`}
-                        tick={{
-                          fontSize: 9,
-                          fill: "#8b95a5",
-                        }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-
-                      <Tooltip
-                        cursor={{
-                          fill: "rgba(49,89,217,.035)",
-                        }}
-                        formatter={(value) => [
-                          `${value}%`,
-                          "Attendance",
-                        ]}
-                      />
-
-                      <ReferenceLine
-                        y={75}
-                        stroke="#d9a441"
-                        strokeDasharray="5 5"
-                        label={{
-                          value: "75% minimum",
-                          position: "insideTopRight",
-                          fill: "#9a731e",
-                          fontSize: 9,
-                        }}
-                      />
-
-                      <Bar
-                        dataKey="attendance"
-                        name="Attendance"
-                        radius={[7, 7, 2, 2]}
-                        fill="#3159d9"
-                        maxBarSize={44}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                <DashboardAttendanceChart
+                  data={dashboardAttendanceChart}
+                />
 
                 <div className="dashboardChartLegend">
                   <span>
@@ -5444,7 +6485,7 @@ function Dashboard({
 
                   <span>
                     <i className="dashboardLegendLine"/>
-                    Required minimum — 75%
+                    Required minimum — 85%
                   </span>
                 </div>
               </>
@@ -5831,7 +6872,24 @@ function NotificationCenter({role, items, readIds, filter, onFilter, onClose, on
 }
 
 function RoleDashboardPanels({role, go}: {role: Role; go: (v: View) => void}) {
-  const views: View[] = role === "Student" ? ["Placements", "Assignments", "Attendance"] : role === "Faculty" ? ["Assignments", "Attendance", "Learning"] : ["Placements", "Applications", "Admin"];
+  const views: View[] =
+    role === "Student"
+      ? [
+          "Placements",
+          "Assignments",
+          "Attendance",
+        ]
+      : role === "Faculty"
+        ? [
+            "Faculty Workspace",
+            "My Batches",
+            "Attendance",
+          ]
+        : [
+            "Placements",
+            "Applications",
+            "Admin",
+          ];
   return <div className="grid">{views.map(view => <Panel key={view} title={view}><MetricRow title={`Open ${view}`} meta="Use the live module to create, review or update records." value="Open"/><button className="ghost" onClick={() => go(view)}>Go to {view} →</button></Panel>)}</div>;
 }
 
@@ -5908,342 +6966,1782 @@ function Network({profile}: {profile: Profile}) {
   type Person = {
     id: string;
     full_name: string;
-    email?: string;
-    role: Role;
+    campus_uid: string;
     department: string;
     graduation_year: string;
+    role: Role;
+    avatar_url?: string | null;
     bio: string;
     skills: string;
-    avatar_url?: string | null;
   };
 
-  type IncomingRequest = {
+  type ConnectionRecord = {
     id: string;
     requester_id: string;
+    receiver_id: string;
     status: string;
   };
 
+  type DirectorySearchPerson = {
+    id: string;
+    full_name: string;
+    campus_uid: string;
+    usn: string;
+    department: string;
+    graduation_year: string;
+    role: string;
+    avatar_url?: string | null;
+  };
+
   const [people, setPeople] = useState<Person[]>([]);
-  const [sent, setSent] = useState<string[]>([]);
-  const [incoming, setIncoming] = useState<IncomingRequest[]>([]);
-  const [status, setStatus] = useState("");
+  const [connections, setConnections] =
+    useState<ConnectionRecord[]>([]);
+
+  const [currentUserId, setCurrentUserId] = useState("");
   const [query, setQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All");
+  const [networkTab, setNetworkTab] = useState<"Feed" | "Discover">("Feed");
+  const [selectedNetworkProfileId, setSelectedNetworkProfileId] =
+    useState<string | null>(null);
+  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [busyUserId, setBusyUserId] =
+    useState<string | null>(null);
+
+  const [ccId, setCcId] = useState("");
+  const [ccIdResult, setCcIdResult] =
+    useState<Person | null>(null);
+  const [ccIdSearching, setCcIdSearching] =
+    useState(false);
+  const [ccIdMessage, setCcIdMessage] =
+    useState("");
+
+  const normalizeConnectionStatus = (
+    value: string
+  ) => value.trim().toLowerCase();
 
   useEffect(() => {
     let active = true;
 
     const client = getSupabaseClient();
-    if (!client) return;
 
-    (async () => {
+    if (!client) {
+      setStatus("Supabase is not configured.");
+      setLoading(false);
+      return;
+    }
+
+    const load = async () => {
+      setLoading(true);
+
       const {data: auth, error: authError} =
         await client.auth.getUser();
 
       if (!active) return;
 
       if (authError || !auth.user) {
-        setStatus("Sign in again to use your campus network.");
+        setStatus(
+          "Sign in again to use your campus network."
+        );
+        setLoading(false);
         return;
       }
 
       const userId = auth.user.id;
 
+      setCurrentUserId(userId);
+
       const [
         directoryResult,
-        sentResult,
-        incomingResult,
+        connectionResult,
       ] = await Promise.all([
+        client.rpc(
+          "list_campus_network_profiles"
+        ),
+
         client
-          .from("campus_directory")
+          .from("chat_connections")
           .select(
-            "id,full_name,role,department,graduation_year,bio,skills,avatar_url"
+            "id,requester_id,receiver_id,status"
           )
-          .neq("id", userId)
-          .order("full_name"),
-
-        client
-          .from("connection_requests")
-          .select("addressee_id")
-          .eq("requester_id", userId),
-
-        client
-          .from("connection_requests")
-          .select("id,requester_id,status")
-          .eq("addressee_id", userId)
-          .eq("status", "pending")
-          .order("created_at", {ascending: false}),
+          .or(
+            `requester_id.eq.${userId},receiver_id.eq.${userId}`
+          ),
       ]);
 
       if (!active) return;
 
       if (directoryResult.error) {
-        setStatus(directoryResult.error.message);
+        setStatus(
+          `Network directory: ${directoryResult.error.message}`
+        );
+        setLoading(false);
         return;
       }
 
-      if (sentResult.error) {
-        setStatus(sentResult.error.message);
+      if (connectionResult.error) {
+        setStatus(
+          `Connections: ${connectionResult.error.message}`
+        );
+        setLoading(false);
         return;
       }
 
-      if (incomingResult.error) {
-        setStatus(incomingResult.error.message);
-        return;
-      }
-
-      setPeople((directoryResult.data || []) as Person[]);
-
-      setSent(
-        (sentResult.data || []).map(row =>
-          String(row.addressee_id)
-        )
+      setPeople(
+        (directoryResult.data || []) as Person[]
       );
 
-      setIncoming(
-        (incomingResult.data || []) as IncomingRequest[]
+      setConnections(
+        (connectionResult.data || []) as ConnectionRecord[]
       );
-    })();
+
+      setLoading(false);
+    };
+
+    void load();
 
     return () => {
       active = false;
     };
   }, []);
 
-  const connect = async (id: string) => {
-    const client = getSupabaseClient();
+  const relationshipFor = (
+    personId: string
+  ) =>
+    connections.find(
+      connection =>
+        (
+          connection.requester_id ===
+            currentUserId &&
+          connection.receiver_id ===
+            personId
+        ) ||
+        (
+          connection.requester_id ===
+            personId &&
+          connection.receiver_id ===
+            currentUserId
+        )
+    );
 
-    if (!client) {
-      setStatus("Supabase is not configured.");
+  const connectedIds = new Set(
+    connections
+      .filter(
+        connection =>
+          normalizeConnectionStatus(
+            connection.status
+          ) === "accepted"
+      )
+      .map(connection =>
+        connection.requester_id ===
+        currentUserId
+          ? connection.receiver_id
+          : connection.requester_id
+      )
+  );
+
+  const incoming = connections.filter(
+    connection =>
+      connection.receiver_id ===
+        currentUserId &&
+      normalizeConnectionStatus(
+        connection.status
+      ) === "pending"
+  );
+
+  const pendingOutgoingIds = new Set(
+    connections
+      .filter(
+        connection =>
+          connection.requester_id ===
+            currentUserId &&
+          normalizeConnectionStatus(
+            connection.status
+          ) === "pending"
+      )
+      .map(
+        connection =>
+          connection.receiver_id
+      )
+  );
+
+  const openNetworkMessage = (
+    personId: string
+  ) => {
+    if (
+      typeof window === "undefined"
+    ) {
       return;
     }
 
-    const {data: userData} = await client.auth.getUser();
+    window.sessionStorage.setItem(
+      "campusconnect-open-direct-chat",
+      personId
+    );
 
-    if (!userData.user) {
-      setStatus("Sign in again.");
-      return;
-    }
+    setSelectedNetworkProfileId(null);
 
-    const {error} = await client
-      .from("connection_requests")
-      .insert({
-        requester_id: userData.user.id,
-        addressee_id: id,
-      });
+    window.dispatchEvent(
+      new CustomEvent(
+        "campus-navigate",
+        {
+          detail: "Groups",
+        }
+      )
+    );
+  };
 
-    if (error) {
+  const connect = async (
+    personId: string
+  ) => {
+    const client =
+      getSupabaseClient();
+
+    if (!client || !currentUserId) {
       setStatus(
-        error.code === "23505"
-          ? "Connection request already sent."
-          : error.message
+        "Sign in again to send connection requests."
       );
       return;
     }
 
-    setSent(current =>
-      current.includes(id) ? current : [...current, id]
-    );
+    if (
+      personId === currentUserId ||
+      busyUserId
+    ) {
+      return;
+    }
 
-    setStatus("Connection request sent.");
+    setBusyUserId(personId);
+    setStatus("");
+
+    try {
+      const existing =
+        relationshipFor(personId);
+
+      if (existing) {
+        const existingStatus =
+          normalizeConnectionStatus(
+            existing.status
+          );
+
+        if (
+          existingStatus ===
+          "accepted"
+        ) {
+          setStatus(
+            "You are already connected with this person."
+          );
+          return;
+        }
+
+        if (
+          existingStatus ===
+          "pending"
+        ) {
+          setStatus(
+            existing.receiver_id ===
+            currentUserId
+              ? "This person has already sent you an invitation."
+              : "Your connection request is already pending."
+          );
+          return;
+        }
+
+        if (
+          existingStatus ===
+          "blocked"
+        ) {
+          setStatus(
+            "This connection is currently unavailable."
+          );
+          return;
+        }
+
+        if (
+          existingStatus ===
+          "rejected"
+        ) {
+          if (
+            existing.requester_id ===
+            currentUserId
+          ) {
+            const {
+              data,
+              error,
+            } = await client
+              .from(
+                "chat_connections"
+              )
+              .update({
+                status: "Pending",
+                updated_at:
+                  new Date().toISOString(),
+              })
+              .eq(
+                "id",
+                existing.id
+              )
+              .select(
+                "id,requester_id,receiver_id,status"
+              )
+              .single();
+
+            if (error) {
+              throw error;
+            }
+
+            setConnections(
+              current =>
+                current.map(
+                  connection =>
+                    connection.id ===
+                    existing.id
+                      ? data as ConnectionRecord
+                      : connection
+                )
+            );
+
+            setStatus(
+              "Connection request sent."
+            );
+            return;
+          }
+
+          const {
+            error: deleteError,
+          } = await client
+            .from(
+              "chat_connections"
+            )
+            .delete()
+            .eq(
+              "id",
+              existing.id
+            );
+
+          if (deleteError) {
+            throw deleteError;
+          }
+
+          setConnections(
+            current =>
+              current.filter(
+                connection =>
+                  connection.id !==
+                  existing.id
+              )
+          );
+        }
+      }
+
+      const {
+        data,
+        error,
+      } = await client
+        .from(
+          "chat_connections"
+        )
+        .insert({
+          requester_id:
+            currentUserId,
+          receiver_id:
+            personId,
+          status:
+            "Pending",
+        })
+        .select(
+          "id,requester_id,receiver_id,status"
+        )
+        .single();
+
+      if (error) {
+        if (
+          error.code ===
+          "23505"
+        ) {
+          setStatus(
+            "A connection relationship already exists. Refresh the Network page."
+          );
+          return;
+        }
+
+        throw error;
+      }
+
+      setConnections(
+        current => [
+          ...current,
+          data as ConnectionRecord,
+        ]
+      );
+
+      setStatus(
+        "Connection request sent."
+      );
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "Unable to send connection request."
+      );
+    } finally {
+      setBusyUserId(null);
+    }
   };
 
   const respond = async (
-    id: string,
-    nextStatus: "accepted" | "rejected"
+    connectionId: string,
+    nextStatus:
+      | "Accepted"
+      | "Rejected"
   ) => {
-    const client = getSupabaseClient();
+    const client =
+      getSupabaseClient();
 
     if (!client) {
-      setStatus("Supabase is not configured.");
+      setStatus(
+        "Supabase is not configured."
+      );
       return;
     }
 
-    const {error} = await client
-      .from("connection_requests")
-      .update({
-        status: nextStatus,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id);
+    const connection =
+      connections.find(
+        item =>
+          item.id ===
+          connectionId
+      );
 
-    if (error) {
-      setStatus(error.message);
+    if (
+      !connection ||
+      connection.receiver_id !==
+        currentUserId ||
+      normalizeConnectionStatus(
+        connection.status
+      ) !== "pending"
+    ) {
+      setStatus(
+        "This invitation is no longer available."
+      );
       return;
     }
 
-    setIncoming(current =>
-      current.filter(item => item.id !== id)
+    setBusyUserId(
+      connection.requester_id
     );
 
-    setStatus(
-      nextStatus === "accepted"
-        ? "Connection accepted."
-        : "Connection request declined."
-    );
+    try {
+      const {
+        data,
+        error,
+      } = await client
+        .from(
+          "chat_connections"
+        )
+        .update({
+          status:
+            nextStatus,
+          updated_at:
+            new Date().toISOString(),
+        })
+        .eq(
+          "id",
+          connectionId
+        )
+        .select(
+          "id,requester_id,receiver_id,status"
+        )
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      setConnections(
+        current =>
+          current.map(
+            item =>
+              item.id ===
+              connectionId
+                ? data as ConnectionRecord
+                : item
+          )
+      );
+
+      setStatus(
+        nextStatus ===
+        "Accepted"
+          ? "Connection accepted."
+          : "Connection invitation ignored."
+      );
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "Unable to update connection."
+      );
+    } finally {
+      setBusyUserId(null);
+    }
   };
 
-  const normalizedQuery = query.trim().toLowerCase();
+  const findByCcId =
+    async () => {
+      const client =
+        getSupabaseClient();
 
-  const visible = people.filter(person =>
-    `${person.full_name} ${person.department} ${person.skills} ${person.role}`
-      .toLowerCase()
-      .includes(normalizedQuery)
-  );
+      if (!client) {
+        setCcIdMessage(
+          "Supabase is not configured."
+        );
+        return;
+      }
+
+      const value =
+        ccId.trim();
+
+      if (
+        value.length < 2
+      ) {
+        setCcIdResult(null);
+        setCcIdMessage(
+          "Enter a valid CampusConnect CC ID."
+        );
+        return;
+      }
+
+      if (!currentUserId) {
+        setCcIdResult(null);
+        setCcIdMessage(
+          "Sign in again to search the campus network."
+        );
+        return;
+      }
+
+      setCcIdSearching(true);
+      setCcIdResult(null);
+      setCcIdMessage("");
+
+      try {
+        const {
+          data,
+          error,
+        } = await client.rpc(
+          "search_campus_directory",
+          {
+            search_term:
+              value,
+          }
+        );
+
+        if (error) {
+          throw error;
+        }
+
+        const rows =
+          (data || []) as DirectorySearchPerson[];
+
+        const exact =
+          rows.find(
+            row =>
+              String(
+                row.campus_uid ||
+                  ""
+              )
+                .trim()
+                .toLowerCase() ===
+              value.toLowerCase()
+          );
+
+        if (!exact) {
+          setCcIdMessage(
+            "No CampusConnect member found with this CC ID."
+          );
+          return;
+        }
+
+        if (
+          exact.id ===
+          currentUserId
+        ) {
+          setCcIdMessage(
+            "This is your own CC ID."
+          );
+          return;
+        }
+
+        const existingDirectoryPerson =
+          people.find(
+            person =>
+              person.id ===
+              exact.id
+          );
+
+        const person: Person =
+          existingDirectoryPerson || {
+            id:
+              exact.id,
+            full_name:
+              exact.full_name,
+            campus_uid:
+              exact.campus_uid,
+            department:
+              exact.department,
+            graduation_year:
+              exact.graduation_year,
+            role:
+              exact.role as Role,
+            avatar_url:
+              exact.avatar_url,
+            bio: "",
+            skills: "",
+          };
+
+        setCcIdResult(
+          person
+        );
+
+        setCcIdMessage(
+          "Verified CampusConnect profile found."
+        );
+      } catch (error) {
+        setCcIdMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to search this CC ID."
+        );
+      } finally {
+        setCcIdSearching(false);
+      }
+    };
+
+  const normalizedQuery =
+    query
+      .trim()
+      .toLowerCase();
+
+  const visible =
+    people.filter(
+      person => {
+        const searchText = [
+          person.full_name,
+          person.campus_uid,
+          person.role,
+          person.department,
+          person.graduation_year,
+          person.bio,
+          person.skills,
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        const matchesQuery =
+          !normalizedQuery ||
+          searchText.includes(
+            normalizedQuery
+          );
+
+        const matchesRole =
+          roleFilter ===
+            "All" ||
+          person.role ===
+            roleFilter;
+
+        return (
+          matchesQuery &&
+          matchesRole
+        );
+      }
+    );
+
+  const roles =
+    Array.from(
+      new Set(
+        people
+          .map(
+            person =>
+              person.role
+          )
+          .filter(Boolean)
+      )
+    ).sort();
+
+  const profileSkills =
+    profile.skills
+      .split(",")
+      .map(
+        skill =>
+          skill.trim()
+      )
+      .filter(Boolean)
+      .slice(0, 5);
 
   return (
-    <div className="network">
-      <section>
-        <div className="compose card">
-          <Avatar
-            t={getInitials(profile.name)}
-            src={profile.avatar_url}
-            alt={`${profile.name} profile`}
-          />
+    <div className="linkedinNetworkPage">
+      <section className="linkedinNetworkTopbar">
+        <div>
+          <span>
+            CAMPUSCONNECT NETWORK
+          </span>
 
-          <div>
-            <b>Campus professional network</b>
-            <small>
-              Connect with verified students, faculty and
-              placement mentors.
-            </small>
-          </div>
+          <h1>
+            Build your professional campus network
+          </h1>
+
+          <p>
+            Discover verified students, faculty and placement
+            professionals across your campus.
+          </p>
         </div>
 
-        {status && <StatusLine text={status}/>}
+        <div className="linkedinNetworkTopStats">
+          <article>
+            <strong>
+              {connectedIds.size}
+            </strong>
+            <span>
+              Connections
+            </span>
+          </article>
 
-        <section className="card networkDirectory">
-          <header>
-            <div>
-              <span>DISCOVER PEOPLE</span>
-              <h2>Campus directory</h2>
-            </div>
+          <article>
+            <strong>
+              {incoming.length}
+            </strong>
+            <span>
+              Invitations
+            </span>
+          </article>
 
-            <input
-              value={query}
-              onChange={event => setQuery(event.target.value)}
-              placeholder="Search name, department or skill"
-            />
-          </header>
-
-          {visible.map(person => (
-            <article className="person" key={person.id}>
-              <Avatar
-                t={getInitials(person.full_name)}
-                src={person.avatar_url || undefined}
-                alt={`${person.full_name} profile`}
-              />
-
-              <p>
-                <b>{person.full_name}</b>
-
-                <small>
-                  {person.role} · {person.department} ·{" "}
-                  {person.graduation_year}
-                </small>
-
-                <small>
-                  {person.skills ||
-                    person.bio ||
-                    "CampusConnect member"}
-                </small>
-              </p>
-
-              <button
-                disabled={sent.includes(person.id)}
-                onClick={() => void connect(person.id)}
-              >
-                {sent.includes(person.id)
-                  ? "✓ Requested"
-                  : "Connect"}
-              </button>
-            </article>
-          ))}
-
-          {!visible.length && (
-            <EmptyState
-              title="No people found"
-              text="Try another search or ask students and staff to create their CampusConnect account."
-            />
-          )}
-        </section>
+          <article>
+            <strong>
+              {people.length}
+            </strong>
+            <span>
+              People
+            </span>
+          </article>
+        </div>
       </section>
 
-      <section>
-        <Panel title="Connection requests">
-          <div className="networkPrivacy">
-            {incoming.length ? (
-              incoming.map(request => {
-                const person = people.find(
-                  item => item.id === request.requester_id
+      {status && (
+        <div className="linkedinNetworkStatus">
+          <StatusLine
+            text={status}
+          />
+        </div>
+      )}
+
+      <div className="linkedinNetworkLayout">
+        <aside className="linkedinNetworkLeft">
+          <section className="linkedinProfileCard card">
+            <div className="linkedinProfileCover">
+              <span>CC</span>
+            </div>
+
+            <div className="linkedinProfileIdentity">
+              <Avatar
+                t={getInitials(
+                  profile.name
+                )}
+                src={
+                  profile.avatar_url
+                }
+                alt={`${profile.name} profile`}
+              />
+
+              <h2>
+                {profile.name}
+              </h2>
+
+              <p>
+                {profile.role}
+                {profile.department
+                  ? ` · ${profile.department}`
+                  : ""}
+              </p>
+
+              {profile.year && (
+                <small>
+                  Class of{" "}
+                  {profile.year}
+                </small>
+              )}
+            </div>
+
+            {profile.bio && (
+              <p className="linkedinProfileBio">
+                {profile.bio}
+              </p>
+            )}
+
+            {!!profileSkills.length && (
+              <div className="linkedinProfileSkills">
+                {profileSkills.map(
+                  skill => (
+                    <span
+                      key={skill}
+                    >
+                      {skill}
+                    </span>
+                  )
+                )}
+              </div>
+            )}
+
+            <div className="linkedinProfileMetrics">
+              <div>
+                <span>
+                  Connections
+                </span>
+                <strong>
+                  {connectedIds.size}
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  Pending
+                </span>
+                <strong>
+                  {
+                    pendingOutgoingIds.size
+                  }
+                </strong>
+              </div>
+            </div>
+          </section>
+
+          <section className="linkedinCcConnect card">
+            <header>
+              <span>
+                CONNECT DIRECTLY
+              </span>
+
+              <h3>
+                Connect with CC ID
+              </h3>
+
+              <p>
+                Enter a CampusConnect ID to find a verified
+                member directly.
+              </p>
+            </header>
+
+            <div className="linkedinCcSearch">
+              <input
+                value={ccId}
+                onChange={event => {
+                  setCcId(
+                    event.target.value
+                      .toUpperCase()
+                      .replace(
+                        /\s+/g,
+                        ""
+                      )
+                  );
+
+                  setCcIdResult(
+                    null
+                  );
+
+                  setCcIdMessage(
+                    ""
+                  );
+                }}
+                onKeyDown={event => {
+                  if (
+                    event.key ===
+                    "Enter"
+                  ) {
+                    event.preventDefault();
+                    void findByCcId();
+                  }
+                }}
+                placeholder="CC-FBF14465"
+                autoComplete="off"
+                spellCheck={false}
+                aria-label="CampusConnect CC ID"
+              />
+
+              <button
+                type="button"
+                disabled={
+                  ccIdSearching ||
+                  ccId.trim()
+                    .length < 2
+                }
+                onClick={() =>
+                  void findByCcId()
+                }
+              >
+                {ccIdSearching
+                  ? "Finding…"
+                  : "Find"}
+              </button>
+            </div>
+
+            {ccIdMessage && (
+              <small className="linkedinCcMessage">
+                {ccIdMessage}
+              </small>
+            )}
+
+            {ccIdResult && (() => {
+              const relationship =
+                relationshipFor(
+                  ccIdResult.id
                 );
 
-                return (
-                  <div className="person" key={request.id}>
-                    <Avatar
-                      t={getInitials(
-                        person?.full_name || "User"
-                      )}
-                      src={person?.avatar_url || undefined}
-                      alt={`${
-                        person?.full_name || "Campus member"
-                      } profile`}
-                    />
+              const relationshipStatus =
+                relationship
+                  ? normalizeConnectionStatus(
+                      relationship.status
+                    )
+                  : "";
 
-                    <p>
+              const incomingRequest =
+                relationshipStatus ===
+                  "pending" &&
+                relationship?.receiver_id ===
+                  currentUserId;
+
+              const outgoingRequest =
+                relationshipStatus ===
+                  "pending" &&
+                relationship?.requester_id ===
+                  currentUserId;
+
+              const connected =
+                relationshipStatus ===
+                "accepted";
+
+              const busy =
+                busyUserId ===
+                ccIdResult.id;
+
+              return (
+                <article className="linkedinCcResult">
+                  <Avatar
+                    t={getInitials(
+                      ccIdResult.full_name
+                    )}
+                    src={
+                      ccIdResult.avatar_url ||
+                      undefined
+                    }
+                    alt={`${ccIdResult.full_name} profile`}
+                  />
+
+                  <div className="linkedinCcResultInfo">
+                    <div>
                       <b>
-                        {person?.full_name ||
-                          "Campus member"}
+                        {
+                          ccIdResult.full_name
+                        }
+
+                        <span title="Verified CampusConnect profile">
+                          ✓
+                        </span>
                       </b>
 
                       <small>
-                        {person?.department || ""} ·{" "}
-                        {person?.role || "Student"}
+                        {
+                          ccIdResult.role
+                        }
+                        {ccIdResult.department
+                          ? ` · ${ccIdResult.department}`
+                          : ""}
                       </small>
-                    </p>
 
-                    <span>
+                      <strong>
+                        {
+                          ccIdResult.campus_uid
+                        }
+                      </strong>
+                    </div>
+
+                    {connected ? (
                       <button
-                        className="ghost"
+                        type="button"
+                        className="linkedinConnectedButton"
+                        disabled
+                      >
+                        ✓ Connected
+                      </button>
+                    ) : incomingRequest &&
+                      relationship ? (
+                      <button
+                        type="button"
+                        className="linkedinPrimaryButton"
+                        disabled={busy}
                         onClick={() =>
                           void respond(
-                            request.id,
-                            "rejected"
+                            relationship.id,
+                            "Accepted"
                           )
                         }
                       >
-                        Decline
+                        {busy
+                          ? "Accepting…"
+                          : "Accept"}
                       </button>
-
+                    ) : outgoingRequest ? (
                       <button
-                        className="primary"
+                        type="button"
+                        className="linkedinPendingButton"
+                        disabled
+                      >
+                        ✓ Pending
+                      </button>
+                    ) : relationshipStatus ===
+                      "blocked" ? (
+                      <button
+                        type="button"
+                        className="linkedinPendingButton"
+                        disabled
+                      >
+                        Unavailable
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="linkedinPrimaryButton"
+                        disabled={busy}
                         onClick={() =>
-                          void respond(
-                            request.id,
-                            "accepted"
+                          void connect(
+                            ccIdResult.id
                           )
                         }
                       >
-                        Accept
+                        {busy
+                          ? "Sending…"
+                          : "+ Connect"}
                       </button>
-                    </span>
+                    )}
                   </div>
-                );
-              })
-            ) : (
-              <div className="networkPrivacy">
-                <b>No pending requests</b>
+                </article>
+              );
+            })()}
+          </section>
+
+          <section className="linkedinNetworkMenu card">
+            <header>
+              <span>
+                MY NETWORK
+              </span>
+            </header>
+
+            <div>
+              <p>
+                <span className="linkedinMenuIcon">
+                  ◎
+                </span>
+                <b>
+                  Connections
+                </b>
+                <strong>
+                  {connectedIds.size}
+                </strong>
+              </p>
+
+              <p>
+                <span className="linkedinMenuIcon">
+                  ↗
+                </span>
+                <b>
+                  Sent requests
+                </b>
+                <strong>
+                  {
+                    pendingOutgoingIds.size
+                  }
+                </strong>
+              </p>
+
+              <p>
+                <span className="linkedinMenuIcon">
+                  ✦
+                </span>
+                <b>
+                  Invitations
+                </b>
+                <strong>
+                  {incoming.length}
+                </strong>
+              </p>
+            </div>
+          </section>
+        </aside>
+
+        <main className="linkedinNetworkMain">
+          <nav className="linkedinNetworkTabs card" aria-label="Network sections">
+            <button
+              type="button"
+              className={networkTab === "Feed" ? "active" : ""}
+              onClick={() => setNetworkTab("Feed")}
+            >
+              <span>Home</span>
+              <small>Professional feed</small>
+            </button>
+
+            <button
+              type="button"
+              className={networkTab === "Discover" ? "active" : ""}
+              onClick={() => setNetworkTab("Discover")}
+            >
+              <span>My Network</span>
+              <small>Discover people</small>
+            </button>
+          </nav>
+
+          {networkTab === "Feed" ? (
+            <section className="linkedinProfessionalFeed">
+              <NetworkProfessionalFeed
+                profile={{
+                  name: profile.name,
+                  role: profile.role,
+                  department: profile.department,
+                  campus_uid: profile.campus_uid,
+                  avatar_url: profile.avatar_url,
+                }}
+              />
+            </section>
+          ) : (
+            <>
+<section className="linkedinNetworkSearch card">
+            <div className="linkedinNetworkSearchHeading">
+              <div>
+                <span>
+                  DISCOVER
+                </span>
+
+                <h2>
+                  People you may know
+                </h2>
+
                 <p>
-                  New connection requests will appear here.
+                  Search by name, CC ID, department,
+                  role or skill.
+                </p>
+              </div>
+
+              <strong>
+                {visible.length} result
+                {visible.length === 1
+                  ? ""
+                  : "s"}
+              </strong>
+            </div>
+
+            <div className="linkedinSearchInput">
+              <span>⌕</span>
+
+              <input
+                value={query}
+                onChange={event =>
+                  setQuery(
+                    event.target.value
+                  )
+                }
+                placeholder="Search people, skills, UID or departments"
+              />
+
+              {query && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQuery("")
+                  }
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <div className="linkedinRoleFilters">
+              <button
+                type="button"
+                className={
+                  roleFilter ===
+                  "All"
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setRoleFilter(
+                    "All"
+                  )
+                }
+              >
+                All
+              </button>
+
+              {roles.map(
+                role => (
+                  <button
+                    type="button"
+                    key={role}
+                    className={
+                      roleFilter ===
+                      role
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() =>
+                      setRoleFilter(
+                        role
+                      )
+                    }
+                  >
+                    {role}
+                  </button>
+                )
+              )}
+            </div>
+          </section>
+
+          <section className="linkedinPeopleGrid">
+            {loading ? (
+              <section className="linkedinNetworkEmpty card">
+                <div className="linkedinNetworkLoader"/>
+
+                <h3>
+                  Loading your campus network
+                </h3>
+
+                <p>
+                  Reading verified CampusConnect profiles.
+                </p>
+              </section>
+            ) : (
+              visible.map(
+                person => {
+                  const relationship =
+                    relationshipFor(
+                      person.id
+                    );
+
+                  const relationshipStatus =
+                    relationship
+                      ? normalizeConnectionStatus(
+                          relationship.status
+                        )
+                      : "";
+
+                  const connected =
+                    relationshipStatus ===
+                    "accepted";
+
+                  const outgoing =
+                    relationshipStatus ===
+                      "pending" &&
+                    relationship?.requester_id ===
+                      currentUserId;
+
+                  const incomingRequest =
+                    relationshipStatus ===
+                      "pending" &&
+                    relationship?.receiver_id ===
+                      currentUserId;
+
+                  const busy =
+                    busyUserId ===
+                    person.id;
+
+                  const skills =
+                    person.skills
+                      .split(",")
+                      .map(
+                        skill =>
+                          skill.trim()
+                      )
+                      .filter(Boolean)
+                      .slice(0, 3);
+
+                  return (
+                    <article
+                      className="linkedinPersonCard card linkedinPersonCardClickable"
+                      key={person.id}
+                      onClick={() =>
+                        setSelectedNetworkProfileId(
+                          person.id
+                        )
+                      }
+                    >
+                      <div className="linkedinPersonCover">
+                        <span>
+                          {person.department ||
+                            "CampusConnect"}
+                        </span>
+                      </div>
+
+                      <div className="linkedinPersonBody">
+                        <button
+                          type="button"
+                          className="linkedinPersonAvatar networkProfileTrigger"
+                          onClick={() =>
+                            setSelectedNetworkProfileId(
+                              person.id
+                            )
+                          }
+                          aria-label={`View ${person.full_name} profile`}
+                        >
+                          <Avatar
+                            t={getInitials(
+                              person.full_name
+                            )}
+                            src={
+                              person.avatar_url ||
+                              undefined
+                            }
+                            alt={`${person.full_name} profile`}
+                          />
+                        </button>
+
+                        <div className="linkedinPersonHeading">
+                          <button
+                            type="button"
+                            className="networkProfileNameButton"
+                            onClick={() =>
+                              setSelectedNetworkProfileId(
+                                person.id
+                              )
+                            }
+                          >
+                            <h3>
+                              {person.full_name ||
+                                "Campus member"}
+
+                              <span title="Verified CampusConnect profile">
+                                ✓
+                              </span>
+                            </h3>
+                          </button>
+
+                          <p>
+                            {person.role}
+                            {person.department
+                              ? ` · ${person.department}`
+                              : ""}
+                          </p>
+
+                          {person.graduation_year && (
+                            <small>
+                              Class of{" "}
+                              {
+                                person.graduation_year
+                              }
+                            </small>
+                          )}
+
+                          {person.campus_uid && (
+                            <small>
+                              {
+                                person.campus_uid
+                              }
+                            </small>
+                          )}
+                        </div>
+
+                        <p className="linkedinPersonBio">
+                          {person.bio ||
+                            "CampusConnect member building their professional campus network."}
+                        </p>
+
+                        {!!skills.length && (
+                          <div className="linkedinPersonSkills">
+                            {skills.map(
+                              skill => (
+                                <span
+                                  key={skill}
+                                >
+                                  {skill}
+                                </span>
+                              )
+                            )}
+                          </div>
+                        )}
+
+                        <div
+                          className="linkedinPersonActions"
+                          onClick={event =>
+                            event.stopPropagation()
+                          }
+                        >
+                          {connected ? (
+                            <button
+                              type="button"
+                              className="linkedinConnectedButton"
+                              disabled
+                            >
+                              ✓ Connected
+                            </button>
+                          ) : incomingRequest &&
+                            relationship ? (
+                            <>
+                              <button
+                                type="button"
+                                className="linkedinSecondaryButton"
+                                disabled={
+                                  busy
+                                }
+                                onClick={() =>
+                                  void respond(
+                                    relationship.id,
+                                    "Rejected"
+                                  )
+                                }
+                              >
+                                Ignore
+                              </button>
+
+                              <button
+                                type="button"
+                                className="linkedinPrimaryButton"
+                                disabled={
+                                  busy
+                                }
+                                onClick={() =>
+                                  void respond(
+                                    relationship.id,
+                                    "Accepted"
+                                  )
+                                }
+                              >
+                                {busy
+                                  ? "Accepting…"
+                                  : "Accept"}
+                              </button>
+                            </>
+                          ) : outgoing ? (
+                            <button
+                              type="button"
+                              className="linkedinPendingButton"
+                              disabled
+                            >
+                              ✓ Pending
+                            </button>
+                          ) : relationshipStatus ===
+                            "blocked" ? (
+                            <button
+                              type="button"
+                              className="linkedinPendingButton"
+                              disabled
+                            >
+                              Unavailable
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="linkedinPrimaryButton"
+                              disabled={
+                                busy
+                              }
+                              onClick={() =>
+                                void connect(
+                                  person.id
+                                )
+                              }
+                            >
+                              {busy
+                                ? "Sending…"
+                                : "+ Connect"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  );
+                }
+              )
+            )}
+
+            {!loading &&
+              !visible.length && (
+                <section className="linkedinNetworkEmpty card">
+                  <span>⌕</span>
+                  <h3>
+                    No people found
+                  </h3>
+                  <p>
+                    Try another search or role filter.
+                  </p>
+                </section>
+              )}
+          </section>
+            </>
+          )}
+        </main>
+
+        <aside className="linkedinNetworkRight">
+          <section className="linkedinInvitationCard card">
+            <header>
+              <div>
+                <span>
+                  INVITATIONS
+                </span>
+
+                <h3>
+                  Connection requests
+                </h3>
+              </div>
+
+              <strong>
+                {incoming.length}
+              </strong>
+            </header>
+
+            {incoming.length ? (
+              <div className="linkedinInvitations">
+                {incoming
+                  .slice(0, 5)
+                  .map(
+                    request => {
+                      const person =
+                        people.find(
+                          item =>
+                            item.id ===
+                            request.requester_id
+                        );
+
+                      const busy =
+                        busyUserId ===
+                        request.requester_id;
+
+                      return (
+                        <article
+                          key={
+                            request.id
+                          }
+                        >
+                          <Avatar
+                            t={getInitials(
+                              person?.full_name ||
+                                "User"
+                            )}
+                            src={
+                              person?.avatar_url ||
+                              undefined
+                            }
+                            alt={`${
+                              person?.full_name ||
+                              "Campus member"
+                            } profile`}
+                          />
+
+                          <div>
+                            <b>
+                              {person?.full_name ||
+                                "Campus member"}
+                            </b>
+
+                            <small>
+                              {person?.role ||
+                                "Student"}
+                              {person?.department
+                                ? ` · ${person.department}`
+                                : ""}
+                            </small>
+
+                            <div>
+                              <button
+                                type="button"
+                                className="linkedinSecondaryButton"
+                                disabled={
+                                  busy
+                                }
+                                onClick={() =>
+                                  void respond(
+                                    request.id,
+                                    "Rejected"
+                                  )
+                                }
+                              >
+                                Ignore
+                              </button>
+
+                              <button
+                                type="button"
+                                className="linkedinPrimaryButton"
+                                disabled={
+                                  busy
+                                }
+                                onClick={() =>
+                                  void respond(
+                                    request.id,
+                                    "Accepted"
+                                  )
+                                }
+                              >
+                                {busy
+                                  ? "Accepting…"
+                                  : "Accept"}
+                              </button>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    }
+                  )}
+              </div>
+            ) : (
+              <div className="linkedinNoInvitations">
+                <span>✓</span>
+                <b>
+                  You're all caught up
+                </b>
+                <p>
+                  New connection invitations will appear here.
                 </p>
               </div>
             )}
-          </div>
-        </Panel>
-      </section>
+          </section>
+
+          <section className="linkedinNetworkInfo card">
+            <span>
+              CAMPUSCONNECT
+            </span>
+
+            <h3>
+              Professional campus networking
+            </h3>
+
+            <p>
+              Build real relationships around academics,
+              projects, mentorship and placements.
+            </p>
+
+            <div>
+              <span>
+                Verified profiles
+              </span>
+              <span>
+                Campus-only network
+              </span>
+              <span>
+                Messenger-compatible connections
+              </span>
+            </div>
+          </section>
+        </aside>
+      </div>
+    {selectedNetworkProfileId && (
+      <NetworkProfileModal
+        key={selectedNetworkProfileId}
+        userId={selectedNetworkProfileId}
+        connectionStatus={(() => {
+          const relationship =
+            relationshipFor(
+              selectedNetworkProfileId
+            );
+
+          if (!relationship) {
+            return "none";
+          }
+
+          const state =
+            normalizeConnectionStatus(
+              relationship.status
+            );
+
+          if (
+            state === "accepted" ||
+            state === "pending" ||
+            state === "blocked"
+          ) {
+            return state;
+          }
+
+          return "none";
+        })()}
+        incomingRequest={(() => {
+          const relationship =
+            relationshipFor(
+              selectedNetworkProfileId
+            );
+
+          return Boolean(
+            relationship &&
+            normalizeConnectionStatus(
+              relationship.status
+            ) === "pending" &&
+            relationship.receiver_id ===
+              currentUserId
+          );
+        })()}
+        busy={
+          busyUserId ===
+          selectedNetworkProfileId
+        }
+        onConnect={() =>
+          connect(
+            selectedNetworkProfileId
+          )
+        }
+        onAccept={async () => {
+          const relationship =
+            relationshipFor(
+              selectedNetworkProfileId
+            );
+
+          if (!relationship) {
+            return;
+          }
+
+          await respond(
+            relationship.id,
+            "Accepted"
+          );
+        }}
+        onIgnore={async () => {
+          const relationship =
+            relationshipFor(
+              selectedNetworkProfileId
+            );
+
+          if (!relationship) {
+            return;
+          }
+
+          await respond(
+            relationship.id,
+            "Rejected"
+          );
+        }}
+        onMessage={() =>
+          openNetworkMessage(
+            selectedNetworkProfileId
+          )
+        }
+        onClose={() =>
+          setSelectedNetworkProfileId(null)
+        }
+      />
+    )}
+
     </div>
   );
 }
 
+type GuardianContact = {
+  guardian_name: string;
+  relationship: string;
+  email: string;
+  phone: string;
+  sms_enabled: boolean;
+  email_enabled: boolean;
+};
+
+const emptyGuardianContact: GuardianContact = {
+  guardian_name: "",
+  relationship: "Parent",
+  email: "",
+  phone: "",
+  sms_enabled: true,
+  email_enabled: true,
+};
 
 function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; onProfileChange: (profile: Profile) => void; onSignOut: () => Promise<void> | void}) {
   const [editing, setEditing] = useState(false);
@@ -6251,12 +8749,364 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [rnsitOpen, setRnsitOpen] = useState(false);
-  const [usn, setUsn] = useState(profile.usn);
-  const [dob, setDob] = useState("");
-  const [connecting, setConnecting] = useState(false);
 
-  useEffect(() => { setForm(profile); setUsn(profile.usn); }, [profile]);
+  const [guardian, setGuardian] =
+    useState<GuardianContact>(
+      emptyGuardianContact
+    );
+
+  const [guardianLoading, setGuardianLoading] =
+    useState(
+      profile.role === "Student"
+    );
+
+  const [guardianSaving, setGuardianSaving] =
+    useState(false);
+
+  const [guardianEditing, setGuardianEditing] =
+    useState(false);
+
+  const [guardianMessage, setGuardianMessage] =
+    useState("");
+
+  const [guardianError, setGuardianError] =
+    useState("");
+
+  useEffect(() => {
+    setForm(profile);
+  }, [profile]);
+
+  useEffect(() => {
+    if (
+      profile.role !== "Student"
+    ) {
+      setGuardianLoading(false);
+      return;
+    }
+
+    let active = true;
+
+    const loadGuardian =
+      async () => {
+        const client =
+          getSupabaseClient();
+
+        if (!client) {
+          if (active) {
+            setGuardianError(
+              "Supabase is not connected."
+            );
+
+            setGuardianLoading(false);
+          }
+
+          return;
+        }
+
+        setGuardianLoading(true);
+        setGuardianError("");
+
+        try {
+          const {
+            data: auth,
+            error: authError,
+          } =
+            await client.auth
+              .getUser();
+
+          if (
+            authError ||
+            !auth.user
+          ) {
+            throw new Error(
+              "Your session has expired. Please sign in again."
+            );
+          }
+
+          const {
+            data,
+            error: loadError,
+          } =
+            await client
+              .from(
+                "student_guardian_contacts"
+              )
+              .select(
+                "guardian_name,relationship,email,phone,sms_enabled,email_enabled"
+              )
+              .eq(
+                "student_id",
+                auth.user.id
+              )
+              .maybeSingle();
+
+          if (loadError) {
+            throw loadError;
+          }
+
+          if (!active) {
+            return;
+          }
+
+          if (data) {
+            setGuardian({
+              guardian_name:
+                data.guardian_name || "",
+
+              relationship:
+                data.relationship ||
+                "Parent",
+
+              email:
+                data.email || "",
+
+              phone:
+                data.phone || "",
+
+              sms_enabled:
+                data.sms_enabled !==
+                false,
+
+              email_enabled:
+                data.email_enabled !==
+                false,
+            });
+          } else {
+            setGuardian({
+              ...emptyGuardianContact,
+            });
+
+            setGuardianEditing(true);
+          }
+
+        } catch (loadError) {
+          if (!active) {
+            return;
+          }
+
+          setGuardianError(
+            loadError instanceof Error
+              ? loadError.message
+              : "Unable to load guardian contact."
+          );
+        } finally {
+          if (active) {
+            setGuardianLoading(false);
+          }
+        }
+      };
+
+    void loadGuardian();
+
+    return () => {
+      active = false;
+    };
+  }, [profile.role]);
+
+  const saveGuardian =
+    async (
+      event:
+        FormEvent<HTMLFormElement>
+    ) => {
+      event.preventDefault();
+
+      if (
+        profile.role !== "Student"
+      ) {
+        return;
+      }
+
+      const guardianName =
+        guardian.guardian_name.trim();
+
+      const relationship =
+        guardian.relationship.trim() ||
+        "Parent";
+
+      const email =
+        guardian.email
+          .trim()
+          .toLowerCase();
+
+      const phone =
+        guardian.phone.trim();
+
+      if (!guardianName) {
+        setGuardianError(
+          "Enter the parent or guardian name."
+        );
+        return;
+      }
+
+      if (
+        guardian.email_enabled &&
+        !email
+      ) {
+        setGuardianError(
+          "Guardian email is required while email alerts are enabled."
+        );
+        return;
+      }
+
+      if (
+        email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+          email
+        )
+      ) {
+        setGuardianError(
+          "Enter a valid guardian email address."
+        );
+        return;
+      }
+
+      if (
+        guardian.sms_enabled &&
+        !phone
+      ) {
+        setGuardianError(
+          "Guardian mobile number is required while SMS alerts are enabled."
+        );
+        return;
+      }
+
+      const normalizedPhone =
+        phone.replace(
+          /[\s()-]/g,
+          ""
+        );
+
+      if (
+        phone &&
+        !/^\+?[0-9]{8,15}$/.test(
+          normalizedPhone
+        )
+      ) {
+        setGuardianError(
+          "Enter a valid guardian mobile number including country code when required."
+        );
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        setGuardianError(
+          "Supabase is not connected."
+        );
+        return;
+      }
+
+      setGuardianSaving(true);
+      setGuardianError("");
+      setGuardianMessage("");
+
+      try {
+        const {
+          data: auth,
+          error: authError,
+        } =
+          await client.auth
+            .getUser();
+
+        if (
+          authError ||
+          !auth.user
+        ) {
+          throw new Error(
+            "Your session has expired. Please sign in again."
+          );
+        }
+
+        const payload = {
+          student_id:
+            auth.user.id,
+
+          guardian_name:
+            guardianName,
+
+          relationship,
+
+          email,
+
+          phone:
+            normalizedPhone,
+
+          sms_enabled:
+            guardian.sms_enabled,
+
+          email_enabled:
+            guardian.email_enabled,
+
+          updated_at:
+            new Date()
+              .toISOString(),
+        };
+
+        const {
+          data,
+          error: saveGuardianError,
+        } =
+          await client
+            .from(
+              "student_guardian_contacts"
+            )
+            .upsert(
+              payload,
+              {
+                onConflict:
+                  "student_id",
+              }
+            )
+            .select(
+              "guardian_name,relationship,email,phone,sms_enabled,email_enabled"
+            )
+            .single();
+
+        if (saveGuardianError) {
+          throw saveGuardianError;
+        }
+
+        setGuardian({
+          guardian_name:
+            data.guardian_name || "",
+
+          relationship:
+            data.relationship ||
+            "Parent",
+
+          email:
+            data.email || "",
+
+          phone:
+            data.phone || "",
+
+          sms_enabled:
+            data.sms_enabled !==
+            false,
+
+          email_enabled:
+            data.email_enabled !==
+            false,
+        });
+
+        setGuardianEditing(false);
+
+        setGuardianMessage(
+          "Guardian contact saved successfully."
+        );
+
+      } catch (saveError) {
+        setGuardianError(
+          saveError instanceof Error
+            ? saveError.message
+            : "Unable to save guardian contact."
+        );
+      } finally {
+        setGuardianSaving(false);
+      }
+    };
 
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -6394,36 +9244,6 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
     };
 
 
-  const connectRnsit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(""); setMessage("");
-    if (!usn.trim() || !dob) return setError("Enter your RNSIT USN and date of birth.");
-    setConnecting(true);
-    try {
-      const client = getSupabaseClient();
-      if (!client) throw new Error("Supabase is not connected.");
-      const {data: sessionData} = await client.auth.getSession();
-      const token = sessionData.session?.access_token;
-      if (!token) throw new Error("Your session has expired. Sign in again.");
-      const response = await fetch("/api/rnsit/sync", {method: "POST", headers: {"Content-Type": "application/json", Authorization: `Bearer ${token}`}, body: JSON.stringify({usn: usn.trim().toUpperCase(), dob})});
-      const payload = (await response.json().catch(() => ({}))) as {
-        error?: string;
-        attendanceCount?: number;
-        marksCount?: number;
-        resultCount?: number;
-        feeCount?: number;
-      };
-      if (!response.ok) throw new Error(payload.error || "RNSIT sync failed.");
-      const {data: auth} = await client.auth.getUser();
-      if (auth.user) await client.from("profiles").update({usn: usn.trim().toUpperCase(), updated_at: new Date().toISOString()}).eq("id", auth.user.id);
-      onProfileChange({...profile, usn: usn.trim().toUpperCase()});
-      setMessage(`RNSIT connected. Synced ${payload.attendanceCount || 0} attendance, ${payload.marksCount || 0} marks, ${payload.resultCount || 0} results and ${payload.feeCount || 0} fee records.`);
-      setDob("");
-      setRnsitOpen(false);
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to connect RNSIT."); }
-    finally { setConnecting(false); }
-  };
-
   return <div className="profilePage">
     <section className="profileHero card">
       <div className="profileIdentity"><Avatar t={getInitials(profile.name) || "U"} src={profile.avatar_url} alt={`${profile.name} profile`}/><div><span>YOUR CAMPUS IDENTITY</span><h2>{profile.name || "Campus user"}</h2><p>{profile.role} · {profile.department || "Department not set"} · {profile.year || "Year not set"}</p></div></div>
@@ -6441,15 +9261,332 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
           <Field label="Bio"><textarea value={form.bio} onChange={e => setForm({...form,bio:e.target.value})} maxLength={500} placeholder="A short professional introduction" /></Field>
           <Field label="Skills"><input value={form.skills} onChange={e => setForm({...form,skills:e.target.value})} placeholder="Java, Python, Embedded Systems" /></Field>
           <div className="formActions"><button type="button" className="ghost" onClick={() => {setForm(profile);setEditing(false)}}>Cancel</button><button className="primary" disabled={saving}>{saving ? "Saving..." : "Save changes"}</button></div>
-        </form> : <div className="profileDetails"><div><small>Email</small><b>{profile.email}</b></div><div><small>Phone</small><b>{profile.phone || "Not added"}</b></div><div><small>USN</small><b>{profile.usn || "Not connected"}</b></div><div><small>Department</small><b>{profile.department || "Not added"}</b></div><div><small>Graduation year</small><b>{profile.year || "Not added"}</b></div><div><small>Role</small><b>{profile.role}</b></div><div className="profileBio"><small>Bio</small><p>{profile.bio || "Add a short professional bio from Edit profile."}</p></div><div className="profileBio"><small>Skills</small><p>{profile.skills || "Add your skills to improve your profile and resume."}</p></div></div>}
+        </form> : <div className="profileDetails"><div><small>Email</small><b>{profile.email}</b></div><div><small>Phone</small><b>{profile.phone || "Not added"}</b></div><div><small>USN</small><b>{profile.usn || "Not added"}</b></div><div><small>Department</small><b>{profile.department || "Not added"}</b></div><div><small>Graduation year</small><b>{profile.year || "Not added"}</b></div><div><small>Role</small><b>{profile.role}</b></div><div className="profileBio"><small>Bio</small><p>{profile.bio || "Add a short professional bio from Edit profile."}</p></div><div className="profileBio"><small>Skills</small><p>{profile.skills || "Add your skills to improve your profile and resume."}</p></div></div>}
       </section>
-      <section className="card profileCard collegeConnectCard"><header><div><span>ACADEMIC INTEGRATION</span><h3>Connect RNSIT Contineo</h3></div><i className="integrationBadge">R</i></header>
-        <div className="integrationStatus"><span className="statusDot"/><div><b>Not connected</b><small>Attendance, marks, results and fees are not synced.</small></div></div>
-        <p className="integrationText">Connect your official RNSIT student portal to bring permitted academic records into CampusConnect. CampusConnect will never store your date of birth in the browser or pretend a sync succeeded.</p>
-        <ul className="integrationList"><li>Attendance by subject</li><li>CIE / internal marks</li><li>Semester results and grades</li><li>Fee status and payment records</li><li>Registered courses and notes</li><li>One-click secure re-sync</li></ul>
-        <button className="primary full" onClick={() => {setRnsitOpen(true);setError("")}}>Connect RNSIT account</button>
-        <a className="portalLink" href="https://rnsit-students.contineo.in/parents/index.php" target="_blank" rel="noreferrer">Open official RNSIT portal ↗</a>
-      </section>
+      {profile.role === "Student" && (
+        <section className="card profileCard guardianContactCard">
+          <header>
+            <div>
+              <span>
+                ATTENDANCE NOTIFICATIONS
+              </span>
+
+              <h3>
+                Parent / Guardian Contact
+              </h3>
+            </div>
+
+            {!guardianLoading &&
+              !guardianEditing && (
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => {
+                    setGuardianEditing(true);
+                    setGuardianMessage("");
+                    setGuardianError("");
+                  }}
+                >
+                  Edit
+                </button>
+              )}
+          </header>
+
+          <p className="guardianIntro">
+            This private contact is used for
+            attendance alerts. It is not shown
+            on your public CampusConnect profile.
+          </p>
+
+          {guardianMessage && (
+            <StatusLine
+              text={guardianMessage}
+            />
+          )}
+
+          {guardianError && (
+            <p
+              className="authError"
+              role="alert"
+            >
+              {guardianError}
+            </p>
+          )}
+
+          {guardianLoading ? (
+            <div
+              className="guardianLoading"
+              aria-live="polite"
+            >
+              Loading guardian contact...
+            </div>
+          ) : guardianEditing ? (
+            <form
+              className="profileForm guardianForm"
+              onSubmit={saveGuardian}
+            >
+              <Field label="Guardian name">
+                <input
+                  value={
+                    guardian.guardian_name
+                  }
+                  onChange={event =>
+                    setGuardian(
+                      current => ({
+                        ...current,
+                        guardian_name:
+                          event.target.value,
+                      })
+                    )
+                  }
+                  placeholder="Parent or guardian name"
+                  autoComplete="name"
+                  required
+                />
+              </Field>
+
+              <Field label="Relationship">
+                <select
+                  value={
+                    guardian.relationship
+                  }
+                  onChange={event =>
+                    setGuardian(
+                      current => ({
+                        ...current,
+                        relationship:
+                          event.target.value,
+                      })
+                    )
+                  }
+                >
+                  <option value="Parent">
+                    Parent
+                  </option>
+
+                  <option value="Father">
+                    Father
+                  </option>
+
+                  <option value="Mother">
+                    Mother
+                  </option>
+
+                  <option value="Guardian">
+                    Guardian
+                  </option>
+                </select>
+              </Field>
+
+              <Field label="Guardian email">
+                <input
+                  type="email"
+                  value={guardian.email}
+                  onChange={event =>
+                    setGuardian(
+                      current => ({
+                        ...current,
+                        email:
+                          event.target.value,
+                      })
+                    )
+                  }
+                  placeholder="parent@example.com"
+                  autoComplete="email"
+                />
+              </Field>
+
+              <Field label="Guardian mobile">
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  value={guardian.phone}
+                  onChange={event =>
+                    setGuardian(
+                      current => ({
+                        ...current,
+                        phone:
+                          event.target.value,
+                      })
+                    )
+                  }
+                  placeholder="+91 9876543210"
+                  autoComplete="tel"
+                />
+              </Field>
+
+              <div className="guardianAlertPreferences">
+                <div>
+                  <strong>
+                    Attendance alert preferences
+                  </strong>
+
+                  <small>
+                    Choose how your guardian can
+                    receive absence notifications.
+                  </small>
+                </div>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={
+                      guardian.email_enabled
+                    }
+                    onChange={event =>
+                      setGuardian(
+                        current => ({
+                          ...current,
+                          email_enabled:
+                            event.target.checked,
+                        })
+                      )
+                    }
+                  />
+
+                  <span>
+                    <b>
+                      Email alerts
+                    </b>
+
+                    <small>
+                      Email guardian when an
+                      absence notification is
+                      generated.
+                    </small>
+                  </span>
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={
+                      guardian.sms_enabled
+                    }
+                    onChange={event =>
+                      setGuardian(
+                        current => ({
+                          ...current,
+                          sms_enabled:
+                            event.target.checked,
+                        })
+                      )
+                    }
+                  />
+
+                  <span>
+                    <b>
+                      SMS alerts
+                    </b>
+
+                    <small>
+                      SMS guardian when an
+                      absence notification is
+                      generated.
+                    </small>
+                  </span>
+                </label>
+              </div>
+
+              <div className="formActions">
+                <button
+                  type="button"
+                  className="ghost"
+                  disabled={guardianSaving}
+                  onClick={() => {
+                    setGuardianEditing(false);
+                    setGuardianError("");
+                    setGuardianMessage("");
+                  }}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="primary"
+                  disabled={guardianSaving}
+                >
+                  {guardianSaving
+                    ? "Saving..."
+                    : "Save guardian contact"}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="profileDetails guardianDetails">
+              <div>
+                <small>
+                  Guardian
+                </small>
+
+                <b>
+                  {guardian.guardian_name ||
+                    "Not added"}
+                </b>
+              </div>
+
+              <div>
+                <small>
+                  Relationship
+                </small>
+
+                <b>
+                  {guardian.relationship ||
+                    "Not added"}
+                </b>
+              </div>
+
+              <div>
+                <small>
+                  Email
+                </small>
+
+                <b>
+                  {guardian.email ||
+                    "Not added"}
+                </b>
+              </div>
+
+              <div>
+                <small>
+                  Mobile
+                </small>
+
+                <b>
+                  {guardian.phone ||
+                    "Not added"}
+                </b>
+              </div>
+
+              <div>
+                <small>
+                  Email alerts
+                </small>
+
+                <b>
+                  {guardian.email_enabled
+                    ? "Enabled"
+                    : "Disabled"}
+                </b>
+              </div>
+
+              <div>
+                <small>
+                  SMS alerts
+                </small>
+
+                <b>
+                  {guardian.sms_enabled
+                    ? "Enabled"
+                    : "Disabled"}
+                </b>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       <section className="card profileCard securityCard"><header><div><span>ACCOUNT & SECURITY</span><h3>Security controls</h3></div></header><button className="securityAction" onClick={() => {const client=getSupabaseClient(); if(client) void client.auth.resetPasswordForEmail(profile.email, {redirectTo: window.location.origin}); setMessage("Password reset email requested. Check your inbox.")}}>Change password <span>→</span></button><button
           className="securityAction"
           onClick={() =>
@@ -6482,9 +9619,13 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
               Delete
             </strong>
           </button>
-        )}<p>CampusConnect authentication is handled by Supabase. Sensitive college credentials must only be processed by an approved server-side integration.</p></section>
+        )}
+        <p>
+          CampusConnect authentication is handled by Supabase. Sensitive college
+          credentials must only be processed by an approved server-side integration.
+        </p>
+      </section>
     </div>
-    {rnsitOpen && <div className="modalScrim"><section className="integrationModal card" role="dialog" aria-modal="true" aria-labelledby="rnsit-title"><button className="modalClose" onClick={() => setRnsitOpen(false)} aria-label="Close">×</button><span>RNSIT CONTINEO</span><h2 id="rnsit-title">Connect your academic account</h2><p>Enter the credentials used by the official RNSIT student/parent portal. Credentials are sent only to the server-side connector and are never written to Supabase.</p><form onSubmit={connectRnsit}><Field label="USN"><input value={usn} onChange={e => setUsn(e.target.value.toUpperCase())} autoComplete="username" required/></Field><Field label="Date of birth"><input type="date" value={dob} onChange={e => setDob(e.target.value)} autoComplete="bday" required/></Field><p className="securityNote">CampusConnect uses a server-side connector so your date of birth is never stored in the browser or database. If RNSIT changes its portal/API, the connector can be updated without changing this dashboard.</p>{error && <p className="authError" role="alert">{error}</p>}<div className="formActions"><button type="button" className="ghost" onClick={() => setRnsitOpen(false)}>Cancel</button><button className="primary" disabled={connecting}>{connecting ? "Verifying..." : "Verify & connect"}</button></div></form></section></div>}
   </div>;
 }
 
@@ -6513,6 +9654,21 @@ function Resume({
 
   const [saved, setSaved] =
     useState(false);
+
+  const [savingResume, setSavingResume] =
+    useState(false);
+
+  const [resumeSaveError, setResumeSaveError] =
+    useState("");
+
+  const [showJobMatcher, setShowJobMatcher] =
+    useState(false);
+
+  const [jobDescription, setJobDescription] =
+    useState("");
+
+  const [targetRole, setTargetRole] =
+    useState("");
 
   const [resumeData, setResumeData] =
     useState({
@@ -6580,6 +9736,331 @@ function Resume({
       engagement: "",
     });
 
+  /*
+   * Persist the ORIGINAL Resume builder.
+   *
+   * resume_builder_data stores every field used by this
+   * existing UI without changing its layout, ATS logic,
+   * fonts, sections or preview.
+   */
+  useEffect(() => {
+    let active = true;
+
+    const loadSavedResume = async () => {
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      try {
+        const {
+          data: auth,
+          error: authError,
+        } =
+          await client.auth.getUser();
+
+        if (
+          authError ||
+          !auth.user ||
+          !active
+        ) {
+          return;
+        }
+
+        const {
+          data,
+          error,
+        } =
+          await client
+            .from("student_resumes")
+            .select("resume_builder_data")
+            .eq(
+              "user_id",
+              auth.user.id
+            )
+            .maybeSingle();
+
+        if (error) {
+          console.error(
+            "[Resume] Load failed:",
+            error
+          );
+          return;
+        }
+
+        if (
+          active &&
+          data?.resume_builder_data &&
+          typeof data.resume_builder_data ===
+            "object" &&
+          !Array.isArray(
+            data.resume_builder_data
+          )
+        ) {
+          setResumeData(current => ({
+            ...current,
+            ...(
+              data.resume_builder_data as
+                Partial<typeof current>
+            ),
+          }));
+
+          setSaved(true);
+        }
+      } catch (error) {
+        console.error(
+          "[Resume] Unexpected load error:",
+          error
+        );
+      }
+    };
+
+    void loadSavedResume();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+
+  const saveOriginalResume =
+    async () => {
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        setResumeSaveError(
+          "CampusConnect is not connected to Supabase."
+        );
+        return;
+      }
+
+      setSavingResume(true);
+      setResumeSaveError("");
+
+      try {
+        const {
+          data: auth,
+          error: authError,
+        } =
+          await client.auth.getUser();
+
+        if (
+          authError ||
+          !auth.user
+        ) {
+          setResumeSaveError(
+            "Your session has expired. Please sign in again."
+          );
+          return;
+        }
+
+        /*
+         * Store ALL original Resume fields in JSON.
+         *
+         * Also synchronize the compatible fields with the
+         * existing professional student_resumes columns so
+         * Placement/AI features can continue reading them.
+         */
+        const payload = {
+          user_id:
+            auth.user.id,
+
+          resume_builder_data:
+            resumeData,
+
+          phone:
+            resumeData.phone,
+
+          location:
+            resumeData.city,
+
+          college:
+            resumeData.college,
+
+          degree:
+            resumeData.degree,
+
+          graduation_year:
+            resumeData.collegeEnd,
+
+          cgpa:
+            resumeData.cgpa,
+
+          skills:
+            [
+              resumeData.languages,
+              resumeData.tools,
+              resumeData.frameworks,
+              resumeData.databases,
+            ]
+              .filter(Boolean)
+              .join(", "),
+
+          linkedin_url:
+            resumeData.linkedin,
+
+          github_url:
+            resumeData.github,
+
+          portfolio_url:
+            resumeData.portfolio,
+
+          leetcode_url:
+            resumeData.leetcode,
+
+          updated_at:
+            new Date()
+              .toISOString(),
+        };
+
+        const {
+          data: savedRow,
+          error: saveError,
+        } =
+          await client
+            .from("student_resumes")
+            .upsert(
+              payload,
+              {
+                onConflict:
+                  "user_id",
+              }
+            )
+            .select(
+              "user_id,resume_builder_data,updated_at"
+            )
+            .single();
+
+        if (
+          saveError ||
+          !savedRow
+        ) {
+          console.error(
+            "[Resume] Save failed:",
+            saveError
+          );
+
+          setResumeSaveError(
+            saveError?.message ||
+            "Resume could not be saved."
+          );
+
+          return;
+        }
+
+        /*
+         * Verify the exact builder data can immediately
+         * be read back from Supabase.
+         */
+        const {
+          data: verified,
+          error: verifyError,
+        } =
+          await client
+            .from("student_resumes")
+            .select(
+              "resume_builder_data"
+            )
+            .eq(
+              "user_id",
+              auth.user.id
+            )
+            .single();
+
+        if (
+          verifyError ||
+          !verified
+        ) {
+          console.error(
+            "[Resume] Verification failed:",
+            verifyError
+          );
+
+          setResumeSaveError(
+            "Resume was saved but could not be verified."
+          );
+
+          return;
+        }
+
+        const persistedData =
+          verified.resume_builder_data as
+            Partial<typeof resumeData> | null;
+
+        if (
+          !persistedData ||
+          typeof persistedData !== "object"
+        ) {
+          console.error(
+            "[Resume] Saved resume data is missing."
+          );
+
+          setResumeSaveError(
+            "Resume was saved but could not be verified."
+          );
+
+          return;
+        }
+
+        const resumeKeys =
+          Object.keys(
+            resumeData
+          ) as Array<
+            keyof typeof resumeData
+          >;
+
+        const mismatchedFields =
+          resumeKeys.filter(
+            key =>
+              String(
+                persistedData[key] ?? ""
+              ) !==
+              String(
+                resumeData[key] ?? ""
+              )
+          );
+
+        if (
+          mismatchedFields.length > 0
+        ) {
+          console.error(
+            "[Resume] Saved data verification mismatch:",
+            mismatchedFields
+          );
+
+          setResumeSaveError(
+            "Resume was not saved completely. Please try again."
+          );
+
+          return;
+        }
+
+        setSaved(true);
+
+        /*
+         * Saving must never artificially change ATS quality.
+         * ATS is calculated only from the actual resume content.
+         */
+
+      } catch (error) {
+        console.error(
+          "[Resume] Unexpected save error:",
+          error
+        );
+
+        setResumeSaveError(
+          "Unable to save your resume right now."
+        );
+
+      } finally {
+        setSavingResume(false);
+      }
+    };
+
+
   const updateField = (
     key: keyof typeof resumeData,
     value: string
@@ -6630,7 +10111,7 @@ function Resume({
       window.open(
         "",
         "_blank",
-        "width=900,height=1200"
+        "width=1000,height=1200"
       );
 
     if (!printWindow) {
@@ -6640,350 +10121,1472 @@ function Resume({
       return;
     }
 
-    const styles = Array.from(
-      document.querySelectorAll(
-        'style, link[rel="stylesheet"]'
+    /*
+     * Read the CSS rules that are ACTUALLY active in
+     * CampusConnect instead of copying stylesheet <link>
+     * elements into about:blank.
+     *
+     * This keeps the exported resume visually identical
+     * to the on-screen resume preview.
+     */
+    const applicationCss =
+      Array.from(
+        document.styleSheets
       )
-    )
-      .map(node =>
-        node.outerHTML
-      )
-      .join("\\n");
+        .map(styleSheet => {
+          try {
+            return Array.from(
+              styleSheet.cssRules
+            )
+              .map(
+                rule =>
+                  rule.cssText
+              )
+              .join("\n");
+          } catch {
+            /*
+             * Ignore inaccessible third-party stylesheets.
+             * CampusConnect's own stylesheet is same-origin
+             * and can be serialized normally.
+             */
+            return "";
+          }
+        })
+        .filter(Boolean)
+        .join("\n");
+
+    /*
+     * Clone only the resume document.
+     * No dashboard, sidebar, floating actions or editor UI
+     * are copied into the export window.
+     */
+    const resumeHtml =
+      resume.outerHTML;
 
     printWindow.document.open();
 
     printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
 
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1"
-          />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1"
+>
 
-          <title>
-            ${resumeData.name || "Resume"} Resume
-          </title>
+<title>Resume</title>
 
-          ${styles}
+<style>
+${applicationCss}
 
-          <style>
-            html,
-            body {
-              margin: 0 !important;
-              padding: 0 !important;
-              background: #ffffff !important;
-            }
+/* ======================================================
+   CAMPUSCONNECT — CLEAN A4 RESUME EXPORT
+   ====================================================== */
 
-            body {
-              display: block !important;
-            }
+* {
+  box-sizing: border-box;
+}
 
-            #resume-export-root {
-              width: 210mm !important;
-              min-height: 297mm !important;
-              margin: 0 auto !important;
-              background: #fff !important;
-            }
+html,
+body {
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
 
-            #resume-export-root
-            .placementResumePaper {
-              display: block !important;
-              position: static !important;
+  background: #ffffff !important;
 
-              width: 210mm !important;
-              min-height: 297mm !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
 
-              max-width: none !important;
+body {
+  display: block !important;
 
-              margin: 0 !important;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 
-              padding:
-                10mm 12mm !important;
+  color: #111827 !important;
+}
 
-              border: 0 !important;
-              border-radius: 0 !important;
+#resume-export-root {
+  display: block !important;
 
-              box-shadow: none !important;
+  width: 210mm !important;
+  min-height: 297mm !important;
 
-              transform: none !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
 
-              overflow: visible !important;
+  background: #ffffff !important;
+}
 
-              background: #fff !important;
-              color: #000 !important;
-            }
+/*
+ * Override any dashboard / responsive styles that could
+ * affect the cloned resume.
+ */
+#resume-export-root
+#placementResumePaper,
+#resume-export-root
+.placementResumePaper {
+  display: block !important;
 
-            #resume-export-root
-            .placementResumePaper * {
-              visibility: visible !important;
-            }
+  position: static !important;
 
-            @page {
-              size: A4;
-              margin: 0;
-            }
+  width: 210mm !important;
+  max-width: 210mm !important;
 
-            @media print {
-              html,
-              body {
-                width: 210mm !important;
-                min-height: 297mm !important;
+  min-height: 297mm !important;
 
-                margin: 0 !important;
-                padding: 0 !important;
+  margin: 0 !important;
 
-                background: #fff !important;
-              }
+  padding:
+    11mm 13mm !important;
 
-              #resume-export-root {
-                width: 210mm !important;
+  border: 0 !important;
+  border-radius: 0 !important;
 
-                margin: 0 !important;
-                padding: 0 !important;
-              }
+  background: #ffffff !important;
 
-              #resume-export-root
-              .placementResumePaper {
-                width: 210mm !important;
-                min-height: 297mm !important;
+  color: #111827 !important;
 
-                margin: 0 !important;
+  box-shadow: none !important;
 
-                padding:
-                  10mm 12mm !important;
+  transform: none !important;
 
-                border: 0 !important;
+  overflow: visible !important;
+}
 
-                box-shadow:
-                  none !important;
+#resume-export-root
+#placementResumePaper *,
+#resume-export-root
+.placementResumePaper * {
+  visibility: visible !important;
 
-                break-after:
-                  auto !important;
+  box-sizing: border-box;
+}
 
-                page-break-after:
-                  auto !important;
-              }
+/*
+ * Header
+ */
+#resume-export-root
+.placementResumeHeader {
+  display: block !important;
 
-              .resumePrintSection,
-              .resumeProjectBlock,
-              .resumeEducationRow,
-              .resumeExperienceHead {
-                break-inside:
-                  avoid !important;
+  margin: 0 !important;
 
-                page-break-inside:
-                  avoid !important;
-              }
-            }
-          </style>
-        </head>
+  padding:
+    0 0 5mm !important;
 
-        <body>
-          <main id="resume-export-root">
-            ${resume.outerHTML}
-          </main>
-        </body>
-      </html>
+  border-bottom:
+    1.5px solid #1f2937 !important;
+}
+
+#resume-export-root
+.placementResumeHeader h1 {
+  margin:
+    0 0 2.5mm !important;
+
+  padding: 0 !important;
+
+  color: #111827 !important;
+
+  font-size:
+    22pt !important;
+
+  font-weight:
+    750 !important;
+
+  line-height:
+    1.05 !important;
+
+  letter-spacing:
+    -.02em !important;
+}
+
+#resume-export-root
+.placementResumeContacts {
+  display: flex !important;
+
+  flex-wrap: wrap !important;
+
+  align-items: center !important;
+
+  gap:
+    1.5mm 4mm !important;
+
+  margin: 0 !important;
+
+  color: #374151 !important;
+
+  font-size:
+    8.5pt !important;
+
+  line-height:
+    1.35 !important;
+}
+
+#resume-export-root
+.placementResumeContacts span,
+#resume-export-root
+.placementResumeContacts a {
+  display: inline !important;
+
+  margin: 0 !important;
+
+  color: #374151 !important;
+
+  font-size:
+    8.5pt !important;
+
+  text-decoration:
+    none !important;
+}
+
+#resume-export-root
+.placementResumeContacts a {
+  color:
+    #1f4f99 !important;
+}
+
+/*
+ * Resume sections
+ */
+#resume-export-root
+.rsection,
+#resume-export-root
+.resumePrintSection {
+  margin:
+    5mm 0 0 !important;
+
+  padding: 0 !important;
+}
+
+#resume-export-root
+.rsection > h4,
+#resume-export-root
+.resumePrintSection > h4 {
+  margin:
+    0 0 2.5mm !important;
+
+  padding:
+    0 0 1.4mm !important;
+
+  border-bottom:
+    .6px solid #cfd5dd !important;
+
+  color: #1f2937 !important;
+
+  font-size:
+    9pt !important;
+
+  font-weight:
+    800 !important;
+
+  line-height:
+    1.2 !important;
+
+  letter-spacing:
+    .08em !important;
+
+  text-transform:
+    uppercase !important;
+}
+
+/*
+ * General resume typography
+ */
+#resume-export-root p {
+  margin:
+    1.2mm 0 !important;
+
+  color:
+    #303741 !important;
+
+  font-size:
+    8.5pt !important;
+
+  line-height:
+    1.42 !important;
+}
+
+#resume-export-root b,
+#resume-export-root strong {
+  color:
+    #161b22 !important;
+}
+
+#resume-export-root small {
+  font-size:
+    8pt !important;
+
+  line-height:
+    1.35 !important;
+}
+
+/*
+ * Education / Experience rows
+ */
+#resume-export-root
+.resumePreviewRow {
+  display: flex !important;
+
+  flex-direction: row !important;
+
+  justify-content:
+    space-between !important;
+
+  align-items:
+    flex-start !important;
+
+  gap:
+    8mm !important;
+
+  margin: 0 !important;
+}
+
+#resume-export-root
+.resumePreviewRow > div {
+  min-width: 0 !important;
+}
+
+#resume-export-root
+.resumePreviewRow > div:last-child {
+  flex: 0 0 auto !important;
+
+  text-align:
+    right !important;
+}
+
+#resume-export-root
+.resumePreviewRow b {
+  font-size:
+    9pt !important;
+}
+
+#resume-export-root
+.resumePreviewRow strong {
+  display: block !important;
+
+  font-size:
+    8.5pt !important;
+}
+
+#resume-export-root
+.resumePreviewRow small {
+  display: block !important;
+
+  margin-top:
+    .8mm !important;
+
+  color:
+    #59616c !important;
+
+  font-size:
+    7.8pt !important;
+}
+
+/*
+ * Projects
+ */
+#resume-export-root
+.resumeProjectPreview,
+#resume-export-root
+.resumeProjectBlock {
+  margin:
+    0 0 3mm !important;
+
+  break-inside:
+    avoid !important;
+
+  page-break-inside:
+    avoid !important;
+}
+
+#resume-export-root
+.resumeProjectPreview > div {
+  display: flex !important;
+
+  justify-content:
+    space-between !important;
+
+  align-items:
+    baseline !important;
+
+  gap:
+    5mm !important;
+}
+
+#resume-export-root
+.resumeProjectPreview b {
+  font-size:
+    9pt !important;
+}
+
+#resume-export-root
+.resumeProjectPreview small {
+  color:
+    #53657d !important;
+
+  font-size:
+    7.8pt !important;
+}
+
+/*
+ * Bullets
+ */
+#resume-export-root ul {
+  margin:
+    1.5mm 0 2.5mm 5mm !important;
+
+  padding:
+    0 !important;
+}
+
+#resume-export-root li {
+  margin:
+    .9mm 0 !important;
+
+  padding-left:
+    1mm !important;
+
+  color:
+    #303741 !important;
+
+  font-size:
+    8.4pt !important;
+
+  line-height:
+    1.4 !important;
+}
+
+/*
+ * Skills
+ */
+#resume-export-root
+.professionalSkillList {
+  display: flex !important;
+
+  flex-wrap: wrap !important;
+
+  gap:
+    1mm 4mm !important;
+}
+
+#resume-export-root
+.professionalSkillList span {
+  color:
+    #303741 !important;
+
+  font-size:
+    8.2pt !important;
+
+  font-weight:
+    600 !important;
+}
+
+#resume-export-root
+.resumePreserveLines {
+  white-space:
+    pre-line !important;
+}
+
+/*
+ * Links
+ */
+#resume-export-root a {
+  color:
+    inherit !important;
+
+  text-decoration:
+    none !important;
+}
+
+/*
+ * Keep logical blocks together where possible.
+ */
+#resume-export-root
+.resumeEducationRow,
+#resume-export-root
+.resumeExperienceHead,
+#resume-export-root
+.resumeProjectBlock,
+#resume-export-root
+.resumeProjectPreview {
+  break-inside:
+    avoid !important;
+
+  page-break-inside:
+    avoid !important;
+}
+
+
+/* ======================================================
+   PRINT
+   ====================================================== */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+
+  html,
+  body {
+    width:
+      210mm !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      0 !important;
+
+    background:
+      #ffffff !important;
+  }
+
+  body * {
+    visibility:
+      visible !important;
+  }
+
+  #resume-export-root {
+    width:
+      210mm !important;
+
+    margin:
+      0 !important;
+  }
+
+  #resume-export-root
+  #placementResumePaper,
+  #resume-export-root
+  .placementResumePaper {
+    width:
+      210mm !important;
+
+    min-height:
+      297mm !important;
+
+    margin:
+      0 !important;
+
+    padding:
+      11mm 13mm !important;
+
+    border:
+      0 !important;
+
+    box-shadow:
+      none !important;
+
+    transform:
+      none !important;
+  }
+
+  #resume-export-root
+  .resumeProjectPreview,
+  #resume-export-root
+  .resumeProjectBlock,
+  #resume-export-root
+  .resumeEducationRow,
+  #resume-export-root
+  .resumeExperienceHead {
+    break-inside:
+      avoid !important;
+
+    page-break-inside:
+      avoid !important;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<main id="resume-export-root">
+${resumeHtml}
+</main>
+
+</body>
+</html>
     `);
 
     printWindow.document.close();
 
+    /*
+     * Set the title safely after writing the document.
+     */
+    printWindow.document.title =
+      `${resumeData.name.trim() || "Student"} Resume`;
+
     const startPrint = () => {
-      window.setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-      }, 400);
+      window.setTimeout(
+        () => {
+          printWindow.focus();
+          printWindow.print();
+        },
+        350
+      );
     };
 
+    /*
+     * Wait for fonts before opening the print dialog so
+     * typography does not jump while generating the PDF.
+     */
     if (
-      printWindow.document.readyState ===
-      "complete"
+      printWindow.document.fonts
     ) {
-      startPrint();
+      void printWindow.document.fonts.ready
+        .then(startPrint)
+        .catch(startPrint);
     } else {
-      printWindow.onload =
-        startPrint;
+      startPrint();
     }
   };
 
+
   /*
-   * Real-time placement ATS readiness.
+   * CampusConnect ATS Readiness Engine
+   * ----------------------------------
+   * This is a deterministic, content-based ATS readiness
+   * analyzer. It does NOT pretend to be a company's private
+   * ATS algorithm.
    *
-   * This is intentionally more useful than a simple
-   * "number of filled fields" percentage.
-   *
-   * The score reacts instantly as the student edits
-   * contact details, education, projects, skills,
-   * achievements, certifications and professional links.
+   * Score is based only on the resume currently entered by
+   * the authenticated student.
    */
-  const atsChecks = [
-    {
-      points: 8,
-      passed:
-        resumeData.name.trim().length >= 3,
-    },
 
-    {
-      points: 6,
-      passed:
-        resumeData.phone.trim().length >= 8,
-    },
+  const normalizeResumeText = (
+    value: string
+  ) =>
+    value
+      .replace(/\s+/g, " ")
+      .trim();
 
-    {
-      points: 6,
-      passed:
-        /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(
-          resumeData.email.trim()
-        ),
-    },
+  const countCsvItems = (
+    value: string
+  ) =>
+    value
+      .split(/[,;\n]/)
+      .map(item => item.trim())
+      .filter(Boolean)
+      .length;
 
-    {
-      points: 4,
-      passed:
-        resumeData.city.trim().length >= 2,
-    },
+  const containsNumber =
+    (value: string) =>
+      /\b\d+(?:\.\d+)?%?\b/.test(
+        value
+      );
 
-    {
-      points: 4,
-      passed:
-        Boolean(
-          resumeData.linkedin.trim() ||
-          resumeData.github.trim() ||
-          resumeData.portfolio.trim()
-        ),
-    },
+  const containsActionVerb =
+    (value: string) =>
+      /\b(built|developed|designed|implemented|created|engineered|deployed|optimized|integrated|automated|improved|reduced|increased|managed|led|analyzed|delivered|architected|launched|collaborated)\b/i.test(
+        value
+      );
 
-    {
-      points: 10,
-      passed:
-        Boolean(
-          resumeData.college.trim() &&
-          resumeData.degree.trim() &&
-          resumeData.collegeEnd.trim()
-        ),
-    },
+  const validEmail =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+      resumeData.email.trim()
+    );
 
-    {
-      points: 5,
-      passed:
-        resumeData.cgpa.trim().length > 0,
-    },
+  const validPhone =
+    resumeData.phone
+      .replace(/\D/g, "")
+      .length >= 10;
 
-    {
-      points: 12,
-      passed:
-        Boolean(
-          resumeData.project1Title.trim() &&
-          resumeData.project1Tech.trim() &&
-          resumeData.project1Description.trim().length >= 30
-        ),
-    },
+  const professionalLinkCount =
+    [
+      resumeData.linkedin,
+      resumeData.github,
+      resumeData.portfolio,
+      resumeData.leetcode,
+      resumeData.codechef,
+    ].filter(
+      value =>
+        value.trim().length > 0
+    ).length;
 
-    {
-      points: 6,
-      passed:
-        Boolean(
-          resumeData.project2Title.trim() &&
-          resumeData.project2Description.trim().length >= 20
-        ),
-    },
+  const technicalSkillCount =
+    [
+      resumeData.languages,
+      resumeData.tools,
+      resumeData.frameworks,
+      resumeData.databases,
+    ].reduce(
+      (total, value) =>
+        total +
+        countCsvItems(value),
+      0
+    );
 
+  const projects = [
     {
-      points: 10,
-      passed:
-        Boolean(
-          resumeData.languages.trim() ||
-          resumeData.frameworks.trim() ||
-          resumeData.tools.trim() ||
-          resumeData.databases.trim()
-        ),
+      title:
+        resumeData.project1Title,
+      tech:
+        resumeData.project1Tech,
+      link:
+        resumeData.project1Link,
+      description:
+        resumeData.project1Description,
     },
-
     {
-      points: 5,
-      passed:
-        resumeData.coursework.trim().length > 0,
+      title:
+        resumeData.project2Title,
+      tech:
+        resumeData.project2Tech,
+      link:
+        resumeData.project2Link,
+      description:
+        resumeData.project2Description,
     },
-
     {
-      points: 7,
-      passed:
-        resumeData.achievements.trim().length >= 10,
-    },
-
-    {
-      points: 7,
-      passed:
-        resumeData.certifications.trim().length >= 5,
-    },
-
-    {
-      points: 5,
-      passed:
-        Boolean(
-          resumeData.experienceTitle.trim() ||
-          resumeData.engagement.trim()
-        ),
-    },
-
-    {
-      points: 5,
-      passed:
-        Boolean(
-          resumeData.github.trim() ||
-          resumeData.project1Link.trim() ||
-          resumeData.project2Link.trim() ||
-          resumeData.project3Link.trim()
-        ),
+      title:
+        resumeData.project3Title,
+      tech:
+        resumeData.project3Tech,
+      link:
+        resumeData.project3Link,
+      description:
+        resumeData.project3Description,
     },
   ];
 
-  const ats = Math.min(
-    100,
-    atsChecks.reduce(
-      (total, check) =>
-        total +
-        (
-          check.passed
-            ? check.points
-            : 0
+  const completedProjects =
+    projects.filter(
+      project =>
+        project.title.trim() &&
+        project.tech.trim() &&
+        project.description
+          .trim()
+          .length >= 40
+    );
+
+  const strongProjectDescriptions =
+    projects.filter(
+      project => {
+        const description =
+          normalizeResumeText(
+            project.description
+          );
+
+        return (
+          description.length >= 70 &&
+          containsActionVerb(
+            description
+          )
+        );
+      }
+    );
+
+  const quantifiedProjects =
+    projects.filter(
+      project =>
+        containsNumber(
+          project.description
+        )
+    );
+
+  const experienceText =
+    normalizeResumeText(
+      resumeData.experienceDescription
+    );
+
+  const achievementText =
+    normalizeResumeText(
+      resumeData.achievements
+    );
+
+  type AtsCheck = {
+    id: string;
+    label: string;
+    points: number;
+    passed: boolean;
+    suggestion: string;
+  };
+
+  const atsChecks: AtsCheck[] = [
+    {
+      id: "identity",
+      label:
+        "Complete professional identity",
+      points: 6,
+      passed:
+        resumeData.name
+          .trim()
+          .length >= 3 &&
+        validEmail &&
+        validPhone &&
+        resumeData.city
+          .trim()
+          .length >= 2,
+      suggestion:
+        "Complete your name, professional email, phone number and location.",
+    },
+
+    {
+      id: "links",
+      label:
+        "Professional links",
+      points: 6,
+      passed:
+        Boolean(
+          resumeData.github
+            .trim()
+        ) &&
+        professionalLinkCount >= 2,
+      suggestion:
+        "Add GitHub plus LinkedIn, portfolio or a coding profile.",
+    },
+
+    {
+      id: "education",
+      label:
+        "Complete education",
+      points: 9,
+      passed:
+        Boolean(
+          resumeData.college
+            .trim() &&
+          resumeData.degree
+            .trim() &&
+          resumeData.collegeStart
+            .trim() &&
+          resumeData.collegeEnd
+            .trim()
         ),
-      0
-    )
-  );
+      suggestion:
+        "Add college, degree and complete education dates.",
+    },
+
+    {
+      id: "academic-score",
+      label:
+        "Academic score",
+      points: 4,
+      passed:
+        Boolean(
+          resumeData.cgpa
+            .trim()
+        ),
+      suggestion:
+        "Add your CGPA if it strengthens your application.",
+    },
+
+    {
+      id: "projects",
+      label:
+        "Strong project portfolio",
+      points: 14,
+      passed:
+        completedProjects.length >= 2,
+      suggestion:
+        "Add at least two complete technical projects with title, stack and meaningful descriptions.",
+    },
+
+    {
+      id: "project-writing",
+      label:
+        "Action-oriented project writing",
+      points: 8,
+      passed:
+        strongProjectDescriptions.length >= 2,
+      suggestion:
+        "Start project bullets with action verbs such as Built, Developed, Designed, Implemented or Deployed.",
+    },
+
+    {
+      id: "project-impact",
+      label:
+        "Measurable project impact",
+      points: 8,
+      passed:
+        quantifiedProjects.length >= 1,
+      suggestion:
+        "Add measurable impact to at least one project: users, modules, APIs, accuracy, latency, time saved or another defensible number.",
+    },
+
+    {
+      id: "skills",
+      label:
+        "Technical skills depth",
+      points: 12,
+      passed:
+        technicalSkillCount >= 10 &&
+        Boolean(
+          resumeData.languages
+            .trim()
+        ),
+      suggestion:
+        "Add relevant languages, frameworks, tools and databases. Aim for 10+ genuine technical skills.",
+    },
+
+    {
+      id: "coursework",
+      label:
+        "Relevant coursework",
+      points: 5,
+      passed:
+        countCsvItems(
+          resumeData.coursework
+        ) >= 4,
+      suggestion:
+        "Add four or more role-relevant subjects such as DSA, OOP, DBMS and Computer Networks.",
+    },
+
+    {
+      id: "experience",
+      label:
+        "Experience / technical work",
+      points: 8,
+      passed:
+        Boolean(
+          resumeData.experienceTitle
+            .trim()
+        ) &&
+        experienceText.length >= 60 &&
+        containsActionVerb(
+          experienceText
+        ),
+      suggestion:
+        "Describe your experience or serious project work using action-oriented, specific responsibilities.",
+    },
+
+    {
+      id: "experience-impact",
+      label:
+        "Experience impact",
+      points: 5,
+      passed:
+        experienceText.length >= 60 &&
+        containsNumber(
+          experienceText
+        ),
+      suggestion:
+        "Where truthful, quantify the scale or outcome of your experience.",
+    },
+
+    {
+      id: "achievements",
+      label:
+        "Meaningful achievements",
+      points: 6,
+      passed:
+        achievementText.length >= 50,
+      suggestion:
+        "Add concise achievements that demonstrate engineering, leadership or measurable outcomes.",
+    },
+
+    {
+      id: "certifications",
+      label:
+        "Relevant certification",
+      points: 3,
+      passed:
+        resumeData.certifications
+          .trim()
+          .length >= 5,
+      suggestion:
+        "Add only certifications you actually completed. This section is optional.",
+    },
+
+    {
+      id: "engagement",
+      label:
+        "Leadership / engagement",
+      points: 3,
+      passed:
+        resumeData.engagement
+          .trim()
+          .length >= 30,
+      suggestion:
+        "Add relevant leadership, technical community or social engagement if applicable.",
+    },
+
+    {
+      id: "ats-structure",
+      label:
+        "ATS-safe structure",
+      points: 3,
+      passed:
+        Boolean(
+          resumeData.name
+            .trim() &&
+          resumeData.college
+            .trim() &&
+          resumeData.languages
+            .trim() &&
+          completedProjects.length >= 1
+        ),
+      suggestion:
+        "Keep standard headings such as Education, Projects, Technical Skills and Experience.",
+    },
+  ];
+
+  const ats =
+    Math.min(
+      100,
+      atsChecks.reduce(
+        (
+          total,
+          check
+        ) =>
+          total +
+          (
+            check.passed
+              ? check.points
+              : 0
+          ),
+        0
+      )
+    );
 
   const atsPassed =
     atsChecks.filter(
-      check => check.passed
+      check =>
+        check.passed
     ).length;
 
   const atsTotal =
     atsChecks.length;
 
+  const atsMissing =
+    atsChecks
+      .filter(
+        check =>
+          !check.passed
+      )
+      .sort(
+        (a, b) =>
+          b.points -
+          a.points
+      );
+
   const atsStatus =
     ats >= 90
       ? "Excellent"
-      : ats >= 75
-      ? "Placement ready"
+      : ats >= 80
+      ? "Strong"
+      : ats >= 70
+      ? "Application ready"
       : ats >= 60
       ? "Good foundation"
-      : ats >= 40
+      : ats >= 45
       ? "Needs improvement"
-      : "Getting started";
+      : "Incomplete";
 
   const atsRecommendation =
-    ats >= 90
-      ? "Strong ATS structure. Review wording and measurable impact before applying."
-      : ats >= 75
-      ? "Good resume. Add stronger project outcomes and measurable achievements."
-      : ats >= 60
-      ? "Add technical depth, project impact and professional links."
-      : ats >= 40
-      ? "Complete projects, skills, achievements and certifications."
-      : "Start by completing contact details, education, skills and your strongest project.";
+    atsMissing.length === 0
+      ? "Your resume has strong ATS readiness. Tailor keywords and project impact to each job description before applying."
+      : atsMissing
+          .slice(0, 2)
+          .map(
+            check =>
+              check.suggestion
+          )
+          .join(" ");
+
+  /*
+   * ---------------------------------------------------------
+   * JOB DESCRIPTION MATCH ANALYZER
+   * ---------------------------------------------------------
+   *
+   * A deterministic local keyword/skill comparison.
+   * It does not claim to reproduce a company's private ATS.
+   */
+
+  const resumeSearchText =
+    normalizeResumeText(
+      Object.values(
+        resumeData
+      )
+        .filter(
+          value =>
+            typeof value === "string"
+        )
+        .join(" ")
+    )
+      .toLowerCase();
+
+  const normalizedJobDescription =
+    normalizeResumeText(
+      jobDescription
+    )
+      .toLowerCase();
+
+  const jobSkillDictionary = [
+    "javascript",
+    "typescript",
+    "java",
+    "python",
+    "c++",
+    "c",
+    "sql",
+    "html",
+    "css",
+    "react",
+    "next.js",
+    "nextjs",
+    "vite",
+    "node.js",
+    "nodejs",
+    "express",
+    "flask",
+    "fastapi",
+    "django",
+    "spring boot",
+    "tailwind",
+    "bootstrap",
+    "postgresql",
+    "postgres",
+    "mysql",
+    "mongodb",
+    "sqlite",
+    "redis",
+    "supabase",
+    "firebase",
+    "aws",
+    "azure",
+    "gcp",
+    "cloudflare",
+    "docker",
+    "kubernetes",
+    "git",
+    "github",
+    "linux",
+    "rest api",
+    "restful api",
+    "graphql",
+    "microservices",
+    "system design",
+    "data structures",
+    "algorithms",
+    "dsa",
+    "oop",
+    "object oriented programming",
+    "dbms",
+    "computer networks",
+    "operating systems",
+    "machine learning",
+    "deep learning",
+    "artificial intelligence",
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "tensorflow",
+    "pytorch",
+    "matlab",
+    "verilog",
+    "vhdl",
+    "fpga",
+    "embedded systems",
+    "esp32",
+    "stm32",
+    "arduino",
+    "iot",
+    "uart",
+    "spi",
+    "i2c",
+    "vlsi",
+    "digital electronics",
+    "signal processing",
+    "communication systems",
+    "agile",
+    "scrum",
+    "testing",
+    "unit testing",
+    "ci/cd",
+    "problem solving",
+    "communication",
+    "leadership",
+    "teamwork",
+  ];
+
+  const normalizeMatchKeyword = (
+    value: string
+  ) =>
+    value
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9+#.\-/ ]/g,
+        " "
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
+      .trim();
+
+  const containsKeyword = (
+    source: string,
+    keyword: string
+  ) => {
+    const cleanSource =
+      normalizeMatchKeyword(
+        source
+      );
+
+    const cleanKeyword =
+      normalizeMatchKeyword(
+        keyword
+      );
+
+    return Boolean(
+      cleanKeyword &&
+      cleanSource.includes(
+        cleanKeyword
+      )
+    );
+  };
+
+  const jdSkillKeywords =
+    jobDescription.trim()
+      ? jobSkillDictionary
+          .filter(
+            keyword =>
+              containsKeyword(
+                normalizedJobDescription,
+                keyword
+              )
+          )
+          .filter(
+            (
+              keyword,
+              index,
+              values
+            ) =>
+              values.indexOf(
+                keyword
+              ) === index
+          )
+      : [];
+
+  const stopWords =
+    new Set([
+      "the",
+      "and",
+      "for",
+      "with",
+      "that",
+      "this",
+      "from",
+      "your",
+      "you",
+      "our",
+      "are",
+      "will",
+      "have",
+      "has",
+      "who",
+      "into",
+      "about",
+      "work",
+      "working",
+      "role",
+      "team",
+      "candidate",
+      "candidates",
+      "responsibilities",
+      "responsibility",
+      "requirements",
+      "required",
+      "preferred",
+      "qualification",
+      "qualifications",
+      "experience",
+      "years",
+      "year",
+      "skills",
+      "skill",
+      "knowledge",
+      "strong",
+      "good",
+      "ability",
+      "using",
+      "including",
+      "such",
+      "other",
+      "more",
+      "than",
+      "their",
+      "they",
+      "them",
+      "would",
+      "should",
+      "must",
+      "can",
+      "job",
+      "company",
+      "position",
+      "looking",
+      "join",
+      "based",
+      "across",
+      "through",
+      "within",
+      "etc",
+    ]);
+
+  const jdWordCounts =
+    normalizedJobDescription
+      .split(
+        /[^a-z0-9+#.-]+/
+      )
+      .filter(
+        word =>
+          word.length >= 4 &&
+          !stopWords.has(
+            word
+          ) &&
+          !/^\d+$/.test(
+            word
+          )
+      )
+      .reduce(
+        (
+          map,
+          word
+        ) => {
+          map.set(
+            word,
+            (
+              map.get(
+                word
+              ) || 0
+            ) + 1
+          );
+
+          return map;
+        },
+        new Map<string, number>()
+      );
+
+  const jdGeneralKeywords =
+    Array.from(
+      jdWordCounts.entries()
+    )
+      .sort(
+        (a, b) =>
+          b[1] - a[1]
+      )
+      .map(
+        ([word]) =>
+          word
+      )
+      .filter(
+        word =>
+          !jdSkillKeywords.some(
+            skill =>
+              normalizeMatchKeyword(
+                skill
+              ).includes(
+                word
+              )
+          )
+      )
+      .slice(
+        0,
+        12
+      );
+
+  const matchedJobSkills =
+    jdSkillKeywords.filter(
+      keyword =>
+        containsKeyword(
+          resumeSearchText,
+          keyword
+        )
+    );
+
+  const missingJobSkills =
+    jdSkillKeywords.filter(
+      keyword =>
+        !containsKeyword(
+          resumeSearchText,
+          keyword
+        )
+    );
+
+  const matchedGeneralKeywords =
+    jdGeneralKeywords.filter(
+      keyword =>
+        containsKeyword(
+          resumeSearchText,
+          keyword
+        )
+    );
+
+  const missingGeneralKeywords =
+    jdGeneralKeywords.filter(
+      keyword =>
+        !containsKeyword(
+          resumeSearchText,
+          keyword
+        )
+    );
+
+  const skillWeight =
+    jdSkillKeywords.length * 2;
+
+  const generalWeight =
+    jdGeneralKeywords.length;
+
+  const totalJobMatchWeight =
+    skillWeight +
+    generalWeight;
+
+  const earnedJobMatchWeight =
+    (
+      matchedJobSkills.length *
+      2
+    ) +
+    matchedGeneralKeywords.length;
+
+  const jobMatchScore =
+    jobDescription.trim() &&
+    totalJobMatchWeight > 0
+      ? Math.min(
+          100,
+          Math.round(
+            (
+              earnedJobMatchWeight /
+              totalJobMatchWeight
+            ) *
+            100
+          )
+        )
+      : 0;
+
+  const jobMatchStatus =
+    !jobDescription.trim()
+      ? "Paste a job description"
+      : jobMatchScore >= 85
+      ? "Excellent match"
+      : jobMatchScore >= 70
+      ? "Strong match"
+      : jobMatchScore >= 55
+      ? "Moderate match"
+      : jobMatchScore >= 35
+      ? "Low match"
+      : "Major skill gap";
+
+  const jobMatchAdvice =
+    !jobDescription.trim()
+      ? "Paste a real job description to compare it with your current resume."
+      : missingJobSkills.length > 0
+      ? `Your highest-value gaps include ${missingJobSkills
+          .slice(0, 4)
+          .join(", ")}. Add them only if you genuinely have those skills or experience.`
+      : missingGeneralKeywords.length > 0
+      ? "Core technical skills match well. Improve role-specific wording where it truthfully reflects your experience."
+      : "Your current resume covers the major keywords detected in this job description.";
 
   const sections: {
     id: ResumeSection;
@@ -7071,20 +11674,131 @@ function Resume({
                 {atsRecommendation}
               </p>
 
+              <div className="resumeAtsBreakdown">
+
+                <div className="resumeAtsBreakdownHeader">
+                  <span>
+                    TOP IMPROVEMENTS
+                  </span>
+
+                  <small>
+                    Recoverable points
+                  </small>
+                </div>
+
+                {atsMissing.length > 0 ? (
+                  <div className="resumeAtsImprovementList">
+
+                    {atsMissing
+                      .slice(0, 3)
+                      .map(check => (
+                        <div
+                          className="resumeAtsImprovement"
+                          key={check.id}
+                        >
+                          <strong>
+                            +{check.points}
+                          </strong>
+
+                          <div>
+                            <b>
+                              {check.label}
+                            </b>
+
+                            <small>
+                              {check.suggestion}
+                            </small>
+                          </div>
+                        </div>
+                      ))}
+
+                  </div>
+                ) : (
+                  <div className="resumeAtsCompleteState">
+                    <b>
+                      All ATS readiness checks passed
+                    </b>
+
+                    <small>
+                      Tailor keywords and impact statements to the specific job description before applying.
+                    </small>
+                  </div>
+                )}
+
+                <div className="resumeAtsPassedSummary">
+
+                  <span>
+                    PASSED CHECKS
+                  </span>
+
+                  <b>
+                    {atsPassed}/{atsTotal}
+                  </b>
+
+                </div>
+
+                <div className="resumeAtsPassedList">
+
+                  {atsChecks
+                    .filter(check => check.passed)
+                    .slice(0, 5)
+                    .map(check => (
+                      <span key={check.id}>
+                        <i>
+                          ✓
+                        </i>
+
+                        {check.label}
+                      </span>
+                    ))}
+
+                </div>
+
+              </div>
+
             </div>
           </div>
 
           <button
             type="button"
             className="ghost"
-            onClick={() => {
-              setSaved(true);
-              improve();
-            }}
+            disabled={savingResume}
+            onClick={() =>
+              void saveOriginalResume()
+            }
           >
-            {saved
+            {savingResume
+              ? "Saving..."
+              : saved
               ? "Saved ✓"
               : "Save resume"}
+          </button>
+
+          {resumeSaveError && (
+            <small
+              role="alert"
+              style={{
+                color: "#b42318",
+                maxWidth: 220,
+              }}
+            >
+              {resumeSaveError}
+            </small>
+          )}
+
+          <button
+            type="button"
+            className="ghost resumeJobMatchButton"
+            onClick={() =>
+              setShowJobMatcher(
+                current =>
+                  !current
+              )
+            }
+          >
+            {showJobMatcher
+              ? "Close JD Match"
+              : "Match Job Description"}
           </button>
 
           <button
@@ -7098,6 +11812,294 @@ function Resume({
         </div>
 
       </section>
+
+
+      {showJobMatcher && (
+        <section className="resumeJobMatcher">
+
+          <div className="resumeJobMatcherHeader">
+
+            <div>
+              <span>
+                JOB DESCRIPTION MATCH
+              </span>
+
+              <h2>
+                Tailor this resume for a specific role
+              </h2>
+
+              <p>
+                Paste a real job description. CampusConnect compares its skills and recurring keywords with your current resume locally in your browser.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="ghost"
+              onClick={() =>
+                setShowJobMatcher(
+                  false
+                )
+              }
+            >
+              Close
+            </button>
+
+          </div>
+
+
+          <div className="resumeJobMatcherGrid">
+
+            <div className="resumeJobInputCard">
+
+              <label>
+                Target role
+                <input
+                  type="text"
+                  placeholder="e.g. Software Development Engineer"
+                  value={targetRole}
+                  onChange={event =>
+                    setTargetRole(
+                      event.target.value
+                    )
+                  }
+                />
+              </label>
+
+              <label>
+                Job description
+                <textarea
+                  placeholder="Paste the complete job description here..."
+                  value={jobDescription}
+                  onChange={event =>
+                    setJobDescription(
+                      event.target.value
+                    )
+                  }
+                />
+              </label>
+
+              <div className="resumeJobPrivacy">
+                <b>
+                  Local analysis
+                </b>
+
+                <span>
+                  This comparison runs in your browser. The pasted job description is not saved to your resume record.
+                </span>
+              </div>
+
+            </div>
+
+
+            <div className="resumeJobResultCard">
+
+              <div className="resumeJobScoreHeader">
+
+                <div
+                  className="resumeJobScoreRing"
+                  style={{
+                    "--job-progress":
+                      `${jobMatchScore * 3.6}deg`,
+                  } as CSSProperties}
+                >
+                  <div>
+                    <strong>
+                      {jobMatchScore}
+                    </strong>
+
+                    <small>
+                      /100
+                    </small>
+                  </div>
+                </div>
+
+                <div>
+                  <span>
+                    JD MATCH SCORE
+                  </span>
+
+                  <h3>
+                    {jobMatchStatus}
+                  </h3>
+
+                  {targetRole.trim() && (
+                    <small>
+                      {targetRole}
+                    </small>
+                  )}
+                </div>
+
+              </div>
+
+
+              <p className="resumeJobAdvice">
+                {jobMatchAdvice}
+              </p>
+
+
+              <div className="resumeJobKeywordStats">
+
+                <article>
+                  <strong>
+                    {matchedJobSkills.length}
+                  </strong>
+
+                  <span>
+                    skills matched
+                  </span>
+                </article>
+
+                <article>
+                  <strong>
+                    {missingJobSkills.length}
+                  </strong>
+
+                  <span>
+                    skill gaps
+                  </span>
+                </article>
+
+                <article>
+                  <strong>
+                    {
+                      matchedGeneralKeywords.length
+                    }
+                  </strong>
+
+                  <span>
+                    supporting keywords
+                  </span>
+                </article>
+
+              </div>
+
+
+              <div className="resumeJobKeywordSection">
+
+                <div>
+                  <span>
+                    MATCHED SKILLS
+                  </span>
+
+                  <small>
+                    Found in both JD and resume
+                  </small>
+                </div>
+
+                <div className="resumeJobChips">
+
+                  {matchedJobSkills.length > 0 ? (
+                    matchedJobSkills.map(
+                      skill => (
+                        <span
+                          className="matched"
+                          key={skill}
+                        >
+                          ✓ {skill}
+                        </span>
+                      )
+                    )
+                  ) : (
+                    <p>
+                      No matched technical skills detected yet.
+                    </p>
+                  )}
+
+                </div>
+
+              </div>
+
+
+              <div className="resumeJobKeywordSection">
+
+                <div>
+                  <span>
+                    MISSING / REVIEW
+                  </span>
+
+                  <small>
+                    Never add a skill you cannot defend in an interview
+                  </small>
+                </div>
+
+                <div className="resumeJobChips">
+
+                  {missingJobSkills.length > 0 ? (
+                    missingJobSkills.map(
+                      skill => (
+                        <span
+                          className="missing"
+                          key={skill}
+                        >
+                          + {skill}
+                        </span>
+                      )
+                    )
+                  ) : jobDescription.trim() ? (
+                    jdSkillKeywords.length === 0 ? (
+                      <p>
+                        No technical requirements were detected in this job description. Paste the complete responsibilities and requirements section for a meaningful comparison.
+                      </p>
+                    ) : (
+                      <span className="matched">
+                        ✓ No major technical skill gaps detected
+                      </span>
+                    )
+                  ) : (
+                    <p>
+                      Paste a job description first.
+                    </p>
+                  )}
+
+                </div>
+
+              </div>
+
+
+              {missingGeneralKeywords.length > 0 && (
+                <div className="resumeJobKeywordSection">
+
+                  <div>
+                    <span>
+                      ROLE-SPECIFIC WORDING
+                    </span>
+
+                    <small>
+                      Important recurring terms not currently found in your resume
+                    </small>
+                  </div>
+
+                  <div className="resumeJobChips">
+
+                    {missingGeneralKeywords
+                      .slice(0, 8)
+                      .map(
+                        keyword => (
+                          <span
+                            className="neutral"
+                            key={keyword}
+                          >
+                            {keyword}
+                          </span>
+                        )
+                      )}
+
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+
+          </div>
+
+          <div className="resumeJobDisclaimer">
+            JD Match is a CampusConnect keyword and skill-alignment heuristic. Employer ATS platforms may rank or parse resumes differently.
+          </div>
+
+        </section>
+      )}
 
 
       <div className="resumeStudioLayout">
@@ -8347,6 +13349,624 @@ function ResumePrintSection({
   );
 }
 
+
+function AcademicControl({
+  role,
+  profile,
+}: {
+  role: Role;
+  profile: Profile;
+}) {
+  type AcademicControlSection =
+    | "home"
+    | "faculty"
+    | "timetable"
+    | "coverage";
+
+  const [
+    activeSection,
+    setActiveSection,
+  ] =
+    useState<AcademicControlSection>(
+      "home"
+    );
+
+
+  if (role !== "Main Admin") {
+    return (
+      <div className="academicControlAccess">
+        <strong>
+          Academic Control
+        </strong>
+
+        <p>
+          This workspace is currently available
+          to Main Admin only.
+        </p>
+      </div>
+    );
+  }
+
+
+  const goHome = () => {
+    setActiveSection("home");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+
+  /*
+   * MODULE 01
+   * Faculty allocation gets its own workspace.
+   */
+  if (activeSection === "faculty") {
+    return (
+      <div className="academicControlWorkspace">
+
+        <section className="academicControlModulePage">
+
+          <header className="academicControlModulePageHeader">
+
+            <button
+              type="button"
+              className="academicControlBackButton"
+              onClick={goHome}
+            >
+              <span>←</span>
+              Academic Control
+            </button>
+
+            <div className="academicControlModuleHeading">
+
+              <div>
+                <span>
+                  ECE · FACULTY OPERATIONS
+                </span>
+
+                <h1>
+                  Faculty Workload
+                </h1>
+
+                <p>
+                  Manage teaching allocations,
+                  batches, subjects, labs and
+                  weekly academic workload from
+                  one dedicated workspace.
+                </p>
+              </div>
+
+              <div className="academicControlModuleBadge">
+                <small>
+                  MODULE
+                </small>
+
+                <strong>
+                  01
+                </strong>
+              </div>
+
+            </div>
+
+          </header>
+
+
+          <div className="academicControlModuleBody">
+            <FacultyWorkloadManager
+              profile={profile}
+            />
+          </div>
+
+        </section>
+
+      </div>
+    );
+  }
+
+
+  /*
+   * MODULE 02
+   * Timetable automation gets its own workspace.
+   */
+  if (activeSection === "timetable") {
+    return (
+      <div className="academicControlWorkspace">
+
+        <section className="academicControlModulePage">
+
+          <header className="academicControlModulePageHeader">
+
+            <button
+              type="button"
+              className="academicControlBackButton"
+              onClick={goHome}
+            >
+              <span>←</span>
+              Academic Control
+            </button>
+
+            <div className="academicControlModuleHeading">
+
+              <div>
+                <span>
+                  ECE · SCHEDULING ENGINE
+                </span>
+
+                <h1>
+                  Timetable Automation
+                </h1>
+
+                <p>
+                  Configure scheduling profiles,
+                  batches, working days, teaching
+                  periods, classrooms and labs
+                  before timetable generation.
+                </p>
+              </div>
+
+              <div className="academicControlModuleBadge">
+                <small>
+                  MODULE
+                </small>
+
+                <strong>
+                  02
+                </strong>
+              </div>
+
+            </div>
+
+          </header>
+
+
+          <div className="academicControlModuleBody">
+            <TimetableAutomationManager
+              profile={profile}
+              onOpenFacultyWorkload={() => {
+                setActiveSection(
+                  "faculty"
+                );
+
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }}
+            />
+          </div>
+
+        </section>
+
+      </div>
+    );
+  }
+
+
+  /*
+   * MODULE 03
+   * Faculty coverage supervision and exception handling.
+   */
+  if (activeSection === "coverage") {
+    return (
+      <div className="academicControlWorkspace">
+
+        <section className="academicControlModulePage">
+
+          <header className="academicControlModulePageHeader">
+
+            <button
+              type="button"
+              className="academicControlBackButton"
+              onClick={goHome}
+            >
+              <span>←</span>
+              Academic Control
+            </button>
+
+            <div className="academicControlModuleHeading">
+
+              <div>
+                <span>
+                  ECE · COVERAGE ENGINE
+                </span>
+
+                <h1>
+                  Faculty Coverage
+                </h1>
+
+                <p>
+                  Monitor substitute requests,
+                  candidate matching and
+                  date-specific class coverage
+                  without changing the permanent
+                  timetable.
+                </p>
+              </div>
+
+              <div className="academicControlModuleBadge">
+                <small>
+                  MODULE
+                </small>
+
+                <strong>
+                  03
+                </strong>
+              </div>
+
+            </div>
+
+          </header>
+
+          <div className="academicControlModuleBody">
+            <FacultyCoverageControlCenter
+              profile={profile}
+            />
+          </div>
+
+        </section>
+
+      </div>
+    );
+  }
+
+
+  /*
+   * DEFAULT LANDING PAGE
+   *
+   * No operational component is rendered here.
+   * A module loads only after Main Admin selects it.
+   */
+  return (
+    <div className="academicControlWorkspace">
+
+      <section className="academicControlHero">
+
+        <div className="academicControlHeroCopy">
+
+          <span>
+            ECE · ACADEMIC OPERATIONS
+          </span>
+
+          <h1>
+            Academic Control
+          </h1>
+
+          <p>
+            Central operations workspace for
+            faculty allocation, scheduling,
+            timetable automation and future
+            classroom coverage workflows.
+          </p>
+
+          <div className="academicControlHeroActions">
+
+            <button
+              type="button"
+              className="primary"
+              onClick={() =>
+                setActiveSection(
+                  "faculty"
+                )
+              }
+            >
+              Faculty allocation
+            </button>
+
+            <button
+              type="button"
+              className="secondary"
+              onClick={() =>
+                setActiveSection(
+                  "timetable"
+                )
+              }
+            >
+              Timetable engine
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div className="academicControlHeroPanel">
+
+          <span>
+            OPERATIONS CENTER
+          </span>
+
+          <strong>
+            ECE
+          </strong>
+
+          <p>
+            Current implementation scope
+          </p>
+
+          <div>
+
+            <span>
+              Faculty
+              <b>
+                Workload
+              </b>
+            </span>
+
+            <span>
+              Schedule
+              <b>
+                Automation
+              </b>
+            </span>
+
+            <span>
+              Access
+              <b>
+                Main Admin
+              </b>
+            </span>
+
+            <span>
+              Scope
+              <b>
+                ECE
+              </b>
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <section className="academicControlModuleNav">
+
+        <header>
+          <div>
+            <span>
+              ACADEMIC OPERATIONS
+            </span>
+
+            <h2>
+              Choose an operation
+            </h2>
+
+            <p>
+              Open only the workspace you need.
+              Configuration modules no longer
+              appear together on this page.
+            </p>
+          </div>
+        </header>
+
+
+        <div className="academicControlModuleGrid">
+
+
+          <button
+            type="button"
+            onClick={() =>
+              setActiveSection(
+                "faculty"
+              )
+            }
+          >
+            <i>
+              01
+            </i>
+
+            <div>
+              <span>
+                FACULTY OPERATIONS
+              </span>
+
+              <h3>
+                Faculty Workload
+              </h3>
+
+              <p>
+                Assign faculty to ECE subjects,
+                sections and labs, then configure
+                weekly teaching requirements.
+              </p>
+            </div>
+
+            <strong>
+              →
+            </strong>
+          </button>
+
+
+          <button
+            type="button"
+            onClick={() =>
+              setActiveSection(
+                "timetable"
+              )
+            }
+          >
+            <i>
+              02
+            </i>
+
+            <div>
+              <span>
+                SCHEDULING ENGINE
+              </span>
+
+              <h3>
+                Timetable Automation
+              </h3>
+
+              <p>
+                Configure scheduling profiles,
+                periods, working days, classrooms
+                and laboratories.
+              </p>
+            </div>
+
+            <strong>
+              →
+            </strong>
+          </button>
+
+
+          <button
+            type="button"
+            onClick={() =>
+              setActiveSection(
+                "coverage"
+              )
+            }
+          >
+
+            <i>
+              03
+            </i>
+
+            <div>
+              <span>
+                COVERAGE ENGINE
+              </span>
+
+              <h3>
+                Faculty Coverage
+              </h3>
+
+              <p>
+                Monitor ECE substitute requests,
+                candidate matching, uncovered
+                classes and active substitutions.
+              </p>
+            </div>
+
+            <strong>
+              →
+            </strong>
+
+          </button>
+
+
+          <div className="academicControlFutureCard">
+
+            <i>
+              04
+            </i>
+
+            <div>
+              <span>
+                ECE INTELLIGENCE
+              </span>
+
+              <h3>
+                HOD Analytics
+              </h3>
+
+              <p>
+                Department workload, scheduling
+                coverage and academic exceptions
+                will appear here.
+              </p>
+            </div>
+
+            <em>
+              Planned
+            </em>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <section className="academicControlFlow">
+
+        <div>
+          <span>
+            01
+          </span>
+
+          <div>
+            <small>
+              CONFIGURE
+            </small>
+
+            <strong>
+              Faculty allocation
+            </strong>
+
+            <p>
+              Define who teaches each
+              ECE subject and lab.
+            </p>
+          </div>
+        </div>
+
+
+        <b>
+          →
+        </b>
+
+
+        <div>
+          <span>
+            02
+          </span>
+
+          <div>
+            <small>
+              PREPARE
+            </small>
+
+            <strong>
+              Scheduling rules
+            </strong>
+
+            <p>
+              Configure periods,
+              working days and rooms.
+            </p>
+          </div>
+        </div>
+
+
+        <b>
+          →
+        </b>
+
+
+        <div>
+          <span>
+            03
+          </span>
+
+          <div>
+            <small>
+              GENERATE
+            </small>
+
+            <strong>
+              Timetable
+            </strong>
+
+            <p>
+              Build and validate the
+              academic schedule.
+            </p>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  );
+}
+
+
 function Academics({role, profile}: {role: Role; profile: Profile}) {
   type AcademicRow = Record<string, any>;
 
@@ -8356,6 +13976,7 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
     | "Marks"
     | "Results"
     | "Timetable"
+    | "Resources"
     | "Fees";
 
   const [attendance, setAttendance] = useState<AcademicRow[]>([]);
@@ -8364,13 +13985,51 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
   const [fees, setFees] = useState<AcademicRow[]>([]);
   const [subjects, setSubjects] = useState<AcademicRow[]>([]);
   const [timetable, setTimetable] = useState<AcademicRow[]>([]);
+  const [
+    timetableSubstitutions,
+    setTimetableSubstitutions,
+  ] = useState<AcademicRow[]>([]);
+  const [timetableBreaks, setTimetableBreaks] = useState<AcademicRow[]>([]);
+
+  const [
+    timetableGridSlots,
+    setTimetableGridSlots,
+  ] = useState<AcademicRow[]>([]);
+
+
+  const [
+    timetableOffline,
+    setTimetableOffline,
+  ] = useState(false);
+
+  const [
+    timetableLastSynced,
+    setTimetableLastSynced,
+  ] = useState("");
+
   const [academicEvents, setAcademicEvents] = useState<AcademicRow[]>([]);
+  const [learningResources, setLearningResources] = useState<AcademicRow[]>([]);
+  const [assignments, setAssignments] = useState<AcademicRow[]>([]);
   const [connection, setConnection] = useState<AcademicRow | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<AcademicTab>("Overview");
+
+  const [tab, setTab] =
+    useState<AcademicTab>("Overview");
+
   const [semester, setSemester] = useState("All");
   const [query, setQuery] = useState("");
+
+  const normalizeAcademicSubject = (
+    value: unknown
+  ) =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
 
   const go = (target: View) => {
     window.dispatchEvent(
@@ -8407,46 +14066,446 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
 
 
   useEffect(() => {
+    if (role !== "Student") {
+      setTimetableBreaks([]);
+      return;
+    }
+
     let active = true;
 
-    const load = async () => {
+    const loadTimetableBreaks =
+      async () => {
+        const client =
+          getSupabaseClient();
+
+        if (!client) {
+          return;
+        }
+
+        try {
+          /*
+           * getSession() reads the persisted Supabase
+           * session locally. Do this before any request
+           * that requires network access so the student's
+           * cached timetable remains available offline.
+           */
+          const {
+            data: sessionData,
+          } =
+            await client.auth
+              .getSession();
+
+          const localUserId =
+            sessionData.session
+              ?.user.id || "";
+
+          if (
+            typeof navigator !==
+              "undefined" &&
+            !navigator.onLine
+          ) {
+            if (!localUserId) {
+              return;
+            }
+
+            const cached =
+              await getOfflineTimetableSchedule(
+                localUserId
+              );
+
+            if (
+              cached &&
+              active
+            ) {
+              setTimetableBreaks(
+                cached.breaks
+              );
+
+              setTimetableOffline(
+                true
+              );
+
+              setTimetableLastSynced(
+                cached.syncedAt
+              );
+            }
+
+            return;
+          }
+
+          /*
+           * Online: validate the current user with
+           * Supabase before fetching live timetable data.
+           */
+          const {
+            data: auth,
+            error: authError,
+          } =
+            await client.auth
+              .getUser();
+
+          if (
+            authError ||
+            !auth.user ||
+            !active
+          ) {
+            return;
+          }
+
+          const userId =
+            auth.user.id;
+
+          const {
+            data,
+            error,
+          } = await client.rpc(
+            "get_my_timetable_breaks"
+          );
+
+          if (!active) {
+            return;
+          }
+
+          if (error) {
+            console.warn(
+              "Student timetable breaks:",
+              error.message
+            );
+
+            return;
+          }
+
+          const breakRows =
+            Array.isArray(data)
+              ? data
+              : [];
+
+          setTimetableBreaks(
+            breakRows
+          );
+
+          /*
+           * Preserve any timetable entries
+           * already cached by the main
+           * Academics loader.
+           */
+          try {
+            const existing =
+              await getOfflineTimetableSchedule(
+                userId
+              );
+
+            await saveOfflineTimetableSchedule(
+              {
+                userId,
+
+                entries:
+                  existing?.entries ||
+                  [],
+
+                breaks:
+                  breakRows,
+
+                syncedAt:
+                  new Date()
+                    .toISOString(),
+              }
+            );
+          } catch (
+            cacheError
+          ) {
+            console.warn(
+              "Timetable breaks offline cache:",
+              cacheError
+            );
+          }
+        } catch (error) {
+          console.warn(
+            "Student timetable breaks:",
+            error
+          );
+        }
+      };
+
+    void loadTimetableBreaks();
+
+    return () => {
+      active = false;
+    };
+  }, [role]);
+
+
+  /*
+   * Digital Timetable V2
+   *
+   * Load the real scheduling-profile slots independently
+   * from occupied timetable rows.
+   *
+   * This means Period 4 still appears even if nobody has
+   * been scheduled into Period 4 yet.
+   */
+  useEffect(() => {
+
+    if (
+      role !==
+      "Student"
+    ) {
+
+      setTimetableGridSlots(
+        []
+      );
+
+      return;
+    }
+
+
+    let active =
+      true;
+
+
+    const loadTimetableGridSlots =
+      async () => {
+
+        const client =
+          getSupabaseClient();
+
+
+        if (!client) {
+          return;
+        }
+
+
+        try {
+
+          const {
+            data:
+              slotData,
+
+            error:
+              slotError,
+          } =
+            await client.rpc(
+              "get_my_timetable_grid_slots"
+            );
+
+
+          if (
+            !active
+          ) {
+            return;
+          }
+
+
+          if (
+            slotError
+          ) {
+
+            console.warn(
+              "Student timetable grid slots:",
+              slotError.message
+            );
+
+            setTimetableGridSlots(
+              []
+            );
+
+            return;
+          }
+
+
+          setTimetableGridSlots(
+            Array.isArray(
+              slotData
+            )
+              ? slotData
+              : []
+          );
+
+        } catch (
+          slotError
+        ) {
+
+          if (
+            active
+          ) {
+
+            console.warn(
+              "Student timetable grid slots:",
+              slotError
+            );
+
+            setTimetableGridSlots(
+              []
+            );
+          }
+        }
+      };
+
+
+    void loadTimetableGridSlots();
+
+
+    return () => {
+      active =
+        false;
+    };
+
+  }, [role]);
+
+  useEffect(() => {
+    let active = true;
+
+
+  const load = async () => {
       const client = getSupabaseClient();
 
       if (!client) {
         setLoading(false);
         return;
       }
-
-      if (role !== "Student") {
+if (role !== "Student") {
         setLoading(false);
         return;
       }
 
       try {
-        const {data: auth} =
-          await client.auth.getUser();
+        /*
+         * Resolve the locally persisted session before
+         * performing any network-dependent auth call.
+         */
+        const {
+          data: sessionData,
+        } =
+          await client.auth
+            .getSession();
 
-        if (!auth.user || !active) {
+        const localUserId =
+          sessionData.session
+            ?.user.id || "";
+
+        /*
+         * OFFLINE PATH
+         *
+         * Never call Supabase here. Hydrate the timetable
+         * directly from this student's IndexedDB snapshot.
+         */
+        if (
+          typeof navigator !==
+            "undefined" &&
+          !navigator.onLine
+        ) {
+          if (localUserId) {
+            const cached =
+              await getOfflineTimetableSchedule(
+                localUserId
+              );
+
+            if (
+              cached &&
+              active
+            ) {
+              setTimetable(
+                cached.entries
+              );
+
+              /*
+               * Date-specific substitutions are intentionally
+               * not persisted in the recurring timetable cache.
+               */
+              setTimetableSubstitutions(
+                []
+              );
+
+              setTimetableBreaks(
+                cached.breaks
+              );
+
+              setTimetableOffline(
+                true
+              );
+
+              setTimetableLastSynced(
+                cached.syncedAt
+              );
+            }
+          }
+
           return;
         }
 
-        const id = auth.user.id;
+        /*
+         * ONLINE PATH
+         *
+         * Validate the authenticated user before reading
+         * live academic information from Supabase.
+         */
+        const {
+          data: auth,
+          error: authError,
+        } =
+          await client.auth
+            .getUser();
+
+        if (
+          authError ||
+          !auth.user ||
+          !active
+        ) {
+          return;
+        }
+
+        const id =
+          auth.user.id;
+
+        /*
+         * STUDENT TIMETABLE SUBSTITUTION OVERLAY
+         *
+         * Use the student's browser-local calendar date.
+         * This intentionally avoids UTC date conversion so
+         * a late-evening/early-morning timezone boundary does
+         * not request the wrong academic day.
+         */
+        const localNow =
+          new Date();
+
+        const localDate =
+          [
+            localNow.getFullYear(),
+            String(
+              localNow.getMonth() + 1
+            ).padStart(2, "0"),
+            String(
+              localNow.getDate()
+            ).padStart(2, "0"),
+          ].join("-");
 
         const [
           attendanceResult,
+          campusAttendanceResult,
           marksResult,
           resultsResult,
           feesResult,
           connectionResult,
           subjectsResult,
           timetableResult,
+          timetableSubstitutionsResult,
           eventsResult,
+          learningResourcesResult,
+          assignmentsResult,
         ] = await Promise.all([
           client
             .from("college_attendance")
             .select("*")
             .eq("student_id", id)
             .order("subject_name"),
+
+          client
+            .from("attendance_records")
+            .select(
+              "id,student_id,subject,attended,total,updated_at"
+            )
+            .eq("student_id", id)
+            .order("subject"),
 
           client
             .from("college_marks")
@@ -8482,11 +14541,28 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
             .eq("student_id", id)
             .order("subject_name"),
 
-          client
-            .from("college_timetable")
-            .select("*")
-            .eq("student_id", id)
-            .order("period_order"),
+          client.rpc(
+            "get_my_timetable"
+          ),
+
+          /*
+           * Date-specific overlay only.
+           *
+           * The RPC verifies the authenticated student's
+           * batch membership server-side and exposes only:
+           * - timetable entry id
+           * - class date
+           * - substitute faculty name
+           *
+           * Permanent timetable data remains unchanged.
+           */
+          client.rpc(
+            "get_my_timetable_substitutions",
+            {
+              target_date:
+                localDate,
+            }
+          ),
 
           client
             .from("college_academic_events")
@@ -8495,12 +14571,63 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
             .order("starts_at", {
               ascending: true,
             }),
+
+          client
+            .from("learning_resources")
+            .select("*")
+            .order("is_verified", {
+              ascending: false,
+            })
+            .order("created_at", {
+              ascending: false,
+            })
+            .limit(80),
+
+          client.rpc(
+            "get_my_assignments"
+          ),
         ]);
 
         if (!active) return;
 
-        if (!attendanceResult.error)
-          setAttendance(attendanceResult.data || []);
+        if (!attendanceResult.error) {
+          const officialAttendance =
+            attendanceResult.data || [];
+
+          if (officialAttendance.length) {
+            setAttendance(
+              officialAttendance
+            );
+          } else if (
+            !campusAttendanceResult.error
+          ) {
+            setAttendance(
+              (
+                campusAttendanceResult.data ||
+                []
+              ).map(item => ({
+                ...item,
+                subject_name:
+                  item.subject || "",
+                subject_code: "",
+              }))
+            );
+          }
+        } else if (
+          !campusAttendanceResult.error
+        ) {
+          setAttendance(
+            (
+              campusAttendanceResult.data ||
+              []
+            ).map(item => ({
+              ...item,
+              subject_name:
+                item.subject || "",
+              subject_code: "",
+            }))
+          );
+        }
 
         if (!marksResult.error)
           setMarks(marksResult.data || []);
@@ -8514,20 +14641,421 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
         if (!connectionResult.error)
           setConnection(connectionResult.data || null);
 
-        if (!subjectsResult.error)
-          setSubjects(subjectsResult.data || []);
+        if (!assignmentsResult.error)
+          setAssignments(
+            assignmentsResult.data || []
+          );
+        else
+          console.warn(
+            "Academics assignments:",
+            assignmentsResult.error.message
+          );
 
-        if (!timetableResult.error)
-          setTimetable(timetableResult.data || []);
+        if (!subjectsResult.error) {
+          const officialSubjects =
+            subjectsResult.data || [];
+
+          let batchSubjects:
+            AcademicRow[] = [];
+
+          /*
+           * Student Academics uses the authenticated
+           * get_my_batch_subjects RPC as the source of
+           * truth for configured batch subjects.
+           *
+           * The RPC already verifies the current student
+           * through attendance_batch_students and returns
+           * faculty/profile enriched subject metadata.
+           */
+          const [
+            batchSubjectsResult,
+            studentBatchesResult,
+          ] = await Promise.all([
+            client.rpc(
+              "get_my_batch_subjects"
+            ),
+            client.rpc(
+              "get_my_attendance_batches"
+            ),
+          ]);
+
+          if (
+            batchSubjectsResult.error
+          ) {
+            console.warn(
+              "Academics batch subjects:",
+              batchSubjectsResult.error.message
+            );
+          } else {
+            const studentBatches =
+              Array.isArray(
+                studentBatchesResult.data
+              )
+                ? (
+                    studentBatchesResult.data as AcademicRow[]
+                  )
+                : [];
+
+            const batchMetadata =
+              new Map<
+                string,
+                AcademicRow
+              >();
+
+            for (
+              const batch of studentBatches
+            ) {
+              const batchId =
+                String(
+                  batch.id ||
+                    batch.batch_id ||
+                    ""
+                ).trim();
+
+              if (batchId) {
+                batchMetadata.set(
+                  batchId,
+                  batch
+                );
+              }
+            }
+
+            batchSubjects =
+              (
+                Array.isArray(
+                  batchSubjectsResult.data
+                )
+                  ? batchSubjectsResult.data
+                  : []
+              ).map(item => {
+                const row =
+                  item as AcademicRow;
+
+                const batchId =
+                  String(
+                    row.batch_id ||
+                      ""
+                  ).trim();
+
+                const batch =
+                  batchMetadata.get(
+                    batchId
+                  );
+
+                return {
+                  ...row,
+
+                  semester:
+                    batch?.semester ??
+                    row.semester ??
+                    null,
+
+                  academic_year:
+                    batch?.academic_year ||
+                    row.academic_year ||
+                    "",
+                };
+              });
+          }
+
+          if (
+            studentBatchesResult.error
+          ) {
+            console.warn(
+              "Academics student batches:",
+              studentBatchesResult.error.message
+            );
+          }
+
+
+          /*
+           * Priority:
+           *
+           * 1. Configured batch subject data
+           * 2. Official college_subjects
+           * 3. Attendance-derived subject names
+           *
+           * Attendance rows are also used to ensure a
+           * live subject is not hidden just because batch
+           * configuration is incomplete.
+           */
+          const configuredSource =
+            batchSubjects.length
+              ? batchSubjects
+              : officialSubjects;
+
+
+          const fallbackAttendance =
+            !attendanceResult.error &&
+            (attendanceResult.data || [])
+              .length
+              ? attendanceResult.data || []
+              : !campusAttendanceResult.error
+              ? (
+                  campusAttendanceResult.data ||
+                  []
+                ).map(item => ({
+                  ...item,
+                  subject_name:
+                    item.subject || "",
+                  subject_code: "",
+                }))
+              : [];
+
+
+          const subjectMap =
+            new Map<
+              string,
+              AcademicRow
+            >();
+
+
+          for (
+            const row of configuredSource
+          ) {
+            const subjectName =
+              String(
+                row.subject_name || ""
+              ).trim();
+
+            if (!subjectName) {
+              continue;
+            }
+
+            const key =
+              normalizeAcademicSubject(
+                subjectName
+              );
+
+            subjectMap.set(
+              key,
+              {
+                ...row,
+                subject_name:
+                  subjectName,
+              }
+            );
+          }
+
+
+          for (
+            const row of fallbackAttendance
+          ) {
+            const subjectName =
+              String(
+                row.subject_name ||
+                  row.subject ||
+                  ""
+              ).trim();
+
+            if (!subjectName) {
+              continue;
+            }
+
+            const key =
+              normalizeAcademicSubject(
+                subjectName
+              );
+
+            /*
+             * Keep configured metadata where it exists.
+             * Attendance only fills missing subjects.
+             */
+            if (
+              !subjectMap.has(key)
+            ) {
+              subjectMap.set(
+                key,
+                {
+                  id:
+                    row.id ||
+                    `fallback-${key}`,
+                  subject_name:
+                    subjectName,
+                  subject_code:
+                    row.subject_code ||
+                    "",
+                  semester:
+                    row.semester ||
+                    null,
+                  academic_year:
+                    row.academic_year ||
+                    "",
+                  credits: null,
+                  faculty_name: "",
+                  subject_type:
+                    "Course",
+                  __fallback:
+                    true,
+                }
+              );
+            }
+          }
+
+
+          setSubjects(
+            Array.from(
+              subjectMap.values()
+            )
+          );
+        }
+
+        if (
+          !timetableSubstitutionsResult.error
+        ) {
+          setTimetableSubstitutions(
+            Array.isArray(
+              timetableSubstitutionsResult.data
+            )
+              ? timetableSubstitutionsResult.data
+              : []
+          );
+        } else {
+          /*
+           * The permanent timetable remains usable even if
+           * the temporary substitution overlay cannot load.
+           */
+          setTimetableSubstitutions(
+            []
+          );
+
+          console.warn(
+            "Student timetable substitutions:",
+            timetableSubstitutionsResult.error.message
+          );
+        }
+
+        if (!timetableResult.error) {
+          const timetableRows =
+            Array.isArray(
+              timetableResult.data
+            )
+              ? timetableResult.data
+              : [];
+
+          setTimetable(
+            timetableRows
+          );
+
+          setTimetableOffline(
+            false
+          );
+
+          const syncedAt =
+            new Date()
+              .toISOString();
+
+          setTimetableLastSynced(
+            syncedAt
+          );
+
+          try {
+            const existing =
+              await getOfflineTimetableSchedule(
+                id
+              );
+
+            await saveOfflineTimetableSchedule(
+              {
+                userId: id,
+
+                entries:
+                  timetableRows,
+
+                breaks:
+                  existing?.breaks ||
+                  timetableBreaks,
+
+                syncedAt,
+              }
+            );
+          } catch (
+            cacheError
+          ) {
+            console.warn(
+              "Structured timetable offline cache:",
+              cacheError
+            );
+          }
+        }
 
         if (!eventsResult.error)
           setAcademicEvents(eventsResult.data || []);
+
+        if (!learningResourcesResult.error)
+          setLearningResources(
+            learningResourcesResult.data || []
+          );
 
       } catch (error) {
         console.error(
           "Academics load error:",
           error
         );
+
+        /*
+         * Supabase requests can reject as a
+         * group while offline because this
+         * loader uses Promise.all.
+         *
+         * Recover only the authenticated
+         * student's previously saved
+         * timetable snapshot.
+         */
+        try {
+          const {
+            data: auth,
+          } =
+            await client.auth
+              .getSession();
+
+          const userId =
+            auth.session
+              ?.user.id || "";
+
+          if (userId) {
+            const cached =
+              await getOfflineTimetableSchedule(
+                userId
+              );
+
+            if (
+              cached &&
+              active
+            ) {
+              setTimetable(
+                cached.entries
+              );
+
+              /*
+               * Date-specific substitutions are intentionally
+               * not persisted in the recurring timetable cache.
+               */
+              setTimetableSubstitutions(
+                []
+              );
+
+              setTimetableBreaks(
+                cached.breaks
+              );
+
+              setTimetableOffline(
+                true
+              );
+
+              setTimetableLastSynced(
+                cached.syncedAt
+              );
+            }
+          }
+        } catch (
+          cacheError
+        ) {
+          console.warn(
+            "Academics offline timetable fallback:",
+            cacheError
+          );
+        }
       } finally {
         if (active) {
           setLoading(false);
@@ -8645,7 +15173,36 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
             <strong>→</strong>
           </button>
 
+
+
         </section>
+
+
+        {(role === "Faculty" ||
+          role === "Main Admin") && (
+          <>
+            {role === "Faculty" && (
+              <>
+                <FacultyWorkloadManager
+                  profile={profile}
+                />
+
+                <FacultyAvailabilityManager
+                  profile={profile}
+                />
+
+                <FacultyCoverageManager
+                  profile={profile}
+                />
+              </>
+            )}
+
+<AcademicMarksManager
+              role={role}
+              profile={profile}
+            />
+          </>
+        )}
 
       </div>
     );
@@ -8757,6 +15314,41 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
     );
 
 
+  const visibleLearningResources =
+    learningResources.filter(
+      item => {
+        const semesterOk =
+          semester === "All" ||
+          !item.semester ||
+          String(item.semester) ===
+            "All" ||
+          String(item.semester) ===
+            semester;
+
+        if (!semesterOk) {
+          return false;
+        }
+
+        if (!normalizedQuery) {
+          return true;
+        }
+
+        return [
+          item.title,
+          item.subject,
+          item.description,
+          item.department,
+          item.resource_type,
+          item.contributor_name,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery);
+      }
+    );
+
+
   const attendanceAverage =
     visibleAttendance.length
       ? Math.round(
@@ -8803,23 +15395,175 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
     );
 
 
+  const now = new Date();
+
   const currentDay =
     new Intl.DateTimeFormat(
       "en-US",
       {
         weekday: "long",
       }
-    ).format(new Date());
+    ).format(now);
+
+
+  const timetableMinutes = (
+    value: unknown
+  ) => {
+    const match = String(
+      value || ""
+    ).match(
+      /^(\\d{1,2}):(\\d{2})/
+    );
+
+    if (!match) {
+      return null;
+    }
+
+    const hours =
+      Number(match[1]);
+
+    const minutes =
+      Number(match[2]);
+
+    if (
+      !Number.isInteger(hours) ||
+      !Number.isInteger(minutes) ||
+      hours < 0 ||
+      hours > 23 ||
+      minutes < 0 ||
+      minutes > 59
+    ) {
+      return null;
+    }
+
+    return hours * 60 + minutes;
+  };
+
+
+  const currentMinutes =
+    now.getHours() * 60 +
+    now.getMinutes();
+
+
+  /*
+   * Temporary substitutions are keyed by the permanent
+   * timetable entry UUID returned by get_my_timetable().
+   *
+   * This map affects Today's Classes only. The recurring
+   * Full Timetable continues showing its permanent faculty.
+   */
+  const substitutionByTimetableEntry =
+    new Map<string, AcademicRow>(
+      timetableSubstitutions
+        .filter(
+          substitution =>
+            substitution
+              .timetable_entry_id
+        )
+        .map(
+          substitution => [
+            String(
+              substitution
+                .timetable_entry_id
+            ),
+            substitution,
+          ]
+        )
+    );
 
 
   const todayClasses =
-    visibleTimetable.filter(
-      item =>
-        String(
-          item.day_of_week || ""
-        ).toLowerCase() ===
-        currentDay.toLowerCase()
-    );
+    visibleTimetable
+      .filter(
+        item =>
+          String(
+            item.day_of_week || ""
+          ).toLowerCase() ===
+          currentDay.toLowerCase()
+      )
+      .sort(
+        (a, b) => {
+          const periodDifference =
+            Number(
+              a.period_order || 0
+            ) -
+            Number(
+              b.period_order || 0
+            );
+
+          if (periodDifference) {
+            return periodDifference;
+          }
+
+          return (
+            timetableMinutes(
+              a.start_time
+            ) ?? 0
+          ) - (
+            timetableMinutes(
+              b.start_time
+            ) ?? 0
+          );
+        }
+      );
+
+
+  const classStatus = (
+    item: AcademicRow
+  ) => {
+    const start =
+      timetableMinutes(
+        item.start_time
+      );
+
+    const end =
+      timetableMinutes(
+        item.end_time
+      );
+
+    if (
+      start === null ||
+      end === null
+    ) {
+      return "upcoming";
+    }
+
+    if (
+      currentMinutes >= start &&
+      currentMinutes < end
+    ) {
+      return "live";
+    }
+
+    if (currentMinutes >= end) {
+      return "completed";
+    }
+
+    const upcoming =
+      todayClasses.filter(
+        row => {
+          const rowStart =
+            timetableMinutes(
+              row.start_time
+            );
+
+          return (
+            rowStart !== null &&
+            rowStart >
+              currentMinutes
+          );
+        }
+      );
+
+    if (
+      upcoming.length &&
+      upcoming[0].id === item.id
+    ) {
+      return "next";
+    }
+
+    return "upcoming";
+  };
 
 
   const upcomingEvents =
@@ -8840,11 +15584,21 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
       row =>
         (
           item.subject_code &&
-          row.subject_code ===
-            item.subject_code
+          row.subject_code &&
+          String(
+            row.subject_code
+          ).toLowerCase() ===
+            String(
+              item.subject_code
+            ).toLowerCase()
         ) ||
-        row.subject_name ===
-          item.subject_name
+        normalizeAcademicSubject(
+          row.subject_name ||
+            row.subject
+        ) ===
+          normalizeAcademicSubject(
+            item.subject_name
+          )
     );
 
 
@@ -8855,18 +15609,135 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
       row =>
         (
           item.subject_code &&
-          row.subject_code ===
-            item.subject_code
+          row.subject_code &&
+          String(
+            row.subject_code
+          ).toLowerCase() ===
+            String(
+              item.subject_code
+            ).toLowerCase()
         ) ||
-        row.subject_name ===
-          item.subject_name
+        normalizeAcademicSubject(
+          row.subject_name
+        ) ===
+          normalizeAcademicSubject(
+            item.subject_name
+          )
     );
+
+
+  const assignmentsForSubject = (
+    item: AcademicRow
+  ) =>
+    assignments.filter(
+      row =>
+        normalizeAcademicSubject(
+          row.subject
+        ) ===
+        normalizeAcademicSubject(
+          item.subject_name
+        )
+    );
+
+
+  const openLearningResource = async (
+    item: AcademicRow
+  ) => {
+    const externalUrl =
+      item.url ||
+      item.file_url ||
+      item.resource_url ||
+      "";
+
+    if (externalUrl) {
+      window.open(
+        externalUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+      return;
+    }
+
+    if (!item.file_path) {
+      window.alert(
+        "This resource does not have an available file or link."
+      );
+      return;
+    }
+
+    const popup =
+      window.open(
+        "about:blank",
+        "_blank"
+      );
+
+    if (popup) {
+      popup.opener = null;
+      popup.document.title =
+        "Opening resource…";
+      popup.document.body.innerHTML =
+        "<p style=\"font-family:system-ui;padding:24px\">Opening resource…</p>";
+    }
+
+    try {
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        throw new Error(
+          "CampusConnect is not connected to Supabase."
+        );
+      }
+
+      const {data, error} =
+        await client.storage
+          .from("learning-resources")
+          .createSignedUrl(
+            item.file_path,
+            60 * 10
+          );
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data?.signedUrl) {
+        throw new Error(
+          "Unable to generate resource link."
+        );
+      }
+
+      if (popup) {
+        popup.location.href =
+          data.signedUrl;
+      } else {
+        window.location.href =
+          data.signedUrl;
+      }
+
+    } catch (error) {
+      if (popup) {
+        popup.close();
+      }
+
+      console.error(
+        "Learning resource open error:",
+        error
+      );
+
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "Unable to open this resource."
+      );
+    }
+  };
 
 
   return (
     <div className="academicCenterPro">
 
-      
+
       <StudentPerformanceTracker />
 
 <section className="academicProHero">
@@ -8983,6 +15854,7 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
               "Marks",
               "Results",
               "Timetable",
+              "Resources",
               "Fees",
             ] as AcademicTab[]
           ).map(item => (
@@ -8996,11 +15868,6 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
               }
               onClick={() => {
                 setTab(item);
-
-                window.scrollTo({
-                  top: 0,
-                  behavior: "smooth",
-                });
               }}
             >
               {item}
@@ -9111,7 +15978,7 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
             <span>
               <small>ATTENDANCE</small>
               <b>Attendance Advisor</b>
-              <em>Check risk and 75% targets</em>
+              <em>Check risk and 85% targets</em>
             </span>
             <strong>→</strong>
           </button>
@@ -9258,7 +16125,7 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
                       ? ""
                       : "s"}
                     {" "}
-                    below 75%
+                    below 85%
                   </p>
                 </article>
 
@@ -9295,41 +16162,124 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
                       <div className="academicTodaySchedule">
 
                         {todayClasses.map(
-                          item => (
-                            <article
-                              key={item.id}
-                            >
+                          item => {
+                            const status =
+                              classStatus(
+                                item
+                              );
 
-                              <time>
-                                {String(
-                                  item.start_time ||
+                            const substitution =
+                              substitutionByTimetableEntry.get(
+                                String(
+                                  item.id ||
                                     ""
-                                ).slice(0,5)}
-                              </time>
+                                )
+                              );
 
-                              <div>
-                                <strong>
-                                  {item.subject_name}
-                                </strong>
+                            const substituteFacultyName =
+                              String(
+                                substitution
+                                  ?.substitute_faculty_name ||
+                                  ""
+                              ).trim();
 
-                                <small>
-                                  {[
-                                    item.subject_code,
-                                    item.class_type,
-                                    item.room,
-                                  ]
-                                    .filter(Boolean)
-                                    .join(" · ")}
-                                </small>
-                              </div>
+                            const hasSubstitute =
+                              Boolean(
+                                substituteFacultyName
+                              );
 
-                              <span>
-                                {item.faculty_name ||
-                                  "Faculty"}
-                              </span>
+                            const displayFacultyName =
+                              hasSubstitute
+                                ? substituteFacultyName
+                                : String(
+                                    item.faculty_name ||
+                                      "Faculty"
+                                  );
 
-                            </article>
-                          )
+                            return (
+                              <article
+                                key={item.id}
+                                className={
+                                  `academicTodayClass ${status}`
+                                }
+                              >
+
+                                <time>
+                                  <strong>
+                                    {String(
+                                      item.start_time ||
+                                        ""
+                                    ).slice(
+                                      0,
+                                      5
+                                    )}
+                                  </strong>
+
+                                  <small>
+                                    {String(
+                                      item.end_time ||
+                                        ""
+                                    ).slice(
+                                      0,
+                                      5
+                                    )}
+                                  </small>
+                                </time>
+
+                                <div>
+                                  <strong>
+                                    {item.subject_name}
+                                  </strong>
+
+                                  <small>
+                                    {[
+                                      item.subject_code,
+                                      item.class_type,
+                                      item.room,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(
+                                        " · "
+                                      )}
+                                  </small>
+
+                                  <span
+                                    className={
+                                      hasSubstitute
+                                        ? "academicTodayFaculty academicTodayFacultySubstitute"
+                                        : "academicTodayFaculty"
+                                    }
+                                  >
+                                    {displayFacultyName}
+
+                                    {hasSubstitute && (
+                                      <em className="academicSubstituteBadge">
+                                        SUBSTITUTE TODAY
+                                      </em>
+                                    )}
+                                  </span>
+                                </div>
+
+                                <span
+                                  className={
+                                    `academicClassStatus ${status}`
+                                  }
+                                >
+                                  {status ===
+                                  "live"
+                                    ? "LIVE NOW"
+                                    : status ===
+                                        "next"
+                                      ? "NEXT"
+                                      : status ===
+                                          "completed"
+                                        ? "COMPLETED"
+                                        : "UPCOMING"}
+                                </span>
+
+                              </article>
+                            );
+                          }
                         )}
 
                       </div>
@@ -9416,7 +16366,7 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
 
                                 <b
                                   className={
-                                    percent < 75
+                                    percent < 85
                                       ? "risk"
                                       : "safe"
                                   }
@@ -9616,6 +16566,11 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
                         subjectItem
                       );
 
+                    const subjectAssignments =
+                      assignmentsForSubject(
+                        subjectItem
+                      );
+
                     return (
                       <article
                         key={
@@ -9641,7 +16596,7 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
 
                         <p>
                           {subjectItem.faculty_name ||
-                            "Faculty not synced"}
+                            "Faculty information unavailable"}
                         </p>
 
 
@@ -9663,7 +16618,7 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
                             <strong
                               className={
                                 percent !== null &&
-                                percent < 75
+                                percent < 85
                                   ? "riskText"
                                   : ""
                               }
@@ -9676,11 +16631,11 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
 
                           <div>
                             <small>
-                              ASSESSMENTS
+                              ASSIGNMENTS
                             </small>
 
                             <strong>
-                              {subjectMarks.length}
+                              {subjectAssignments.length}
                             </strong>
                           </div>
 
@@ -9954,7 +16909,7 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
 
           {tab === "Timetable" && (
 
-            <section className="academicProSection">
+            <section className="academicProSection academicStudentTimetable">
 
               <header className="academicProSectionHeading">
 
@@ -9968,122 +16923,244 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
                   </h2>
 
                   <p>
-                    Your lectures, labs,
-                    rooms and faculty
-                    schedule.
+                    Your complete weekly lectures,
+                    labs, rooms, faculty and breaks.
                   </p>
+
+                  {timetableOffline && (
+                    <div
+                      className="academicOfflineStatus"
+                      role="status"
+                    >
+                      <strong>
+                        Offline schedule
+                      </strong>
+
+                      {timetableLastSynced && (
+                        <span>
+                          Last synced{" "}
+                          {new Date(
+                            timetableLastSynced
+                          ).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
+
+                <strong>
+                  {visibleTimetable.length}
+                  {" "}
+                  classes
+                </strong>
 
               </header>
 
 
-              <div className="academicWeek">
+              <AcademicTimetableGrid
+                entries={
+                  visibleTimetable
+                }
+                breaks={
+                  timetableBreaks
+                }
 
-                {[
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                ].map(day => {
-                  const dayItems =
-                    visibleTimetable.filter(
-                      item =>
-                        String(
-                          item.day_of_week ||
-                            ""
-                        ).toLowerCase() ===
-                        day.toLowerCase()
+                slots={
+                  timetableGridSlots
+                }
+              />
+
+            </section>
+
+          )}
+
+
+          {tab === "Resources" && (
+
+            <section className="academicProSection">
+
+              <header className="academicProSectionHeading">
+
+                <div>
+                  <span>
+                    LEARNING LIBRARY
+                  </span>
+
+                  <h2>
+                    Notes, PYQs & learning resources
+                  </h2>
+
+                  <p>
+                    Discover verified academic resources,
+                    subject material and useful learning
+                    content available in CampusConnect.
+                  </p>
+                </div>
+
+                <strong>
+                  {visibleLearningResources.length}
+                  {" "}
+                  resources
+                </strong>
+
+              </header>
+
+
+              <div className="academicResourceGrid">
+
+                {visibleLearningResources.map(
+                  item => {
+
+                    const hasResource =
+                      Boolean(
+                        item.url ||
+                        item.file_url ||
+                        item.resource_url ||
+                        item.file_path
+                      );
+
+                    const verified =
+                      Boolean(
+                        item.is_verified
+                      );
+
+                    return (
+                      <article
+                        key={item.id}
+                        className="academicResourceCard"
+                      >
+
+                        <header>
+
+                          <div
+                            className="academicResourceType"
+                          >
+                            <i>
+                              {String(
+                                item.resource_type ||
+                                  ""
+                              ).toLowerCase() ===
+                              "video"
+                                ? "▶"
+                                : String(
+                                    item.resource_type ||
+                                      ""
+                                  ).toLowerCase() ===
+                                  "pdf"
+                                ? "PDF"
+                                : "R"}
+                            </i>
+
+                            <span>
+                              {item.resource_type ||
+                                "Resource"}
+                            </span>
+                          </div>
+
+                          {verified && (
+                            <strong className="academicResourceVerified">
+                              ✓ Verified
+                            </strong>
+                          )}
+
+                        </header>
+
+
+                        <div>
+
+                          <small>
+                            {item.subject ||
+                              "General"}
+                          </small>
+
+                          <h3>
+                            {item.title ||
+                              "Learning resource"}
+                          </h3>
+
+                          {item.description && (
+                            <p>
+                              {item.description}
+                            </p>
+                          )}
+
+                        </div>
+
+
+                        <footer>
+
+                          <div>
+                            <span>
+                              {item.department ||
+                                "All departments"}
+                            </span>
+
+                            <i>·</i>
+
+                            <span>
+                              {item.semester &&
+                              String(
+                                item.semester
+                              ) !==
+                                "All"
+                                ? `Semester ${item.semester}`
+                                : "All semesters"}
+                            </span>
+                          </div>
+
+
+                          {item.contributor_name && (
+                            <small>
+                              Added by{" "}
+                              {item.contributor_name}
+                            </small>
+                          )}
+
+
+                          <button
+                            type="button"
+                            className="academicResourceOpen"
+                            disabled={!hasResource}
+                            onClick={() =>
+                              void openLearningResource(
+                                item
+                              )
+                            }
+                          >
+                            {hasResource
+                              ? String(
+                                  item.resource_type ||
+                                    ""
+                                ).toLowerCase() ===
+                                "video"
+                                ? "Watch video"
+                                : String(
+                                    item.resource_type ||
+                                      ""
+                                  ).toLowerCase() ===
+                                  "pdf"
+                                ? "View PDF"
+                                : "Open resource"
+                              : "Resource unavailable"}
+
+                            {hasResource && (
+                              <span>↗</span>
+                            )}
+                          </button>
+
+                        </footer>
+
+                      </article>
                     );
-
-                  if (!dayItems.length) {
-                    return null;
                   }
-
-                  return (
-                    <section
-                      key={day}
-                      className="academicDay"
-                    >
-
-                      <header>
-                        <strong>
-                          {day}
-                        </strong>
-
-                        <small>
-                          {dayItems.length}
-                          {" "}
-                          class
-                          {dayItems.length === 1
-                            ? ""
-                            : "es"}
-                        </small>
-                      </header>
-
-
-                      <div>
-
-                        {dayItems.map(
-                          item => (
-                            <article
-                              key={item.id}
-                            >
-
-                              <time>
-                                <strong>
-                                  {String(
-                                    item.start_time ||
-                                      ""
-                                  ).slice(0,5)}
-                                </strong>
-
-                                <small>
-                                  {String(
-                                    item.end_time ||
-                                      ""
-                                  ).slice(0,5)}
-                                </small>
-                              </time>
-
-                              <div>
-                                <span>
-                                  {item.class_type ||
-                                    "Class"}
-                                </span>
-
-                                <h3>
-                                  {item.subject_name}
-                                </h3>
-
-                                <p>
-                                  {[
-                                    item.subject_code,
-                                    item.faculty_name,
-                                    item.room,
-                                  ]
-                                    .filter(Boolean)
-                                    .join(" · ")}
-                                </p>
-                              </div>
-
-                            </article>
-                          )
-                        )}
-
-                      </div>
-
-                    </section>
-                  );
-                })}
+                )}
 
               </div>
 
 
-              {!visibleTimetable.length && (
+              {!visibleLearningResources.length && (
                 <EmptyAcademic
-                  text="No timetable synced for this semester."
+                  text="No learning resources are available for the current filters."
                 />
               )}
 
@@ -10223,6 +17300,4542 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
     </div>
   );
 }
+
+
+
+
+function AcademicTimetableManager({
+  role,
+  profile: _profile,
+}: {
+  role: Role;
+  profile: Profile;
+}) {
+  type BatchRow = Record<string, any>;
+  type TimetableDocument = Record<string, any>;
+
+  const TIMETABLE_BUCKET =
+    "campus-timetables";
+
+  const [batches, setBatches] =
+    useState<BatchRow[]>([]);
+
+  const [
+    selectedBatchId,
+    setSelectedBatchId,
+  ] = useState("");
+
+  const [
+    document,
+    setDocument,
+  ] =
+    useState<TimetableDocument | null>(
+      null
+    );
+
+  const [
+    signedUrl,
+    setSignedUrl,
+  ] = useState("");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    uploading,
+    setUploading,
+  ] = useState(false);
+
+  const [
+    statusMessage,
+    setStatusMessage,
+  ] = useState("");
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState("");
+
+  const canManage =
+    role === "Faculty" ||
+    role === "Main Admin";
+
+  const batchLabel = (
+    batch: BatchRow
+  ) => {
+    const pieces = [
+      batch.department,
+      batch.academic_year,
+      batch.semester
+        ? `Semester ${batch.semester}`
+        : "",
+      batch.section
+        ? `Section ${batch.section}`
+        : "",
+    ].filter(
+      value =>
+        typeof value === "string" &&
+        value.trim()
+    );
+
+    if (pieces.length) {
+      return pieces.join(" · ");
+    }
+
+    if (
+      typeof batch.batch_name === "string" &&
+      batch.batch_name.trim()
+    ) {
+      return batch.batch_name;
+    }
+
+    return "Academic Batch";
+  };
+
+  const makeSignedUrl =
+    async (
+      storagePath: string
+    ) => {
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return "";
+      }
+
+      const {
+        data,
+        error,
+      } = await client.storage
+        .from(TIMETABLE_BUCKET)
+        .createSignedUrl(
+          storagePath,
+          60 * 60
+        );
+
+      if (error) {
+        console.warn(
+          "Timetable file signed URL:",
+          error.message
+        );
+
+        return "";
+      }
+
+      return data?.signedUrl || "";
+    };
+
+  const loadDocument =
+    async (
+      batchId: string
+    ) => {
+      if (!batchId) {
+        setDocument(null);
+        setSignedUrl("");
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      const {
+        data,
+        error,
+      } = await client
+        .from(
+          "batch_timetable_documents"
+        )
+        .select("*")
+        .eq(
+          "batch_id",
+          batchId
+        )
+        .maybeSingle();
+
+      if (error) {
+        setDocument(null);
+        setSignedUrl("");
+        setErrorMessage(
+          error.message
+        );
+        return;
+      }
+
+      setDocument(data || null);
+
+      if (data?.storage_path) {
+        setSignedUrl(
+          await makeSignedUrl(
+            data.storage_path
+          )
+        );
+      } else {
+        setSignedUrl("");
+      }
+    };
+
+  useEffect(() => {
+    let active = true;
+
+    const loadBatches =
+      async () => {
+        const client =
+          getSupabaseClient();
+
+        if (!client) {
+          if (active) {
+            setLoading(false);
+          }
+          return;
+        }
+
+        setLoading(true);
+        setErrorMessage("");
+
+        try {
+          const {
+            data: auth,
+            error: authError,
+          } =
+            await client.auth.getUser();
+
+          if (
+            authError ||
+            !auth.user
+          ) {
+            throw new Error(
+              authError?.message ||
+              "Authentication required."
+            );
+          }
+
+          let rows:
+            BatchRow[] = [];
+
+          if (
+            role === "Main Admin"
+          ) {
+            const {
+              data,
+              error,
+            } = await client
+              .from(
+                "attendance_batches"
+              )
+              .select("*")
+              .order(
+                "created_at",
+                {
+                  ascending: false,
+                }
+              );
+
+            if (error) {
+              throw error;
+            }
+
+            rows = data || [];
+          } else if (
+            role === "Faculty"
+          ) {
+            const {
+              data:
+                subjectRows,
+              error:
+                subjectError,
+            } = await client
+              .from(
+                "attendance_batch_subjects"
+              )
+              .select(
+                "batch_id"
+              )
+              .eq(
+                "faculty_id",
+                auth.user.id
+              );
+
+            if (subjectError) {
+              throw subjectError;
+            }
+
+            const ids =
+              Array.from(
+                new Set(
+                  (
+                    subjectRows ||
+                    []
+                  )
+                    .map(
+                      row =>
+                        row.batch_id
+                    )
+                    .filter(Boolean)
+                )
+              );
+
+            if (ids.length) {
+              const {
+                data,
+                error,
+              } = await client
+                .from(
+                  "attendance_batches"
+                )
+                .select("*")
+                .in(
+                  "id",
+                  ids
+                )
+                .order(
+                  "created_at",
+                  {
+                    ascending:
+                      false,
+                  }
+                );
+
+              if (error) {
+                throw error;
+              }
+
+              rows = data || [];
+            }
+          }
+
+          if (!active) {
+            return;
+          }
+
+          setBatches(rows);
+
+          setSelectedBatchId(
+            current => {
+              if (
+                current &&
+                rows.some(
+                  row =>
+                    row.id ===
+                    current
+                )
+              ) {
+                return current;
+              }
+
+              return rows[0]?.id || "";
+            }
+          );
+        } catch (error) {
+          if (!active) {
+            return;
+          }
+
+          setErrorMessage(
+            error instanceof Error
+              ? error.message
+              : "Unable to load batches."
+          );
+        } finally {
+          if (active) {
+            setLoading(false);
+          }
+        }
+      };
+
+    void loadBatches();
+
+    return () => {
+      active = false;
+    };
+  }, [role]);
+
+  useEffect(() => {
+    setStatusMessage("");
+    setErrorMessage("");
+
+    void loadDocument(
+      selectedBatchId
+    );
+  }, [selectedBatchId]);
+
+  type TimetableScanMatch = {
+    status:
+      | "exact"
+      | "possible"
+      | "unmatched";
+
+    batchSubjectId:
+      string | null;
+
+    subjectCode: string;
+    subjectName: string;
+    facultyName: string;
+    reason: string;
+  };
+
+  type TimetableScanEntry = {
+    day_of_week: string;
+    start_period: number;
+    end_period: number;
+    start_time: string;
+    end_time: string;
+    raw_text: string;
+    detected_code: string;
+    detected_name: string;
+    detected_faculty: string;
+    detected_room: string;
+    detected_class_type: string;
+    confidence: string;
+    match: TimetableScanMatch;
+  };
+
+  type TimetableScanBreak = {
+    label: string;
+    start_time: string;
+    end_time: string;
+  };
+
+  type TimetableScanResult = {
+    success: boolean;
+
+    mode?:
+      | "vision"
+      | "pdf-text";
+
+    readOnly?: boolean;
+    batchId?: string;
+    fileName?: string;
+    mimeType?: string;
+    extractedText?: string;
+
+    entries?:
+      TimetableScanEntry[];
+
+    breaks?:
+      TimetableScanBreak[];
+
+    warnings?: string[];
+
+    message?: string;
+    error?: string;
+  };
+
+  const [
+    timetableScan,
+    setTimetableScan,
+  ] =
+    useState<TimetableScanResult | null>(
+      null
+    );
+
+  const [
+    scanningTimetable,
+    setScanningTimetable,
+  ] = useState(false);
+
+  const [
+    timetableScanError,
+    setTimetableScanError,
+  ] = useState("");
+
+  const scanOfficialTimetable =
+    async (
+      scanDay: string
+    ) => {
+      if (
+        !selectedBatchId ||
+        !document
+      ) {
+        setTimetableScanError(
+          "Upload an official timetable before scanning."
+        );
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        setTimetableScanError(
+          "Supabase is unavailable."
+        );
+        return;
+      }
+
+      setScanningTimetable(true);
+      setTimetableScanError("");
+
+      try {
+        const {
+          data: sessionData,
+          error: sessionError,
+        } =
+          await client.auth
+            .getSession();
+
+        const session =
+          sessionData.session;
+
+        if (
+          sessionError ||
+          !session?.access_token
+        ) {
+          throw new Error(
+            sessionError?.message ||
+            "Authentication required."
+          );
+        }
+
+        const body =
+          new FormData();
+
+        body.set(
+          "batchId",
+          selectedBatchId
+        );
+
+        body.set(
+          "scanDay",
+          scanDay
+        );
+
+        const response =
+          await fetch(
+            "/api/academics/timetable/scan",
+            {
+              method: "POST",
+
+              headers: {
+                Authorization:
+                  `Bearer ${session.access_token}`,
+              },
+
+              body,
+            }
+          );
+
+        const result =
+          await response.json() as
+            TimetableScanResult;
+
+        if (
+          !response.ok ||
+          !result.success
+        ) {
+          throw new Error(
+            result.error ||
+            "Unable to scan timetable."
+          );
+        }
+
+        setTimetableScan(
+          result
+        );
+      } catch (error) {
+        setTimetableScanError(
+          error instanceof Error
+            ? error.message
+            : "Unable to scan timetable."
+        );
+      } finally {
+        setScanningTimetable(false);
+      }
+    };
+
+  const uploadPdf =
+    async (
+      file: File | null
+    ) => {
+      if (
+        !file ||
+        !selectedBatchId
+      ) {
+        return;
+      }
+
+      setStatusMessage("");
+      setErrorMessage("");
+
+      const fileName =
+        file.name.toLowerCase();
+
+      const extension =
+        fileName
+          .split(".")
+          .pop() || "";
+
+      const allowedExtensions = [
+        "pdf",
+        "jpg",
+        "jpeg",
+        "png",
+        "webp",
+      ];
+
+      const allowedMimeTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+      ];
+
+      const isAllowedFile =
+        allowedExtensions.includes(
+          extension
+        ) &&
+        (
+          !file.type ||
+          allowedMimeTypes.includes(
+            file.type
+          )
+        );
+
+      if (!isAllowedFile) {
+        setErrorMessage(
+          "Upload PDF, JPG, JPEG, PNG or WEBP only."
+        );
+        return;
+      }
+
+      if (
+        file.size >
+        20 * 1024 * 1024
+      ) {
+        setErrorMessage(
+          "Timetable file cannot exceed 20 MB."
+        );
+        return;
+      }
+
+      const contentType =
+        file.type ||
+        (
+          extension === "pdf"
+            ? "application/pdf"
+            : extension === "png"
+              ? "image/png"
+              : extension === "webp"
+                ? "image/webp"
+                : "image/jpeg"
+        );
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        setErrorMessage(
+          "Supabase is unavailable."
+        );
+        return;
+      }
+
+      setUploading(true);
+
+      let newStoragePath = "";
+
+      try {
+        const {
+          data: auth,
+          error: authError,
+        } =
+          await client.auth.getUser();
+
+        if (
+          authError ||
+          !auth.user
+        ) {
+          throw new Error(
+            authError?.message ||
+            "Authentication required."
+          );
+        }
+
+        const safeFileName =
+          file.name
+            .replace(
+              /[^a-zA-Z0-9._-]+/g,
+              "-"
+            )
+            .replace(
+              /-+/g,
+              "-"
+            );
+
+        newStoragePath =
+          `${selectedBatchId}/` +
+          `${Date.now()}-${safeFileName}`;
+
+        const {
+          error: uploadError,
+        } = await client.storage
+          .from(
+            TIMETABLE_BUCKET
+          )
+          .upload(
+            newStoragePath,
+            file,
+            {
+              contentType,
+              cacheControl:
+                "3600",
+              upsert: false,
+            }
+          );
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const previousPath =
+          document?.storage_path ||
+          "";
+
+        const {
+          data: saved,
+          error: saveError,
+        } = await client
+          .from(
+            "batch_timetable_documents"
+          )
+          .upsert(
+            {
+              batch_id:
+                selectedBatchId,
+              storage_path:
+                newStoragePath,
+              file_name:
+                file.name,
+              file_size:
+                file.size,
+              uploaded_by:
+                auth.user.id,
+            },
+            {
+              onConflict:
+                "batch_id",
+            }
+          )
+          .select("*")
+          .single();
+
+        if (saveError) {
+          await client.storage
+            .from(
+              TIMETABLE_BUCKET
+            )
+            .remove([
+              newStoragePath,
+            ]);
+
+          throw saveError;
+        }
+
+        if (
+          previousPath &&
+          previousPath !==
+            newStoragePath
+        ) {
+          const {
+            error:
+              cleanupError,
+          } =
+            await client.storage
+              .from(
+                TIMETABLE_BUCKET
+              )
+              .remove([
+                previousPath,
+              ]);
+
+          if (cleanupError) {
+            console.warn(
+              "Old timetable file cleanup:",
+              cleanupError.message
+            );
+          }
+        }
+
+        setDocument(saved);
+
+        setSignedUrl(
+          await makeSignedUrl(
+            newStoragePath
+          )
+        );
+
+        setStatusMessage(
+          "Official timetable published successfully."
+        );
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to upload timetable."
+        );
+      } finally {
+        setUploading(false);
+      }
+    };
+
+  const removePdf =
+    async () => {
+      if (!document) {
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          "Remove this official timetable file?"
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      setUploading(true);
+      setStatusMessage("");
+      setErrorMessage("");
+
+      try {
+        const storagePath =
+          document.storage_path;
+
+        const {
+          error,
+        } = await client
+          .from(
+            "batch_timetable_documents"
+          )
+          .delete()
+          .eq(
+            "id",
+            document.id
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        if (storagePath) {
+          const {
+            error:
+              storageError,
+          } =
+            await client.storage
+              .from(
+                TIMETABLE_BUCKET
+              )
+              .remove([
+                storagePath,
+              ]);
+
+          if (storageError) {
+            console.warn(
+              "Timetable storage cleanup:",
+              storageError.message
+            );
+          }
+        }
+
+        setDocument(null);
+        setSignedUrl("");
+
+        setStatusMessage(
+          "Timetable removed."
+        );
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to remove timetable."
+        );
+      } finally {
+        setUploading(false);
+      }
+    };
+
+  if (!canManage) {
+    return null;
+  }
+
+  return (
+    <section
+      id="academic-timetable-manager"
+      className="timetablePdfPanel"
+    >
+      <div className="timetablePdfHeading">
+        <div>
+          <span>
+            OFFICIAL TIMETABLE
+          </span>
+
+          <h3>
+            Publish Official Timetable
+          </h3>
+
+          <p>
+            Select a batch and upload its official
+            timetable as PDF or image. Students in
+            that batch will see it automatically.
+          </p>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="timetablePdfEmpty">
+          Loading batches...
+        </div>
+      ) : (
+        <>
+          <div className="timetablePdfControls">
+            <label>
+              <span>
+                Select batch
+              </span>
+
+              <select
+                value={
+                  selectedBatchId
+                }
+                onChange={
+                  event =>
+                    {
+                      setSelectedBatchId(
+                        event.target
+                          .value
+                      );
+
+                      setTimetableScan(
+                        null
+                      );
+
+                      setTimetableScanError(
+                        ""
+                      );
+                    }
+                }
+              >
+                {!batches.length ? (
+                  <option value="">
+                    No assigned batch
+                  </option>
+                ) : null}
+
+                {batches.map(
+                  batch => (
+                    <option
+                      key={batch.id}
+                      value={batch.id}
+                    >
+                      {batchLabel(
+                        batch
+                      )}
+                    </option>
+                  )
+                )}
+              </select>
+            </label>
+
+            <label
+              className={
+                "timetablePdfUpload " +
+                (
+                  uploading ||
+                  !selectedBatchId
+                    ? "disabled"
+                    : ""
+                )
+              }
+            >
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
+                disabled={
+                  uploading ||
+                  !selectedBatchId
+                }
+                onChange={
+                  event => {
+                    const file =
+                      event.target
+                        .files?.[0] ||
+                      null;
+
+                    void uploadPdf(
+                      file
+                    );
+
+                    event.currentTarget
+                      .value = "";
+                  }
+                }
+              />
+
+              {uploading
+                ? "Uploading..."
+                : document
+                  ? "Replace Timetable"
+                  : "Upload Timetable"}
+            </label>
+          </div>
+
+          {statusMessage ? (
+            <div className="timetablePdfSuccess">
+              {statusMessage}
+            </div>
+          ) : null}
+
+          {errorMessage ? (
+            <div className="timetablePdfError">
+              {errorMessage}
+            </div>
+          ) : null}
+
+          {!selectedBatchId ? (
+            <div className="timetablePdfEmpty">
+              No batch is currently assigned.
+            </div>
+          ) : document ? (
+            <>
+            <div className="timetablePdfDocument">
+              <div className="timetablePdfMeta">
+                <div className="timetablePdfBadge">
+                  {String(
+                    document.file_name ||
+                      ""
+                  )
+                    .split(".")
+                    .pop()
+                    ?.toUpperCase() ||
+                    "FILE"}
+                </div>
+
+                <div>
+                  <strong>
+                    {document.file_name ||
+                      "Official Timetable"}
+                  </strong>
+
+                  <small>
+                    Updated{" "}
+                    {document.updated_at
+                      ? new Date(
+                          document.updated_at
+                        ).toLocaleString()
+                      : "recently"}
+                  </small>
+                </div>
+              </div>
+
+              <div className="timetablePdfActions">
+                {signedUrl ? (
+                  <a
+                    href={signedUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open File
+                  </a>
+                ) : null}
+
+                <button
+                  type="button"
+                  className="timetableScanButton"
+                  onClick={
+                    () =>
+                      void scanOfficialTimetable(
+                        "Monday"
+                      )
+                  }
+                  disabled={
+                    uploading ||
+                    scanningTimetable
+                  }
+                >
+                  {scanningTimetable
+                    ? "Scanning Monday..."
+                    : "Test Monday Scan"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={
+                    () =>
+                      void removePdf()
+                  }
+                  disabled={
+                    uploading ||
+                    scanningTimetable
+                  }
+                >
+                  Remove
+                </button>
+              </div>
+
+              {signedUrl ? (
+                /\.(jpe?g|png|webp)$/i.test(
+                  String(
+                    document.file_name ||
+                      ""
+                  )
+                ) ? (
+                  <img
+                    className="timetableImageViewer"
+                    src={signedUrl}
+                    alt={
+                      document.file_name ||
+                      "Official timetable"
+                    }
+                  />
+                ) : (
+                  <iframe
+                    className="timetablePdfViewer"
+                    src={signedUrl}
+                    title={
+                      document.file_name ||
+                      "Official timetable"
+                    }
+                  />
+                )
+              ) : null}
+            </div>
+
+            {timetableScanError ? (
+              <div className="timetableScanError">
+                {timetableScanError}
+              </div>
+            ) : null}
+
+            {timetableScan ? (
+              <section className="timetableScanReview">
+                <div className="timetableScanReviewHeader">
+                  <div>
+                    <span>
+                      AI EXTRACTION · REVIEW ONLY
+                    </span>
+
+                    <h4>
+                      Review Detected Schedule
+                    </h4>
+
+                    <p>
+                      Nothing below has been published to
+                      the structured timetable. Check the
+                      detected cells and subject matches
+                      before any future publish step.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={
+                      () => {
+                        setTimetableScan(
+                          null
+                        );
+
+                        setTimetableScanError(
+                          ""
+                        );
+                      }
+                    }
+                  >
+                    Discard Scan
+                  </button>
+                </div>
+
+                {timetableScan.mode ===
+                "pdf-text" ? (
+                  <div className="timetableScanPdfText">
+                    <strong>
+                      PDF text extracted
+                    </strong>
+
+                    <p>
+                      This PDF has embedded text.
+                      Structured PDF parsing has not
+                      been enabled yet, so no schedule
+                      rows were generated.
+                    </p>
+
+                    {timetableScan.extractedText ? (
+                      <pre>
+                        {
+                          timetableScan
+                            .extractedText
+                        }
+                      </pre>
+                    ) : null}
+                  </div>
+                ) : (
+                  <>
+                    <div className="timetableScanStats">
+                      <div>
+                        <strong>
+                          {
+                            timetableScan
+                              .entries
+                              ?.length ||
+                            0
+                          }
+                        </strong>
+                        <span>
+                          Detected cells
+                        </span>
+                      </div>
+
+                      <div>
+                        <strong>
+                          {
+                            timetableScan
+                              .entries
+                              ?.filter(
+                                item =>
+                                  item
+                                    .match
+                                    .status ===
+                                  "exact"
+                              )
+                              .length ||
+                            0
+                          }
+                        </strong>
+                        <span>
+                          Exact matches
+                        </span>
+                      </div>
+
+                      <div>
+                        <strong>
+                          {
+                            timetableScan
+                              .entries
+                              ?.filter(
+                                item =>
+                                  item
+                                    .match
+                                    .status ===
+                                  "possible"
+                              )
+                              .length ||
+                            0
+                          }
+                        </strong>
+                        <span>
+                          Possible
+                        </span>
+                      </div>
+
+                      <div>
+                        <strong>
+                          {
+                            timetableScan
+                              .entries
+                              ?.filter(
+                                item =>
+                                  item
+                                    .match
+                                    .status ===
+                                  "unmatched"
+                              )
+                              .length ||
+                            0
+                          }
+                        </strong>
+                        <span>
+                          Unmatched
+                        </span>
+                      </div>
+                    </div>
+
+                    {(
+                      timetableScan
+                        .warnings ||
+                      []
+                    ).length ? (
+                      <div className="timetableScanWarnings">
+                        <strong>
+                          Review warnings
+                        </strong>
+
+                        <ul>
+                          {(
+                            timetableScan
+                              .warnings ||
+                            []
+                          ).map(
+                            (
+                              warning,
+                              index
+                            ) => (
+                              <li
+                                key={
+                                  `${index}-${warning}`
+                                }
+                              >
+                                {warning}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    ) : null}
+
+                    {(
+                      timetableScan
+                        .breaks ||
+                      []
+                    ).length ? (
+                      <div className="timetableScanBreaks">
+                        {(
+                          timetableScan
+                            .breaks ||
+                          []
+                        ).map(
+                          (
+                            item,
+                            index
+                          ) => (
+                            <div
+                              key={
+                                `${item.label}-${index}`
+                              }
+                            >
+                              <strong>
+                                {item.label}
+                              </strong>
+
+                              <span>
+                                {
+                                  item.start_time ||
+                                  "?"
+                                }
+                                {" – "}
+                                {
+                                  item.end_time ||
+                                  "?"
+                                }
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : null}
+
+                    <div className="timetableScanDays">
+                      {[
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday",
+                      ].map(day => {
+                        const dayEntries =
+                          (
+                            timetableScan
+                              .entries ||
+                            []
+                          )
+                            .filter(
+                              item =>
+                                item.day_of_week ===
+                                day
+                            )
+                            .sort(
+                              (
+                                a,
+                                b
+                              ) =>
+                                a.start_period -
+                                b.start_period
+                            );
+
+                        if (
+                          !dayEntries
+                            .length
+                        ) {
+                          return null;
+                        }
+
+                        return (
+                          <section
+                            key={day}
+                            className="timetableScanDay"
+                          >
+                            <h5>
+                              {day}
+                            </h5>
+
+                            <div className="timetableScanEntries">
+                              {dayEntries.map(
+                                (
+                                  item,
+                                  index
+                                ) => {
+                                  const span =
+                                    item.end_period >
+                                    item.start_period
+                                      ? `Periods ${item.start_period}–${item.end_period}`
+                                      : `Period ${item.start_period}`;
+
+                                  return (
+                                    <article
+                                      key={
+                                        `${day}-${item.start_period}-${index}`
+                                      }
+                                      className={
+                                        "timetableScanEntry " +
+                                        `is-${item.match.status}`
+                                      }
+                                    >
+                                      <div className="timetableScanEntryTop">
+                                        <div>
+                                          <strong>
+                                            {
+                                              item.start_time ||
+                                              "?"
+                                            }
+                                            {" – "}
+                                            {
+                                              item.end_time ||
+                                              "?"
+                                            }
+                                          </strong>
+
+                                          <span>
+                                            {span}
+                                          </span>
+                                        </div>
+
+                                        <span
+                                          className={
+                                            "timetableScanMatch " +
+                                            `is-${item.match.status}`
+                                          }
+                                        >
+                                          {item.match.status ===
+                                          "exact"
+                                            ? "Exact match"
+                                            : item.match.status ===
+                                                "possible"
+                                              ? "Needs confirmation"
+                                              : "Unmatched"}
+                                        </span>
+                                      </div>
+
+                                      <div className="timetableScanRaw">
+                                        <small>
+                                          RAW DOCUMENT CELL
+                                        </small>
+
+                                        <strong>
+                                          {
+                                            item.raw_text ||
+                                            "No text detected"
+                                          }
+                                        </strong>
+                                      </div>
+
+                                      <div className="timetableScanDetails">
+                                        {item.detected_code ? (
+                                          <span>
+                                            <b>
+                                              Code
+                                            </b>
+                                            {
+                                              item.detected_code
+                                            }
+                                          </span>
+                                        ) : null}
+
+                                        {item.detected_name ? (
+                                          <span>
+                                            <b>
+                                              Detected
+                                            </b>
+                                            {
+                                              item.detected_name
+                                            }
+                                          </span>
+                                        ) : null}
+
+                                        {item.detected_faculty ? (
+                                          <span>
+                                            <b>
+                                              Faculty
+                                            </b>
+                                            {
+                                              item.detected_faculty
+                                            }
+                                          </span>
+                                        ) : null}
+
+                                        {item.detected_room ? (
+                                          <span>
+                                            <b>
+                                              Room
+                                            </b>
+                                            {
+                                              item.detected_room
+                                            }
+                                          </span>
+                                        ) : null}
+
+                                        <span>
+                                          <b>
+                                            Confidence
+                                          </b>
+                                          {
+                                            item.confidence ||
+                                            "unknown"
+                                          }
+                                        </span>
+                                      </div>
+
+                                      <div className="timetableScanMapping">
+                                        {item.match.status ===
+                                        "unmatched" ? (
+                                          <>
+                                            <strong>
+                                              No safe CampusConnect subject match
+                                            </strong>
+
+                                            <p>
+                                              {
+                                                item
+                                                  .match
+                                                  .reason
+                                              }
+                                            </p>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <strong>
+                                              {
+                                                item
+                                                  .match
+                                                  .subjectCode
+                                              }
+                                              {" · "}
+                                              {
+                                                item
+                                                  .match
+                                                  .subjectName
+                                              }
+                                            </strong>
+
+                                            <p>
+                                              {
+                                                item
+                                                  .match
+                                                  .facultyName
+                                              }
+                                              {
+                                                item
+                                                  .match
+                                                  .facultyName
+                                                  ? " · "
+                                                  : ""
+                                              }
+                                              {
+                                                item
+                                                  .match
+                                                  .reason
+                                              }
+                                            </p>
+                                          </>
+                                        )}
+                                      </div>
+                                    </article>
+                                  );
+                                }
+                              )}
+                            </div>
+                          </section>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </section>
+            ) : null}
+            </>
+          ) : (
+            <div className="timetablePdfEmpty">
+              <h4>
+                No timetable uploaded
+              </h4>
+
+              <p>
+                Upload the official timetable for this batch.
+              </p>
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
+
+
+
+function AcademicTimetableGrid({
+  entries: _entries = [],
+  breaks: _breaks = [],
+  slots: _slots = [],
+  editable: _editable = false,
+  currentUserId: _currentUserId,
+  onEdit: _onEdit,
+  onDelete: _onDelete,
+}: {
+  entries?: Record<string, any>[];
+  breaks?: Record<string, any>[];
+  slots?: Record<string, any>[];
+  editable?: boolean;
+  currentUserId?: string;
+  onEdit?: (
+    item: Record<string, any>
+  ) => void;
+  onDelete?: (
+    item: Record<string, any>
+  ) => void;
+}) {
+  /*
+   * Student timetable is now rendered from the
+   * authenticated student's structured Published
+   * timetable returned by get_my_timetable().
+   *
+   * Legacy uploaded timetable images/PDFs are no
+   * longer the primary student timetable.
+   */
+
+  void _editable;
+  void _currentUserId;
+  void _onEdit;
+  void _onDelete;
+
+
+  type DigitalSlot = {
+    key: string;
+    kind:
+      | "teaching"
+      | "break";
+
+    periodOrder:
+      number;
+
+    displayOrder:
+      number;
+
+    label:
+      string;
+
+    startTime:
+      string;
+
+    endTime:
+      string;
+  };
+
+
+  const DAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+
+  const entries =
+    Array.isArray(
+      _entries
+    )
+      ? _entries
+      : [];
+
+
+  const breaks =
+    Array.isArray(
+      _breaks
+    )
+      ? _breaks
+      : [];
+
+
+  const cleanTime = (
+    value: unknown
+  ) => {
+
+    const raw =
+      String(
+        value || ""
+      )
+        .trim();
+
+
+    if (!raw) {
+      return "";
+    }
+
+
+    const match =
+      raw.match(
+        /^(\d{1,2}):(\d{2})/
+      );
+
+
+    if (!match) {
+      return raw;
+    }
+
+
+    return (
+      String(
+        Number(
+          match[1]
+        )
+      )
+      +
+      ":"
+      +
+      match[2]
+    );
+  };
+
+
+  const timeMinutes = (
+    value: unknown
+  ) => {
+
+    const raw =
+      String(
+        value || ""
+      );
+
+
+    const match =
+      raw.match(
+        /^(\d{1,2}):(\d{2})/
+      );
+
+
+    if (!match) {
+      return 99999;
+    }
+
+
+    return (
+      Number(
+        match[1]
+      ) * 60
+      +
+      Number(
+        match[2]
+      )
+    );
+  };
+
+
+  const formatClock = (
+    value: unknown
+  ) => {
+
+    const raw =
+      String(
+        value || ""
+      );
+
+
+    const match =
+      raw.match(
+        /^(\d{1,2}):(\d{2})/
+      );
+
+
+    if (!match) {
+      return raw || "—";
+    }
+
+
+    const hour =
+      Number(
+        match[1]
+      );
+
+    const minute =
+      match[2];
+
+    const suffix =
+      hour >= 12
+        ? "PM"
+        : "AM";
+
+    const twelveHour =
+      hour % 12 ||
+      12;
+
+
+    return (
+      twelveHour
+      +
+      ":"
+      +
+      minute
+      +
+      " "
+      +
+      suffix
+    );
+  };
+
+
+  /*
+   * Preferred source: real timetable profile slots.
+   *
+   * Fallback source: legacy structured timetable rows +
+   * batch break rows, used only when configured slots are
+   * temporarily unavailable/offline.
+   */
+  const configuredSlots =
+    Array.isArray(
+      _slots
+    )
+      ? _slots
+      : [];
+
+
+  const profileSlots:
+    DigitalSlot[] =
+      configuredSlots
+        .map<DigitalSlot>(
+          (
+            item,
+            index
+          ) => {
+
+            const teaching =
+              item.is_teaching_slot !==
+                false;
+
+
+            const periodOrder =
+              Number(
+                item.period_order
+              );
+
+
+            return {
+
+              key:
+                `configured-${
+                  String(
+                    item.id ||
+                    index
+                  )
+                }`,
+
+              kind:
+                teaching
+                  ? "teaching"
+                  : "break",
+
+              periodOrder:
+                Number.isFinite(
+                  periodOrder
+                )
+                  ? periodOrder
+                  : index + 1,
+
+              displayOrder:
+                Number.isFinite(
+                  periodOrder
+                )
+                  ? periodOrder
+                  : index + 1,
+
+              label:
+                String(
+                  item.label ||
+                  (
+                    teaching
+                      ? `Period ${
+                          Number.isFinite(
+                            periodOrder
+                          )
+                            ? periodOrder
+                            : index + 1
+                        }`
+                      : "Break"
+                  )
+                ),
+
+              startTime:
+                String(
+                  item.start_time ||
+                  ""
+                ),
+
+              endTime:
+                String(
+                  item.end_time ||
+                  ""
+                ),
+            };
+          }
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            a.displayOrder -
+            b.displayOrder
+        );
+
+
+  const teachingSlotMap =
+    new Map<
+      string,
+      DigitalSlot
+    >();
+
+
+  entries.forEach(
+    item => {
+
+      const periodOrder =
+        Number(
+          item.period_order
+        );
+
+
+      if (
+        !Number.isFinite(
+          periodOrder
+        ) ||
+        periodOrder <= 0
+      ) {
+        return;
+      }
+
+
+      const startTime =
+        String(
+          item.start_time ||
+          ""
+        );
+
+      const endTime =
+        String(
+          item.end_time ||
+          ""
+        );
+
+
+      const key =
+        [
+          periodOrder,
+          cleanTime(
+            startTime
+          ),
+          cleanTime(
+            endTime
+          ),
+        ].join("|");
+
+
+      if (
+        teachingSlotMap.has(
+          key
+        )
+      ) {
+        return;
+      }
+
+
+      teachingSlotMap.set(
+        key,
+        {
+          key:
+            `period-${key}`,
+
+          kind:
+            "teaching",
+
+          periodOrder,
+
+          displayOrder:
+            periodOrder,
+
+          label:
+            `Period ${periodOrder}`,
+
+          startTime,
+
+          endTime,
+        }
+      );
+    }
+  );
+
+
+  const teachingSlots =
+    Array.from(
+      teachingSlotMap.values()
+    );
+
+
+  const breakSlots:
+    DigitalSlot[] =
+      breaks.map(
+        (
+          item,
+          index
+        ) => ({
+
+          key:
+            `break-${
+              String(
+                item.id ||
+                index
+              )
+            }`,
+
+          kind:
+            "break",
+
+          periodOrder:
+            Number(
+              item.period_order ||
+              0
+            ),
+
+          displayOrder:
+            Number(
+              item.display_order ||
+              item.period_order ||
+              1000 +
+              index
+            ),
+
+          label:
+            String(
+              item.label ||
+              "Break"
+            ),
+
+          startTime:
+            String(
+              item.start_time ||
+              ""
+            ),
+
+          endTime:
+            String(
+              item.end_time ||
+              ""
+            ),
+
+        })
+      );
+
+
+  const legacySlots =
+    [
+      ...teachingSlots,
+      ...breakSlots,
+    ].sort(
+      (
+        a,
+        b
+      ) => {
+
+        const timeDifference =
+          timeMinutes(
+            a.startTime
+          )
+          -
+          timeMinutes(
+            b.startTime
+          );
+
+
+        if (
+          timeDifference !==
+          0
+        ) {
+          return timeDifference;
+        }
+
+
+        return (
+          a.displayOrder
+          -
+          b.displayOrder
+        );
+      }
+    );
+
+
+  const slots =
+    profileSlots.length
+      ? profileSlots
+      : legacySlots;
+
+
+  const entryDay = (
+    item: Record<
+      string,
+      any
+    >
+  ) =>
+    String(
+      item.day_of_week ||
+      ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const classesForSlot = (
+    day: string,
+    slot:
+      DigitalSlot
+  ) => {
+
+    if (
+      slot.kind !==
+      "teaching"
+    ) {
+      return [];
+    }
+
+
+    return entries.filter(
+      item => {
+
+        if (
+          entryDay(
+            item
+          ) !==
+          day.toLowerCase()
+        ) {
+          return false;
+        }
+
+
+        const itemPeriod =
+          Number(
+            item.period_order
+          );
+
+
+        if (
+          itemPeriod ===
+          slot.periodOrder
+        ) {
+          return true;
+        }
+
+
+        return (
+          cleanTime(
+            item.start_time
+          ) ===
+            cleanTime(
+              slot.startTime
+            )
+          &&
+          cleanTime(
+            item.end_time
+          ) ===
+            cleanTime(
+              slot.endTime
+            )
+        );
+      }
+    );
+  };
+
+
+  const isSameSession = (
+    current:
+      Record<string, any>,
+
+    next:
+      Record<string, any>
+  ) => {
+
+    return (
+      String(
+        current.subject_code ||
+        current.subject_name ||
+        ""
+      )
+        .trim()
+        .toLowerCase()
+      ===
+      String(
+        next.subject_code ||
+        next.subject_name ||
+        ""
+      )
+        .trim()
+        .toLowerCase()
+      &&
+      String(
+        current.faculty_name ||
+        ""
+      )
+        .trim()
+        .toLowerCase()
+      ===
+      String(
+        next.faculty_name ||
+        ""
+      )
+        .trim()
+        .toLowerCase()
+      &&
+      Number(
+        next.period_order
+      )
+      ===
+      Number(
+        current.period_order
+      ) + 1
+    );
+  };
+
+
+  const sessionPosition = (
+    day: string,
+    slot:
+      DigitalSlot,
+    item:
+      Record<string, any>
+  ) => {
+
+    const period =
+      Number(
+        item.period_order
+      );
+
+
+    const dayEntries =
+      entries
+        .filter(
+          candidate =>
+            entryDay(
+              candidate
+            ) ===
+            day.toLowerCase()
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            Number(
+              a.period_order
+            )
+            -
+            Number(
+              b.period_order
+            )
+        );
+
+
+    const previous =
+      dayEntries.find(
+        candidate =>
+          Number(
+            candidate.period_order
+          ) ===
+            period - 1
+          &&
+          isSameSession(
+            candidate,
+            item
+          )
+      );
+
+
+    const next =
+      dayEntries.find(
+        candidate =>
+          Number(
+            candidate.period_order
+          ) ===
+            period + 1
+          &&
+          isSameSession(
+            item,
+            candidate
+          )
+      );
+
+
+    if (
+      previous &&
+      next
+    ) {
+      return "middle";
+    }
+
+
+    if (previous) {
+      return "end";
+    }
+
+
+    if (next) {
+      return "start";
+    }
+
+
+    void slot;
+
+    return "single";
+  };
+
+
+  if (
+    !entries.length
+  ) {
+
+    return (
+      <section className="studentDigitalTimetable">
+
+        <div className="studentDigitalTimetableEmpty">
+
+          <div>
+            ▦
+          </div>
+
+          <h3>
+            Digital timetable not published yet
+          </h3>
+
+          <p>
+            Your batch timetable will appear here
+            automatically after the Timetable
+            Coordinator publishes it.
+          </p>
+
+        </div>
+
+      </section>
+    );
+  }
+
+
+  return (
+    <section className="studentDigitalTimetable">
+
+      <header className="studentDigitalTimetableIntro">
+
+        <div>
+
+          <span>
+            MY BATCH · LIVE SCHEDULE
+          </span>
+
+          <h3>
+            Digital Timetable
+          </h3>
+
+          <p>
+            Your published weekly schedule with
+            subjects, faculty, rooms, labs and breaks.
+          </p>
+
+        </div>
+
+
+        <div className="studentDigitalTimetableStatus">
+
+          <i />
+
+          <span>
+            Published
+          </span>
+
+        </div>
+
+      </header>
+
+
+      <div className="studentDigitalTimetableLegend">
+
+        <span>
+          <i className="lecture" />
+          Lecture
+        </span>
+
+        <span>
+          <i className="lab" />
+          Lab / Practical
+        </span>
+
+        <span>
+          <i className="break" />
+          Break
+        </span>
+
+      </div>
+
+
+      <div className="studentDigitalTimetableScroller">
+
+        <div
+          className="studentDigitalTimetableTable"
+          style={{
+            gridTemplateColumns:
+              `128px repeat(${slots.length}, minmax(158px, 1fr))`,
+          }}
+        >
+
+          <div className="studentDigitalTimetableCorner">
+
+            <strong>
+              DAY
+            </strong>
+
+            <small>
+              WEEK
+            </small>
+
+          </div>
+
+
+          {slots.map(
+            slot => (
+
+              <div
+                key={
+                  `header-${slot.key}`
+                }
+                className={
+                  slot.kind ===
+                  "break"
+                    ? "studentDigitalTimetableSlotHeader is-break"
+                    : "studentDigitalTimetableSlotHeader"
+                }
+              >
+
+                <strong>
+                  {slot.label}
+                </strong>
+
+                <small>
+                  {formatClock(
+                    slot.startTime
+                  )}
+                  {" – "}
+                  {formatClock(
+                    slot.endTime
+                  )}
+                </small>
+
+              </div>
+            )
+          )}
+
+
+          {DAYS.map(
+            day => (
+
+              <div
+                key={
+                  `row-${day}`
+                }
+                className="studentDigitalTimetableRowContents"
+                style={{
+                  display:
+                    "contents",
+                }}
+              >
+
+                <div className="studentDigitalTimetableDay">
+
+                  <strong>
+                    {day}
+                  </strong>
+
+                  <small>
+                    {entries.filter(
+                      item =>
+                        entryDay(
+                          item
+                        ) ===
+                        day.toLowerCase()
+                    ).length}
+                    {" "}
+                    periods
+                  </small>
+
+                </div>
+
+
+                {slots.map(
+                  slot => {
+
+                    if (
+                      slot.kind ===
+                      "break"
+                    ) {
+
+                      return (
+                        <div
+                          key={
+                            `${day}-${slot.key}`
+                          }
+                          className="studentDigitalTimetableBreak"
+                        >
+
+                          <span>
+                            {slot.label}
+                          </span>
+
+                          <small>
+                            {formatClock(
+                              slot.startTime
+                            )}
+                          </small>
+
+                        </div>
+                      );
+                    }
+
+
+                    const cellEntries =
+                      classesForSlot(
+                        day,
+                        slot
+                      );
+
+
+                    if (
+                      !cellEntries.length
+                    ) {
+
+                      return (
+                        <div
+                          key={
+                            `${day}-${slot.key}`
+                          }
+                          className="studentDigitalTimetableCell is-empty"
+                        >
+
+                          <span>
+                            Free
+                          </span>
+
+                        </div>
+                      );
+                    }
+
+
+                    return (
+                      <div
+                        key={
+                          `${day}-${slot.key}`
+                        }
+                        className="studentDigitalTimetableCell"
+                      >
+
+                        {cellEntries.map(
+                          (
+                            item,
+                            itemIndex
+                          ) => {
+
+                            const classType =
+                              String(
+                                item.class_type ||
+                                "Lecture"
+                              );
+
+
+                            const isLab =
+                              /lab|practical/i.test(
+                                classType
+                              );
+
+
+                            const position =
+                              sessionPosition(
+                                day,
+                                slot,
+                                item
+                              );
+
+
+                            return (
+                              <article
+                                key={
+                                  String(
+                                    item.id ||
+                                    `${day}-${slot.key}-${itemIndex}`
+                                  )
+                                }
+                                className={
+                                  [
+                                    "studentDigitalTimetableClass",
+                                    isLab
+                                      ? "is-lab"
+                                      : "",
+                                    position !==
+                                    "single"
+                                      ? `is-session-${position}`
+                                      : "",
+                                  ]
+                                    .filter(
+                                      Boolean
+                                    )
+                                    .join(
+                                      " "
+                                    )
+                                }
+                              >
+
+                                <div className="studentDigitalTimetableClassTop">
+
+                                  <span>
+                                    {String(
+                                      item.subject_code ||
+                                      classType
+                                    )}
+                                  </span>
+
+                                  <i>
+                                    {classType}
+                                  </i>
+
+                                </div>
+
+
+                                <h4>
+                                  {String(
+                                    item.subject_name ||
+                                    item.subject_code ||
+                                    "Scheduled class"
+                                  )}
+                                </h4>
+
+
+                                <div className="studentDigitalTimetableClassMeta">
+
+                                  <span>
+                                    <b>
+                                      Faculty
+                                    </b>
+
+                                    {String(
+                                      item.faculty_name ||
+                                      "Assigned faculty"
+                                    )}
+                                  </span>
+
+
+                                  <span>
+                                    <b>
+                                      Room
+                                    </b>
+
+                                    {String(
+                                      item.room ||
+                                      "TBA"
+                                    )}
+                                  </span>
+
+                                </div>
+
+
+                                {position !==
+                                  "single" && (
+                                  <div className="studentDigitalTimetableSessionBadge">
+
+                                    {position ===
+                                    "start"
+                                      ? "Multi-period session starts"
+                                      : position ===
+                                          "middle"
+                                        ? "Session continues"
+                                        : "Session ends"}
+
+                                  </div>
+                                )}
+
+                              </article>
+                            );
+                          }
+                        )}
+
+                      </div>
+                    );
+                  }
+                )}
+
+              </div>
+            )
+          )}
+
+        </div>
+
+      </div>
+
+
+      <footer className="studentDigitalTimetableFooter">
+
+        <div>
+
+          <strong>
+            Live from CampusConnect
+          </strong>
+
+          <span>
+            Only your authenticated batch timetable
+            is shown here.
+          </span>
+
+        </div>
+
+
+        <span>
+          {entries.length}
+          {" "}
+          published periods
+        </span>
+
+      </footer>
+
+    </section>
+  );
+}
+
+
+
+
+function AcademicMarksManager({
+  role,
+  profile,
+}: {
+  role: Role;
+  profile: Profile;
+}) {
+  type MarksBatch = {
+    id: string;
+    batch_name: string;
+    section: string;
+    department: string;
+    academic_year: string;
+    semester: string;
+    total_students?: number;
+  };
+
+  type MarksSubject = {
+    id: string;
+    batch_id: string;
+    subject_name: string;
+    subject_code: string;
+    credits?: number | null;
+    subject_type?: string;
+    faculty_id: string | null;
+    faculty_name: string;
+  };
+
+  type MarksStudent = {
+    id: string;
+    batch_id: string;
+    student_id: string;
+    student_name: string;
+    campus_uid: string;
+    department: string;
+    graduation_year: string;
+    roll_number: string;
+  };
+
+  type MarksRecord = {
+    id: string;
+    student_id: string;
+    batch_id: string | null;
+    batch_subject_id: string | null;
+    faculty_id: string | null;
+    faculty_name: string;
+    subject_code: string;
+    subject_name: string;
+    semester: number | null;
+    assessment: string;
+    assessment_type: string;
+    assessment_number: number | null;
+    marks: number | null;
+    max_marks: number | null;
+    remarks: string;
+    published_at: string | null;
+    created_at: string;
+    updated_at: string;
+  };
+
+  const assessmentTypes = [
+    "Internal",
+    "Assignment",
+    "Lab",
+    "CIE",
+    "Quiz",
+    "Project",
+    "Other",
+  ];
+
+  const canManageMarks =
+    role === "Faculty" ||
+    role === "Main Admin";
+
+  const [batches, setBatches] =
+    useState<MarksBatch[]>([]);
+
+  const [subjects, setSubjects] =
+    useState<MarksSubject[]>([]);
+
+  const [students, setStudents] =
+    useState<MarksStudent[]>([]);
+
+  const [records, setRecords] =
+    useState<MarksRecord[]>([]);
+
+  const [
+    selectedBatchId,
+    setSelectedBatchId,
+  ] = useState("");
+
+  const [
+    selectedSubjectId,
+    setSelectedSubjectId,
+  ] = useState("");
+
+  const [
+    selectedStudentId,
+    setSelectedStudentId,
+  ] = useState("");
+
+  const [assessmentType, setAssessmentType] =
+    useState("Internal");
+
+  const [
+    assessmentNumber,
+    setAssessmentNumber,
+  ] = useState("1");
+
+  const [obtainedMarks, setObtainedMarks] =
+    useState("");
+
+  const [maximumMarks, setMaximumMarks] =
+    useState("");
+
+  const [remarks, setRemarks] =
+    useState("");
+
+  const [editingId, setEditingId] =
+    useState("");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [deletingId, setDeletingId] =
+    useState("");
+
+  const [status, setStatus] =
+    useState("");
+
+  const [search, setSearch] =
+    useState("");
+
+  const selectedBatch =
+    batches.find(
+      item =>
+        item.id === selectedBatchId
+    ) || null;
+
+  const selectedSubject =
+    subjects.find(
+      item =>
+        item.id === selectedSubjectId
+    ) || null;
+
+  const selectedStudent =
+    students.find(
+      item =>
+        item.student_id ===
+        selectedStudentId
+    ) || null;
+
+
+  const resetAssessmentForm = () => {
+    setEditingId("");
+    setAssessmentType("Internal");
+    setAssessmentNumber("1");
+    setObtainedMarks("");
+    setMaximumMarks("");
+    setRemarks("");
+  };
+
+
+  const loadBatches = async () => {
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      setStatus(
+        "Unable to connect to CampusConnect."
+      );
+      return;
+    }
+
+    const {
+      data: auth,
+      error: authError,
+    } = await client.auth.getUser();
+
+    if (
+      authError ||
+      !auth.user
+    ) {
+      setStatus(
+        "Your session is unavailable."
+      );
+      return;
+    }
+
+    let allowedBatchIds:
+      string[] | null = null;
+
+    if (role === "Faculty") {
+      const {
+        data: assignedSubjects,
+        error: assignedError,
+      } = await client
+        .from(
+          "attendance_batch_subjects"
+        )
+        .select("batch_id")
+        .eq(
+          "faculty_id",
+          auth.user.id
+        );
+
+      if (assignedError) {
+        console.error(
+          "Marks assigned batches:",
+          assignedError
+        );
+
+        setStatus(
+          `Unable to load assigned batches: ${assignedError.message}`
+        );
+        return;
+      }
+
+      allowedBatchIds =
+        Array.from(
+          new Set(
+            (
+              assignedSubjects ||
+              []
+            )
+              .map(item =>
+                String(
+                  item.batch_id ||
+                  ""
+                ).trim()
+              )
+              .filter(Boolean)
+          )
+        );
+
+      if (
+        allowedBatchIds.length === 0
+      ) {
+        setBatches([]);
+        setSelectedBatchId("");
+        setStatus(
+          "No academic subjects are assigned to you yet."
+        );
+        return;
+      }
+    }
+
+    let query =
+      client
+        .from(
+          "attendance_batches"
+        )
+        .select(
+          "id,batch_name,section,department,academic_year,semester,total_students"
+        )
+        .order(
+          "updated_at",
+          {
+            ascending: false,
+          }
+        );
+
+    if (
+      allowedBatchIds
+    ) {
+      query =
+        query.in(
+          "id",
+          allowedBatchIds
+        );
+    }
+
+    const {
+      data,
+      error,
+    } = await query;
+
+    if (error) {
+      console.error(
+        "Marks batches:",
+        error
+      );
+
+      setStatus(
+        `Unable to load batches: ${error.message}`
+      );
+      return;
+    }
+
+    const rows =
+      (data ||
+        []) as MarksBatch[];
+
+    setBatches(rows);
+
+    setSelectedBatchId(
+      current =>
+        current &&
+        rows.some(
+          item =>
+            item.id === current
+        )
+          ? current
+          : rows[0]?.id || ""
+    );
+  };
+
+
+  const loadSubjects = async (
+    batchId: string
+  ) => {
+    if (!batchId) {
+      setSubjects([]);
+      setSelectedSubjectId("");
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return;
+    }
+
+    const {
+      data: auth,
+    } = await client.auth.getUser();
+
+    let query =
+      client
+        .from(
+          "attendance_batch_subjects"
+        )
+        .select(
+          "id,batch_id,subject_name,subject_code,credits,subject_type,faculty_id,faculty_name"
+        )
+        .eq(
+          "batch_id",
+          batchId
+        );
+
+    if (
+      role === "Faculty" &&
+      auth.user?.id
+    ) {
+      query =
+        query.eq(
+          "faculty_id",
+          auth.user.id
+        );
+    }
+
+    const {
+      data,
+      error,
+    } = await query.order(
+      "subject_name",
+      {
+        ascending: true,
+      }
+    );
+
+    if (error) {
+      console.error(
+        "Marks subjects:",
+        error
+      );
+
+      setSubjects([]);
+      setStatus(
+        `Unable to load subjects: ${error.message}`
+      );
+      return;
+    }
+
+    const rows =
+      (data ||
+        []) as MarksSubject[];
+
+    setSubjects(rows);
+
+    setSelectedSubjectId(
+      current =>
+        current &&
+        rows.some(
+          item =>
+            item.id === current
+        )
+          ? current
+          : rows[0]?.id || ""
+    );
+  };
+
+
+  const loadStudents = async (
+    batchId: string
+  ) => {
+    if (!batchId) {
+      setStudents([]);
+      setSelectedStudentId("");
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return;
+    }
+
+    const {
+      data,
+      error,
+    } = await client
+      .from(
+        "attendance_batch_students"
+      )
+      .select(
+        "id,batch_id,student_id,student_name,campus_uid,department,graduation_year,roll_number"
+      )
+      .eq(
+        "batch_id",
+        batchId
+      )
+      .order(
+        "student_name",
+        {
+          ascending: true,
+        }
+      );
+
+    if (error) {
+      console.error(
+        "Marks batch students:",
+        error
+      );
+
+      setStudents([]);
+      setStatus(
+        `Unable to load students: ${error.message}`
+      );
+      return;
+    }
+
+    const rows =
+      (data ||
+        []) as MarksStudent[];
+
+    setStudents(rows);
+
+    setSelectedStudentId(
+      current =>
+        current &&
+        rows.some(
+          item =>
+            item.student_id ===
+            current
+        )
+          ? current
+          : rows[0]?.student_id ||
+            ""
+    );
+  };
+
+
+  const loadMarks = async () => {
+    if (
+      !selectedBatchId ||
+      !selectedSubjectId ||
+      !selectedStudentId
+    ) {
+      setRecords([]);
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return;
+    }
+
+    const {
+      data,
+      error,
+    } = await client
+      .from("college_marks")
+      .select("*")
+      .eq(
+        "batch_id",
+        selectedBatchId
+      )
+      .eq(
+        "batch_subject_id",
+        selectedSubjectId
+      )
+      .eq(
+        "student_id",
+        selectedStudentId
+      )
+      .order(
+        "assessment_type",
+        {
+          ascending: true,
+        }
+      )
+      .order(
+        "assessment_number",
+        {
+          ascending: true,
+        }
+      );
+
+    if (error) {
+      console.error(
+        "Marks records:",
+        error
+      );
+
+      setRecords([]);
+      setStatus(
+        `Unable to load marks: ${error.message}`
+      );
+      return;
+    }
+
+    setRecords(
+      (data ||
+        []) as MarksRecord[]
+    );
+  };
+
+
+  useEffect(() => {
+    if (!canManageMarks) {
+      setLoading(false);
+      return;
+    }
+
+    let active = true;
+
+    const run = async () => {
+      setLoading(true);
+      setStatus("");
+
+      await loadBatches();
+
+      if (active) {
+        setLoading(false);
+      }
+    };
+
+    void run();
+
+    return () => {
+      active = false;
+    };
+  }, [role]);
+
+
+  useEffect(() => {
+    resetAssessmentForm();
+    setStatus("");
+
+    if (!selectedBatchId) {
+      setSubjects([]);
+      setStudents([]);
+      setRecords([]);
+      return;
+    }
+
+    void Promise.all([
+      loadSubjects(
+        selectedBatchId
+      ),
+      loadStudents(
+        selectedBatchId
+      ),
+    ]);
+  }, [selectedBatchId]);
+
+
+  useEffect(() => {
+    resetAssessmentForm();
+    setStatus("");
+    void loadMarks();
+  }, [
+    selectedSubjectId,
+    selectedStudentId,
+  ]);
+
+
+  const saveMarks = async () => {
+    if (
+      !selectedBatch ||
+      !selectedSubject ||
+      !selectedStudent
+    ) {
+      setStatus(
+        "Select a batch, subject and student first."
+      );
+      return;
+    }
+
+    const number =
+      Number(
+        assessmentNumber
+      );
+
+    const marksValue =
+      Number(
+        obtainedMarks
+      );
+
+    const maxValue =
+      Number(
+        maximumMarks
+      );
+
+    if (
+      !Number.isInteger(number) ||
+      number < 1
+    ) {
+      setStatus(
+        "Assessment number must be 1 or greater."
+      );
+      return;
+    }
+
+    if (
+      obtainedMarks.trim() === "" ||
+      !Number.isFinite(
+        marksValue
+      ) ||
+      marksValue < 0
+    ) {
+      setStatus(
+        "Enter valid obtained marks."
+      );
+      return;
+    }
+
+    if (
+      maximumMarks.trim() === "" ||
+      !Number.isFinite(
+        maxValue
+      ) ||
+      maxValue <= 0
+    ) {
+      setStatus(
+        "Maximum marks must be greater than zero."
+      );
+      return;
+    }
+
+    if (
+      marksValue > maxValue
+    ) {
+      setStatus(
+        "Obtained marks cannot exceed maximum marks."
+      );
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      setStatus(
+        "Unable to connect to CampusConnect."
+      );
+      return;
+    }
+
+    const {
+      data: auth,
+      error: authError,
+    } = await client.auth.getUser();
+
+    if (
+      authError ||
+      !auth.user
+    ) {
+      setStatus(
+        "Your session is unavailable."
+      );
+      return;
+    }
+
+    const semesterNumber =
+      Number(
+        selectedBatch.semester
+      );
+
+    const assessmentLabel =
+      `${assessmentType} ${number}`;
+
+    const payload = {
+      student_id:
+        selectedStudent.student_id,
+
+      batch_id:
+        selectedBatch.id,
+
+      batch_subject_id:
+        selectedSubject.id,
+
+      faculty_id:
+        role === "Faculty"
+          ? auth.user.id
+          : selectedSubject.faculty_id ||
+            null,
+
+      faculty_name:
+        role === "Faculty"
+          ? String(
+              profile.name ||
+                selectedSubject.faculty_name ||
+                ""
+            )
+          : selectedSubject.faculty_name ||
+            "",
+
+      subject_code:
+        selectedSubject.subject_code ||
+        "",
+
+      subject_name:
+        selectedSubject.subject_name,
+
+      semester:
+        Number.isFinite(
+          semesterNumber
+        )
+          ? semesterNumber
+          : null,
+
+      assessment:
+        assessmentLabel,
+
+      assessment_type:
+        assessmentType,
+
+      assessment_number:
+        number,
+
+      marks:
+        marksValue,
+
+      max_marks:
+        maxValue,
+
+      remarks:
+        remarks.trim(),
+
+      published_at:
+        new Date().toISOString(),
+
+      updated_at:
+        new Date().toISOString(),
+    };
+
+    setSaving(true);
+    setStatus("");
+
+    try {
+      if (editingId) {
+        const {
+          error,
+        } = await client
+          .from(
+            "college_marks"
+          )
+          .update(payload)
+          .eq(
+            "id",
+            editingId
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        setStatus(
+          `${assessmentLabel} updated successfully.`
+        );
+      } else {
+        const {
+          error,
+        } = await client
+          .from(
+            "college_marks"
+          )
+          .insert({
+            ...payload,
+            created_at:
+              new Date().toISOString(),
+          });
+
+        if (error) {
+          if (
+            error.code ===
+              "23505" ||
+            error.message
+              .toLowerCase()
+              .includes(
+                "duplicate"
+              )
+          ) {
+            throw new Error(
+              `${assessmentLabel} already exists for this student and subject. Edit the existing record instead.`
+            );
+          }
+
+          throw error;
+        }
+
+        setStatus(
+          `${assessmentLabel} published successfully.`
+        );
+      }
+
+      resetAssessmentForm();
+      await loadMarks();
+
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error ===
+              "object" &&
+            error !== null &&
+            "message" in error
+          ? String(
+              (
+                error as {
+                  message?: unknown;
+                }
+              ).message ||
+                "Unknown error"
+            )
+          : "Unknown error";
+
+      console.error(
+        "Save academic marks:",
+        error
+      );
+
+      setStatus(
+        `Unable to save marks: ${message}`
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+
+  const editMarks = (
+    item: MarksRecord
+  ) => {
+    setEditingId(
+      item.id
+    );
+
+    setAssessmentType(
+      item.assessment_type ||
+        "Internal"
+    );
+
+    setAssessmentNumber(
+      String(
+        item.assessment_number ||
+          1
+      )
+    );
+
+    setObtainedMarks(
+      item.marks === null ||
+        item.marks === undefined
+        ? ""
+        : String(item.marks)
+    );
+
+    setMaximumMarks(
+      item.max_marks === null ||
+        item.max_marks === undefined
+        ? ""
+        : String(
+            item.max_marks
+          )
+    );
+
+    setRemarks(
+      item.remarks || ""
+    );
+
+    setStatus("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+
+  const deleteMarks = async (
+    item: MarksRecord
+  ) => {
+    const confirmed =
+      window.confirm(
+        `Delete ${item.assessment} for ${selectedStudent?.student_name || "this student"}?\n\nThis action cannot be undone.`
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return;
+    }
+
+    setDeletingId(
+      item.id
+    );
+
+    setStatus("");
+
+    try {
+      const {
+        error,
+      } = await client
+        .from(
+          "college_marks"
+        )
+        .delete()
+        .eq(
+          "id",
+          item.id
+        );
+
+      if (error) {
+        throw error;
+      }
+
+      if (
+        editingId === item.id
+      ) {
+        resetAssessmentForm();
+      }
+
+      setStatus(
+        `${item.assessment} deleted.`
+      );
+
+      await loadMarks();
+
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : typeof error ===
+              "object" &&
+            error !== null &&
+            "message" in error
+          ? String(
+              (
+                error as {
+                  message?: unknown;
+                }
+              ).message ||
+                "Unknown error"
+            )
+          : "Unknown error";
+
+      console.error(
+        "Delete academic marks:",
+        error
+      );
+
+      setStatus(
+        `Unable to delete marks: ${message}`
+      );
+    } finally {
+      setDeletingId("");
+    }
+  };
+
+
+  const totalObtained =
+    records.reduce(
+      (sum, item) =>
+        sum +
+        Number(
+          item.marks || 0
+        ),
+      0
+    );
+
+  const totalMaximum =
+    records.reduce(
+      (sum, item) =>
+        sum +
+        Number(
+          item.max_marks || 0
+        ),
+      0
+    );
+
+  const overallPercentage =
+    totalMaximum > 0
+      ? (
+          (
+            totalObtained /
+            totalMaximum
+          ) * 100
+        ).toFixed(1)
+      : "0.0";
+
+  const filteredStudents =
+    students.filter(
+      student => {
+        const needle =
+          search
+            .trim()
+            .toLowerCase();
+
+        if (!needle) {
+          return true;
+        }
+
+        return [
+          student.student_name,
+          student.campus_uid,
+          student.roll_number,
+        ].some(value =>
+          String(
+            value || ""
+          )
+            .toLowerCase()
+            .includes(
+              needle
+            )
+        );
+      }
+    );
+
+
+  /*
+   * Keep the selected student synchronized with the
+   * currently visible search results.
+   *
+   * Without this, the native <select> can visually show
+   * the first filtered option while selectedStudentId
+   * still points to the previously selected student.
+   */
+  useEffect(() => {
+    if (!search.trim()) {
+      return;
+    }
+
+    if (!filteredStudents.length) {
+      setSelectedStudentId("");
+      return;
+    }
+
+    const selectedStillVisible =
+      filteredStudents.some(
+        student =>
+          student.student_id ===
+          selectedStudentId
+      );
+
+    if (!selectedStillVisible) {
+      setSelectedStudentId(
+        filteredStudents[0].student_id
+      );
+    }
+  }, [
+    search,
+    students,
+    selectedStudentId,
+  ]);
+
+
+  if (!canManageMarks) {
+    return null;
+  }
+
+
+  return (
+    <section
+      className="academicProSection academicMarksManager"
+    >
+      <header
+        className="academicProSectionHeading"
+      >
+        <div>
+          <span>
+            ASSESSMENT MANAGEMENT
+          </span>
+
+          <h2>
+            Marks management
+          </h2>
+
+          <p>
+            Publish and manage assessment
+            marks using verified batch,
+            subject and student records.
+          </p>
+        </div>
+
+        <strong>
+          {role === "Faculty"
+            ? "Assigned subjects only"
+            : "Admin access"}
+        </strong>
+      </header>
+
+
+      {loading ? (
+        <div className="academicEmpty">
+          <span>◇</span>
+          <p>
+            Loading academic workspace...
+          </p>
+        </div>
+      ) : (
+        <>
+          <div
+            className="academicMarksManagerFilters"
+          >
+            <label>
+              <span>BATCH</span>
+
+              <select
+                value={
+                  selectedBatchId
+                }
+                onChange={event =>
+                  setSelectedBatchId(
+                    event.target
+                      .value
+                  )
+                }
+              >
+                {!batches.length && (
+                  <option value="">
+                    No batches available
+                  </option>
+                )}
+
+                {batches.map(
+                  batch => (
+                    <option
+                      key={
+                        batch.id
+                      }
+                      value={
+                        batch.id
+                      }
+                    >
+                      {[
+                        batch.batch_name,
+                        batch.section,
+                        batch.department,
+                        batch.semester
+                          ? `Sem ${batch.semester}`
+                          : "",
+                      ]
+                        .filter(
+                          Boolean
+                        )
+                        .join(
+                          " · "
+                        )}
+                    </option>
+                  )
+                )}
+              </select>
+            </label>
+
+
+            <label>
+              <span>SUBJECT</span>
+
+              <select
+                value={
+                  selectedSubjectId
+                }
+                disabled={
+                  !subjects.length
+                }
+                onChange={event =>
+                  setSelectedSubjectId(
+                    event.target
+                      .value
+                  )
+                }
+              >
+                {!subjects.length && (
+                  <option value="">
+                    No assigned subjects
+                  </option>
+                )}
+
+                {subjects.map(
+                  subject => (
+                    <option
+                      key={
+                        subject.id
+                      }
+                      value={
+                        subject.id
+                      }
+                    >
+                      {subject.subject_name}
+                      {subject.subject_code
+                        ? ` · ${subject.subject_code}`
+                        : ""}
+                    </option>
+                  )
+                )}
+              </select>
+            </label>
+
+
+            <label>
+              <span>FIND STUDENT</span>
+
+              <input
+                value={search}
+                placeholder="Name, UID or roll number"
+                onChange={event =>
+                  setSearch(
+                    event.target
+                      .value
+                  )
+                }
+              />
+            </label>
+
+
+            <label>
+              <span>STUDENT</span>
+
+              <select
+                value={
+                  selectedStudentId
+                }
+                disabled={
+                  !filteredStudents.length
+                }
+                onChange={event =>
+                  setSelectedStudentId(
+                    event.target
+                      .value
+                  )
+                }
+              >
+                {!filteredStudents.length && (
+                  <option value="">
+                    No students available
+                  </option>
+                )}
+
+                {filteredStudents.map(
+                  student => (
+                    <option
+                      key={
+                        student.student_id
+                      }
+                      value={
+                        student.student_id
+                      }
+                    >
+                      {student.student_name}
+                      {student.campus_uid
+                        ? ` · ${student.campus_uid}`
+                        : ""}
+                    </option>
+                  )
+                )}
+              </select>
+            </label>
+          </div>
+
+
+          <div
+            className="academicMarksManagerContext"
+          >
+            <div>
+              <small>
+                SELECTED STUDENT
+              </small>
+
+              <strong>
+                {selectedStudent
+                  ?.student_name ||
+                  "No student selected"}
+              </strong>
+
+              <span>
+                {selectedStudent
+                  ?.campus_uid ||
+                  "—"}
+              </span>
+            </div>
+
+            <div>
+              <small>
+                SUBJECT
+              </small>
+
+              <strong>
+                {selectedSubject
+                  ?.subject_name ||
+                  "—"}
+              </strong>
+
+              <span>
+                {selectedSubject
+                  ?.subject_code ||
+                  "—"}
+              </span>
+            </div>
+
+            <div>
+              <small>
+                FACULTY
+              </small>
+
+              <strong>
+                {selectedSubject
+                  ?.faculty_name ||
+                  profile.name ||
+                  "—"}
+              </strong>
+
+              <span>
+                {selectedBatch
+                  ? [
+                      selectedBatch
+                        .batch_name,
+                      selectedBatch
+                        .section,
+                    ]
+                      .filter(
+                        Boolean
+                      )
+                      .join(
+                        " · "
+                      )
+                  : "—"}
+              </span>
+            </div>
+          </div>
+
+
+          <div
+            className="academicMarksEntryPanel"
+          >
+            <header>
+              <div>
+                <span>
+                  {editingId
+                    ? "EDIT ASSESSMENT"
+                    : "NEW ASSESSMENT"}
+                </span>
+
+                <h3>
+                  {editingId
+                    ? "Update published marks"
+                    : "Publish assessment marks"}
+                </h3>
+              </div>
+
+              {editingId && (
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={
+                    resetAssessmentForm
+                  }
+                >
+                  Cancel edit
+                </button>
+              )}
+            </header>
+
+
+            <div
+              className="academicMarksEntryGrid"
+            >
+              <label>
+                <span>
+                  ASSESSMENT TYPE
+                </span>
+
+                <select
+                  value={
+                    assessmentType
+                  }
+                  onChange={event =>
+                    setAssessmentType(
+                      event.target
+                        .value
+                    )
+                  }
+                >
+                  {assessmentTypes.map(
+                    item => (
+                      <option
+                        key={
+                          item
+                        }
+                        value={
+                          item
+                        }
+                      >
+                        {item}
+                      </option>
+                    )
+                  )}
+                </select>
+              </label>
+
+
+              <label>
+                <span>
+                  NUMBER
+                </span>
+
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={
+                    assessmentNumber
+                  }
+                  onChange={event =>
+                    setAssessmentNumber(
+                      event.target
+                        .value
+                    )
+                  }
+                />
+              </label>
+
+
+              <label>
+                <span>
+                  MARKS OBTAINED
+                </span>
+
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputMode="decimal"
+                  value={
+                    obtainedMarks
+                  }
+                  placeholder="18"
+                  onChange={event =>
+                    setObtainedMarks(
+                      event.target
+                        .value
+                    )
+                  }
+                />
+              </label>
+
+
+              <label>
+                <span>
+                  MAXIMUM MARKS
+                </span>
+
+                <input
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  inputMode="decimal"
+                  value={
+                    maximumMarks
+                  }
+                  placeholder="20"
+                  onChange={event =>
+                    setMaximumMarks(
+                      event.target
+                        .value
+                    )
+                  }
+                />
+              </label>
+            </div>
+
+
+            <label
+              className="academicMarksRemarks"
+            >
+              <span>
+                REMARKS
+              </span>
+
+              <textarea
+                rows={3}
+                value={remarks}
+                placeholder="Optional faculty remarks"
+                onChange={event =>
+                  setRemarks(
+                    event.target
+                      .value
+                  )
+                }
+              />
+            </label>
+
+
+            <footer
+              className="academicMarksEntryFooter"
+            >
+              <div>
+                {obtainedMarks &&
+                maximumMarks &&
+                Number(
+                  maximumMarks
+                ) > 0 ? (
+                  <>
+                    <small>
+                      PERFORMANCE
+                    </small>
+
+                    <strong>
+                      {Math.min(
+                        100,
+                        Math.max(
+                          0,
+                          (
+                            Number(
+                              obtainedMarks
+                            ) /
+                            Number(
+                              maximumMarks
+                            )
+                          ) *
+                            100
+                        )
+                      ).toFixed(
+                        1
+                      )}
+                      %
+                    </strong>
+                  </>
+                ) : (
+                  <small>
+                    Enter marks to preview
+                    performance.
+                  </small>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className="primary"
+                disabled={
+                  saving ||
+                  !selectedBatch ||
+                  !selectedSubject ||
+                  !selectedStudent
+                }
+                onClick={() =>
+                  void saveMarks()
+                }
+              >
+                {saving
+                  ? "Saving..."
+                  : editingId
+                  ? "Update marks"
+                  : "Publish marks"}
+              </button>
+            </footer>
+          </div>
+
+
+          {status && (
+            <div
+              className="academicMarksStatus"
+              role="status"
+            >
+              {status}
+            </div>
+          )}
+
+
+          <div
+            className="academicMarksSummary"
+          >
+            <article>
+              <small>
+                ASSESSMENTS
+              </small>
+
+              <strong>
+                {records.length}
+              </strong>
+            </article>
+
+            <article>
+              <small>
+                OBTAINED
+              </small>
+
+              <strong>
+                {totalObtained.toLocaleString(
+                  "en-IN",
+                  {
+                    maximumFractionDigits:
+                      2,
+                  }
+                )}
+              </strong>
+            </article>
+
+            <article>
+              <small>
+                MAXIMUM
+              </small>
+
+              <strong>
+                {totalMaximum.toLocaleString(
+                  "en-IN",
+                  {
+                    maximumFractionDigits:
+                      2,
+                  }
+                )}
+              </strong>
+            </article>
+
+            <article>
+              <small>
+                OVERALL
+              </small>
+
+              <strong>
+                {overallPercentage}%
+              </strong>
+            </article>
+          </div>
+
+
+          <div
+            className="academicMarksProTable academicMarksManagementTable"
+          >
+            <header>
+              <span>
+                ASSESSMENT
+              </span>
+
+              <span>
+                SCORE
+              </span>
+
+              <span>
+                PERFORMANCE
+              </span>
+
+              <span>
+                ACTIONS
+              </span>
+            </header>
+
+            {records.map(
+              item => {
+                const percent =
+                  item.max_marks
+                    ? (
+                        Number(
+                          item.marks ||
+                            0
+                        ) /
+                        Number(
+                          item.max_marks
+                        )
+                      ) * 100
+                    : 0;
+
+                return (
+                  <article
+                    key={
+                      item.id
+                    }
+                  >
+                    <div>
+                      <strong>
+                        {item.assessment}
+                      </strong>
+
+                      <small>
+                        {item.remarks ||
+                          "Published assessment"}
+                      </small>
+                    </div>
+
+                    <strong>
+                      {item.marks ??
+                        "—"}
+                      {item.max_marks
+                        ? ` / ${item.max_marks}`
+                        : ""}
+                    </strong>
+
+                    <div
+                      className="academicMarksProgress"
+                    >
+                      <i>
+                        <span
+                          style={{
+                            width:
+                              `${Math.min(
+                                100,
+                                Math.max(
+                                  0,
+                                  percent
+                                )
+                              )}%`,
+                          }}
+                        />
+                      </i>
+
+                      <small>
+                        {percent.toFixed(
+                          1
+                        )}
+                        %
+                      </small>
+                    </div>
+
+                    <div
+                      className="academicMarksRowActions"
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          editMarks(
+                            item
+                          )
+                        }
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={
+                          deletingId ===
+                          item.id
+                        }
+                        onClick={() =>
+                          void deleteMarks(
+                            item
+                          )
+                        }
+                      >
+                        {deletingId ===
+                        item.id
+                          ? "Deleting..."
+                          : "Delete"}
+                      </button>
+                    </div>
+                  </article>
+                );
+              }
+            )}
+          </div>
+
+
+          {!records.length && (
+            <EmptyAcademic
+              text={
+                selectedStudent &&
+                selectedSubject
+                  ? "No marks have been published for this student and subject yet."
+                  : "Select a batch, subject and student to manage marks."
+              }
+            />
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
 
 function EmptyAcademic({text}:{text:string}) { return <div className="academicEmpty"><span>◇</span><p>{text}</p></div>; }
 
@@ -15358,9 +26971,10 @@ function Event({d, title}: {d: string; title: string}) {
 }
 
 function subtitle(v: View, role: Role) {
+  if (v === "College ID") return "Verify an official physical college ID barcode and view the authenticated digital student identity.";
   if (v === "Seva Kendra") return "Submit and track official campus requests through a secure role-based service desk.";
   if (v === "About CampusConnect") return "Open the ancient Patra to discover the story, mission and developer behind CampusConnect.";
-  if (isCampusModuleView(v)) return campusModuleSubtitle(v, role);
+  if (isCampusModuleView(v)) return campusModuleSubtitle(v, role as CampusModuleRole);
   const copy: Record<Role, Partial<Record<View, string>>> = {
     Faculty: {Dashboard: "Classes, mentoring priorities and academic activity in one view.", Placements: "Verified opportunities and preparation activity.", Network: "Collaborate with students, faculty and campus communities.", Resume: "Student resume guidance and review tools.", Academics: "Manage classes, attendance, resources and mentoring actions.", Campus: "Events, official notices and faculty participation."},
     "Placement Cell": {Dashboard: "Recruitment performance, deadlines and student readiness at a glance.", Placements: "Manage active drives, eligibility data and student communication.", Network: "Publish verified opportunities and placement announcements.", Resume: "Review student readiness and resume quality.", Academics: "View verified academic eligibility records.", Campus: "Coordinate placement events, workshops and official notices."},

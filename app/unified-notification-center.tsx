@@ -21,7 +21,8 @@ type NotificationCategory =
   | "notices"
   | "academic"
   | "placement"
-  | "events";
+  | "events"
+  | "social";
 
 
 type UnifiedItem = {
@@ -29,7 +30,8 @@ type UnifiedItem = {
   source:
     | "existing"
     | "task"
-    | "notice";
+    | "notice"
+    | "attendance";
   category:
     Exclude<
       NotificationCategory,
@@ -48,7 +50,11 @@ type UnifiedItem = {
     | "Critical";
   unread: boolean;
   taskId?: string;
+  notificationId?: string;
+  notificationType?: string;
+  connectionId?: string;
   noticeId?: string;
+  attendanceNotificationId?: string;
   actionUrl?: string;
   requiresAcknowledgement?: boolean;
   acknowledged?: boolean;
@@ -152,6 +158,146 @@ function relativeTime(
         timestamp
       )
     );
+}
+
+
+
+function notificationTimestamp(
+  item: UnifiedItem
+) {
+  const value =
+    String(
+      item.createdAt || ""
+    ).trim();
+
+  if (!value) {
+    return 0;
+  }
+
+  const parsed =
+    Date.parse(value);
+
+  if (
+    Number.isFinite(parsed)
+  ) {
+    return parsed;
+  }
+
+  const numeric =
+    Number(value);
+
+  if (
+    Number.isFinite(numeric) &&
+    numeric > 0
+  ) {
+    return numeric < 10_000_000_000
+      ? numeric * 1000
+      : numeric;
+  }
+
+  const relative =
+    value
+      .toLowerCase()
+      .trim();
+
+  if (
+    relative === "just now" ||
+    relative === "now"
+  ) {
+    return Date.now();
+  }
+
+  const match =
+    relative.match(
+      /^(\d+)\s*(m|min|mins|minute|minutes|h|hr|hrs|hour|hours|d|day|days)\s*(?:ago)?$/
+    );
+
+  if (match) {
+    const amount =
+      Number(match[1]);
+
+    const unit =
+      match[2];
+
+    let milliseconds = 0;
+
+    if (
+      unit === "m" ||
+      unit === "min" ||
+      unit === "mins" ||
+      unit === "minute" ||
+      unit === "minutes"
+    ) {
+      milliseconds =
+        amount * 60_000;
+    } else if (
+      unit === "h" ||
+      unit === "hr" ||
+      unit === "hrs" ||
+      unit === "hour" ||
+      unit === "hours"
+    ) {
+      milliseconds =
+        amount * 3_600_000;
+    } else {
+      milliseconds =
+        amount * 86_400_000;
+    }
+
+    return (
+      Date.now() -
+      milliseconds
+    );
+  }
+
+  return 0;
+}
+
+
+function notificationDayGroup(
+  item: UnifiedItem
+) {
+  const timestamp =
+    notificationTimestamp(
+      item
+    );
+
+  if (!timestamp) {
+    return "Earlier";
+  }
+
+  const date =
+    new Date(timestamp);
+
+  const now =
+    new Date();
+
+  const todayStart =
+    new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    ).getTime();
+
+  const yesterdayStart =
+    todayStart -
+    86_400_000;
+
+  if (
+    timestamp >=
+    todayStart
+  ) {
+    return "Today";
+  }
+
+  if (
+    timestamp >=
+    yesterdayStart
+  ) {
+    return "Yesterday";
+  }
+
+  return "Earlier";
 }
 
 
@@ -280,6 +426,7 @@ async function loadExternalUnreadCount() {
     taskResult,
     noticeResult,
     receiptResult,
+    attendanceResult,
   ] =
     await Promise.all([
       client
@@ -321,6 +468,28 @@ async function loadExternalUnreadCount() {
           auth.user.id
         )
         .limit(200),
+
+      client
+        .from(
+          "student_attendance_notifications"
+        )
+        .select(
+          "id",
+          {
+            count:
+              "exact",
+            head:
+              true,
+          }
+        )
+        .eq(
+          "student_id",
+          auth.user.id
+        )
+        .eq(
+          "is_read",
+          false
+        ),
     ]);
 
   const viewed =
@@ -357,7 +526,11 @@ async function loadExternalUnreadCount() {
       taskResult.count ||
       0
     ) +
-    unreadNotices
+    unreadNotices +
+    (
+      attendanceResult.count ||
+      0
+    )
   );
 }
 
@@ -551,6 +724,7 @@ UnifiedNotificationCenter({
           taskResult,
           noticeResult,
           receiptResult,
+          attendanceResult,
         ] =
           await Promise.all([
             client
@@ -558,7 +732,7 @@ UnifiedNotificationCenter({
                 "campus_task_notifications"
               )
               .select(
-                "id,task_id,title,message,read_at,created_at"
+                "id,task_id,title,message,read_at,created_at,notification_type,actor_id,connection_id,target"
               )
               .order(
                 "created_at",
@@ -595,7 +769,28 @@ UnifiedNotificationCenter({
                 auth.user.id
               )
               .limit(200),
+
+            client
+              .from(
+                "student_attendance_notifications"
+              )
+              .select(
+                "id,subject,title,message,notification_type,attendance_percentage,threshold_percentage,is_read,created_at"
+              )
+              .eq(
+                "student_id",
+                auth.user.id
+              )
+              .order(
+                "created_at",
+                {
+                  ascending:
+                    false,
+                }
+              )
+              .limit(100),
           ]);
+
 
         const receipts =
           new Map<
@@ -630,41 +825,86 @@ UnifiedNotificationCenter({
             taskResult.data ||
             []
           ).map(
-            row => ({
-              id:
-                `task-${row.id}`,
-              source:
-                "task",
-              category:
-                "tasks",
-              label:
-                "STAFF OPERATIONS",
-              title:
-                row.title,
-              message:
-                row.message,
-              createdAt:
-                row.created_at,
-              timeLabel:
-                relativeTime(
-                  row.created_at
-                ),
-              target:
-                "Dashboard",
-              priority:
-                row.message
-                  .toLowerCase()
-                  .includes(
-                    "critical"
-                  )
-                  ? "Critical"
-                  : "Normal",
-              unread:
-                !row.read_at,
-              taskId:
-                row.task_id,
-            })
+            row => {
+              const notificationType =
+                String(
+                  row.notification_type ||
+                  "task"
+                );
+
+              const isSocial =
+                notificationType ===
+                  "connection_request" ||
+                notificationType ===
+                  "connection_accepted";
+
+              return {
+                id:
+                  `task-${row.id}`,
+
+                source:
+                  "task",
+
+                category:
+                  isSocial
+                    ? "social"
+                    : "tasks",
+
+                label:
+                  isSocial
+                    ? "CAMPUS NETWORK"
+                    : "STAFF OPERATIONS",
+
+                title:
+                  row.title,
+
+                message:
+                  row.message,
+
+                createdAt:
+                  row.created_at,
+
+                timeLabel:
+                  relativeTime(
+                    row.created_at
+                  ),
+
+                target:
+                  isSocial
+                    ? "Messenger"
+                    : String(
+                        row.target ||
+                        "Dashboard"
+                      ),
+
+                priority:
+                  row.message
+                    .toLowerCase()
+                    .includes(
+                      "critical"
+                    )
+                    ? "Critical"
+                    : "Normal",
+
+                unread:
+                  !row.read_at,
+
+                taskId:
+                  row.task_id ||
+                  undefined,
+
+                notificationId:
+                  row.id,
+
+                notificationType,
+
+                connectionId:
+                  row.connection_id ||
+                  undefined,
+              };
+            }
           );
+
 
         const noticeItems:
           UnifiedItem[] =
@@ -766,9 +1006,87 @@ UnifiedNotificationCenter({
             }
           );
 
+        const attendanceItems:
+          UnifiedItem[] =
+          (
+            attendanceResult.data ||
+            []
+          ).map(
+            row => ({
+              id:
+                `attendance-${row.id}`,
+
+              source:
+                "attendance",
+
+              category:
+                "academic",
+
+              label:
+                "ATTENDANCE",
+
+              title:
+                String(
+                  row.title ||
+                  "Attendance warning"
+                ),
+
+              message:
+                String(
+                  row.message ||
+                  ""
+                ),
+
+              createdAt:
+                String(
+                  row.created_at ||
+                  ""
+                ),
+
+              timeLabel:
+                relativeTime(
+                  String(
+                    row.created_at ||
+                    ""
+                  )
+                ),
+
+              target:
+                "Attendance",
+
+              priority:
+                Number(
+                  row.attendance_percentage
+                ) <
+                Number(
+                  row.threshold_percentage
+                )
+                  ? "High"
+                  : "Normal",
+
+              unread:
+                !Boolean(
+                  row.is_read
+                ),
+
+              attendanceNotificationId:
+                String(
+                  row.id
+                ),
+
+              notificationType:
+                String(
+                  row.notification_type ||
+                  "attendance_warning"
+                ),
+            })
+          );
+
+
         setDatabaseItems([
           ...taskItems,
           ...noticeItems,
+          ...attendanceItems,
         ]);
 
         setLoading(
@@ -832,6 +1150,16 @@ UnifiedNotificationCenter({
             },
             refresh
           )
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table:
+                "student_attendance_notifications",
+            },
+            refresh
+          )
           .subscribe();
 
       return () => {
@@ -879,6 +1207,7 @@ UnifiedNotificationCenter({
               String(
                 item.created_at ||
                 item.updated_at ||
+                item.time ||
                 ""
               ),
             timeLabel:
@@ -908,51 +1237,54 @@ UnifiedNotificationCenter({
     );
 
 
+  const [
+    hideRead,
+    setHideRead,
+  ] = useState(false);
+
+
   const unifiedItems =
     useMemo(
       () =>
         [
           ...databaseItems,
           ...existingItems,
-        ].sort(
-          (a, b) => {
-            if (
-              a.unread !==
-              b.unread
-            ) {
-              return a.unread
-                ? -1
-                : 1;
+        ]
+          .map(
+            (
+              item,
+              originalIndex
+            ) => ({
+              item,
+              originalIndex,
+            })
+          )
+          .sort(
+            (a, b) => {
+              const difference =
+                notificationTimestamp(
+                  b.item
+                ) -
+                notificationTimestamp(
+                  a.item
+                );
+
+              if (
+                difference !== 0
+              ) {
+                return difference;
+              }
+
+              return (
+                a.originalIndex -
+                b.originalIndex
+              );
             }
-
-            const aTime =
-              Date.parse(
-                a.createdAt
-              );
-
-            const bTime =
-              Date.parse(
-                b.createdAt
-              );
-
-            return (
-              (
-                Number.isFinite(
-                  bTime
-                )
-                  ? bTime
-                  : 0
-              ) -
-              (
-                Number.isFinite(
-                  aTime
-                )
-                  ? aTime
-                  : 0
-              )
-            );
-          }
-        ),
+          )
+          .map(
+            entry =>
+              entry.item
+          ),
       [
         databaseItems,
         existingItems,
@@ -963,31 +1295,58 @@ UnifiedNotificationCenter({
   const visibleItems =
     useMemo(
       () =>
-        unifiedItems.filter(
-          item => {
-            if (
-              activeFilter ===
-              "all"
-            ) {
-              return true;
-            }
+        unifiedItems
+          .filter(
+            item => {
+              if (
+                activeFilter ===
+                "all"
+              ) {
+                return true;
+              }
 
-            if (
-              activeFilter ===
-              "unread"
-            ) {
-              return item.unread;
-            }
+              if (
+                activeFilter ===
+                "unread"
+              ) {
+                return item.unread;
+              }
 
-            return (
-              item.category ===
-              activeFilter
-            );
-          }
-        ),
+              return (
+                item.category ===
+                activeFilter
+              );
+            }
+          )
+          .slice()
+          .sort(
+            (a, b) =>
+              notificationTimestamp(
+                b
+              ) -
+              notificationTimestamp(
+                a
+              )
+          ),
       [
         unifiedItems,
         activeFilter,
+      ]
+    );
+
+
+  const displayedItems =
+    useMemo(
+      () =>
+        hideRead
+          ? visibleItems.filter(
+              item =>
+                item.unread
+            )
+          : visibleItems,
+      [
+        visibleItems,
+        hideRead,
       ]
     );
 
@@ -999,7 +1358,7 @@ UnifiedNotificationCenter({
     ).length;
 
 
-  async function markTaskRead(
+  async function markDatabaseNotificationRead(
     item: UnifiedItem
   ) {
     const client =
@@ -1007,7 +1366,7 @@ UnifiedNotificationCenter({
 
     if (
       !client ||
-      !item.taskId
+      !item.notificationId
     ) {
       return;
     }
@@ -1022,8 +1381,8 @@ UnifiedNotificationCenter({
             .toISOString(),
       })
       .eq(
-        "task_id",
-        item.taskId
+        "id",
+        item.notificationId
       )
       .is(
         "read_at",
@@ -1079,6 +1438,60 @@ UnifiedNotificationCenter({
   }
 
 
+  async function markAttendanceNotificationRead(
+    item: UnifiedItem
+  ) {
+    const client =
+      getSupabaseClient();
+
+    if (
+      !client ||
+      !item.attendanceNotificationId
+    ) {
+      return;
+    }
+
+    const {
+      data: auth,
+    } =
+      await client.auth
+        .getUser();
+
+    if (
+      !auth.user
+    ) {
+      return;
+    }
+
+    const {
+      error,
+    } =
+      await client
+        .from(
+          "student_attendance_notifications"
+        )
+        .update({
+          is_read:
+            true,
+        })
+        .eq(
+          "id",
+          item.attendanceNotificationId
+        )
+        .eq(
+          "student_id",
+          auth.user.id
+        );
+
+    if (error) {
+      console.error(
+        "Unable to mark attendance notification as read:",
+        error
+      );
+    }
+  }
+
+
   async function openItem(
     item: UnifiedItem
   ) {
@@ -1096,27 +1509,17 @@ UnifiedNotificationCenter({
 
     if (
       item.source ===
-      "task"
+      "attendance"
     ) {
-      await markTaskRead(
+      await markAttendanceNotificationRead(
         item
       );
-
-      if (
-        item.taskId
-      ) {
-        window.sessionStorage
-          .setItem(
-            "campusconnect-focus-operational-task",
-            item.taskId
-          );
-      }
 
       onOpen({
         id:
           item.id,
         kind:
-          "task",
+          "academic",
         label:
           item.label,
         title:
@@ -1126,23 +1529,113 @@ UnifiedNotificationCenter({
         time:
           item.timeLabel,
         target:
-          "Dashboard",
+          "Attendance",
       });
 
-      window.setTimeout(
-        () => {
-          window.dispatchEvent(
-            new CustomEvent(
-              "campus-open-operational-task",
-              {
-                detail:
-                  item.taskId,
-              }
-            )
-          );
-        },
-        180
+    } else if (
+      item.source ===
+      "task"
+    ) {
+      await markDatabaseNotificationRead(
+        item
       );
+
+      if (
+        item.category ===
+        "social"
+      ) {
+        const messengerTab =
+          item.notificationType ===
+            "connection_request"
+            ? "Requests"
+            : "Friends";
+
+        window.sessionStorage
+          .setItem(
+            "campusconnect-messenger-people-tab",
+            messengerTab
+          );
+
+        onOpen({
+          id:
+            item.id,
+          kind:
+            "social",
+          label:
+            item.label,
+          title:
+            item.title,
+          message:
+            item.message,
+          time:
+            item.timeLabel,
+          target:
+            "Messenger",
+        });
+
+        window.setTimeout(
+          () => {
+            window.dispatchEvent(
+              new CustomEvent(
+                "campus-open-messenger-tab",
+                {
+                  detail:
+                    messengerTab,
+                }
+              )
+            );
+          },
+          180
+        );
+
+      } else {
+
+        if (
+          item.taskId
+        ) {
+          window.sessionStorage
+            .setItem(
+              "campusconnect-focus-operational-task",
+              item.taskId
+            );
+        }
+
+        onOpen({
+          id:
+            item.id,
+          kind:
+            "task",
+          label:
+            item.label,
+          title:
+            item.title,
+          message:
+            item.message,
+          time:
+            item.timeLabel,
+          target:
+            "Dashboard",
+        });
+
+        if (
+          item.taskId
+        ) {
+          window.setTimeout(
+            () => {
+              window.dispatchEvent(
+                new CustomEvent(
+                  "campus-open-operational-task",
+                  {
+                    detail:
+                      item.taskId,
+                  }
+                )
+              );
+            },
+            180
+          );
+        }
+      }
     } else {
       await markNoticeViewed(
         item
@@ -1369,6 +1862,23 @@ UnifiedNotificationCenter({
                 }
               )
           : Promise.resolve(),
+
+        client
+          .from(
+            "student_attendance_notifications"
+          )
+          .update({
+            is_read:
+              true,
+          })
+          .eq(
+            "student_id",
+            auth.user.id
+          )
+          .eq(
+            "is_read",
+            false
+          ),
       ]);
     }
 
@@ -1431,6 +1941,10 @@ UnifiedNotificationCenter({
       {
         id: "events",
         label: "Events",
+      },
+      {
+        id: "social",
+        label: "Social",
       },
     ];
 
@@ -1536,10 +2050,53 @@ UnifiedNotificationCenter({
             <span />
             <span />
           </div>
-        ) : visibleItems.length ? (
-          visibleItems.map(
-            item => (
-              <article
+        ) : displayedItems.length ? (
+          displayedItems.map(
+            (
+              item,
+              index
+            ) => {
+              const currentGroup =
+                notificationDayGroup(
+                  item
+                );
+
+              const previousGroup =
+                index > 0
+                  ? notificationDayGroup(
+                      displayedItems[
+                        index - 1
+                      ]
+                    )
+                  : "";
+
+              const showGroup =
+                index === 0 ||
+                currentGroup !==
+                  previousGroup;
+
+              return (
+                <>
+                  {showGroup && (
+                    <div
+                      className="unifiedNotificationDateGroup"
+                      key={`group-${currentGroup}-${item.id}`}
+                    >
+                      <span>
+                        {currentGroup}
+                      </span>
+
+                      <small>
+                        {currentGroup === "Today"
+                          ? "Latest updates"
+                          : currentGroup === "Yesterday"
+                          ? "Previous day"
+                          : "Older notifications"}
+                      </small>
+                    </div>
+                  )}
+
+                  <article
                 className={
                   `unifiedNotificationItem ${
                     item.unread
@@ -1576,6 +2133,9 @@ UnifiedNotificationCenter({
                       : item.category ===
                         "events"
                       ? "E"
+                      : item.category ===
+                        "social"
+                      ? "S"
                       : "N"}
                   </i>
 
@@ -1666,7 +2226,9 @@ UnifiedNotificationCenter({
                   )}
                 </footer>
               </article>
-            )
+                </>
+              );
+            }
           )
         ) : (
           <div className="unifiedNotificationEmpty">
@@ -1691,7 +2253,27 @@ UnifiedNotificationCenter({
           Supabase RLS protected
         </span>
 
-        <button
+        <div className="unifiedNotificationFooterActions">
+          <button
+            type="button"
+            className={
+              hideRead
+                ? "active"
+                : ""
+            }
+            onClick={() =>
+              setHideRead(
+                value =>
+                  !value
+              )
+            }
+          >
+            {hideRead
+              ? "Show read"
+              : "Hide read"}
+          </button>
+
+          <button
           type="button"
           onClick={() =>
             void markEverythingRead()
@@ -1706,6 +2288,7 @@ UnifiedNotificationCenter({
             ? "Updating…"
             : "Mark all read"}
         </button>
+        </div>
       </footer>
     </section>
   );

@@ -14,6 +14,20 @@ const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
+
+
+  /*
+   * CampusConnect attendance email queue scheduler.
+   *
+   * Cloudflare Cron Triggers use UTC.
+   * This only registers the trigger.
+   *
+   * No scheduled() handler is being added in this step,
+   * and ATTENDANCE_EMAIL_DELIVERY_ENABLED remains false.
+   */
+  triggers: {
+    crons: ["*/5 * * * *"],
+  },
   d1_databases: d1
     ? [
         {

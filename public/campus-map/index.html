@@ -1,0 +1,5609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RNS Campus Navigator</title>
+
+<style>
+:root{
+  --ink:#1f2933;
+  --muted:#68717d;
+  --line:#dce3e8;
+  --surface:#fffdf9;
+  --soft:#f5f2ec;
+  --navy:#24384b;
+  --blue:#5f7891;
+  --blue-soft:#eaf0f4;
+  --sage:#78927e;
+  --sage-soft:#edf3ee;
+  --amber:#b98647;
+  --amber-soft:#f8eedf;
+  --terracotta:#ad654d;
+  --terracotta-soft:#f5e8e2;
+  --lavender:#827793;
+  --lavender-soft:#efedf3;
+  --road:#52606d;
+  --road-edge:#7b8793;
+  --grass:#9cb89b;
+  --grass-dark:#7fa07e;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  min-height:100%;
+}
+
+body{
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(
+      circle at 80% 4%,
+      rgba(185,134,71,.13),
+      transparent 25%
+    ),
+    linear-gradient(
+      145deg,
+      #f4f6f4,
+      #faf8f4 48%,
+      #eef2f4
+    );
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  -webkit-tap-highlight-color:transparent;
+}
+
+.topbar{
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:14px 28px;
+  background:
+    linear-gradient(
+      135deg,
+      #25394c,
+      #304a60
+    );
+  color:white;
+  border-bottom:
+    1px solid rgba(255,255,255,.12);
+  box-shadow:
+    0 10px 28px rgba(31,41,51,.13);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.brandMark{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:
+    linear-gradient(
+      135deg,
+      #c09255,
+      #9b7450
+    );
+  color:white;
+  font-weight:900;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.2);
+}
+
+.brandText b{
+  display:block;
+  font-size:15px;
+  letter-spacing:-.01em;
+}
+
+.brandText small{
+  display:block;
+  margin-top:2px;
+  color:#c9d4dc;
+  font-size:10px;
+}
+
+.topActions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.guideBadge{
+  padding:7px 10px;
+  border:
+    1px solid rgba(255,255,255,.16);
+  border-radius:999px;
+  background:
+    rgba(255,255,255,.08);
+  color:#e7edf1;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+
+.app{
+  width:min(1700px,100%);
+  margin:auto;
+  display:grid;
+  grid-template-columns:
+    350px minmax(0,1fr);
+  gap:18px;
+  padding:18px;
+}
+
+.sidebar{
+  display:grid;
+  align-content:start;
+  gap:14px;
+  max-height:
+    calc(100vh - 112px);
+  overflow:auto;
+  scrollbar-width:thin;
+}
+
+.card{
+  border:
+    1px solid var(--line);
+  border-radius:19px;
+  background:
+    rgba(255,253,249,.96);
+  box-shadow:
+    0 12px 32px rgba(31,41,51,.055);
+}
+
+.navigator{
+  padding:20px;
+}
+
+.eyebrow{
+  display:inline-flex;
+  margin-bottom:8px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:var(--blue-soft);
+  color:#577086;
+  font-size:8px;
+  font-weight:850;
+  letter-spacing:.13em;
+}
+
+.navigator h1{
+  margin:0;
+  max-width:280px;
+  font-size:24px;
+  line-height:1.1;
+  letter-spacing:-.035em;
+}
+
+.navigatorIntro{
+  margin:9px 0 0;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.6;
+}
+
+.field{
+  margin-top:14px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:6px;
+  color:#56616c;
+  font-size:8px;
+  font-weight:850;
+  letter-spacing:.05em;
+}
+
+.field select,
+.field input{
+  width:100%;
+  min-height:42px;
+  padding:0 11px;
+  border:
+    1px solid #d8e0e5;
+  border-radius:10px;
+  outline:none;
+  background:#fff;
+  color:var(--ink);
+  font-size:10px;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+.field select:focus,
+.field input:focus{
+  border-color:
+    rgba(95,120,145,.55);
+  box-shadow:
+    0 0 0 3px
+    rgba(95,120,145,.08);
+}
+
+.navigateButton{
+  width:100%;
+  min-height:44px;
+  margin-top:12px;
+  border:0;
+  border-radius:11px;
+  background:#5f7891;
+  color:white;
+  cursor:pointer;
+  font-size:10px;
+  font-weight:800;
+  box-shadow:
+    0 9px 18px
+    rgba(95,120,145,.18);
+}
+
+.navigateButton:hover{
+  background:#536d85;
+}
+
+.routeCard{
+  margin-top:12px;
+  padding:13px;
+  border:
+    1px solid rgba(95,120,145,.14);
+  border-radius:12px;
+  background:var(--blue-soft);
+}
+
+.routeCard strong{
+  display:block;
+  color:#40586d;
+  font-size:10px;
+}
+
+.routeCard small{
+  display:block;
+  margin-top:4px;
+  color:#667786;
+  font-size:8px;
+  line-height:1.5;
+}
+
+.routeStats{
+  display:grid;
+  grid-template-columns:
+    repeat(2,1fr);
+  gap:7px;
+  margin-top:10px;
+}
+
+.routeStat{
+  padding:8px;
+  border-radius:9px;
+  background:#fff;
+  border:
+    1px solid rgba(95,120,145,.12);
+}
+
+.routeStat b{
+  display:block;
+  font-size:11px;
+}
+
+.routeStat span{
+  color:var(--muted);
+  font-size:7px;
+}
+
+.sectionCard{
+  padding:16px;
+}
+
+.sectionHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.sectionHeader b{
+  font-size:10px;
+}
+
+.sectionHeader span{
+  color:var(--muted);
+  font-size:8px;
+}
+
+.categoryGrid{
+  display:grid;
+  grid-template-columns:
+    repeat(2,1fr);
+  gap:7px;
+}
+
+.categoryButton{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-height:37px;
+  padding:7px 9px;
+  border:
+    1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+  color:#53606c;
+  cursor:pointer;
+  text-align:left;
+  font-size:8px;
+  font-weight:700;
+}
+
+.categoryButton.active{
+  background:var(--blue-soft);
+  border-color:
+    rgba(95,120,145,.24);
+  color:#4d667c;
+}
+
+.categoryDot{
+  flex:0 0 auto;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--blue);
+}
+
+.quickPlaces{
+  display:grid;
+  gap:6px;
+}
+
+.quickPlace{
+  display:grid;
+  grid-template-columns:
+    34px minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+  width:100%;
+  padding:8px;
+  border:
+    1px solid transparent;
+  border-radius:10px;
+  background:transparent;
+  cursor:pointer;
+  text-align:left;
+}
+
+.quickPlace:hover{
+  background:#f7f5f1;
+  border-color:var(--line);
+}
+
+.quickIcon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:10px;
+  background:var(--amber-soft);
+  color:#92672d;
+  font-size:13px;
+}
+
+.quickPlace:nth-child(2) .quickIcon{
+  background:var(--blue-soft);
+  color:#547089;
+}
+
+.quickPlace:nth-child(3) .quickIcon{
+  background:var(--sage-soft);
+  color:#58705f;
+}
+
+.quickPlace:nth-child(4) .quickIcon{
+  background:var(--lavender-soft);
+  color:#6c6380;
+}
+
+.quickPlace b{
+  display:block;
+  font-size:8px;
+}
+
+.quickPlace small{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:7px;
+}
+
+.quickArrow{
+  color:#8b959d;
+  font-size:14px;
+}
+
+.notice{
+  padding:13px 15px;
+  border-radius:13px;
+  background:var(--amber-soft);
+  color:#745b38;
+  font-size:8px;
+  line-height:1.55;
+}
+
+.mapShell{
+  position:relative;
+  min-height:
+    calc(100vh - 112px);
+  overflow:hidden;
+  border:
+    1px solid var(--line);
+  border-radius:23px;
+  background:
+    radial-gradient(
+      circle at 50% 25%,
+      #dce8dc,
+      #bfd2bd 45%,
+      #9eb99e
+    );
+  box-shadow:
+    0 16px 42px rgba(31,41,51,.08);
+}
+
+.mapHeader{
+  position:absolute;
+  z-index:30;
+  top:16px;
+  left:16px;
+  right:16px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  pointer-events:none;
+}
+
+.mapTitle{
+  padding:10px 13px;
+  border:
+    1px solid rgba(255,255,255,.25);
+  border-radius:12px;
+  background:
+    rgba(37,57,76,.92);
+  color:white;
+  backdrop-filter:blur(9px);
+  box-shadow:
+    0 8px 20px rgba(31,41,51,.12);
+}
+
+.mapTitle b{
+  display:block;
+  font-size:10px;
+}
+
+.mapTitle small{
+  display:block;
+  margin-top:3px;
+  color:#c7d3dc;
+  font-size:8px;
+}
+
+.compass{
+  width:50px;
+  height:50px;
+  display:grid;
+  place-items:center;
+  border:
+    1px solid rgba(255,255,255,.25);
+  border-radius:50%;
+  background:
+    rgba(37,57,76,.92);
+  color:#f1e3c9;
+  font-size:10px;
+  font-weight:900;
+  backdrop-filter:blur(9px);
+}
+
+.viewport{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+}
+
+.world{
+  position:absolute;
+  left:50%;
+  top:52%;
+  width:1050px;
+  height:720px;
+  transform:
+    translate(-50%,-50%)
+    rotateX(57deg)
+    rotateZ(-36deg);
+  transform-style:preserve-3d;
+  border-radius:42px;
+  background:var(--grass);
+  box-shadow:
+    0 70px 100px
+    rgba(36,63,48,.25);
+}
+
+.world::before{
+  content:"";
+  position:absolute;
+  inset:24px;
+  border:
+    2px solid rgba(255,255,255,.22);
+  border-radius:30px;
+  pointer-events:none;
+}
+
+.road{
+  position:absolute;
+  border:
+    9px solid var(--road-edge);
+  border-radius:18px;
+  background:var(--road);
+}
+
+.r1{
+  left:48px;
+  top:48px;
+  width:82px;
+  height:620px;
+}
+
+.r2{
+  left:115px;
+  top:48px;
+  width:850px;
+  height:70px;
+}
+
+.r3{
+  left:870px;
+  top:80px;
+  width:80px;
+  height:570px;
+}
+
+.r4{
+  left:110px;
+  top:580px;
+  width:780px;
+  height:70px;
+}
+
+.r5{
+  left:430px;
+  top:90px;
+  width:65px;
+  height:520px;
+}
+
+.garden{
+  position:absolute;
+  left:190px;
+  top:250px;
+  width:190px;
+  height:190px;
+  border:
+    14px solid #ddd3b7;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle,
+      #668d6a 15%,
+      #8bb98a 16% 30%,
+      #d8e2c7 31% 42%,
+      #719e73 43%
+    );
+  box-shadow:
+    inset 0 0 0 10px
+    rgba(255,255,255,.2);
+}
+
+.building{
+  position:absolute;
+  padding:0;
+  border:0;
+  border-radius:8px;
+  outline:none;
+  background:
+    var(--building,#5f7891);
+  color:white;
+  cursor:pointer;
+  transform-style:preserve-3d;
+  box-shadow:
+    inset -9px -9px 0 rgba(0,0,0,.1),
+    0 0 0 4px rgba(255,255,255,.35);
+  transition:
+    filter .18s ease,
+    opacity .18s ease;
+}
+
+.building::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:8px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.27),
+      transparent 45%
+    );
+}
+
+.building::after{
+  content:"";
+  position:absolute;
+  left:8%;
+  right:8%;
+  bottom:8px;
+  height:4px;
+  opacity:.72;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(235,242,244,.9) 0 9px,
+      transparent 9px 15px
+    );
+}
+
+.building span{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding:8px;
+  transform:
+    rotateZ(36deg)
+    rotateX(-57deg)
+    translateZ(34px);
+  color:white;
+  text-align:center;
+  text-shadow:
+    0 1px 3px rgba(0,0,0,.45);
+  font-size:10px;
+  font-weight:850;
+  line-height:1.15;
+  pointer-events:none;
+}
+
+.building:hover{
+  filter:brightness(1.06);
+  z-index:5;
+}
+
+.building.selected{
+  outline:
+    6px solid #ead8a9;
+  filter:brightness(1.05);
+  z-index:7;
+}
+
+.building.filteredOut{
+  opacity:.18;
+  pointer-events:none;
+}
+
+.b-admin{
+  left:180px;
+  top:500px;
+  width:225px;
+  height:65px;
+  --building:#536f86;
+}
+
+.b-a1{
+  left:520px;
+  top:445px;
+  width:160px;
+  height:92px;
+  --building:#607e98;
+}
+
+.b-a2{
+  left:700px;
+  top:420px;
+  width:140px;
+  height:110px;
+  --building:#66849d;
+}
+
+.b-a3{
+  left:510px;
+  top:315px;
+  width:160px;
+  height:92px;
+  --building:#587792;
+}
+
+.b-a4{
+  left:690px;
+  top:285px;
+  width:150px;
+  height:105px;
+  --building:#6a8498;
+}
+
+.b-a5{
+  left:520px;
+  top:160px;
+  width:190px;
+  height:100px;
+  --building:#a86252;
+}
+
+.b-aud{
+  left:225px;
+  top:130px;
+  width:180px;
+  height:105px;
+  --building:#a96b57;
+}
+
+.b-library{
+  left:145px;
+  top:275px;
+  width:58px;
+  height:105px;
+  --building:#536f86;
+}
+
+.b-pu{
+  left:145px;
+  top:390px;
+  width:58px;
+  height:100px;
+  --building:#708a9e;
+}
+
+.b-first{
+  left:515px;
+  top:275px;
+  width:120px;
+  height:34px;
+  --building:#9b655b;
+}
+
+.b-school{
+  left:645px;
+  top:275px;
+  width:120px;
+  height:34px;
+  --building:#7f7390;
+}
+
+.b-arch{
+  left:525px;
+  top:405px;
+  width:110px;
+  height:34px;
+  --building:#9b714d;
+}
+
+.b-extension{
+  left:385px;
+  top:265px;
+  width:45px;
+  height:185px;
+  --building:#5d7890;
+}
+
+.b-boys{
+  left:790px;
+  top:125px;
+  width:65px;
+  height:150px;
+  --building:#506c82;
+}
+
+.b-girls{
+  left:735px;
+  top:540px;
+  width:95px;
+  height:45px;
+  --building:#906579;
+}
+
+.b-canteen{
+  left:145px;
+  top:510px;
+  width:90px;
+  height:48px;
+  --building:#a67b45;
+}
+
+.b-temple{
+  left:410px;
+  top:545px;
+  width:55px;
+  height:35px;
+  --building:#b28449;
+}
+
+.b-play1{
+  left:520px;
+  top:75px;
+  width:145px;
+  height:62px;
+  --building:#66896c;
+}
+
+.b-play2{
+  left:690px;
+  top:75px;
+  width:145px;
+  height:62px;
+  --building:#66896c;
+}
+
+.b-court{
+  left:250px;
+  top:75px;
+  width:100px;
+  height:45px;
+  --building:#a67d4d;
+}
+
+.routeLine{
+  position:absolute;
+  z-index:15;
+  height:10px;
+  border:
+    3px solid rgba(255,255,255,.95);
+  border-radius:999px;
+  background:#b96d51;
+  transform-origin:left center;
+  pointer-events:none;
+  box-shadow:
+    0 4px 12px rgba(91,52,37,.28);
+}
+
+.routeLine::after{
+  content:"";
+  position:absolute;
+  top:-6px;
+  right:-7px;
+  border-top:
+    7px solid transparent;
+  border-bottom:
+    7px solid transparent;
+  border-left:
+    11px solid white;
+}
+
+.pin{
+  position:absolute;
+  z-index:18;
+  width:27px;
+  height:27px;
+  border:
+    4px solid white;
+  border-radius:
+    50% 50% 50% 0;
+  background:#ad654d;
+  transform:
+    translate(-50%,-100%)
+    rotate(-45deg);
+  box-shadow:
+    0 5px 14px
+    rgba(31,41,51,.3);
+}
+
+.pin::after{
+  content:"";
+  position:absolute;
+  left:6px;
+  top:6px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:white;
+}
+
+.mapControls{
+  position:absolute;
+  z-index:30;
+  right:18px;
+  bottom:18px;
+  display:flex;
+  gap:7px;
+}
+
+.mapControls button{
+  width:40px;
+  height:40px;
+  border:
+    1px solid rgba(61,75,88,.14);
+  border-radius:11px;
+  background:
+    rgba(255,253,249,.95);
+  color:#52606c;
+  cursor:pointer;
+  box-shadow:
+    0 7px 18px rgba(31,41,51,.11);
+}
+
+.placeDetails{
+  position:absolute;
+  z-index:30;
+  left:18px;
+  bottom:18px;
+  width:min(345px,calc(100% - 90px));
+  padding:14px;
+  border:
+    1px solid rgba(255,255,255,.4);
+  border-radius:15px;
+  background:
+    rgba(255,253,249,.94);
+  box-shadow:
+    0 14px 34px rgba(31,41,51,.12);
+  backdrop-filter:blur(10px);
+  transform:
+    translateY(150%);
+  opacity:0;
+  transition:
+    transform .22s ease,
+    opacity .22s ease;
+}
+
+.placeDetails.visible{
+  transform:translateY(0);
+  opacity:1;
+}
+
+.placeDetailsHeader{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.placeDetailsHeader small{
+  display:block;
+  margin-bottom:4px;
+  color:#687785;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:.07em;
+}
+
+.placeDetailsHeader b{
+  display:block;
+  font-size:11px;
+  line-height:1.35;
+}
+
+.favoriteButton{
+  flex:0 0 auto;
+  width:33px;
+  height:33px;
+  border:
+    1px solid var(--line);
+  border-radius:50%;
+  background:white;
+  color:#9a6c59;
+  cursor:pointer;
+  font-size:16px;
+}
+
+.favoriteButton.saved{
+  background:var(--terracotta-soft);
+  color:#a55742;
+}
+
+.placeDescription{
+  margin:8px 0 0;
+  color:var(--muted);
+  font-size:8px;
+  line-height:1.5;
+}
+
+.placeMeta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+
+.placeMeta span{
+  padding:5px 7px;
+  border-radius:999px;
+  background:var(--blue-soft);
+  color:#546d82;
+  font-size:7px;
+  font-weight:700;
+}
+
+.placeMeta span:nth-child(2){
+  background:var(--sage-soft);
+  color:#58705f;
+}
+
+.placeActions{
+  display:grid;
+  grid-template-columns:
+    1fr 1fr;
+  gap:7px;
+  margin-top:10px;
+}
+
+.placeActions button{
+  min-height:35px;
+  border:
+    1px solid var(--line);
+  border-radius:9px;
+  background:#fff;
+  color:#53606c;
+  cursor:pointer;
+  font-size:8px;
+  font-weight:750;
+}
+
+.placeActions button.primary{
+  border:0;
+  background:#5f7891;
+  color:#fff;
+}
+
+@media(max-width:1050px){
+  .app{
+    grid-template-columns:
+      310px minmax(0,1fr);
+  }
+
+  .world{
+    transform:
+      translate(-50%,-50%)
+      scale(.82)
+      rotateX(57deg)
+      rotateZ(-36deg);
+  }
+}
+
+@media(max-width:820px){
+  .topbar{
+    padding:
+      12px 16px;
+  }
+
+  .guideBadge{
+    display:none;
+  }
+
+  .app{
+    display:flex;
+    flex-direction:column;
+    padding:12px;
+  }
+
+  .sidebar{
+    max-height:none;
+  }
+
+  .navigator{
+    padding:17px;
+  }
+
+  .categoryGrid{
+    grid-template-columns:
+      repeat(3,1fr);
+  }
+
+  .mapShell{
+    min-height:650px;
+  }
+
+  .world{
+    transform:
+      translate(-50%,-50%)
+      scale(.7)
+      rotateX(57deg)
+      rotateZ(-36deg);
+  }
+
+  .placeDetails{
+    left:12px;
+    bottom:12px;
+  }
+
+  .mapControls{
+    right:12px;
+    bottom:12px;
+  }
+}
+
+@media(max-width:540px){
+  .brandText small{
+    display:none;
+  }
+
+  .categoryGrid{
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+  .mapShell{
+    min-height:600px;
+  }
+
+  .world{
+    transform:
+      translate(-50%,-50%)
+      scale(.59)
+      rotateX(57deg)
+      rotateZ(-36deg);
+  }
+
+  .mapHeader{
+    top:10px;
+    left:10px;
+    right:10px;
+  }
+
+  .compass{
+    width:44px;
+    height:44px;
+  }
+
+  .placeDetails{
+    width:
+      calc(100% - 72px);
+  }
+}
+
+.liveNavigateButton{
+  width:100%;
+  min-height:44px;
+  margin-top:8px;
+  border:1px solid rgba(95,120,145,.22);
+  border-radius:11px;
+  background:#fff;
+  color:#4f687d;
+  cursor:pointer;
+  font-size:10px;
+  font-weight:800;
+}
+
+.liveNavigateButton.active{
+  border-color:#78927e;
+  background:var(--sage-soft);
+  color:#526b59;
+}
+
+.liveNavStatus{
+  display:none;
+  margin-top:10px;
+  padding:11px;
+  border:1px solid rgba(120,146,126,.2);
+  border-radius:11px;
+  background:var(--sage-soft);
+  color:#526b59;
+  font-size:8px;
+  line-height:1.55;
+}
+
+.liveNavStatus.visible{
+  display:block;
+}
+
+.userLocationDot{
+  position:absolute;
+  z-index:26;
+  width:24px;
+  height:24px;
+  border:5px solid white;
+  border-radius:50%;
+  background:#567b9a;
+  transform:translate(-50%,-50%);
+  box-shadow:
+    0 0 0 8px rgba(86,123,154,.18),
+    0 6px 18px rgba(31,41,51,.28);
+  pointer-events:none;
+}
+
+.userLocationDot::after{
+  content:"";
+  position:absolute;
+  inset:-13px;
+  border:2px solid rgba(86,123,154,.28);
+  border-radius:50%;
+}
+
+.liveRouteLine{
+  position:absolute;
+  z-index:20;
+  height:12px;
+  border:3px solid rgba(255,255,255,.94);
+  border-radius:999px;
+  background:#557890;
+  transform-origin:left center;
+  pointer-events:none;
+  box-shadow:0 4px 12px rgba(37,57,76,.24);
+}
+
+.liveRouteLine.shortcut{
+  background:#78927e;
+}
+
+.dbBuildingMarker{
+  position:absolute;
+  z-index:19;
+  transform:translate(-50%,-50%);
+  min-width:20px;
+  min-height:20px;
+  padding:5px 7px;
+  border:3px solid rgba(255,255,255,.92);
+  border-radius:999px;
+  background:#536f86;
+  color:white;
+  font-size:7px;
+  font-weight:850;
+  cursor:pointer;
+  box-shadow:0 5px 14px rgba(31,41,51,.22);
+}
+
+.adminMapToggle{
+  display:none;
+  min-height:33px;
+  padding:0 11px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:9px;
+  background:rgba(255,255,255,.09);
+  color:white;
+  cursor:pointer;
+  font-size:8px;
+  font-weight:800;
+}
+
+.adminMapToggle.visible{
+  display:inline-flex;
+  align-items:center;
+}
+
+.adminMapPanel{
+  display:none;
+  padding:16px;
+}
+
+.adminMapPanel.visible{
+  display:block;
+}
+
+.adminMapPanel h2{
+  margin:0;
+  font-size:14px;
+}
+
+.adminMapPanel > p{
+  margin:5px 0 14px;
+  color:var(--muted);
+  font-size:8px;
+  line-height:1.5;
+}
+
+.adminEditorBlock{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+}
+
+.adminEditorBlock:first-of-type{
+  margin-top:0;
+  padding-top:0;
+  border-top:0;
+}
+
+.adminEditorBlock h3{
+  margin:0 0 8px;
+  font-size:9px;
+}
+
+.adminEditorGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.adminEditorGrid .full{
+  grid-column:1 / -1;
+}
+
+.adminEditorGrid input,
+.adminEditorGrid select{
+  width:100%;
+  min-height:36px;
+  padding:0 9px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:white;
+  color:var(--ink);
+  font-size:8px;
+}
+
+.adminEditorActions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+
+.adminEditorActions button{
+  min-height:34px;
+  padding:0 10px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:white;
+  color:#52606c;
+  cursor:pointer;
+  font-size:8px;
+  font-weight:750;
+}
+
+.adminEditorActions button.primary{
+  border-color:transparent;
+  background:#5f7891;
+  color:white;
+}
+
+.adminEditorActions button.danger{
+  color:#934c40;
+  background:#fff7f4;
+}
+
+.adminMapMessage{
+  margin-top:10px;
+  color:#62707c;
+  font-size:8px;
+  line-height:1.45;
+}
+
+.adminCheck{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-height:34px;
+  font-size:8px;
+  color:#596774;
+}
+
+.adminCheck input{
+  width:auto;
+  min-height:auto;
+}
+
+@media(max-width:540px){
+  .adminEditorGrid{
+    grid-template-columns:1fr;
+  }
+
+  .adminEditorGrid .full{
+    grid-column:auto;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="brand">
+
+    <div class="brandMark">
+      R
+    </div>
+
+    <div class="brandText">
+      <b>
+        RNS Campus Navigator
+      </b>
+
+      <small>
+        CampusConnect · Find places faster
+      </small>
+    </div>
+
+  </div>
+
+  <div class="topActions">
+
+    <span class="guideBadge">
+      CAMPUS WAYFINDING
+    </span>
+
+    <button
+      class="adminMapToggle"
+      id="adminMapToggle"
+      type="button"
+    >
+      Edit campus map
+    </button>
+
+  </div>
+
+</header>
+
+
+<main class="app">
+
+  <aside class="sidebar">
+
+    <section class="card navigator">
+
+      <span class="eyebrow">
+        CAMPUS NAVIGATION
+      </span>
+
+      <h1>
+        Where do you want to go?
+      </h1>
+
+      <p class="navigatorIntro">
+        Search buildings, choose your starting point and get a clear visual walking route across campus.
+      </p>
+
+
+      <div class="field">
+
+        <label>
+          STARTING POINT
+        </label>
+
+        <select id="start">
+        </select>
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          DESTINATION
+        </label>
+
+        <input
+          id="search"
+          list="places"
+          placeholder="Search library, ECE block, canteen..."
+          autocomplete="off"
+        >
+
+        <datalist id="places">
+        </datalist>
+
+      </div>
+
+
+      <button
+        class="navigateButton"
+        id="navigate"
+        type="button"
+      >
+        Show walking route
+      </button>
+
+      <button
+        class="liveNavigateButton"
+        id="liveNavigate"
+        type="button"
+      >
+        Start live navigation
+      </button>
+
+      <div
+        class="liveNavStatus"
+        id="liveNavStatus"
+      >
+      </div>
+
+
+      <div
+        class="routeCard"
+        id="route"
+      >
+
+        <strong>
+          Choose a destination
+        </strong>
+
+        <small>
+          Your estimated walking route will appear here.
+        </small>
+
+      </div>
+
+    </section>
+
+
+    <section class="card sectionCard">
+
+      <div class="sectionHeader">
+
+        <b>
+          Explore campus
+        </b>
+
+        <span>
+          Filter map
+        </span>
+
+      </div>
+
+      <div
+        class="categoryGrid"
+        id="categories"
+      >
+      </div>
+
+    </section>
+
+
+    <section class="card sectionCard">
+
+      <div class="sectionHeader">
+
+        <b>
+          Quick destinations
+        </b>
+
+        <span>
+          Popular places
+        </span>
+
+      </div>
+
+      <div class="quickPlaces">
+
+        <button
+          class="quickPlace"
+          type="button"
+          data-place="Central Library and College Offices"
+        >
+
+          <span class="quickIcon">
+            B
+          </span>
+
+          <span>
+            <b>
+              Central Library
+            </b>
+
+            <small>
+              Library & college offices
+            </small>
+          </span>
+
+          <span class="quickArrow">
+            ›
+          </span>
+
+        </button>
+
+
+        <button
+          class="quickPlace"
+          type="button"
+          data-place="Academic Block 1 - ECE and COE"
+        >
+
+          <span class="quickIcon">
+            E
+          </span>
+
+          <span>
+            <b>
+              ECE Block
+            </b>
+
+            <small>
+              Academic Block 1
+            </small>
+          </span>
+
+          <span class="quickArrow">
+            ›
+          </span>
+
+        </button>
+
+
+        <button
+          class="quickPlace"
+          type="button"
+          data-place="Canteen"
+        >
+
+          <span class="quickIcon">
+            C
+          </span>
+
+          <span>
+            <b>
+              Canteen
+            </b>
+
+            <small>
+              Food & student area
+            </small>
+          </span>
+
+          <span class="quickArrow">
+            ›
+          </span>
+
+        </button>
+
+
+        <button
+          class="quickPlace"
+          type="button"
+          data-place="Academic Block 4 - Training and Placement Cell, MBA"
+        >
+
+          <span class="quickIcon">
+            P
+          </span>
+
+          <span>
+            <b>
+              Placement Cell
+            </b>
+
+            <small>
+              Academic Block 4
+            </small>
+          </span>
+
+          <span class="quickArrow">
+            ›
+          </span>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+
+    <section
+      class="card adminMapPanel"
+      id="adminMapPanel"
+    >
+
+      <h2>
+        Campus Map Editor
+      </h2>
+
+      <p>
+        Main Admin only. Changes are saved to the authenticated CampusConnect map database.
+      </p>
+
+      <div class="adminEditorBlock">
+
+        <h3>
+          Building
+        </h3>
+
+        <div class="adminEditorGrid">
+
+          <select
+            class="full"
+            id="adminBuildingExisting"
+          >
+            <option value="">
+              Add new building
+            </option>
+          </select>
+
+          <input
+            class="full"
+            id="adminBuildingName"
+            placeholder="Building name"
+          >
+
+          <select
+            id="adminBuildingCategory"
+          >
+            <option>Academic</option>
+            <option>Administration</option>
+            <option>Library</option>
+            <option>Food</option>
+            <option>Hostel</option>
+            <option>Sports</option>
+            <option>Medical</option>
+            <option>Parking</option>
+            <option>Entrance</option>
+            <option>Facility</option>
+            <option>Other</option>
+          </select>
+
+          <input
+            id="adminBuildingShort"
+            placeholder="Short name"
+          >
+
+          <input
+            id="adminBuildingLat"
+            type="number"
+            step="any"
+            placeholder="Latitude"
+          >
+
+          <input
+            id="adminBuildingLng"
+            type="number"
+            step="any"
+            placeholder="Longitude"
+          >
+
+          <input
+            id="adminBuildingX"
+            type="number"
+            step="any"
+            placeholder="Map X"
+          >
+
+          <input
+            id="adminBuildingY"
+            type="number"
+            step="any"
+            placeholder="Map Y"
+          >
+
+        </div>
+
+        <div class="adminEditorActions">
+
+          <button
+            type="button"
+            id="adminBuildingGps"
+          >
+            Use current GPS
+          </button>
+
+          <button
+            type="button"
+            class="primary"
+            id="adminBuildingSave"
+          >
+            Save building
+          </button>
+
+          <button
+            type="button"
+            class="danger"
+            id="adminBuildingDelete"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="adminEditorBlock">
+
+        <h3>
+          Path waypoint
+        </h3>
+
+        <div class="adminEditorGrid">
+
+          <select
+            class="full"
+            id="adminNodeExisting"
+          >
+            <option value="">
+              Add new waypoint
+            </option>
+          </select>
+
+          <input
+            class="full"
+            id="adminNodeName"
+            placeholder="Waypoint / junction name"
+          >
+
+          <select
+            id="adminNodeType"
+          >
+            <option>Path</option>
+            <option>Entrance</option>
+            <option>Junction</option>
+            <option>Building</option>
+            <option>Gate</option>
+            <option>Shortcut</option>
+            <option>Landmark</option>
+          </select>
+
+          <span></span>
+
+          <input
+            id="adminNodeLat"
+            type="number"
+            step="any"
+            placeholder="Latitude"
+          >
+
+          <input
+            id="adminNodeLng"
+            type="number"
+            step="any"
+            placeholder="Longitude"
+          >
+
+          <input
+            id="adminNodeX"
+            type="number"
+            step="any"
+            placeholder="Map X"
+          >
+
+          <input
+            id="adminNodeY"
+            type="number"
+            step="any"
+            placeholder="Map Y"
+          >
+
+        </div>
+
+        <div class="adminEditorActions">
+
+          <button
+            type="button"
+            id="adminNodeGps"
+          >
+            Use current GPS
+          </button>
+
+          <button
+            type="button"
+            class="primary"
+            id="adminNodeSave"
+          >
+            Save waypoint
+          </button>
+
+          <button
+            type="button"
+            class="danger"
+            id="adminNodeDelete"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="adminEditorBlock">
+
+        <h3>
+          Walking path
+        </h3>
+
+        <div class="adminEditorGrid">
+
+          <select
+            class="full"
+            id="adminEdgeExisting"
+          >
+            <option value="">
+              Add new path
+            </option>
+          </select>
+
+          <select id="adminEdgeFrom">
+          </select>
+
+          <select id="adminEdgeTo">
+          </select>
+
+          <select id="adminEdgeType">
+            <option>Walkway</option>
+            <option>Road</option>
+            <option>Stairs</option>
+            <option>Ramp</option>
+            <option>Shortcut</option>
+            <option>Indoor</option>
+            <option>Covered</option>
+          </select>
+
+          <input
+            id="adminEdgeName"
+            placeholder="Path name"
+          >
+
+          <label class="adminCheck">
+            <input
+              id="adminEdgeShortcut"
+              type="checkbox"
+            >
+            Shortcut
+          </label>
+
+          <label class="adminCheck">
+            <input
+              id="adminEdgeBidirectional"
+              type="checkbox"
+              checked
+            >
+            Two way
+          </label>
+
+          <label class="adminCheck">
+            <input
+              id="adminEdgeAccessible"
+              type="checkbox"
+              checked
+            >
+            Accessible
+          </label>
+
+          <label class="adminCheck">
+            <input
+              id="adminEdgeClosed"
+              type="checkbox"
+            >
+            Closed
+          </label>
+
+        </div>
+
+        <div class="adminEditorActions">
+
+          <button
+            type="button"
+            class="primary"
+            id="adminEdgeSave"
+          >
+            Save path
+          </button>
+
+          <button
+            type="button"
+            class="danger"
+            id="adminEdgeDelete"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+      <div
+        class="adminMapMessage"
+        id="adminMapMessage"
+      >
+        Load the map database to begin editing.
+      </div>
+
+    </section>
+
+
+    <div class="notice">
+      Campus routes are a visual guide based on the current CampusConnect map model. Confirm restricted entrances, accessibility and temporary route changes with the institution.
+    </div>
+
+  </aside>
+
+
+  <section class="mapShell">
+
+    <div class="mapHeader">
+
+      <div class="mapTitle">
+
+        <b>
+          RNSIT Campus Overview
+        </b>
+
+        <small>
+          Select any building to view details
+        </small>
+
+      </div>
+
+      <div class="compass">
+        N ↑
+      </div>
+
+    </div>
+
+
+    <div class="viewport">
+
+      <div
+        class="world"
+        id="world"
+      >
+
+        <div class="road r1">
+        </div>
+
+        <div class="road r2">
+        </div>
+
+        <div class="road r3">
+        </div>
+
+        <div class="road r4">
+        </div>
+
+        <div class="road r5">
+        </div>
+
+        <div class="garden">
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="placeDetails"
+      id="placeDetails"
+    >
+    </div>
+
+
+    <div class="mapControls">
+
+      <button
+        id="minus"
+        type="button"
+        aria-label="Zoom out"
+        title="Zoom out"
+      >
+        −
+      </button>
+
+      <button
+        id="reset"
+        type="button"
+        aria-label="Reset map"
+        title="Reset map"
+      >
+        ⌂
+      </button>
+
+      <button
+        id="plus"
+        type="button"
+        aria-label="Zoom in"
+        title="Zoom in"
+      >
+        +
+      </button>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script>
+const places = [
+  {
+    name: "Main Gate",
+    short: "Main Gate",
+    x: 130,
+    y: 610,
+    className: "gate",
+    category: "Access",
+    description:
+      "Primary campus entrance and a useful starting point for navigation."
+  },
+  {
+    name: "Administrative Block - Director, Principal and Offices",
+    short: "Administrative Block",
+    x: 290,
+    y: 532,
+    className: "b-admin",
+    category: "Administration",
+    description:
+      "Administrative offices including institutional leadership and college offices."
+  },
+  {
+    name: "Academic Block 1 - ECE and COE",
+    short: "Academic Block 1",
+    x: 600,
+    y: 490,
+    className: "b-a1",
+    category: "Academic",
+    description:
+      "Academic block serving ECE and COE departments."
+  },
+  {
+    name: "Academic Block 2 - CSE, ISE and MCA",
+    short: "Academic Block 2",
+    x: 770,
+    y: 470,
+    className: "b-a2",
+    category: "Academic",
+    description:
+      "Academic block serving CSE, ISE and MCA."
+  },
+  {
+    name: "Academic Block 3 - Mechanical, CSE-DS and EEE",
+    short: "Academic Block 3",
+    x: 590,
+    y: 360,
+    className: "b-a3",
+    category: "Academic",
+    description:
+      "Academic block serving Mechanical, CSE-DS and EEE."
+  },
+  {
+    name: "Academic Block 4 - Training and Placement Cell, MBA",
+    short: "Academic Block 4",
+    x: 765,
+    y: 335,
+    className: "b-a4",
+    category: "Academic",
+    description:
+      "Home to Training and Placement activities and MBA facilities."
+  },
+  {
+    name: "Academic Block 5 - CSE-AIML and Civil",
+    short: "Academic Block 5",
+    x: 615,
+    y: 210,
+    className: "b-a5",
+    category: "Academic",
+    description:
+      "Academic block serving CSE-AIML and Civil."
+  },
+  {
+    name: "Auditorium Complex",
+    short: "Auditorium",
+    x: 315,
+    y: 180,
+    className: "b-aud",
+    category: "Campus Life",
+    description:
+      "Campus auditorium complex used for major events, sessions and gatherings."
+  },
+  {
+    name: "Central Library and College Offices",
+    short: "Central Library",
+    x: 175,
+    y: 330,
+    className: "b-library",
+    category: "Resources",
+    description:
+      "Central academic library and associated college offices."
+  },
+  {
+    name: "RNS PU College",
+    short: "RNS PU College",
+    x: 175,
+    y: 435,
+    className: "b-pu",
+    category: "Academic",
+    description:
+      "RNS PU College area within the campus."
+  },
+  {
+    name: "RNS First Grade College",
+    short: "First Grade College",
+    x: 575,
+    y: 292,
+    className: "b-first",
+    category: "Academic",
+    description:
+      "RNS First Grade College building."
+  },
+  {
+    name: "RNS International School",
+    short: "International School",
+    x: 705,
+    y: 292,
+    className: "b-school",
+    category: "Academic",
+    description:
+      "RNS International School campus building."
+  },
+  {
+    name: "RNS School of Architecture",
+    short: "School of Architecture",
+    x: 580,
+    y: 422,
+    className: "b-arch",
+    category: "Academic",
+    description:
+      "Campus building for the School of Architecture."
+  },
+  {
+    name: "New College Extension",
+    short: "College Extension",
+    x: 407,
+    y: 355,
+    className: "b-extension",
+    category: "Academic",
+    description:
+      "New college extension area."
+  },
+  {
+    name: "Boys Hostel",
+    short: "Boys Hostel",
+    x: 822,
+    y: 200,
+    className: "b-boys",
+    category: "Hostel",
+    description:
+      "Boys hostel area."
+  },
+  {
+    name: "Girls Hostel",
+    short: "Girls Hostel",
+    x: 782,
+    y: 562,
+    className: "b-girls",
+    category: "Hostel",
+    description:
+      "Girls hostel area."
+  },
+  {
+    name: "Canteen",
+    short: "Canteen",
+    x: 190,
+    y: 535,
+    className: "b-canteen",
+    category: "Food",
+    description:
+      "Campus canteen and student food area."
+  },
+  {
+    name: "Temple",
+    short: "Temple",
+    x: 438,
+    y: 562,
+    className: "b-temple",
+    category: "Campus Life",
+    description:
+      "Temple located within the campus."
+  },
+  {
+    name: "Playground 1",
+    short: "Playground 1",
+    x: 592,
+    y: 105,
+    className: "b-play1",
+    category: "Sports",
+    description:
+      "Outdoor playground area."
+  },
+  {
+    name: "Playground 2",
+    short: "Playground 2",
+    x: 762,
+    y: 105,
+    className: "b-play2",
+    category: "Sports",
+    description:
+      "Outdoor playground area."
+  },
+  {
+    name: "Sports Courts",
+    short: "Sports Courts",
+    x: 300,
+    y: 97,
+    className: "b-court",
+    category: "Sports",
+    description:
+      "Campus sports court area."
+  },
+  {
+    name: "Central Fountain and Garden",
+    short: "Central Garden",
+    x: 285,
+    y: 345,
+    className: "garden",
+    category: "Campus Life",
+    description:
+      "Central landscaped garden and fountain area."
+  }
+];
+
+const categoryColors = {
+  All: "#5f7891",
+  Academic: "#607e98",
+  Administration: "#536f86",
+  Resources: "#8a775d",
+  Food: "#b98647",
+  Hostel: "#827793",
+  Sports: "#78927e",
+  "Campus Life": "#ad654d",
+  Access: "#6f7f87"
+};
+
+const world =
+  document.querySelector(
+    "#world"
+  );
+
+const start =
+  document.querySelector(
+    "#start"
+  );
+
+const search =
+  document.querySelector(
+    "#search"
+  );
+
+const datalist =
+  document.querySelector(
+    "#places"
+  );
+
+const route =
+  document.querySelector(
+    "#route"
+  );
+
+const categoryContainer =
+  document.querySelector(
+    "#categories"
+  );
+
+const placeDetails =
+  document.querySelector(
+    "#placeDetails"
+  );
+
+let activeCategory = "All";
+
+let activePlace = null;
+
+let zoom = 1;
+
+let favorites = [];
+
+try {
+  favorites =
+    JSON.parse(
+      localStorage.getItem(
+        "campusconnect-map-favorites"
+      ) || "[]"
+    );
+} catch {
+  favorites = [];
+}
+
+places.forEach(
+  (place,index) => {
+
+    start.add(
+      new Option(
+        place.name,
+        String(index)
+      )
+    );
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value =
+      place.name;
+
+    datalist.append(
+      option
+    );
+
+    if (
+      place.className ===
+      "gate"
+    ) {
+      return;
+    }
+
+    if (
+      place.className ===
+      "garden"
+    ) {
+      return;
+    }
+
+    const building =
+      document.createElement(
+        "button"
+      );
+
+    building.type =
+      "button";
+
+    building.className =
+      `building ${place.className}`;
+
+    building.dataset.index =
+      String(index);
+
+    building.dataset.category =
+      place.category;
+
+    building.innerHTML =
+      `<span>${place.short}</span>`;
+
+    building.addEventListener(
+      "click",
+      () => {
+        selectPlace(
+          index,
+          true
+        );
+      }
+    );
+
+    world.append(
+      building
+    );
+  }
+);
+
+start.value = "0";
+
+
+const categories = [
+  "All",
+  ...new Set(
+    places.map(
+      place =>
+        place.category
+    )
+  )
+];
+
+categories.forEach(
+  category => {
+
+    const button =
+      document.createElement(
+        "button"
+      );
+
+    button.type =
+      "button";
+
+    button.className =
+      "categoryButton" +
+      (
+        category === "All"
+          ? " active"
+          : ""
+      );
+
+    button.dataset.category =
+      category;
+
+    button.innerHTML =
+      `<span class="categoryDot" style="background:${categoryColors[category] || "#5f7891"}"></span><span>${category}</span>`;
+
+    button.addEventListener(
+      "click",
+      () =>
+        applyCategory(
+          category
+        )
+    );
+
+    categoryContainer.append(
+      button
+    );
+  }
+);
+
+
+function applyCategory(
+  category
+) {
+  activeCategory =
+    category;
+
+  document
+    .querySelectorAll(
+      ".categoryButton"
+    )
+    .forEach(
+      button => {
+        button.classList.toggle(
+          "active",
+          button.dataset.category ===
+            category
+        );
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".building"
+    )
+    .forEach(
+      building => {
+
+        const hidden =
+          category !==
+            "All" &&
+          building.dataset.category !==
+            category;
+
+        building.classList.toggle(
+          "filteredOut",
+          hidden
+        );
+      }
+    );
+}
+
+
+function selectPlace(
+  index,
+  drawRoute = false
+) {
+  const place =
+    places[index];
+
+  if (!place) {
+    return;
+  }
+
+  activePlace =
+    place;
+
+  search.value =
+    place.name;
+
+  document
+    .querySelectorAll(
+      ".building"
+    )
+    .forEach(
+      building =>
+        building.classList.remove(
+          "selected"
+        )
+    );
+
+  const button =
+    document.querySelector(
+      `[data-index="${index}"]`
+    );
+
+  if (button) {
+    button.classList.add(
+      "selected"
+    );
+  }
+
+  renderPlaceDetails(
+    place
+  );
+
+  if (drawRoute) {
+    draw();
+  }
+}
+
+
+function renderPlaceDetails(
+  place
+) {
+  const saved =
+    favorites.includes(
+      place.name
+    );
+
+  placeDetails.innerHTML = `
+    <div class="placeDetailsHeader">
+
+      <div>
+
+        <small>
+          ${place.category.toUpperCase()}
+        </small>
+
+        <b>
+          ${place.name}
+        </b>
+
+      </div>
+
+      <button
+        class="favoriteButton ${saved ? "saved" : ""}"
+        id="favoritePlace"
+        type="button"
+        aria-label="Save place"
+      >
+        ${saved ? "♥" : "♡"}
+      </button>
+
+    </div>
+
+    <p class="placeDescription">
+      ${place.description}
+    </p>
+
+    <div class="placeMeta">
+
+      <span>
+        ${place.category}
+      </span>
+
+      <span>
+        Campus location
+      </span>
+
+    </div>
+
+    <div class="placeActions">
+
+      <button
+        type="button"
+        id="setStartHere"
+      >
+        Start here
+      </button>
+
+      <button
+        type="button"
+        class="primary"
+        id="navigateHere"
+      >
+        Navigate here
+      </button>
+
+    </div>
+  `;
+
+  placeDetails.classList.add(
+    "visible"
+  );
+
+  document
+    .querySelector(
+      "#favoritePlace"
+    )
+    .addEventListener(
+      "click",
+      () => {
+        toggleFavorite(
+          place.name
+        );
+
+        renderPlaceDetails(
+          place
+        );
+      }
+    );
+
+  document
+    .querySelector(
+      "#setStartHere"
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+        const index =
+          places.indexOf(
+            place
+          );
+
+        start.value =
+          String(index);
+
+        route.innerHTML = `
+          <strong>
+            Starting point updated
+          </strong>
+
+          <small>
+            ${place.name} is now your starting point.
+          </small>
+        `;
+      }
+    );
+
+  document
+    .querySelector(
+      "#navigateHere"
+    )
+    .addEventListener(
+      "click",
+      draw
+    );
+}
+
+
+function toggleFavorite(
+  name
+) {
+  if (
+    favorites.includes(
+      name
+    )
+  ) {
+    favorites =
+      favorites.filter(
+        item =>
+          item !== name
+      );
+  } else {
+    favorites = [
+      ...favorites,
+      name
+    ];
+  }
+
+  localStorage.setItem(
+    "campusconnect-map-favorites",
+    JSON.stringify(
+      favorites
+    )
+  );
+}
+
+
+function clearRoute() {
+  world
+    .querySelectorAll(
+      ".routeLine,.pin"
+    )
+    .forEach(
+      element =>
+        element.remove()
+    );
+}
+
+
+function draw() {
+  clearRoute();
+
+  const startPlace =
+    places[
+      Number(
+        start.value
+      )
+    ];
+
+  const destination =
+    places.find(
+      place =>
+        place.name.toLowerCase() ===
+        search.value
+          .trim()
+          .toLowerCase()
+    );
+
+  if (
+    !startPlace ||
+    !destination
+  ) {
+    route.innerHTML = `
+      <strong>
+        Destination not found
+      </strong>
+
+      <small>
+        Select a destination from the available campus locations.
+      </small>
+    `;
+
+    return;
+  }
+
+  activePlace =
+    destination;
+
+  const destinationIndex =
+    places.indexOf(
+      destination
+    );
+
+  document
+    .querySelectorAll(
+      ".building"
+    )
+    .forEach(
+      building =>
+        building.classList.remove(
+          "selected"
+        )
+    );
+
+  const selectedButton =
+    document.querySelector(
+      `[data-index="${destinationIndex}"]`
+    );
+
+  if (
+    selectedButton
+  ) {
+    selectedButton.classList.add(
+      "selected"
+    );
+  }
+
+  renderPlaceDetails(
+    destination
+  );
+
+  const middleStart = [
+    startPlace.name ===
+      "Main Gate"
+      ? 430
+      : startPlace.x,
+
+    startPlace.name ===
+      "Main Gate"
+      ? 610
+      : startPlace.y
+  ];
+
+  const points = [
+    [
+      startPlace.x,
+      startPlace.y
+    ],
+    middleStart,
+    [
+      430,
+      destination.y
+    ],
+    [
+      destination.x,
+      destination.y
+    ]
+  ];
+
+  for (
+    let index = 0;
+    index <
+      points.length - 1;
+    index += 1
+  ) {
+    const [
+      x1,
+      y1
+    ] =
+      points[index];
+
+    const [
+      x2,
+      y2
+    ] =
+      points[index + 1];
+
+    const dx =
+      x2 - x1;
+
+    const dy =
+      y2 - y1;
+
+    const distance =
+      Math.hypot(
+        dx,
+        dy
+      );
+
+    if (
+      distance < 4
+    ) {
+      continue;
+    }
+
+    const line =
+      document.createElement(
+        "i"
+      );
+
+    line.className =
+      "routeLine";
+
+    Object.assign(
+      line.style,
+      {
+        left:
+          `${x1}px`,
+
+        top:
+          `${y1}px`,
+
+        width:
+          `${distance}px`,
+
+        transform:
+          `rotate(${Math.atan2(dy,dx)}rad)`
+      }
+    );
+
+    world.append(
+      line
+    );
+  }
+
+  const pin =
+    document.createElement(
+      "i"
+    );
+
+  pin.className =
+    "pin";
+
+  pin.style.left =
+    `${destination.x}px`;
+
+  pin.style.top =
+    `${destination.y}px`;
+
+  world.append(
+    pin
+  );
+
+  const distance =
+    Math.round(
+      points
+        .slice(1)
+        .reduce(
+          (
+            total,
+            point,
+            index
+          ) =>
+            total +
+            Math.hypot(
+              point[0] -
+                points[index][0],
+
+              point[1] -
+                points[index][1]
+            ),
+          0
+        ) *
+        0.55
+    );
+
+  const walkingMinutes =
+    Math.max(
+      1,
+      Math.ceil(
+        distance / 75
+      )
+    );
+
+  route.innerHTML = `
+    <strong>
+      ${startPlace.short} → ${destination.short}
+    </strong>
+
+    <small>
+      Estimated campus walking route
+    </small>
+
+    <div class="routeStats">
+
+      <div class="routeStat">
+        <b>
+          ${distance} m
+        </b>
+
+        <span>
+          Approx. distance
+        </span>
+      </div>
+
+      <div class="routeStat">
+        <b>
+          ${walkingMinutes} min
+        </b>
+
+        <span>
+          Approx. walk
+        </span>
+      </div>
+
+    </div>
+  `;
+}
+
+
+document
+  .querySelector(
+    "#navigate"
+  )
+  .addEventListener(
+    "click",
+    draw
+  );
+
+
+search.addEventListener(
+  "change",
+  () => {
+
+    const destination =
+      places.find(
+        place =>
+          place.name.toLowerCase() ===
+          search.value
+            .trim()
+            .toLowerCase()
+      );
+
+    if (
+      destination
+    ) {
+      selectPlace(
+        places.indexOf(
+          destination
+        ),
+        false
+      );
+    }
+  }
+);
+
+
+document
+  .querySelectorAll(
+    ".quickPlace"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const destination =
+            places.find(
+              place =>
+                place.name ===
+                button.dataset.place
+            );
+
+          if (
+            !destination
+          ) {
+            return;
+          }
+
+          search.value =
+            destination.name;
+
+          selectPlace(
+            places.indexOf(
+              destination
+            ),
+            true
+          );
+        }
+      );
+    }
+  );
+
+
+function updateZoom() {
+  world.style.zoom =
+    zoom;
+}
+
+
+document
+  .querySelector(
+    "#plus"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      zoom =
+        Math.min(
+          1.35,
+          zoom + 0.1
+        );
+
+      updateZoom();
+    }
+  );
+
+
+document
+  .querySelector(
+    "#minus"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      zoom =
+        Math.max(
+          0.65,
+          zoom - 0.1
+        );
+
+      updateZoom();
+    }
+  );
+
+
+document
+  .querySelector(
+    "#reset"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      zoom = 1;
+
+      activeCategory =
+        "All";
+
+      search.value =
+        "";
+
+      updateZoom();
+
+      clearRoute();
+
+      applyCategory(
+        "All"
+      );
+
+      document
+        .querySelectorAll(
+          ".building"
+        )
+        .forEach(
+          building =>
+            building.classList.remove(
+              "selected"
+            )
+        );
+
+      placeDetails.classList.remove(
+        "visible"
+      );
+
+      route.innerHTML = `
+        <strong>
+          Choose a destination
+        </strong>
+
+        <small>
+          Your estimated walking route will appear here.
+        </small>
+      `;
+    }
+  );
+
+
+const liveNavigateButton =
+  document.querySelector(
+    "#liveNavigate"
+  );
+
+const liveNavStatus =
+  document.querySelector(
+    "#liveNavStatus"
+  );
+
+const adminMapToggle =
+  document.querySelector(
+    "#adminMapToggle"
+  );
+
+const adminMapPanel =
+  document.querySelector(
+    "#adminMapPanel"
+  );
+
+const adminMapMessage =
+  document.querySelector(
+    "#adminMapMessage"
+  );
+
+let campusMapBuildings = [];
+let campusMapNodes = [];
+let campusMapEdges = [];
+
+let canManageCampusMap = false;
+
+let currentGpsPosition = null;
+let gpsWatchId = null;
+let liveDestination = null;
+let activeGraphRoute = [];
+let lastRouteOriginNodeId = null;
+
+
+function sendToCampusConnect(
+  message
+) {
+  window.parent.postMessage(
+    message,
+    window.location.origin
+  );
+}
+
+
+function setLiveStatus(
+  title,
+  text
+) {
+  liveNavStatus.classList.add(
+    "visible"
+  );
+
+  liveNavStatus.innerHTML = `
+    <strong>
+      ${title}
+    </strong>
+
+    <br>
+
+    ${text}
+  `;
+}
+
+
+function haversineMeters(
+  lat1,
+  lng1,
+  lat2,
+  lng2
+) {
+  const radius =
+    6371000;
+
+  const toRad =
+    value =>
+      value *
+      Math.PI /
+      180;
+
+  const dLat =
+    toRad(
+      lat2 - lat1
+    );
+
+  const dLng =
+    toRad(
+      lng2 - lng1
+    );
+
+  const a =
+    Math.sin(
+      dLat / 2
+    ) ** 2 +
+    Math.cos(
+      toRad(lat1)
+    ) *
+    Math.cos(
+      toRad(lat2)
+    ) *
+    Math.sin(
+      dLng / 2
+    ) ** 2;
+
+  return (
+    radius *
+    2 *
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    )
+  );
+}
+
+
+function validNumber(
+  value
+) {
+  return (
+    typeof value ===
+      "number" &&
+    Number.isFinite(
+      value
+    )
+  );
+}
+
+
+function nodeDistance(
+  a,
+  b
+) {
+  if (
+    validNumber(a.latitude) &&
+    validNumber(a.longitude) &&
+    validNumber(b.latitude) &&
+    validNumber(b.longitude)
+  ) {
+    return haversineMeters(
+      a.latitude,
+      a.longitude,
+      b.latitude,
+      b.longitude
+    );
+  }
+
+  if (
+    validNumber(a.map_x) &&
+    validNumber(a.map_y) &&
+    validNumber(b.map_x) &&
+    validNumber(b.map_y)
+  ) {
+    return (
+      Math.hypot(
+        b.map_x - a.map_x,
+        b.map_y - a.map_y
+      ) *
+      0.55
+    );
+  }
+
+  return Infinity;
+}
+
+
+function nearestGpsNode(
+  latitude,
+  longitude
+) {
+  const candidates =
+    campusMapNodes.filter(
+      node =>
+        node.is_active !== false &&
+        validNumber(
+          node.latitude
+        ) &&
+        validNumber(
+          node.longitude
+        )
+    );
+
+  let winner = null;
+  let best = Infinity;
+
+  candidates.forEach(
+    node => {
+      const distance =
+        haversineMeters(
+          latitude,
+          longitude,
+          node.latitude,
+          node.longitude
+        );
+
+      if (
+        distance <
+        best
+      ) {
+        best =
+          distance;
+        winner =
+          node;
+      }
+    }
+  );
+
+  return winner
+    ? {
+        node: winner,
+        distance: best
+      }
+    : null;
+}
+
+
+function findDestinationBuilding() {
+  const value =
+    search.value
+      .trim()
+      .toLowerCase();
+
+  if (!value) {
+    return null;
+  }
+
+  return (
+    campusMapBuildings.find(
+      building =>
+        String(
+          building.name ||
+          ""
+        )
+          .trim()
+          .toLowerCase() ===
+        value
+    ) ||
+    campusMapBuildings.find(
+      building =>
+        String(
+          building.short_name ||
+          ""
+        )
+          .trim()
+          .toLowerCase() ===
+        value
+    ) ||
+    null
+  );
+}
+
+
+function destinationNodeForBuilding(
+  building
+) {
+  const linked =
+    campusMapNodes.find(
+      node =>
+        node.building_id ===
+        building.id &&
+        node.is_active !==
+          false
+    );
+
+  if (linked) {
+    return linked;
+  }
+
+  const latitude =
+    validNumber(
+      building.entrance_latitude
+    )
+      ? building.entrance_latitude
+      : building.latitude;
+
+  const longitude =
+    validNumber(
+      building.entrance_longitude
+    )
+      ? building.entrance_longitude
+      : building.longitude;
+
+  if (
+    !validNumber(latitude) ||
+    !validNumber(longitude)
+  ) {
+    return null;
+  }
+
+  return nearestGpsNode(
+    latitude,
+    longitude
+  )?.node || null;
+}
+
+
+function shortestPath(
+  startId,
+  endId
+) {
+  const activeNodes =
+    campusMapNodes.filter(
+      node =>
+        node.is_active !==
+        false
+    );
+
+  const nodesById =
+    new Map(
+      activeNodes.map(
+        node => [
+          node.id,
+          node
+        ]
+      )
+    );
+
+  if (
+    !nodesById.has(
+      startId
+    ) ||
+    !nodesById.has(
+      endId
+    )
+  ) {
+    return [];
+  }
+
+  const adjacency =
+    new Map();
+
+  activeNodes.forEach(
+    node =>
+      adjacency.set(
+        node.id,
+        []
+      )
+  );
+
+  campusMapEdges
+    .filter(
+      edge =>
+        !edge.is_closed
+    )
+    .forEach(
+      edge => {
+        const from =
+          nodesById.get(
+            edge.from_node
+          );
+
+        const to =
+          nodesById.get(
+            edge.to_node
+          );
+
+        if (
+          !from ||
+          !to
+        ) {
+          return;
+        }
+
+        const weight =
+          validNumber(
+            edge.distance_m
+          )
+            ? edge.distance_m
+            : nodeDistance(
+                from,
+                to
+              );
+
+        if (
+          !Number.isFinite(
+            weight
+          )
+        ) {
+          return;
+        }
+
+        adjacency
+          .get(from.id)
+          .push({
+            nodeId: to.id,
+            weight,
+            edge
+          });
+
+        if (
+          edge.is_bidirectional !==
+          false
+        ) {
+          adjacency
+            .get(to.id)
+            .push({
+              nodeId: from.id,
+              weight,
+              edge
+            });
+        }
+      }
+    );
+
+  const distances =
+    new Map();
+
+  const previous =
+    new Map();
+
+  const previousEdge =
+    new Map();
+
+  const unvisited =
+    new Set(
+      nodesById.keys()
+    );
+
+  nodesById.forEach(
+    (_, id) =>
+      distances.set(
+        id,
+        Infinity
+      )
+  );
+
+  distances.set(
+    startId,
+    0
+  );
+
+  while (
+    unvisited.size
+  ) {
+    let current = null;
+    let best = Infinity;
+
+    unvisited.forEach(
+      id => {
+        const value =
+          distances.get(
+            id
+          );
+
+        if (
+          value < best
+        ) {
+          best = value;
+          current = id;
+        }
+      }
+    );
+
+    if (
+      current === null ||
+      best === Infinity
+    ) {
+      break;
+    }
+
+    if (
+      current ===
+      endId
+    ) {
+      break;
+    }
+
+    unvisited.delete(
+      current
+    );
+
+    (
+      adjacency.get(
+        current
+      ) || []
+    ).forEach(
+      item => {
+        if (
+          !unvisited.has(
+            item.nodeId
+          )
+        ) {
+          return;
+        }
+
+        const alternative =
+          best +
+          item.weight;
+
+        if (
+          alternative <
+          distances.get(
+            item.nodeId
+          )
+        ) {
+          distances.set(
+            item.nodeId,
+            alternative
+          );
+
+          previous.set(
+            item.nodeId,
+            current
+          );
+
+          previousEdge.set(
+            item.nodeId,
+            item.edge
+          );
+        }
+      }
+    );
+  }
+
+  if (
+    startId !== endId &&
+    !previous.has(
+      endId
+    )
+  ) {
+    return [];
+  }
+
+  const routeNodes = [];
+  const routeEdges = [];
+
+  let cursor =
+    endId;
+
+  routeNodes.unshift(
+    nodesById.get(
+      cursor
+    )
+  );
+
+  while (
+    cursor !==
+    startId
+  ) {
+    const edge =
+      previousEdge.get(
+        cursor
+      );
+
+    cursor =
+      previous.get(
+        cursor
+      );
+
+    if (
+      !cursor
+    ) {
+      return [];
+    }
+
+    routeEdges.unshift(
+      edge
+    );
+
+    routeNodes.unshift(
+      nodesById.get(
+        cursor
+      )
+    );
+  }
+
+  return routeNodes.map(
+    (node,index) => ({
+      node,
+      edge:
+        index === 0
+          ? null
+          : routeEdges[
+              index - 1
+            ]
+    })
+  );
+}
+
+
+function clearLiveRoute() {
+  world
+    .querySelectorAll(
+      ".liveRouteLine"
+    )
+    .forEach(
+      item =>
+        item.remove()
+    );
+
+  activeGraphRoute = [];
+}
+
+
+function drawLiveGraphRoute(
+  graphRoute
+) {
+  clearRoute();
+  clearLiveRoute();
+
+  if (
+    graphRoute.length <
+    2
+  ) {
+    return;
+  }
+
+  for (
+    let index = 0;
+    index <
+      graphRoute.length - 1;
+    index += 1
+  ) {
+    const a =
+      graphRoute[index].node;
+
+    const b =
+      graphRoute[
+        index + 1
+      ].node;
+
+    if (
+      !validNumber(a.map_x) ||
+      !validNumber(a.map_y) ||
+      !validNumber(b.map_x) ||
+      !validNumber(b.map_y)
+    ) {
+      continue;
+    }
+
+    const dx =
+      b.map_x -
+      a.map_x;
+
+    const dy =
+      b.map_y -
+      a.map_y;
+
+    const distance =
+      Math.hypot(
+        dx,
+        dy
+      );
+
+    const line =
+      document.createElement(
+        "i"
+      );
+
+    line.className =
+      "liveRouteLine";
+
+    const edge =
+      graphRoute[
+        index + 1
+      ].edge;
+
+    if (
+      edge?.is_shortcut ||
+      edge?.path_type ===
+        "Shortcut"
+    ) {
+      line.classList.add(
+        "shortcut"
+      );
+    }
+
+    Object.assign(
+      line.style,
+      {
+        left:
+          `${a.map_x}px`,
+        top:
+          `${a.map_y}px`,
+        width:
+          `${distance}px`,
+        transform:
+          `rotate(${Math.atan2(dy,dx)}rad)`
+      }
+    );
+
+    world.append(
+      line
+    );
+  }
+
+  activeGraphRoute =
+    graphRoute;
+}
+
+
+function projectedMapPosition(
+  latitude,
+  longitude
+) {
+  const candidates =
+    campusMapNodes
+      .filter(
+        node =>
+          node.is_active !==
+            false &&
+          validNumber(
+            node.latitude
+          ) &&
+          validNumber(
+            node.longitude
+          ) &&
+          validNumber(
+            node.map_x
+          ) &&
+          validNumber(
+            node.map_y
+          )
+      )
+      .map(
+        node => ({
+          node,
+          distance:
+            haversineMeters(
+              latitude,
+              longitude,
+              node.latitude,
+              node.longitude
+            )
+        })
+      )
+      .sort(
+        (a,b) =>
+          a.distance -
+          b.distance
+      )
+      .slice(
+        0,
+        3
+      );
+
+  if (
+    !candidates.length
+  ) {
+    return null;
+  }
+
+  if (
+    candidates[0]
+      .distance < 1
+  ) {
+    return {
+      x:
+        candidates[0]
+          .node.map_x,
+      y:
+        candidates[0]
+          .node.map_y
+    };
+  }
+
+  let weightTotal = 0;
+  let xTotal = 0;
+  let yTotal = 0;
+
+  candidates.forEach(
+    item => {
+      const weight =
+        1 /
+        Math.max(
+          item.distance,
+          1
+        );
+
+      weightTotal +=
+        weight;
+
+      xTotal +=
+        item.node.map_x *
+        weight;
+
+      yTotal +=
+        item.node.map_y *
+        weight;
+    }
+  );
+
+  return {
+    x:
+      xTotal /
+      weightTotal,
+    y:
+      yTotal /
+      weightTotal
+  };
+}
+
+
+function updateUserLocationDot(
+  latitude,
+  longitude
+) {
+  const projected =
+    projectedMapPosition(
+      latitude,
+      longitude
+    );
+
+  if (!projected) {
+    return;
+  }
+
+  let dot =
+    world.querySelector(
+      ".userLocationDot"
+    );
+
+  if (!dot) {
+    dot =
+      document.createElement(
+        "i"
+      );
+
+    dot.className =
+      "userLocationDot";
+
+    world.append(
+      dot
+    );
+  }
+
+  dot.style.left =
+    `${projected.x}px`;
+
+  dot.style.top =
+    `${projected.y}px`;
+}
+
+
+function graphRouteDistance(
+  graphRoute
+) {
+  let total = 0;
+
+  for (
+    let index = 1;
+    index <
+      graphRoute.length;
+    index += 1
+  ) {
+    const edge =
+      graphRoute[index]
+        .edge;
+
+    const a =
+      graphRoute[
+        index - 1
+      ].node;
+
+    const b =
+      graphRoute[index]
+        .node;
+
+    total +=
+      validNumber(
+        edge?.distance_m
+      )
+        ? edge.distance_m
+        : nodeDistance(
+            a,
+            b
+          );
+  }
+
+  return total;
+}
+
+
+function handleLivePosition(
+  position
+) {
+  const {
+    latitude,
+    longitude,
+    accuracy
+  } =
+    position.coords;
+
+  currentGpsPosition = {
+    latitude,
+    longitude,
+    accuracy
+  };
+
+  updateUserLocationDot(
+    latitude,
+    longitude
+  );
+
+  if (
+    !liveDestination
+  ) {
+    return;
+  }
+
+  const startResult =
+    nearestGpsNode(
+      latitude,
+      longitude
+    );
+
+  const destinationNode =
+    destinationNodeForBuilding(
+      liveDestination
+    );
+
+  if (
+    !startResult ||
+    !destinationNode
+  ) {
+    setLiveStatus(
+      "Route unavailable",
+      "The campus path network needs more GPS waypoints for this destination."
+    );
+    return;
+  }
+
+  const graphRoute =
+    shortestPath(
+      startResult.node.id,
+      destinationNode.id
+    );
+
+  if (
+    !graphRoute.length
+  ) {
+    setLiveStatus(
+      "No walking path found",
+      "No open path currently connects your location to this destination."
+    );
+    return;
+  }
+
+  if (
+    lastRouteOriginNodeId !==
+      startResult.node.id ||
+    !activeGraphRoute.length
+  ) {
+    drawLiveGraphRoute(
+      graphRoute
+    );
+
+    lastRouteOriginNodeId =
+      startResult.node.id;
+  }
+
+  const routeDistance =
+    graphRouteDistance(
+      graphRoute
+    );
+
+  let destinationDistance =
+    routeDistance;
+
+  const destinationLat =
+    validNumber(
+      liveDestination
+        .entrance_latitude
+    )
+      ? liveDestination
+          .entrance_latitude
+      : liveDestination
+          .latitude;
+
+  const destinationLng =
+    validNumber(
+      liveDestination
+        .entrance_longitude
+    )
+      ? liveDestination
+          .entrance_longitude
+      : liveDestination
+          .longitude;
+
+  if (
+    validNumber(
+      destinationLat
+    ) &&
+    validNumber(
+      destinationLng
+    )
+  ) {
+    const directDistance =
+      haversineMeters(
+        latitude,
+        longitude,
+        destinationLat,
+        destinationLng
+      );
+
+    if (
+      directDistance <=
+      12
+    ) {
+      setLiveStatus(
+        "You have arrived",
+        `${liveDestination.name} is here.`
+      );
+
+      stopLiveNavigation(
+        false
+      );
+
+      return;
+    }
+
+    destinationDistance =
+      Math.max(
+        directDistance,
+        routeDistance
+      );
+  }
+
+  const minutes =
+    Math.max(
+      1,
+      Math.ceil(
+        destinationDistance /
+        75
+      )
+    );
+
+  setLiveStatus(
+    `Navigating to ${liveDestination.name}`,
+    `${Math.round(destinationDistance)} m remaining · about ${minutes} min · GPS accuracy ±${Math.round(accuracy)} m`
+  );
+
+  route.innerHTML = `
+    <strong>
+      Live walking navigation
+    </strong>
+
+    <small>
+      Route automatically updates as you walk.
+    </small>
+
+    <div class="routeStats">
+
+      <div class="routeStat">
+        <b>
+          ${Math.round(destinationDistance)} m
+        </b>
+
+        <span>
+          Remaining
+        </span>
+      </div>
+
+      <div class="routeStat">
+        <b>
+          ${minutes} min
+        </b>
+
+        <span>
+          Estimated walk
+        </span>
+      </div>
+
+    </div>
+  `;
+}
+
+
+function handleGpsError(
+  error
+) {
+  let message =
+    "Unable to access your current location.";
+
+  if (
+    error?.code === 1
+  ) {
+    message =
+      "Location permission was denied. Allow location access for CampusConnect.";
+  }
+
+  if (
+    error?.code === 2
+  ) {
+    message =
+      "Your device could not determine its location.";
+  }
+
+  if (
+    error?.code === 3
+  ) {
+    message =
+      "Location request timed out. Try again outdoors or near a window.";
+  }
+
+  setLiveStatus(
+    "Location unavailable",
+    message
+  );
+}
+
+
+function startLiveNavigation() {
+  if (
+    !navigator.geolocation
+  ) {
+    setLiveStatus(
+      "GPS unavailable",
+      "This browser does not support geolocation."
+    );
+    return;
+  }
+
+  const destination =
+    findDestinationBuilding();
+
+  if (!destination) {
+    setLiveStatus(
+      "Choose a mapped destination",
+      "Select a destination that has been added to the live campus navigation database."
+    );
+    return;
+  }
+
+  const destinationNode =
+    destinationNodeForBuilding(
+      destination
+    );
+
+  if (!destinationNode) {
+    setLiveStatus(
+      "Destination not connected",
+      "Main Admin must connect this building to a campus path waypoint first."
+    );
+    return;
+  }
+
+  liveDestination =
+    destination;
+
+  liveNavigateButton
+    .classList.add(
+      "active"
+    );
+
+  liveNavigateButton
+    .textContent =
+      "Stop live navigation";
+
+  setLiveStatus(
+    "Finding your position",
+    "CampusConnect is acquiring your GPS location…"
+  );
+
+  navigator.geolocation
+    .getCurrentPosition(
+      handleLivePosition,
+      handleGpsError,
+      {
+        enableHighAccuracy:
+          true,
+        timeout:
+          15000,
+        maximumAge:
+          0
+      }
+    );
+
+  gpsWatchId =
+    navigator.geolocation
+      .watchPosition(
+        handleLivePosition,
+        handleGpsError,
+        {
+          enableHighAccuracy:
+            true,
+          timeout:
+            15000,
+          maximumAge:
+            1500
+        }
+      );
+}
+
+
+function stopLiveNavigation(
+  resetStatus = true
+) {
+  if (
+    gpsWatchId !== null
+  ) {
+    navigator.geolocation
+      .clearWatch(
+        gpsWatchId
+      );
+
+    gpsWatchId =
+      null;
+  }
+
+  liveDestination =
+    null;
+
+  lastRouteOriginNodeId =
+    null;
+
+  liveNavigateButton
+    .classList.remove(
+      "active"
+    );
+
+  liveNavigateButton
+    .textContent =
+      "Start live navigation";
+
+  if (
+    resetStatus
+  ) {
+    liveNavStatus
+      .classList.remove(
+        "visible"
+      );
+  }
+}
+
+
+liveNavigateButton
+  .addEventListener(
+    "click",
+    () => {
+      if (
+        gpsWatchId !==
+        null
+      ) {
+        stopLiveNavigation();
+      } else {
+        startLiveNavigation();
+      }
+    }
+  );
+
+
+function renderDatabaseBuildings() {
+  world
+    .querySelectorAll(
+      ".dbBuildingMarker"
+    )
+    .forEach(
+      marker =>
+        marker.remove()
+    );
+
+  campusMapBuildings
+    .filter(
+      building =>
+        building.is_active !==
+          false &&
+        validNumber(
+          building.map_x
+        ) &&
+        validNumber(
+          building.map_y
+        )
+    )
+    .forEach(
+      building => {
+        const marker =
+          document.createElement(
+            "button"
+          );
+
+        marker.type =
+          "button";
+
+        marker.className =
+          "dbBuildingMarker";
+
+        marker.style.left =
+          `${building.map_x}px`;
+
+        marker.style.top =
+          `${building.map_y}px`;
+
+        marker.textContent =
+          building.short_name ||
+          building.name;
+
+        marker.title =
+          building.name;
+
+        marker.addEventListener(
+          "click",
+          () => {
+            search.value =
+              building.name;
+
+            setLiveStatus(
+              building.name,
+              building.description ||
+              "Campus navigation destination."
+            );
+          }
+        );
+
+        world.append(
+          marker
+        );
+      }
+    );
+}
+
+
+function syncDatabaseDestinations() {
+  datalist
+    .querySelectorAll(
+      '[data-database-place="true"]'
+    )
+    .forEach(
+      option =>
+        option.remove()
+    );
+
+  campusMapBuildings
+    .filter(
+      building =>
+        building.is_active !==
+          false
+    )
+    .forEach(
+      building => {
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          building.name;
+
+        option.dataset.databasePlace =
+          "true";
+
+        datalist.append(
+          option
+        );
+      }
+    );
+}
+
+
+function setAdminMessage(
+  message
+) {
+  adminMapMessage.textContent =
+    message;
+}
+
+
+function postMutation(
+  table,
+  action,
+  id,
+  payload
+) {
+  sendToCampusConnect({
+    type:
+      "campus-map:mutation",
+    table,
+    action,
+    id,
+    payload
+  });
+
+  setAdminMessage(
+    "Saving changes…"
+  );
+}
+
+
+function getNumberInput(
+  id
+) {
+  const value =
+    document
+      .querySelector(id)
+      .value
+      .trim();
+
+  if (
+    value === ""
+  ) {
+    return null;
+  }
+
+  const number =
+    Number(value);
+
+  return Number.isFinite(
+    number
+  )
+    ? number
+    : null;
+}
+
+
+function putNumberInput(
+  id,
+  value
+) {
+  document
+    .querySelector(id)
+    .value =
+      validNumber(value)
+        ? String(value)
+        : "";
+}
+
+
+function captureGps(
+  latSelector,
+  lngSelector
+) {
+  if (
+    !navigator.geolocation
+  ) {
+    setAdminMessage(
+      "GPS is unavailable in this browser."
+    );
+    return;
+  }
+
+  setAdminMessage(
+    "Acquiring current GPS position…"
+  );
+
+  navigator.geolocation
+    .getCurrentPosition(
+      position => {
+        document
+          .querySelector(
+            latSelector
+          )
+          .value =
+            String(
+              position.coords
+                .latitude
+            );
+
+        document
+          .querySelector(
+            lngSelector
+          )
+          .value =
+            String(
+              position.coords
+                .longitude
+            );
+
+        currentGpsPosition = {
+          latitude:
+            position.coords
+              .latitude,
+          longitude:
+            position.coords
+              .longitude,
+          accuracy:
+            position.coords
+              .accuracy
+        };
+
+        setAdminMessage(
+          `GPS captured with ±${Math.round(position.coords.accuracy)} m accuracy.`
+        );
+      },
+      handleGpsError,
+      {
+        enableHighAccuracy:
+          true,
+        timeout:
+          15000,
+        maximumAge:
+          0
+      }
+    );
+}
+
+
+function populateAdminEditors() {
+  const buildingSelect =
+    document.querySelector(
+      "#adminBuildingExisting"
+    );
+
+  const nodeSelect =
+    document.querySelector(
+      "#adminNodeExisting"
+    );
+
+  const edgeSelect =
+    document.querySelector(
+      "#adminEdgeExisting"
+    );
+
+  const edgeFrom =
+    document.querySelector(
+      "#adminEdgeFrom"
+    );
+
+  const edgeTo =
+    document.querySelector(
+      "#adminEdgeTo"
+    );
+
+  buildingSelect.innerHTML =
+    '<option value="">Add new building</option>';
+
+  campusMapBuildings
+    .forEach(
+      building => {
+        buildingSelect.add(
+          new Option(
+            building.name,
+            building.id
+          )
+        );
+      }
+    );
+
+  nodeSelect.innerHTML =
+    '<option value="">Add new waypoint</option>';
+
+  edgeFrom.innerHTML = "";
+  edgeTo.innerHTML = "";
+
+  campusMapNodes
+    .forEach(
+      node => {
+        const label =
+          node.name ||
+          `${node.node_type} waypoint`;
+
+        nodeSelect.add(
+          new Option(
+            label,
+            node.id
+          )
+        );
+
+        edgeFrom.add(
+          new Option(
+            label,
+            node.id
+          )
+        );
+
+        edgeTo.add(
+          new Option(
+            label,
+            node.id
+          )
+        );
+      }
+    );
+
+  edgeSelect.innerHTML =
+    '<option value="">Add new path</option>';
+
+  campusMapEdges
+    .forEach(
+      edge => {
+        const from =
+          campusMapNodes.find(
+            node =>
+              node.id ===
+              edge.from_node
+          );
+
+        const to =
+          campusMapNodes.find(
+            node =>
+              node.id ===
+              edge.to_node
+          );
+
+        edgeSelect.add(
+          new Option(
+            edge.name ||
+            `${from?.name || "Waypoint"} → ${to?.name || "Waypoint"}`,
+            edge.id
+          )
+        );
+      }
+    );
+}
+
+
+document
+  .querySelector(
+    "#adminBuildingExisting"
+  )
+  .addEventListener(
+    "change",
+    event => {
+      const building =
+        campusMapBuildings.find(
+          item =>
+            item.id ===
+            event.target.value
+        );
+
+      document
+        .querySelector(
+          "#adminBuildingName"
+        )
+        .value =
+          building?.name ||
+          "";
+
+      document
+        .querySelector(
+          "#adminBuildingShort"
+        )
+        .value =
+          building?.short_name ||
+          "";
+
+      document
+        .querySelector(
+          "#adminBuildingCategory"
+        )
+        .value =
+          building?.category ||
+          "Academic";
+
+      putNumberInput(
+        "#adminBuildingLat",
+        building?.latitude
+      );
+
+      putNumberInput(
+        "#adminBuildingLng",
+        building?.longitude
+      );
+
+      putNumberInput(
+        "#adminBuildingX",
+        building?.map_x
+      );
+
+      putNumberInput(
+        "#adminBuildingY",
+        building?.map_y
+      );
+    }
+  );
+
+
+document
+  .querySelector(
+    "#adminBuildingGps"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      captureGps(
+        "#adminBuildingLat",
+        "#adminBuildingLng"
+      )
+  );
+
+
+document
+  .querySelector(
+    "#adminBuildingSave"
+  )
+  .addEventListener(
+    "click",
+    () => {
+      const id =
+        document
+          .querySelector(
+            "#adminBuildingExisting"
+          )
+          .value;
+
+      const name =
+        document
+          .querySelector(
+            "#adminBuildingName"
+          )
+          .value
+          .trim();
+
+      if (!name) {
+        setAdminMessage(
+          "Building name is required."
+        );
+        return;
+      }
+
+      const payload = {
+        name,
+        short_name:
+          document
+            .querySelector(
+              "#adminBuildingShort"
+            )
+            .value
+            .trim(),
+        category:
+          document
+            .querySelector(
+              "#adminBuildingCategory"
+            )
+            .value,
+        latitude:
+          getNumberInput(
+            "#adminBuildingLat"
+          ),
+        longitude:
+          getNumberInput(
+            "#adminBuildingLng"
+          ),
+        entrance_latitude:
+          getNumberInput(
+            "#adminBuildingLat"
+          ),
+        entrance_longitude:
+          getNumberInput(
+            "#adminBuildingLng"
+          ),
+        map_x:
+          getNumberInput(
+            "#adminBuildingX"
+          ),
+        map_y:
+          getNumberInput(
+            "#adminBuildingY"
+          ),
+        is_active:
+          true
+      };
+
+      postMutation(
+        "campus_map_buildings",
+        id
+          ? "update"
+          : "insert",
+        id || undefined,
+        payload
+      );
+    }
+  );
+
+
+document
+  .querySelector(
+    "#adminBuildingDelete"
+  )
+  .addEventListener(
+    "click",
+    () => {
+      const id =
+        document
+          .querySelector(
+            "#adminBuildingExisting"
+          )
+          .value;
+
+      if (!id) {
+        setAdminMessage(
+          "Select a building to delete."
+        );
+        return;
+      }
+
+      if (
+        !confirm(
+          "Delete this building from the campus navigation map?"
+        )
+      ) {
+        return;
+      }
+
+      postMutation(
+        "campus_map_buildings",
+        "delete",
+        id,
+        {}
+      );
+    }
+  );
+
+
+document
+  .querySelector(
+    "#adminNodeExisting"
+  )
+  .addEventListener(
+    "change",
+    event => {
+      const node =
+        campusMapNodes.find(
+          item =>
+            item.id ===
+            event.target.value
+        );
+
+      document
+        .querySelector(
+          "#adminNodeName"
+        )
+        .value =
+          node?.name ||
+          "";
+
+      document
+        .querySelector(
+          "#adminNodeType"
+        )
+        .value =
+          node?.node_type ||
+          "Path";
+
+      putNumberInput(
+        "#adminNodeLat",
+        node?.latitude
+      );
+
+      putNumberInput(
+        "#adminNodeLng",
+        node?.longitude
+      );
+
+      putNumberInput(
+        "#adminNodeX",
+        node?.map_x
+      );
+
+      putNumberInput(
+        "#adminNodeY",
+        node?.map_y
+      );
+    }
+  );
+
+
+document
+  .querySelector(
+    "#adminNodeGps"
+  )
+  .addEventListener(
+    "click",
+    () =>
+      captureGps(
+        "#adminNodeLat",
+        "#adminNodeLng"
+      )
+  );
+
+
+document
+  .querySelector(
+    "#adminNodeSave"
+  )
+  .addEventListener(
+    "click",
+    () => {
+      const id =
+        document
+          .querySelector(
+            "#adminNodeExisting"
+          )
+          .value;
+
+      const latitude =
+        getNumberInput(
+          "#adminNodeLat"
+        );
+
+      const longitude =
+        getNumberInput(
+          "#adminNodeLng"
+        );
+
+      if (
+        latitude === null ||
+        longitude === null
+      ) {
+        setAdminMessage(
+          "Waypoint latitude and longitude are required."
+        );
+        return;
+      }
+
+      const payload = {
+        name:
+          document
+            .querySelector(
+              "#adminNodeName"
+            )
+            .value
+            .trim(),
+        node_type:
+          document
+            .querySelector(
+              "#adminNodeType"
+            )
+            .value,
+        latitude,
+        longitude,
+        map_x:
+          getNumberInput(
+            "#adminNodeX"
+          ),
+        map_y:
+          getNumberInput(
+            "#adminNodeY"
+          ),
+        is_active:
+          true
+      };
+
+      postMutation(
+        "campus_map_nodes",
+        id
+          ? "update"
+          : "insert",
+        id || undefined,
+        payload
+      );
+    }
+  );
+
+
+document
+  .querySelector(
+    "#adminNodeDelete"
+  )
+  .addEventListener(
+    "click",
+    () => {
+      const id =
+        document
+          .querySelector(
+            "#adminNodeExisting"
+          )
+          .value;
+
+      if (!id) {
+        setAdminMessage(
+          "Select a waypoint to delete."
+        );
+        return;
+      }
+
+      if (
+        !confirm(
+          "Delete this waypoint? Connected paths will also be removed."
+        )
+      ) {
+        return;
+      }
+
+      postMutation(
+        "campus_map_nodes",
+        "delete",
+        id,
+        {}
+      );
+    }
+  );
+
+
+document
+  .querySelector(
+    "#adminEdgeExisting"
+  )
+  .addEventListener(
+    "change",
+    event => {
+      const edge =
+        campusMapEdges.find(
+          item =>
+            item.id ===
+            event.target.value
+        );
+
+      if (!edge) {
+        return;
+      }
+
+      document
+        .querySelector(
+          "#adminEdgeFrom"
+        )
+        .value =
+          edge.from_node;
+
+      document
+        .querySelector(
+          "#adminEdgeTo"
+        )
+        .value =
+          edge.to_node;
+
+      document
+        .querySelector(
+          "#adminEdgeType"
+        )
+        .value =
+          edge.path_type;
+
+      document
+        .querySelector(
+          "#adminEdgeName"
+        )
+        .value =
+          edge.name ||
+          "";
+
+      document
+        .querySelector(
+          "#adminEdgeShortcut"
+        )
+        .checked =
+          Boolean(
+            edge.is_shortcut
+          );
+
+      document
+        .querySelector(
+          "#adminEdgeBidirectional"
+        )
+        .checked =
+          edge.is_bidirectional !==
+          false;
+
+      document
+        .querySelector(
+          "#adminEdgeAccessible"
+        )
+        .checked =
+          edge.is_accessible !==
+          false;
+
+      document
+        .querySelector(
+          "#adminEdgeClosed"
+        )
+        .checked =
+          Boolean(
+            edge.is_closed
+          );
+    }
+  );
+
+
+document
+  .querySelector(
+    "#adminEdgeSave"
+  )
+  .addEventListener(
+    "click",
+    () => {
+      const id =
+        document
+          .querySelector(
+            "#adminEdgeExisting"
+          )
+          .value;
+
+      const fromId =
+        document
+          .querySelector(
+            "#adminEdgeFrom"
+          )
+          .value;
+
+      const toId =
+        document
+          .querySelector(
+            "#adminEdgeTo"
+          )
+          .value;
+
+      if (
+        !fromId ||
+        !toId ||
+        fromId === toId
+      ) {
+        setAdminMessage(
+          "Choose two different waypoints."
+        );
+        return;
+      }
+
+      const from =
+        campusMapNodes.find(
+          node =>
+            node.id ===
+            fromId
+        );
+
+      const to =
+        campusMapNodes.find(
+          node =>
+            node.id ===
+            toId
+        );
+
+      const distance =
+        from && to
+          ? nodeDistance(
+              from,
+              to
+            )
+          : null;
+
+      const shortcut =
+        document
+          .querySelector(
+            "#adminEdgeShortcut"
+          )
+          .checked;
+
+      const payload = {
+        from_node:
+          fromId,
+        to_node:
+          toId,
+        name:
+          document
+            .querySelector(
+              "#adminEdgeName"
+            )
+            .value
+            .trim(),
+        path_type:
+          shortcut
+            ? "Shortcut"
+            : document
+                .querySelector(
+                  "#adminEdgeType"
+                )
+                .value,
+        distance_m:
+          Number.isFinite(
+            distance
+          )
+            ? distance
+            : null,
+        estimated_seconds:
+          Number.isFinite(
+            distance
+          )
+            ? Math.ceil(
+                distance /
+                1.25
+              )
+            : null,
+        is_bidirectional:
+          document
+            .querySelector(
+              "#adminEdgeBidirectional"
+            )
+            .checked,
+        is_shortcut:
+          shortcut,
+        is_accessible:
+          document
+            .querySelector(
+              "#adminEdgeAccessible"
+            )
+            .checked,
+        is_closed:
+          document
+            .querySelector(
+              "#adminEdgeClosed"
+            )
+            .checked
+      };
+
+      postMutation(
+        "campus_map_edges",
+        id
+          ? "update"
+          : "insert",
+        id || undefined,
+        payload
+      );
+    }
+  );
+
+
+document
+  .querySelector(
+    "#adminEdgeDelete"
+  )
+  .addEventListener(
+    "click",
+    () => {
+      const id =
+        document
+          .querySelector(
+            "#adminEdgeExisting"
+          )
+          .value;
+
+      if (!id) {
+        setAdminMessage(
+          "Select a path to delete."
+        );
+        return;
+      }
+
+      if (
+        !confirm(
+          "Delete this walking path?"
+        )
+      ) {
+        return;
+      }
+
+      postMutation(
+        "campus_map_edges",
+        "delete",
+        id,
+        {}
+      );
+    }
+  );
+
+
+adminMapToggle
+  .addEventListener(
+    "click",
+    () => {
+      adminMapPanel
+        .classList.toggle(
+          "visible"
+        );
+
+      if (
+        adminMapPanel
+          .classList.contains(
+            "visible"
+          )
+      ) {
+        adminMapPanel
+          .scrollIntoView({
+            behavior:
+              "smooth",
+            block:
+              "start"
+          });
+      }
+    }
+  );
+
+
+window.addEventListener(
+  "message",
+  event => {
+    if (
+      event.origin !==
+      window.location.origin
+    ) {
+      return;
+    }
+
+    if (
+      event.source !==
+      window.parent
+    ) {
+      return;
+    }
+
+    const message =
+      event.data;
+
+    if (
+      !message ||
+      typeof message !==
+        "object"
+    ) {
+      return;
+    }
+
+    if (
+      message.type ===
+      "campus-map:auth"
+    ) {
+      canManageCampusMap =
+        Boolean(
+          message.canManage
+        );
+
+      adminMapToggle
+        .classList.toggle(
+          "visible",
+          canManageCampusMap
+        );
+
+      if (
+        !canManageCampusMap
+      ) {
+        adminMapPanel
+          .classList.remove(
+            "visible"
+          );
+      }
+
+      return;
+    }
+
+    if (
+      message.type ===
+      "campus-map:data"
+    ) {
+      campusMapBuildings =
+        Array.isArray(
+          message.buildings
+        )
+          ? message.buildings
+          : [];
+
+      campusMapNodes =
+        Array.isArray(
+          message.nodes
+        )
+          ? message.nodes
+          : [];
+
+      campusMapEdges =
+        Array.isArray(
+          message.edges
+        )
+          ? message.edges
+          : [];
+
+      canManageCampusMap =
+        Boolean(
+          message.canManage
+        );
+
+      adminMapToggle
+        .classList.toggle(
+          "visible",
+          canManageCampusMap
+        );
+
+      syncDatabaseDestinations();
+      renderDatabaseBuildings();
+      populateAdminEditors();
+
+      setAdminMessage(
+        `${campusMapBuildings.length} buildings · ${campusMapNodes.length} waypoints · ${campusMapEdges.length} paths loaded.`
+      );
+
+      return;
+    }
+
+    if (
+      message.type ===
+      "campus-map:mutation-result"
+    ) {
+      setAdminMessage(
+        message.ok
+          ? "Map updated successfully."
+          : message.error ||
+            "Map update failed."
+      );
+    }
+  }
+);
+
+
+sendToCampusConnect({
+  type:
+    "campus-map:ready"
+});
+
+</script>
+
+</body>
+</html>

@@ -136,24 +136,99 @@ export function CommunityPosts({profile}: {profile: CommunityProfile}) {
 
   const loadPosts = useCallback(async () => {
     const client = getSupabaseClient();
+
     if (!client) {
-      setStatus("CampusConnect database connection is unavailable.");
+      setStatus(
+        "CampusConnect database connection is unavailable."
+      );
       setLoading(false);
       return;
     }
 
-    const {data, error} = await client
-      .from("community_posts")
-      .select("*")
-      .order("created_at", {ascending: false})
-      .limit(150);
+    const [
+      postsResult,
+      repliesResult,
+    ] = await Promise.all([
+      client
+        .from("community_posts")
+        .select("*")
+        .order(
+          "created_at",
+          {ascending: false}
+        )
+        .limit(150),
 
-    if (error) {
-      setStatus(error.message);
-    } else {
-      setPosts((data || []) as CommunityPost[]);
-      setStatus("");
+      client
+        .from("community_post_replies")
+        .select("post_id")
+        .limit(10000),
+    ]);
+
+    if (postsResult.error) {
+      setStatus(
+        postsResult.error.message
+      );
+      setLoading(false);
+      return;
     }
+
+    if (repliesResult.error) {
+      console.error(
+        "[Community Posts] Reply-count load failed:",
+        repliesResult.error
+      );
+
+      setStatus(
+        repliesResult.error.message
+      );
+
+      setPosts(
+        (postsResult.data || []) as CommunityPost[]
+      );
+
+      setLoading(false);
+      return;
+    }
+
+    const countByPost =
+      new Map<string, number>();
+
+    for (
+      const reply of
+      repliesResult.data || []
+    ) {
+      const postId =
+        String(
+          reply.post_id || ""
+        );
+
+      if (!postId) {
+        continue;
+      }
+
+      countByPost.set(
+        postId,
+        (countByPost.get(postId) || 0) + 1
+      );
+    }
+
+    const nextPosts =
+      (
+        postsResult.data || []
+      ).map(post => ({
+        ...post,
+
+        // Actual reply rows are authoritative.
+        // Do not rely on stale community_posts.reply_count.
+        reply_count:
+          countByPost.get(post.id) || 0,
+      })) as CommunityPost[];
+
+    setPosts(
+      nextPosts
+    );
+
+    setStatus("");
     setLoading(false);
   }, []);
 
@@ -272,45 +347,173 @@ export function CommunityPosts({profile}: {profile: CommunityProfile}) {
     setBusy(false);
   }
 
-  async function toggleReplies(postId: string) {
-    if (expandedPostId === postId) {
+  async function toggleReplies(
+    postId: string
+  ) {
+    if (
+      expandedPostId ===
+      postId
+    ) {
       setExpandedPostId("");
       return;
     }
-    setExpandedPostId(postId);
-    if (!replies[postId]) await loadReplies(postId);
+
+    setStatus("");
+    setExpandedPostId(
+      postId
+    );
+
+    await loadReplies(
+      postId
+    );
   }
 
-  async function publishReply(event: FormEvent, postId: string) {
+  async function publishReply(
+    event: FormEvent,
+    postId: string
+  ) {
     event.preventDefault();
-    const replyBody = (replyDrafts[postId] || "").trim();
-    if (!replyBody || busy) return;
-    const client = getSupabaseClient();
-    if (!client) return;
-    setBusy(true);
 
-    const {data, error} = await client
-      .from("community_post_replies")
-      .insert({post_id: postId, body: replyBody})
-      .select("*")
-      .single();
+    const replyBody =
+      (replyDrafts[postId] || "").trim();
 
-    if (error) {
-      setStatus(error.message);
-    } else {
-      const reply = data as CommunityReply;
-      setReplies(current => ({
-        ...current,
-        [postId]: [...(current[postId] || []), reply],
-      }));
-      setReplyDrafts(current => ({...current, [postId]: ""}));
-      setPosts(current => current.map(post =>
-        post.id === postId
-          ? {...post, reply_count: post.reply_count + 1}
-          : post
-      ));
+    if (!replyBody) {
+      setStatus(
+        "Write a reply before submitting."
+      );
+      return;
     }
-    setBusy(false);
+
+    if (busy) {
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      setStatus(
+        "CampusConnect database connection is unavailable."
+      );
+      return;
+    }
+
+    setBusy(true);
+    setStatus("");
+
+    try {
+      const {
+        data: auth,
+        error: authError,
+      } =
+        await client.auth.getUser();
+
+      if (
+        authError ||
+        !auth.user
+      ) {
+        setStatus(
+          "Your session has expired. Sign in again to reply."
+        );
+        return;
+      }
+
+      const {
+        data,
+        error,
+      } =
+        await client
+          .from(
+            "community_post_replies"
+          )
+          .insert({
+            post_id:
+              postId,
+
+            body:
+              replyBody,
+          })
+          .select("*")
+          .single();
+
+      if (error) {
+        console.error(
+          "[Community Posts] Reply failed:",
+          error
+        );
+
+        setStatus(
+          `Unable to publish reply: ${error.message}`
+        );
+        return;
+      }
+
+      setReplyDrafts(
+        current => ({
+          ...current,
+          [postId]: "",
+        })
+      );
+
+      // Always keep this thread open after replying.
+      setExpandedPostId(
+        postId
+      );
+
+      // Reload authoritative database data.
+      await loadReplies(postId);
+
+      const {
+        data: refreshedPost,
+        error: refreshError,
+      } =
+        await client
+          .from("community_posts")
+          .select("*")
+          .eq("id", postId)
+          .single();
+
+      if (refreshError) {
+        console.error(
+          "[Community Posts] Reply count refresh failed:",
+          refreshError
+        );
+
+        await loadPosts();
+      } else if (refreshedPost) {
+        setPosts(
+          current =>
+            current.map(
+              post =>
+                post.id === postId
+                  ? refreshedPost as CommunityPost
+                  : post
+            )
+        );
+      }
+
+      setStatus(
+        "Reply posted successfully."
+      );
+
+      console.log(
+        "[Community Posts] Reply published:",
+        data
+      );
+    } catch (error) {
+      console.error(
+        "[Community Posts] Unexpected reply error:",
+        error
+      );
+
+      setStatus(
+        error instanceof Error
+          ? `Unable to publish reply: ${error.message}`
+          : "Unable to publish reply."
+      );
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function toggleResolved(post: CommunityPost) {

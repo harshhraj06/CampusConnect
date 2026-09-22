@@ -530,6 +530,9 @@ export function ResumeStudio({
         getSupabaseClient();
 
       if (!client) {
+        setStatus(
+          "CampusConnect is not connected to Supabase."
+        );
         return;
       }
 
@@ -538,66 +541,257 @@ export function ResumeStudio({
       setStatus("");
 
 
-      const {
-        data: auth,
-      } =
-        await client.auth
-          .getUser();
+      try {
+
+        const {
+          data: auth,
+          error: authError,
+        } =
+          await client.auth
+            .getUser();
 
 
-      if (!auth.user) {
-        setSaving(false);
+        if (
+          authError ||
+          !auth.user
+        ) {
+          setStatus(
+            "Your session has expired. Please sign in again."
+          );
+          return;
+        }
 
-        setStatus(
-          "Your session has expired."
-        );
 
-        return;
-      }
+        const payload = {
+          user_id:
+            auth.user.id,
+
+          headline:
+            resume.headline,
+
+          summary:
+            resume.summary,
+
+          phone:
+            resume.phone,
+
+          location:
+            resume.location,
+
+          college:
+            resume.college,
+
+          degree:
+            resume.degree,
+
+          graduation_year:
+            resume.graduation_year,
+
+          cgpa:
+            resume.cgpa,
+
+          skills:
+            resume.skills,
+
+          linkedin_url:
+            resume.linkedin_url,
+
+          github_url:
+            resume.github_url,
+
+          instagram_url:
+            resume.instagram_url,
+
+          portfolio_url:
+            resume.portfolio_url,
+
+          leetcode_url:
+            resume.leetcode_url,
+
+          template,
+
+          updated_at:
+            new Date()
+              .toISOString(),
+        };
 
 
-      const {
-        error,
-      } =
-        await client
-          .from(
-            "student_resumes"
-          )
-          .upsert(
-            {
-              user_id:
-                auth.user.id,
+        const {
+          data: savedRow,
+          error: saveError,
+        } =
+          await client
+            .from(
+              "student_resumes"
+            )
+            .upsert(
+              payload,
+              {
+                onConflict:
+                  "user_id",
+              }
+            )
+            .select("*")
+            .single();
 
-              ...resume,
 
-              template,
-
-              updated_at:
-                new Date()
-                  .toISOString(),
-            },
-            {
-              onConflict:
-                "user_id",
-            }
+        if (
+          saveError ||
+          !savedRow
+        ) {
+          console.error(
+            "[Resume Studio] Save failed:",
+            saveError
           );
 
+          setStatus(
+            saveError?.message ||
+            "Resume could not be saved."
+          );
 
-      setSaving(false);
+          return;
+        }
 
 
-      if (error) {
+        /*
+         * IMPORTANT:
+         * Use the exact row returned by Supabase.
+         * This guarantees the UI reflects persisted data,
+         * not only temporary React state.
+         */
+        setResume({
+          headline:
+            savedRow.headline ||
+            "",
+
+          summary:
+            savedRow.summary ||
+            "",
+
+          phone:
+            savedRow.phone ||
+            "",
+
+          location:
+            savedRow.location ||
+            "",
+
+          college:
+            savedRow.college ||
+            "",
+
+          degree:
+            savedRow.degree ||
+            "",
+
+          graduation_year:
+            savedRow.graduation_year ||
+            "",
+
+          cgpa:
+            savedRow.cgpa ||
+            "",
+
+          skills:
+            savedRow.skills ||
+            "",
+
+          linkedin_url:
+            savedRow.linkedin_url ||
+            "",
+
+          github_url:
+            savedRow.github_url ||
+            "",
+
+          instagram_url:
+            savedRow.instagram_url ||
+            "",
+
+          portfolio_url:
+            savedRow.portfolio_url ||
+            "",
+
+          leetcode_url:
+            savedRow.leetcode_url ||
+            "",
+        });
+
+
+        if (
+          savedRow.template ===
+            "Modern" ||
+          savedRow.template ===
+            "Classic" ||
+          savedRow.template ===
+            "Minimal"
+        ) {
+          setTemplate(
+            savedRow.template
+          );
+        }
+
+
+        /*
+         * Read the row back once.
+         * If the write somehow was not persisted,
+         * Save Resume must not falsely report success.
+         */
+        const {
+          data: verifiedRow,
+          error: verifyError,
+        } =
+          await client
+            .from(
+              "student_resumes"
+            )
+            .select(
+              "id,user_id,updated_at"
+            )
+            .eq(
+              "user_id",
+              auth.user.id
+            )
+            .single();
+
+
+        if (
+          verifyError ||
+          !verifiedRow
+        ) {
+          console.error(
+            "[Resume Studio] Save verification failed:",
+            verifyError
+          );
+
+          setStatus(
+            "Resume was submitted but could not be verified. Please try again."
+          );
+
+          return;
+        }
+
+
         setStatus(
-          error.message
+          "Resume saved successfully."
         );
 
-        return;
+      } catch (error) {
+
+        console.error(
+          "[Resume Studio] Unexpected save error:",
+          error
+        );
+
+        setStatus(
+          "Unable to save your resume right now."
+        );
+
+      } finally {
+
+        setSaving(false);
+
       }
-
-
-      setStatus(
-        "Resume saved successfully."
-      );
     };
 
 

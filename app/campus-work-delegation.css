@@ -1,0 +1,294 @@
+.campusDelegationDesk {
+  overflow: hidden;
+  padding: 0 !important;
+  border: 1px solid #e5d6c3 !important;
+  border-radius: 16px !important;
+  background: #fffdf8;
+}
+
+.campusDelegationHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  border-bottom: 1px solid #eadfce;
+  background:
+    radial-gradient(
+      circle at 100% 0,
+      rgba(139, 78, 28, .1),
+      transparent 38%
+    ),
+    #fffaf2;
+}
+
+.campusDelegationHeader span,
+.campusDelegationForm label > span,
+.campusDelegationList > header span {
+  color: #8a5228;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.campusDelegationHeader h3,
+.campusDelegationList h4 {
+  margin: 6px 0;
+  color: #3d2a1f;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.campusDelegationHeader h3 {
+  font-size: 24px;
+}
+
+.campusDelegationHeader p {
+  max-width: 620px;
+  margin: 0;
+  color: #7f7063;
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+.campusDelegationSecurity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  padding: 9px 11px;
+  border: 1px solid #d9c5aa;
+  border-radius: 999px;
+  color: #76502e;
+  background: #fffdf8;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.campusDelegationSecurity i {
+  color: #2f7a46;
+  font-style: normal;
+}
+
+.campusDelegationMessage {
+  margin: 18px 24px 0;
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 9px;
+}
+
+.campusDelegationMessage.success {
+  border: 1px solid #cce4d1;
+  color: #276b3d;
+  background: #f0faf2;
+}
+
+.campusDelegationMessage.error {
+  border: 1px solid #ebd0c9;
+  color: #98483a;
+  background: #fff3f0;
+}
+
+.campusDelegationForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  padding: 24px;
+  border-bottom: 1px solid #eadfce;
+}
+
+.campusDelegationForm label {
+  display: grid;
+  gap: 7px;
+}
+
+.campusDelegationForm input,
+.campusDelegationForm select,
+.campusDelegationForm textarea {
+  width: 100%;
+  min-height: 43px;
+  padding: 0 12px;
+  border: 1px solid #decdb8;
+  border-radius: 9px;
+  color: #433126;
+  background: #fffefa;
+  outline: none;
+}
+
+.campusDelegationForm textarea {
+  min-height: 84px;
+  padding-top: 11px;
+  resize: vertical;
+}
+
+.campusDelegationForm input:focus,
+.campusDelegationForm select:focus,
+.campusDelegationForm textarea:focus {
+  border-color: #9e6b3e;
+  box-shadow: 0 0 0 3px rgba(158, 107, 62, .1);
+}
+
+.campusDelegationReason,
+.campusDelegationSubmit {
+  grid-column: 1 / -1;
+}
+
+.campusDelegationSubmit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.campusDelegationSubmit small {
+  max-width: 560px;
+  color: #8a7b6e;
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.campusDelegationList {
+  padding: 22px 24px 24px;
+}
+
+.campusDelegationList > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+.campusDelegationList h4 {
+  font-size: 18px;
+}
+
+.campusDelegationRow {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  gap: 13px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid #eee3d6;
+}
+
+.campusDelegationIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: #805027;
+  background: #f8ecdc;
+  font-size: 15px;
+}
+
+.campusDelegationRow strong,
+.campusDelegationRow p,
+.campusDelegationRow small,
+.campusDelegationRow em {
+  display: block;
+}
+
+.campusDelegationRow strong {
+  color: #453126;
+  font-size: 10px;
+}
+
+.campusDelegationRow p {
+  margin: 3px 0;
+  color: #715d4e;
+  font-size: 8px;
+}
+
+.campusDelegationRow small {
+  color: #948476;
+  font-size: 7px;
+}
+
+.campusDelegationRow em {
+  margin-top: 5px;
+  color: #755a43;
+  font-size: 8px;
+  font-style: normal;
+}
+
+.campusDelegationExpiry {
+  min-width: 160px;
+  text-align: right;
+}
+
+.campusDelegationExpiry time {
+  display: block;
+  margin: 4px 0 8px;
+  color: #5c4737;
+  font-size: 8px;
+}
+
+.campusDelegationExpiry button {
+  border: 0;
+  color: #a04a3a;
+  background: transparent;
+  font-size: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.campusDelegationEmpty {
+  padding: 26px;
+  border: 1px dashed #dfcfbc;
+  border-radius: 10px;
+  color: #8c7d70;
+  background: #fffaf3;
+  text-align: center;
+  font-size: 9px;
+}
+
+.campusDelegationHistory {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #eadfce;
+}
+
+.campusDelegationHistory summary {
+  color: #735339;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.campusDelegationHistory div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 9px 0;
+  border-bottom: 1px solid #f0e7dc;
+  color: #695546;
+  font-size: 8px;
+}
+
+@media(max-width: 760px) {
+  .campusDelegationHeader,
+  .campusDelegationSubmit {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .campusDelegationForm {
+    grid-template-columns: 1fr;
+  }
+
+  .campusDelegationReason,
+  .campusDelegationSubmit {
+    grid-column: auto;
+  }
+
+  .campusDelegationRow {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .campusDelegationExpiry {
+    grid-column: 2;
+    min-width: 0;
+    text-align: left;
+  }
+}

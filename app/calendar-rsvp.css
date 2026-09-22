@@ -1,0 +1,116 @@
+.calendarRsvp {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 13px;
+  border: 1px solid #dce5ec;
+  border-radius: 14px;
+  background: #f7fafc;
+}
+
+.calendarRsvpCounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #657487;
+  font-size: 0.72rem;
+}
+
+.calendarRsvpCounts b {
+  color: #18324f;
+}
+
+.calendarRsvpActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.calendarRsvpActions button {
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid #ccd8e2;
+  border-radius: 10px;
+  color: #43566b;
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.calendarRsvpActions button:hover {
+  border-color: #8fa8bd;
+  background: #edf3f7;
+}
+
+.calendarRsvpActions button.active.going {
+  border-color: #5d8269;
+  color: #315e41;
+  background: #dfebe2;
+}
+
+.calendarRsvpActions button.active.interested {
+  border-color: #bd873b;
+  color: #79571f;
+  background: #f6e8cc;
+}
+
+.calendarRsvpActions button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.calendarRsvpDecline {
+  color: #8c5549 !important;
+}
+
+.calendarReminderControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e7ed;
+}
+
+.calendarReminderControls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #42566d;
+  font-size: 0.74rem;
+  font-weight: 750;
+}
+
+.calendarReminderControls input {
+  accent-color: #356da8;
+}
+
+.calendarReminderControls select {
+  max-width: 170px;
+  min-height: 34px;
+  border: 1px solid #ccd8e2;
+  border-radius: 9px;
+  color: #344a61;
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.72rem;
+}
+
+.calendarRsvpMessage {
+  color: #586b7e;
+  line-height: 1.4;
+}
+
+@media (max-width: 560px) {
+  .calendarReminderControls {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .calendarReminderControls select {
+    width: 100%;
+    max-width: none;
+  }
+}

@@ -6,11 +6,12 @@ import {getSupabaseClient} from "../lib/supabase";
 import CampusGlobalDataSearch from "./campus-global-data-search";
 
 type Role = ModuleProfile["role"];
-export type SearchTarget = "Dashboard" | "My Campus" | "Campus AI" | "Placements" | "Network" | "Resume" | "Academics" | "Campus" | CampusModuleView
+export type SearchTarget = "Dashboard" | "Alumni" | "Campus Map" | "My Campus" | "Campus AI" | "Placements" | "Network" | "Resume" | "Academics" | "Academic Control" | "Calendar" | "Campus" | CampusModuleView
   | "Activity Center"
   | "Faculty Directory"
   | "About CampusConnect"
-  | "Seva Kendra";
+  | "Seva Kendra"
+  | "College ID";
 type SearchCategory = "Academics" | "Career" | "Community" | "Campus" | "Workspace";
 type SearchItem = {
   id: string;
@@ -47,7 +48,54 @@ const everyRole: Role[] = [
 const searchCategories: ("All" | SearchCategory)[] = ["All", "Academics", "Career", "Community", "Campus", "Workspace"];
 
 const searchItems: SearchItem[] = [
+  {
+    id: "campus-alumni",
+    title: "Campus Alumni",
+    description:
+      "Discover verified alumni journeys, achievements and professional impact.",
+    category: "Community",
+    target: "Alumni",
+    icon: "✦",
+    keywords:
+      "alumni graduates seniors success company career achievement network",
+    roles: everyRole,
+    badge: "Network",
+  },
+  {
+    id: "campus-map",
+    title: "RNS Campus Map",
+    description:
+      "Find campus blocks and display an interactive walking path.",
+    category: "Campus",
+    target: "Campus Map",
+    icon: "⌖",
+    keywords:
+      "3d map navigation directions route block gate hostel canteen auditorium campus",
+    roles: everyRole,
+    badge: "3D",
+  },
   {id: "dashboard", title: "Open dashboard", description: "Return to your role overview and priority actions.", category: "Workspace", target: "Dashboard", icon: "⌂", keywords: "home overview metrics priorities", roles: everyRole},
+  {
+    id: "student-calendar",
+    title: "Campus Calendar",
+    description: "View campus events, festivals, holidays, exams, meetings, placement activities and important deadlines.",
+    category: "Academics",
+    target: "Calendar",
+    icon: "▦",
+    keywords: "calendar holiday holidays event events exam exams academic dates workshop placement deadline schedule",
+    roles: everyRole,
+  },
+  {
+    id: "college-id",
+    title: "Official College ID",
+    description: "Open your verified digital college identity or scan an official student ID barcode.",
+    category: "Workspace",
+    target: "College ID",
+    icon: "▥",
+    keywords: "college id student id barcode identity verification rnsit usn digital card",
+    roles: everyRole,
+    badge: "Verified",
+  },
   {
     id: "campus-seva-kendra",
     title: "Campus Seva Kendra",

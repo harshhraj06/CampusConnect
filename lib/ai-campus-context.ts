@@ -1,4 +1,8 @@
 import {
+  CAMPUS_PRODUCT_KNOWLEDGE,
+} from "./ai/campus-product-knowledge";
+
+import {
   buildAcademicSnapshot,
 } from "./ai-academic-snapshot";
 
@@ -408,15 +412,224 @@ buildCampusAiContext(
     needCareer;
 
 
+  const needProductKnowledge =
+    includesAny(
+      query,
+      [
+        "campusconnect",
+        "campus connect",
+        "this app",
+        "this platform",
+        "this project",
+        "who developed",
+        "who created",
+        "who built",
+        "developer",
+        "creator",
+        "founder",
+        "team",
+        "technology",
+        "tech stack",
+        "architecture",
+        "built with",
+        "features",
+        "modules",
+        "how does campusconnect work",
+        "what is campusconnect",
+        "why was campusconnect built",
+        "what can campusconnect do",
+      ]
+    );
+
+
   const needCampus =
     includesAny(
       query,
       [
+        "campus",
+        "campusconnect",
         "event",
         "announcement",
         "notice",
         "club",
+        "society",
+        "community",
+        "sport",
+        "sports",
+        "achievement",
+        "research",
+        "alumni",
+        "recruiter",
+        "faculty",
+        "professor",
+        "teacher",
+        "instructor",
+        "department",
+        "branch",
+        "directory",
         "this week",
+      ]
+    );
+
+
+  const needPeopleDirectory =
+    broadStudyQuestion ||
+    includesAny(
+      query,
+      [
+        "faculty",
+        "professor",
+        "teacher",
+        "instructor",
+        "mentor",
+        "who teaches",
+        "department",
+        "branch",
+        "directory",
+        "hod",
+        "coordinator",
+      ]
+    );
+
+
+  const needCampusLife =
+    includesAny(
+      query,
+      [
+        "club",
+        "clubs",
+        "society",
+        "societies",
+        "sport",
+        "sports",
+        "achievement",
+        "achievements",
+        "research",
+        "alumni",
+        "recruiter",
+        "recruiters",
+        "campus life",
+      ]
+    );
+
+
+  const needNotices =
+    includesAny(
+      query,
+      [
+        "announcement",
+        "announcements",
+        "notice",
+        "notices",
+        "update",
+        "updates",
+        "latest campus",
+      ]
+    );
+
+
+  const needCommunity =
+    includesAny(
+      query,
+      [
+        "community",
+        "group",
+        "groups",
+        "discussion",
+        "post",
+        "posts",
+      ]
+    );
+
+
+  const needLearning =
+    broadStudyQuestion ||
+    includesAny(
+      query,
+      [
+        "learning resource",
+        "learning resources",
+        "resource",
+        "resources",
+        "study material",
+        "study materials",
+        "youtube",
+        "video",
+        "pyq",
+        "previous year",
+      ]
+    );
+
+
+  const needPersonalWorkspace =
+    includesAny(
+      query,
+      [
+        "my note",
+        "my notes",
+        "personal note",
+        "personal notes",
+        "my task",
+        "my tasks",
+        "task",
+        "tasks",
+        "todo",
+        "to do",
+        "subtask",
+        "subtasks",
+        "reminder",
+        "reminders",
+        "remind me",
+        "important task",
+        "urgent task",
+        "pending task",
+        "completed task",
+        "today",
+        "tomorrow",
+        "this week",
+        "what do i have",
+        "what should i do",
+        "my plan",
+      ]
+    );
+
+
+  const needCalendarResponses =
+    includesAny(
+      query,
+      [
+        "rsvp",
+        "going",
+        "interested",
+        "not going",
+        "calendar response",
+        "calendar reminder",
+        "event reminder",
+        "events i joined",
+        "events i am going",
+        "events i'm going",
+      ]
+    );
+
+
+  const needServiceRequests =
+    includesAny(
+      query,
+      [
+        "seva",
+        "seva kendra",
+        "service request",
+        "service requests",
+        "grievance",
+        "bonafide",
+        "leave request",
+        "id card correction",
+        "attendance correction",
+        "technical complaint",
+        "event permission",
+        "placement query",
+        "request status",
+        "resolution",
       ]
     );
 
@@ -485,6 +698,28 @@ buildCampusAiContext(
       count:
         profile.length,
     });
+  }
+
+
+  if (
+    needProductKnowledge
+  ) {
+
+    data.campusconnect_product =
+      CAMPUS_PRODUCT_KNOWLEDGE;
+
+
+    sources.push({
+      key:
+        "campusconnect_product",
+
+      label:
+        "Verified CampusConnect product knowledge",
+
+      count:
+        1,
+    });
+
   }
 
 
@@ -976,6 +1211,641 @@ buildCampusAiContext(
           events.length,
       });
     }
+  }
+
+
+  if (
+    needPeopleDirectory
+  ) {
+
+    const [
+      faculty,
+      directory,
+      branches,
+    ] =
+      await Promise.all([
+        safeRows(
+          "campus faculty",
+          "campus_faculty?select=*&limit=120",
+          accessToken
+        ),
+
+        safeRows(
+          "campus directory",
+          "campus_directory?select=*&limit=120",
+          accessToken
+        ),
+
+        safeRows(
+          "campus branches",
+          "campus_branches?select=*&limit=80",
+          accessToken
+        ),
+      ]);
+
+
+    data.campus_faculty =
+      faculty.map(
+        compactRow
+      );
+
+    data.campus_directory =
+      directory.map(
+        compactRow
+      );
+
+    data.campus_branches =
+      branches.map(
+        compactRow
+      );
+
+
+    if (
+      faculty.length
+    ) {
+      sources.push({
+        key:
+          "campus_faculty",
+
+        label:
+          "Campus faculty directory",
+
+        count:
+          faculty.length,
+      });
+    }
+
+
+    if (
+      directory.length
+    ) {
+      sources.push({
+        key:
+          "campus_directory",
+
+        label:
+          "Campus directory",
+
+        count:
+          directory.length,
+      });
+    }
+
+
+    if (
+      branches.length
+    ) {
+      sources.push({
+        key:
+          "campus_branches",
+
+        label:
+          "Campus branches and departments",
+
+        count:
+          branches.length,
+      });
+    }
+
+  }
+
+
+  if (
+    needCampusLife
+  ) {
+
+    const [
+      clubs,
+      sports,
+      achievements,
+      research,
+      alumni,
+      recruiters,
+    ] =
+      await Promise.all([
+        safeRows(
+          "campus clubs",
+          "campus_clubs?select=*&limit=120",
+          accessToken
+        ),
+
+        safeRows(
+          "campus sports",
+          "campus_sports?select=*&limit=100",
+          accessToken
+        ),
+
+        safeRows(
+          "campus achievements",
+          "campus_achievements?select=*&limit=100",
+          accessToken
+        ),
+
+        safeRows(
+          "campus research",
+          "campus_research?select=*&limit=100",
+          accessToken
+        ),
+
+        safeRows(
+          "campus alumni",
+          "campus_alumni?select=*&limit=100",
+          accessToken
+        ),
+
+        safeRows(
+          "campus recruiters",
+          "campus_recruiters?select=*&limit=100",
+          accessToken
+        ),
+      ]);
+
+
+    data.campus_clubs =
+      clubs.map(
+        compactRow
+      );
+
+    data.campus_sports =
+      sports.map(
+        compactRow
+      );
+
+    data.campus_achievements =
+      achievements.map(
+        compactRow
+      );
+
+    data.campus_research =
+      research.map(
+        compactRow
+      );
+
+    data.campus_alumni =
+      alumni.map(
+        compactRow
+      );
+
+    data.campus_recruiters =
+      recruiters.map(
+        compactRow
+      );
+
+
+    if (
+      clubs.length
+    ) {
+      sources.push({
+        key:
+          "campus_clubs",
+
+        label:
+          "Campus clubs",
+
+        count:
+          clubs.length,
+      });
+    }
+
+
+    if (
+      sports.length
+    ) {
+      sources.push({
+        key:
+          "campus_sports",
+
+        label:
+          "Campus sports",
+
+        count:
+          sports.length,
+      });
+    }
+
+
+    if (
+      achievements.length
+    ) {
+      sources.push({
+        key:
+          "campus_achievements",
+
+        label:
+          "Campus achievements",
+
+        count:
+          achievements.length,
+      });
+    }
+
+
+    if (
+      research.length
+    ) {
+      sources.push({
+        key:
+          "campus_research",
+
+        label:
+          "Campus research",
+
+        count:
+          research.length,
+      });
+    }
+
+
+    if (
+      alumni.length
+    ) {
+      sources.push({
+        key:
+          "campus_alumni",
+
+        label:
+          "Campus alumni",
+
+        count:
+          alumni.length,
+      });
+    }
+
+
+    if (
+      recruiters.length
+    ) {
+      sources.push({
+        key:
+          "campus_recruiters",
+
+        label:
+          "Campus recruiters",
+
+        count:
+          recruiters.length,
+      });
+    }
+
+  }
+
+
+  if (
+    needNotices
+  ) {
+
+    const noticeRail =
+      await safeRows(
+        "campus notice rail",
+        "campus_notice_rail?select=*&limit=60",
+        accessToken
+      );
+
+
+    data.campus_notice_rail =
+      noticeRail.map(
+        compactRow
+      );
+
+
+    if (
+      noticeRail.length
+    ) {
+      sources.push({
+        key:
+          "campus_notice_rail",
+
+        label:
+          "Campus notices",
+
+        count:
+          noticeRail.length,
+      });
+    }
+
+  }
+
+
+  if (
+    needCommunity
+  ) {
+
+    const [
+      groups,
+      posts,
+    ] =
+      await Promise.all([
+        safeRows(
+          "community groups",
+          "community_groups?select=*&limit=80",
+          accessToken
+        ),
+
+        safeRows(
+          "community posts",
+          "community_posts?select=*&order=created_at.desc&limit=60",
+          accessToken
+        ),
+      ]);
+
+
+    data.community_groups =
+      groups.map(
+        compactRow
+      );
+
+    data.community_posts =
+      posts.map(
+        compactRow
+      );
+
+
+    if (
+      groups.length
+    ) {
+      sources.push({
+        key:
+          "community_groups",
+
+        label:
+          "Campus community groups",
+
+        count:
+          groups.length,
+      });
+    }
+
+
+    if (
+      posts.length
+    ) {
+      sources.push({
+        key:
+          "community_posts",
+
+        label:
+          "Campus community posts",
+
+        count:
+          posts.length,
+      });
+    }
+
+  }
+
+
+  if (
+    needLearning
+  ) {
+
+    const resources =
+      await safeRows(
+        "learning resources",
+        "learning_resources?select=*&limit=100",
+        accessToken
+      );
+
+
+    data.learning_resources =
+      resources.map(
+        compactRow
+      );
+
+
+    if (
+      resources.length
+    ) {
+      sources.push({
+        key:
+          "learning_resources",
+
+        label:
+          "Campus learning resources",
+
+        count:
+          resources.length,
+      });
+    }
+
+  }
+
+
+  if (
+    needPersonalWorkspace
+  ) {
+
+    /*
+     * Personal Workspace data is strictly scoped
+     * to the authenticated user.
+     *
+     * All four tables use owner_id.
+     * Supabase RLS also remains active because
+     * these requests use the student's JWT.
+     */
+
+    const [
+      notes,
+      tasks,
+      subtasks,
+      reminders,
+    ] =
+      await Promise.all([
+        safeRows(
+          "personal notes",
+          `personal_notes?select=id,title,body,category,tags,is_pinned,is_archived,created_at,updated_at&owner_id=eq.${user}&order=updated_at.desc&limit=40`,
+          accessToken
+        ),
+
+        safeRows(
+          "personal tasks",
+          `personal_tasks?select=id,title,description,category,priority,status,due_at,is_important,is_pinned,completed_at,created_at,updated_at&owner_id=eq.${user}&order=updated_at.desc&limit=60`,
+          accessToken
+        ),
+
+        safeRows(
+          "personal task subtasks",
+          `personal_task_subtasks?select=id,task_id,title,is_completed,display_order,created_at,updated_at&owner_id=eq.${user}&order=display_order.asc&limit=120`,
+          accessToken
+        ),
+
+        safeRows(
+          "personal reminders",
+          `personal_reminders?select=id,title,description,remind_at,repeat_rule,status,is_important,completed_at,last_triggered_at,created_at,updated_at&owner_id=eq.${user}&order=remind_at.asc&limit=60`,
+          accessToken
+        ),
+      ]);
+
+
+    data.personal_notes =
+      notes.map(
+        compactRow
+      );
+
+    data.personal_tasks =
+      tasks.map(
+        compactRow
+      );
+
+    data.personal_task_subtasks =
+      subtasks.map(
+        compactRow
+      );
+
+    data.personal_reminders =
+      reminders.map(
+        compactRow
+      );
+
+
+    if (
+      notes.length
+    ) {
+      sources.push({
+        key:
+          "personal_notes",
+
+        label:
+          "Your personal workspace notes",
+
+        count:
+          notes.length,
+      });
+    }
+
+
+    if (
+      tasks.length
+    ) {
+      sources.push({
+        key:
+          "personal_tasks",
+
+        label:
+          "Your personal workspace tasks",
+
+        count:
+          tasks.length,
+      });
+    }
+
+
+    if (
+      subtasks.length
+    ) {
+      sources.push({
+        key:
+          "personal_task_subtasks",
+
+        label:
+          "Your task subtasks",
+
+        count:
+          subtasks.length,
+      });
+    }
+
+
+    if (
+      reminders.length
+    ) {
+      sources.push({
+        key:
+          "personal_reminders",
+
+        label:
+          "Your personal reminders",
+
+        count:
+          reminders.length,
+      });
+    }
+
+  }
+
+
+  if (
+    needCalendarResponses
+  ) {
+
+    /*
+     * Calendar RSVP rows are explicitly
+     * scoped through user_id.
+     */
+
+    const rsvps =
+      await safeRows(
+        "calendar RSVPs",
+        `campus_calendar_rsvps?select=id,item_source,item_id,response,reminder_enabled,reminder_minutes_before,created_at,updated_at&user_id=eq.${user}&order=updated_at.desc&limit=80`,
+        accessToken
+      );
+
+
+    data.calendar_rsvps =
+      rsvps.map(
+        compactRow
+      );
+
+
+    if (
+      rsvps.length
+    ) {
+      sources.push({
+        key:
+          "campus_calendar_rsvps",
+
+        label:
+          "Your calendar responses and reminders",
+
+        count:
+          rsvps.length,
+      });
+    }
+
+  }
+
+
+  if (
+    needServiceRequests
+  ) {
+
+    /*
+     * A normal Campus AI request must only
+     * retrieve service requests created by
+     * the authenticated user.
+     *
+     * Staff workflow visibility belongs in
+     * the separate role-aware context engine.
+     */
+
+    const serviceRequests =
+      await safeRows(
+        "campus service requests",
+        `campus_service_requests?select=id,request_number,requester_role,department,category,subject,description,priority,status,assigned_role,assigned_name,resolution_note,due_at,closed_at,created_at,updated_at&requester_id=eq.${user}&order=updated_at.desc&limit=50`,
+        accessToken
+      );
+
+
+    data.campus_service_requests =
+      serviceRequests.map(
+        compactRow
+      );
+
+
+    if (
+      serviceRequests.length
+    ) {
+      sources.push({
+        key:
+          "campus_service_requests",
+
+        label:
+          "Your Campus Seva service requests",
+
+        count:
+          serviceRequests.length,
+      });
+    }
+
   }
 
 

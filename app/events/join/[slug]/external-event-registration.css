@@ -1,0 +1,820 @@
+.externalEventPage {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 8% 0%,
+      rgba(183, 166, 139, 0.12),
+      transparent 30%
+    ),
+    #f5f3ee;
+  color: #273943;
+}
+
+.externalEventNav {
+  width: min(1240px, calc(100% - 44px));
+  min-height: 76px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.externalEventBrand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.externalEventBrand > span,
+.externalEventBrandMark,
+.externalEventLoadingMark {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  border-radius: 12px;
+  background: #2d4651;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.externalEventBrand > div {
+  display: grid;
+  gap: 1px;
+}
+
+.externalEventBrand strong {
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.externalEventBrand small {
+  color: #83837e;
+  font-size: 7px;
+}
+
+.externalEventNavTag {
+  padding: 7px 10px;
+  border: 1px solid rgba(40, 57, 66, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  color: #806b56;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.externalEventShell {
+  width: min(1240px, calc(100% - 44px));
+  margin: 16px auto 60px;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.38fr)
+    minmax(340px, 0.62fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.externalEventExperience,
+.externalEventRegistrationCard,
+.externalEventSuccessCard {
+  border: 1px solid rgba(40, 57, 66, 0.09);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow:
+    0 18px 50px rgba(36, 47, 52, 0.06);
+}
+
+.externalEventExperience {
+  overflow: hidden;
+  border-radius: 21px;
+}
+
+.externalEventVisual {
+  position: relative;
+  min-height: 470px;
+  overflow: hidden;
+  background: #314650;
+}
+
+.externalEventVisual > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.externalEventVisualShade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(19, 31, 36, 0.12),
+      rgba(19, 31, 36, 0.78)
+    );
+}
+
+.externalEventVisualContent {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  padding: 34px;
+  color: #fff;
+}
+
+.externalEventCategory {
+  display: inline-flex;
+  padding: 6px 9px;
+  margin-bottom: 13px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 999px;
+  background: rgba(255,255,255,.1);
+  backdrop-filter: blur(8px);
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.externalEventVisualContent h1 {
+  max-width: 680px;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(35px, 5vw, 58px);
+  font-weight: 500;
+  line-height: .98;
+  letter-spacing: -.045em;
+}
+
+.externalEventVisualContent > p {
+  max-width: 610px;
+  margin: 15px 0 0;
+  color: rgba(255,255,255,.8);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.externalEventHeroMeta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: 25px;
+}
+
+.externalEventHeroMeta > div {
+  display: grid;
+  gap: 4px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 11px;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(8px);
+}
+
+.externalEventHeroMeta small,
+.externalEventInformationGrid span {
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.externalEventHeroMeta small {
+  color: rgba(255,255,255,.58);
+}
+
+.externalEventHeroMeta strong {
+  font-size: 9px;
+}
+
+.externalEventFallbackVisual {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 40px;
+  background:
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(218, 198, 164, .25),
+      transparent 28%
+    ),
+    linear-gradient(135deg, #263e49, #435a60);
+  color: #fff;
+}
+
+.externalEventFallbackVisual span {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.externalEventFallbackVisual strong {
+  max-width: 650px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.externalEventStory {
+  padding: 30px 34px 34px;
+}
+
+.externalEventStoryHeading span,
+.externalEventRegistrationTop > div:first-child > span,
+.externalEventSuccessCard > span {
+  color: #8a7058;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.externalEventStoryHeading h2 {
+  max-width: 430px;
+  margin: 7px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1.08;
+}
+
+.externalEventStory > p {
+  margin: 17px 0 0;
+  color: #717875;
+  font-size: 10px;
+  line-height: 1.75;
+  white-space: pre-line;
+}
+
+.externalEventInformationGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.externalEventInformationGrid > div {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid rgba(40,57,66,.08);
+  border-radius: 11px;
+  background: #f8f7f3;
+}
+
+.externalEventInformationGrid span {
+  color: #948879;
+}
+
+.externalEventInformationGrid strong {
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.externalEventRegistrationColumn {
+  position: sticky;
+  top: 18px;
+}
+
+.externalEventRegistrationCard,
+.externalEventSuccessCard {
+  padding: 22px;
+  border-radius: 19px;
+}
+
+.externalEventRegistrationTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.externalEventRegistrationTop h2,
+.externalEventSuccessCard h2 {
+  margin: 6px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.05;
+}
+
+.externalEventRegistrationTop p {
+  margin: 6px 0 0;
+  color: #858782;
+  font-size: 8px;
+}
+
+.externalEventFee {
+  flex: 0 0 auto;
+  display: grid;
+  align-content: center;
+  justify-items: end;
+  gap: 3px;
+  min-width: 85px;
+  padding: 9px 11px;
+  border-radius: 11px;
+}
+
+.externalEventFee.isFree {
+  background: #edf4ee;
+}
+
+.externalEventFee.isPaid {
+  background: #f6f0e6;
+}
+
+.externalEventFee small {
+  color: #8a8176;
+  font-size: 6px;
+  font-weight: 900;
+}
+
+.externalEventFee strong {
+  color: #365547;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.externalEventSeatStatus {
+  margin-top: 17px;
+  padding: 11px 12px;
+  border-radius: 11px;
+  background: #f7f6f2;
+}
+
+.externalEventSeatStatus > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.externalEventSeatStatus span {
+  color: #948879;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+
+.externalEventSeatStatus strong {
+  font-size: 7px;
+}
+
+.externalEventSeatBar {
+  height: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e7e5df;
+}
+
+.externalEventSeatBar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #506d5b;
+}
+
+.externalEventForm {
+  display: grid;
+  gap: 12px;
+  margin-top: 19px;
+}
+
+.externalEventForm label {
+  display: grid;
+  gap: 5px;
+}
+
+.externalEventForm label > span {
+  color: #5f6c6d;
+  font-size: 7px;
+  font-weight: 850;
+}
+
+.externalEventForm input,
+.externalEventForm select {
+  width: 100%;
+  min-height: 39px;
+  padding: 0 11px;
+  border: 1px solid rgba(40,57,66,.12);
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: #273943;
+  font: inherit;
+  font-size: 9px;
+}
+
+.externalEventForm input:focus,
+.externalEventForm select:focus {
+  border-color: rgba(54,85,71,.42);
+  box-shadow: 0 0 0 3px rgba(54,85,71,.07);
+}
+
+.externalEventForm input:disabled,
+.externalEventForm select:disabled {
+  opacity: .55;
+}
+
+.externalEventFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.externalEventPrimaryButton {
+  width: 100%;
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  background: #2d4853;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.externalEventPrimaryButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(45,72,83,.17);
+}
+
+.externalEventPrimaryButton:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.externalEventTrust {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  justify-content: center;
+}
+
+.externalEventTrust > span {
+  color: #52715d;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.externalEventTrust p {
+  max-width: 270px;
+  margin: 0;
+  color: #96958f;
+  font-size: 6px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.externalEventFormError,
+.externalEventClosedNotice,
+.externalEventPaymentNotice {
+  border-radius: 11px;
+}
+
+.externalEventFormError {
+  display: flex;
+  gap: 8px;
+  padding: 9px 10px;
+  background: #f9ecea;
+  color: #914f49;
+}
+
+.externalEventFormError span {
+  font-weight: 900;
+}
+
+.externalEventFormError p {
+  margin: 0;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.externalEventClosedNotice {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding: 11px;
+  background: #f7ece9;
+}
+
+.externalEventClosedNotice > span {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  background: #fff;
+  color: #9a554d;
+  font-weight: 900;
+}
+
+.externalEventClosedNotice strong {
+  font-size: 8px;
+}
+
+.externalEventClosedNotice p {
+  margin: 3px 0 0;
+  color: #8a716d;
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.externalEventPaymentNotice {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 10px;
+  margin-top: 15px;
+  padding: 12px;
+  background: #faf4e9;
+}
+
+.externalEventPaymentNoticeIcon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #fff;
+  color: #88663d;
+  font-weight: 900;
+}
+
+.externalEventPaymentNotice > div:nth-child(2) {
+  display: grid;
+  gap: 3px;
+}
+
+.externalEventPaymentNotice span {
+  color: #9a7b55;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+
+.externalEventPaymentNotice strong {
+  font-size: 13px;
+}
+
+.externalEventPaymentNotice p {
+  margin: 2px 0 0;
+  color: #82796d;
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.externalEventPaymentNotice > button {
+  width: 25px;
+  height: 25px;
+  border: 0;
+  border-radius: 7px;
+  background: rgba(255,255,255,.7);
+  cursor: pointer;
+}
+
+.externalEventSuccessCard {
+  text-align: center;
+}
+
+.externalEventSuccessIcon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 15px;
+  border-radius: 15px;
+  background: #e9f2eb;
+  color: #41694e;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.externalEventSuccessCard > p {
+  margin: 11px auto 0;
+  max-width: 300px;
+  color: #7d817d;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.externalEventSuccessDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.externalEventSuccessDetails > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f7f6f2;
+}
+
+.externalEventSuccessDetails small {
+  color: #968878;
+  font-size: 6px;
+  font-weight: 900;
+}
+
+.externalEventSuccessDetails strong {
+  color: #3d614b;
+  font-size: 10px;
+}
+
+.externalEventSuccessNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 13px 0 17px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #eef4ef;
+  text-align: left;
+}
+
+.externalEventSuccessNotice span {
+  color: #426b50;
+  font-weight: 900;
+}
+
+.externalEventSuccessNotice p {
+  margin: 0;
+  color: #637268;
+  font-size: 7px;
+}
+
+.externalEventLoading,
+.externalEventUnavailable {
+  width: min(440px, calc(100% - 32px));
+  margin: 15vh auto 0;
+  text-align: center;
+}
+
+.externalEventLoadingMark,
+.externalEventBrandMark {
+  margin: auto;
+}
+
+.externalEventLoading > span {
+  display: block;
+  width: 110px;
+  height: 3px;
+  margin: 18px auto 11px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2dfd7;
+}
+
+.externalEventLoading p {
+  color: #8c8b85;
+  font-size: 8px;
+}
+
+.externalEventUnavailable {
+  padding: 35px;
+  border: 1px solid rgba(40,57,66,.09);
+  border-radius: 20px;
+  background: #fff;
+}
+
+.externalEventUnavailable > span {
+  display: block;
+  margin-top: 18px;
+  color: #8c735c;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.externalEventUnavailable h1 {
+  margin: 8px 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.externalEventUnavailable p {
+  color: #858681;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.externalEventUnavailable button {
+  min-height: 37px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #2d4853;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.externalEventFooter {
+  width: min(1240px, calc(100% - 44px));
+  margin: 0 auto;
+  padding: 0 0 28px;
+  display: flex;
+  justify-content: space-between;
+  color: #92918b;
+  font-size: 7px;
+}
+
+.externalEventFooter > div {
+  display: flex;
+  gap: 7px;
+}
+
+.externalEventFooter p {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .externalEventShell {
+    grid-template-columns: 1fr;
+  }
+
+  .externalEventRegistrationColumn {
+    position: static;
+  }
+
+  .externalEventInformationGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .externalEventNav,
+  .externalEventShell,
+  .externalEventFooter {
+    width: min(100% - 24px, 1240px);
+  }
+
+  .externalEventNav {
+    min-height: 66px;
+  }
+
+  .externalEventBrand small,
+  .externalEventNavTag {
+    display: none;
+  }
+
+  .externalEventShell {
+    margin-top: 8px;
+  }
+
+  .externalEventExperience,
+  .externalEventRegistrationCard,
+  .externalEventSuccessCard {
+    border-radius: 16px;
+  }
+
+  .externalEventVisual {
+    min-height: 430px;
+  }
+
+  .externalEventVisualContent {
+    padding: 22px;
+  }
+
+  .externalEventVisualContent h1 {
+    font-size: 38px;
+  }
+
+  .externalEventHeroMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .externalEventStory {
+    padding: 23px 21px 25px;
+  }
+
+  .externalEventInformationGrid,
+  .externalEventFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .externalEventRegistrationCard,
+  .externalEventSuccessCard {
+    padding: 18px;
+  }
+
+  .externalEventRegistrationTop {
+    align-items: flex-start;
+  }
+
+  .externalEventFooter {
+    flex-direction: column;
+    gap: 6px;
+  }
+}

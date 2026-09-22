@@ -1325,11 +1325,233 @@ export function ProfessionalRoleDashboard({
         .toLowerCase()
         .replace(/\s+/g, "-")}`}
     >
-      <section className="proDashboardHero">
+      <style>{`
+        .proRoleDashboard .proDashboardPhotoHero {
+          position: relative !important;
+          isolation: isolate !important;
+          overflow: hidden !important;
+          min-height: 365px !important;
+          padding: 38px 42px !important;
+          border: 1px solid rgba(55,72,82,.13) !important;
+          border-radius: 26px !important;
+          background: #f7f3eb !important;
+          box-shadow: 0 20px 50px rgba(36,48,56,.10) !important;
+        }
+
+        .proRoleDashboard .proDashboardHeroPhoto {
+          position: absolute !important;
+          inset: 0 !important;
+          z-index: 0 !important;
+          display: block !important;
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: cover !important;
+          object-position: center 44% !important;
+          opacity: 1 !important;
+          filter: saturate(.9) contrast(.97) brightness(1.02) !important;
+          pointer-events: none !important;
+        }
+
+        .proRoleDashboard .proDashboardHeroPhotoOverlay {
+          position: absolute !important;
+          inset: 0 !important;
+          z-index: 1 !important;
+          display: block !important;
+          pointer-events: none !important;
+          background:
+            linear-gradient(
+              90deg,
+              rgba(250,247,240,.98) 0%,
+              rgba(250,247,240,.95) 22%,
+              rgba(250,247,240,.82) 40%,
+              rgba(250,247,240,.50) 57%,
+              rgba(250,247,240,.15) 74%,
+              rgba(250,247,240,0) 100%
+            ) !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero::before,
+        .proRoleDashboard .proDashboardPhotoHero::after,
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardOrb {
+          display: none !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroContent {
+          position: relative !important;
+          z-index: 3 !important;
+          max-width: 660px !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroContent > span {
+          color: var(--prd-accent) !important;
+          text-shadow: none !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroContent > span::before {
+          background: var(--prd-accent) !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroContent h1 {
+          max-width: 650px !important;
+          margin: 8px 0 0 !important;
+          color: #263b46 !important;
+          font-family: Georgia, "Times New Roman", serif !important;
+          font-size: clamp(38px,4.25vw,54px) !important;
+          font-weight: 500 !important;
+          line-height: 1.04 !important;
+          letter-spacing: -.04em !important;
+          text-shadow: none !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroContent > p {
+          max-width: 590px !important;
+          margin-top: 15px !important;
+          color: #5d6f79 !important;
+          font-size: 10px !important;
+          line-height: 1.72 !important;
+          text-shadow: none !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroAside {
+          position: relative !important;
+          z-index: 4 !important;
+          align-self: center !important;
+          padding: 19px !important;
+          border: 1px solid rgba(255,255,255,.95) !important;
+          border-radius: 20px !important;
+          background: rgba(255,255,255,.92) !important;
+          box-shadow: 0 22px 48px rgba(29,44,53,.16) !important;
+          backdrop-filter: blur(18px) saturate(120%) !important;
+          -webkit-backdrop-filter: blur(18px) saturate(120%) !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroAside > header {
+          border-bottom-color: rgba(55,72,81,.10) !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroAside header small {
+          color: #8a9499 !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroAside header strong {
+          color: #2c404b !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardRoleMark {
+          background: var(--prd-accent-soft) !important;
+          color: var(--prd-accent) !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroMetrics button {
+          border: 1px solid rgba(55,72,81,.10) !important;
+          background: rgba(250,250,249,.95) !important;
+          color: #263b46 !important;
+          box-shadow: 0 7px 18px rgba(41,53,60,.04) !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroMetrics small {
+          color: #899399 !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardHeroMetrics strong {
+          color: #263b46 !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardAiAction {
+          border: 0 !important;
+          background: var(--prd-accent) !important;
+          color: #fff !important;
+          box-shadow: 0 12px 28px rgba(var(--prd-accent-rgb),.20) !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardAiAction strong,
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardAiAction > b,
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardAiAction > i {
+          color: #fff !important;
+        }
+
+        .proRoleDashboard .proDashboardPhotoHero .proDashboardAiAction small {
+          color: rgba(255,255,255,.72) !important;
+        }
+
+        .proRoleDashboard-faculty {
+          --prd-accent: #356b91 !important;
+          --prd-accent-soft: #e9f3fa !important;
+          --prd-accent-rgb: 53,107,145 !important;
+        }
+
+        .proRoleDashboard-placement-cell {
+          --prd-accent: #765966 !important;
+          --prd-accent-soft: #f5edef !important;
+          --prd-accent-rgb: 118,89,102 !important;
+        }
+
+        .proRoleDashboard-coordinator {
+          --prd-accent: #657e6a !important;
+          --prd-accent-soft: #edf4ee !important;
+          --prd-accent-rgb: 101,126,106 !important;
+        }
+
+        .proRoleDashboard-volunteer {
+          --prd-accent: #9a7055 !important;
+          --prd-accent-soft: #f8eee8 !important;
+          --prd-accent-rgb: 154,112,85 !important;
+        }
+
+        .proRoleDashboard-main-admin {
+          --prd-accent: #344f63 !important;
+          --prd-accent-soft: #eaf1f5 !important;
+          --prd-accent-rgb: 52,79,99 !important;
+        }
+
+        @media (max-width: 1050px) {
+          .proRoleDashboard .proDashboardPhotoHero {
+            grid-template-columns: 1fr !important;
+          }
+
+          .proRoleDashboard .proDashboardHeroPhotoOverlay {
+            background:
+              linear-gradient(
+                180deg,
+                rgba(250,247,240,.97),
+                rgba(250,247,240,.88) 52%,
+                rgba(250,247,240,.50)
+              ) !important;
+          }
+        }
+      `}</style>
+
+      <section className="proDashboardHero proDashboardPhotoHero">
+        <img
+          className="proDashboardHeroPhoto"
+          src="/rnsit-campus-gate.png"
+          alt=""
+          aria-hidden="true"
+        />
+
+        <div
+          className="proDashboardHeroPhotoOverlay"
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 1,
+            pointerEvents: "none",
+            background:
+              "linear-gradient(90deg, rgba(250,247,240,.98) 0%, rgba(250,247,240,.94) 24%, rgba(250,247,240,.80) 41%, rgba(250,247,240,.42) 59%, rgba(250,247,240,.10) 76%, rgba(250,247,240,0) 100%)",
+          }}
+        />
         <div className="proDashboardOrb proDashboardOrbOne" />
         <div className="proDashboardOrb proDashboardOrbTwo" />
 
-        <div className="proDashboardHeroContent">
+        <div
+          className="proDashboardHeroContent"
+          style={{
+            position: "relative",
+            zIndex: 3,
+            maxWidth: 680,
+          }}
+        >
           {role ===
             "Main Admin" &&
             adminEditing ? (
@@ -1378,7 +1600,14 @@ export function ProfessionalRoleDashboard({
               }
             />
           ) : (
-            <h1>
+            <h1
+              style={{
+                color: "#263b46",
+                textShadow: "none",
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontWeight: 500,
+              }}
+            >
               {config.title}
             </h1>
           )}
@@ -1403,13 +1632,32 @@ export function ProfessionalRoleDashboard({
               }
             />
           ) : (
-            <p>
+            <p
+              style={{
+                color: "#5f7079",
+                textShadow: "none",
+                maxWidth: 600,
+              }}
+            >
               {config.description}
             </p>
           )}
         </div>
 
-        <aside className="proDashboardHeroAside">
+        <aside
+          className="proDashboardHeroAside"
+          style={{
+            position: "relative",
+            zIndex: 4,
+            alignSelf: "center",
+            background: "rgba(255,255,255,.93)",
+            border: "1px solid rgba(255,255,255,.95)",
+            borderRadius: 20,
+            boxShadow: "0 22px 50px rgba(31,45,54,.16)",
+            backdropFilter: "blur(18px) saturate(120%)",
+            WebkitBackdropFilter: "blur(18px) saturate(120%)",
+          }}
+        >
           <header>
             <span className="proDashboardRoleMark">
               {role === "Main Admin"
@@ -1555,55 +1803,7 @@ export function ProfessionalRoleDashboard({
         className="proDashboardBody"
         id="pro-dashboard-overview"
       >
-        <header className="proDashboardGreeting">
-          <div>
-            <span>
-              {role.toUpperCase()}
-              {" "}WORKSPACE
-            </span>
-
-            <h2>
-              {liveGreeting},{" "}
-              <strong>{firstName}</strong>
-              <span
-                className="proGreetingWave"
-                aria-hidden="true"
-              >
-                👋
-              </span>
-            </h2>
-
-            <p>
-              Live information from
-              your CampusConnect
-              workspace.
-            </p>
-          </div>
-
-          {role ===
-            "Main Admin" && (
-            <button
-              type="button"
-              className={
-                adminEditing
-                  ? "proAdminEditButton active"
-                  : "proAdminEditButton"
-              }
-              onClick={() =>
-                setAdminEditing(
-                  current =>
-                    !current
-                )
-              }
-            >
-              {adminEditing
-                ? "✓ Finish editing"
-                : "✎ Edit dashboard"}
-            </button>
-          )}
-        </header>
-
-      {role !== "Student" && (
+        {role !== "Student" && (
         <RoleActionCenter
           role={role}
           go={go}

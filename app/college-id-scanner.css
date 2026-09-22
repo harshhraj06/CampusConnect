@@ -1,0 +1,503 @@
+.collegeIdWorkspace {
+  width: 100%;
+  display: grid;
+  gap: 24px;
+}
+
+.collegeIdHero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 26px 28px;
+  border: 1px solid #e4e8ef;
+  border-radius: 22px;
+  background: #ffffff;
+}
+
+.collegeIdHero > div:first-child {
+  max-width: 720px;
+}
+
+.collegeIdHero span,
+.collegeIdScannerHeader span,
+.collegeIdManual > span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #718096;
+}
+
+.collegeIdHero h2,
+.collegeIdScannerHeader h3 {
+  margin: 0;
+  color: #172033;
+}
+
+.collegeIdHero h2 {
+  font-size: 28px;
+}
+
+.collegeIdHero p {
+  margin: 10px 0 0;
+  color: #647084;
+  line-height: 1.6;
+}
+
+.collegeIdHeroBadge {
+  min-width: 150px;
+  padding: 17px 20px;
+  border: 1px solid #dce4ea;
+  border-radius: 17px;
+  text-align: center;
+  background: #f7f9fb;
+}
+
+.collegeIdHeroBadge strong {
+  display: block;
+  font-size: 25px;
+  letter-spacing: 0.08em;
+  color: #18345a;
+}
+
+.collegeIdHeroBadge small {
+  color: #647084;
+}
+
+.collegeIdGrid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(340px, 440px);
+  gap: 24px;
+  align-items: start;
+}
+
+.collegeIdScannerCard,
+.collegeIdResult {
+  border: 1px solid #e3e8ef;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow:
+    0 8px 28px
+    rgba(24, 36, 58, 0.06);
+}
+
+.collegeIdScannerCard {
+  padding: 24px;
+}
+
+.collegeIdScannerHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+
+.collegeIdScannerHeader h3 {
+  font-size: 21px;
+}
+
+.collegeIdLiveBadge {
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #eef1f5;
+  color: #647084;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.collegeIdLiveBadge.active {
+  background: #e7f6ec;
+  color: #24743a;
+}
+
+.collegeIdCamera {
+  overflow: hidden;
+  min-height: 250px;
+  margin-top: 20px;
+  border: 1px dashed #cfd7e1;
+  border-radius: 18px;
+  background: #f6f8fa;
+}
+
+.collegeIdCamera:empty::before {
+  content: "Camera preview";
+  min-height: 250px;
+  display: grid;
+  place-items: center;
+  color: #9aa5b4;
+  font-weight: 700;
+}
+
+.collegeIdScannerActions,
+.collegeIdButtonRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.collegeIdScannerCard button {
+  min-height: 43px;
+  padding: 0 17px;
+  border: 1px solid #d8dee8;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #293448;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.collegeIdScannerCard button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.collegeIdScannerCard .collegeIdPrimary {
+  background: #173f78;
+  border-color: #173f78;
+  color: #ffffff;
+}
+
+.collegeIdDivider {
+  position: relative;
+  margin: 25px 0;
+  text-align: center;
+}
+
+.collegeIdDivider::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #e6eaf0;
+}
+
+.collegeIdDivider span {
+  position: relative;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #99a3b1;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.collegeIdManual input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #d8dee7;
+  border-radius: 11px;
+  outline: none;
+  color: #172033;
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.collegeIdManual input:focus {
+  border-color: #5377a7;
+  box-shadow:
+    0 0 0 3px
+    rgba(36, 74, 124, 0.08);
+}
+
+.collegeIdRegisterBox {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #f7f9fb;
+  border: 1px solid #e1e6ed;
+}
+
+.collegeIdRegisterBox strong {
+  display: block;
+  color: #27344a;
+}
+
+.collegeIdRegisterBox p {
+  margin: 7px 0 13px;
+  color: #697587;
+  line-height: 1.55;
+  font-size: 13px;
+}
+
+.collegeIdError,
+.collegeIdSuccess {
+  margin: 15px 0 0;
+  padding: 11px 13px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.collegeIdError {
+  background: #fff0f0;
+  color: #a63737;
+}
+
+.collegeIdSuccess {
+  background: #edf8f0;
+  color: #2b7141;
+}
+
+.collegeIdResult {
+  min-height: 600px;
+  padding: 20px;
+}
+
+.collegeIdEmpty {
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+  padding: 30px;
+}
+
+.collegeIdEmptyIcon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+  border-radius: 17px;
+  background: #f0f3f7;
+  color: #677488;
+  font-size: 25px;
+}
+
+.collegeIdEmpty strong {
+  color: #263247;
+  font-size: 17px;
+}
+
+.collegeIdEmpty p {
+  max-width: 310px;
+  margin: 8px 0 0;
+  color: #7b8695;
+  line-height: 1.55;
+}
+
+.digitalCollegeId {
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid #c9d2cf;
+  background:
+    linear-gradient(
+      180deg,
+      #f8fbfb 0%,
+      #f8fbfb 42%,
+      #5c8b72 42%,
+      #5c8b72 93%,
+      #e9d900 93%,
+      #e9d900 100%
+    );
+  box-shadow:
+    0 18px 35px
+    rgba(33, 53, 49, 0.14);
+  min-height: 560px;
+  padding: 20px 20px 0;
+  color: #ffffff;
+}
+
+.digitalCollegeIdTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #15325a;
+}
+
+.digitalCollegeIdBrand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.digitalCollegeIdSeal {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #193e6a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.digitalCollegeIdBrand strong {
+  display: block;
+  font-size: 29px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.digitalCollegeIdBrand span,
+.digitalCollegeIdBrand small {
+  display: block;
+  color: #2e4159;
+}
+
+.digitalCollegeIdBrand span {
+  margin-top: 4px;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.digitalCollegeIdBrand small {
+  font-size: 10px;
+}
+
+.digitalCollegeIdStudent {
+  padding: 8px 6px;
+  border-radius: 8px;
+  background: #ebdb00;
+  color: #152332;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.digitalCollegeIdPhotoWrap {
+  display: grid;
+  place-items: center;
+  margin-top: 41px;
+}
+
+.digitalCollegeIdPhoto,
+.digitalCollegeIdPhotoFallback {
+  width: 165px;
+  height: 190px;
+  border: 5px solid #ffffff;
+  border-radius: 29px;
+  box-shadow:
+    0 6px 18px
+    rgba(24, 49, 38, 0.15);
+}
+
+.digitalCollegeIdPhoto {
+  object-fit: cover;
+}
+
+.digitalCollegeIdPhotoFallback {
+  display: grid;
+  place-items: center;
+  background: #e7ece9;
+  color: #41644f;
+  font-size: 42px;
+  font-weight: 900;
+}
+
+.digitalCollegeIdIdentity {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.digitalCollegeIdIdentity h3 {
+  margin: 0;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.digitalCollegeIdIdentity > strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 15px;
+}
+
+.digitalCollegeIdFacts {
+  display: grid;
+  grid-template-columns:
+    repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.digitalCollegeIdFacts > div {
+  padding: 10px 8px;
+  border-radius: 10px;
+  background:
+    rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.digitalCollegeIdFacts span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  opacity: 0.83;
+}
+
+.digitalCollegeIdFacts strong {
+  font-size: 11px;
+}
+
+.digitalCollegeIdVerified {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 12px;
+  background:
+    rgba(255, 255, 255, 0.14);
+}
+
+.digitalCollegeIdVerified > span {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #3e7756;
+  font-weight: 900;
+}
+
+.digitalCollegeIdVerified strong,
+.digitalCollegeIdVerified small {
+  display: block;
+}
+
+.digitalCollegeIdVerified strong {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.digitalCollegeIdVerified small {
+  margin-top: 2px;
+  font-size: 9px;
+  opacity: 0.8;
+}
+
+.digitalCollegeIdFooter {
+  margin: 17px -20px 0;
+  min-height: 45px;
+  display: grid;
+  place-items: center;
+  background: #e9d900;
+  color: #1e292e;
+}
+
+.digitalCollegeIdFooter strong {
+  font-size: 15px;
+}
+
+@media (max-width: 900px) {
+  .collegeIdGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .collegeIdResult {
+    max-width: 480px;
+    width: 100%;
+  }
+}

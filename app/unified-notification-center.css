@@ -436,3 +436,2094 @@
     animation: none !important;
   }
 }
+
+/* =========================================================
+   CAMPUSCONNECT — ENTERPRISE NOTIFICATION CENTER V1
+   Visual-only upgrade. Existing logic remains unchanged.
+========================================================= */
+
+
+/* ---------------------------------------------------------
+   PANEL SHELL
+--------------------------------------------------------- */
+
+.unifiedNotificationCenter {
+  position: absolute !important;
+  z-index: 5200 !important;
+
+  top: calc(100% + 14px) !important;
+  right: 0 !important;
+
+  display: grid !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto !important;
+
+  width: min(480px, calc(100vw - 32px)) !important;
+  max-height: min(720px, calc(100vh - 96px)) !important;
+
+  overflow: hidden !important;
+
+  border: 1px solid rgba(62, 54, 46, .12) !important;
+  border-radius: 22px !important;
+
+  color: #2f2b27 !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fdfcfb 100%
+    ) !important;
+
+  box-shadow:
+    0 30px 90px rgba(31, 27, 23, .18),
+    0 8px 24px rgba(31, 27, 23, .07) !important;
+
+  isolation: isolate !important;
+
+  animation:
+    unifiedNotificationEnterpriseIn
+    .18s ease both !important;
+}
+
+
+@keyframes unifiedNotificationEnterpriseIn {
+  from {
+    opacity: 0;
+    transform: translateY(-7px) scale(.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* subtle top accent */
+
+.unifiedNotificationCenter::before {
+  content: "" !important;
+
+  position: absolute !important;
+
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+
+  height: 3px !important;
+
+  z-index: 2 !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      #74614f 0%,
+      #ae9274 52%,
+      #d8c4ad 100%
+    ) !important;
+}
+
+
+/* ---------------------------------------------------------
+   HEADER
+--------------------------------------------------------- */
+
+.unifiedNotificationHeader {
+  position: relative !important;
+
+  display: flex !important;
+
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+
+  gap: 20px !important;
+
+  padding:
+    22px
+    22px
+    18px !important;
+
+  border-bottom:
+    1px solid #ebe7e2 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff 0%,
+      #fbf9f6 100%
+    ) !important;
+}
+
+
+.unifiedNotificationHeader > div {
+  min-width: 0 !important;
+}
+
+
+.unifiedNotificationHeader > div > span {
+  display: block !important;
+
+  margin:
+    0
+    0
+    7px !important;
+
+  color:
+    #8d6c4e !important;
+
+  font-size:
+    9px !important;
+
+  line-height:
+    1 !important;
+
+  font-weight:
+    850 !important;
+
+  letter-spacing:
+    .14em !important;
+
+  text-transform:
+    uppercase !important;
+}
+
+
+.unifiedNotificationHeader h3 {
+  margin: 0 !important;
+
+  color:
+    #292521 !important;
+
+  font-size:
+    21px !important;
+
+  line-height:
+    1.15 !important;
+
+  font-weight:
+    750 !important;
+
+  letter-spacing:
+    -.025em !important;
+}
+
+
+.unifiedNotificationHeader p {
+  max-width: 340px !important;
+
+  margin:
+    7px
+    0
+    0 !important;
+
+  color:
+    #8c857e !important;
+
+  font-size:
+    11px !important;
+
+  line-height:
+    1.5 !important;
+}
+
+
+/* CLOSE BUTTON */
+
+.unifiedNotificationHeader > button {
+  display: grid !important;
+  place-items: center !important;
+
+  width: 36px !important;
+  height: 36px !important;
+
+  flex: none !important;
+
+  padding: 0 !important;
+
+  border:
+    1px solid #e3dfda !important;
+
+  border-radius:
+    10px !important;
+
+  background:
+    #ffffff !important;
+
+  color:
+    #716b65 !important;
+
+  box-shadow:
+    0 3px 10px rgba(38, 33, 28, .04) !important;
+
+  font-size:
+    18px !important;
+
+  line-height:
+    1 !important;
+
+  cursor:
+    pointer !important;
+
+  transition:
+    background .16s ease,
+    color .16s ease,
+    border-color .16s ease,
+    transform .16s ease !important;
+}
+
+
+.unifiedNotificationHeader > button:hover {
+  border-color:
+    #d2ccc5 !important;
+
+  background:
+    #f7f5f2 !important;
+
+  color:
+    #292521 !important;
+
+  transform:
+    translateY(-1px) !important;
+}
+
+
+/* ---------------------------------------------------------
+   FILTER BAR
+--------------------------------------------------------- */
+
+.unifiedNotificationFilters {
+  display: flex !important;
+
+  gap:
+    7px !important;
+
+  padding:
+    11px
+    15px !important;
+
+  overflow-x:
+    auto !important;
+
+  border-bottom:
+    1px solid #ece8e3 !important;
+
+  background:
+    #fbfaf8 !important;
+
+  scrollbar-width:
+    none !important;
+}
+
+
+.unifiedNotificationFilters::-webkit-scrollbar {
+  display:
+    none !important;
+}
+
+
+.unifiedNotificationFilters button {
+  display:
+    inline-flex !important;
+
+  min-height:
+    33px !important;
+
+  flex:
+    none !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    center !important;
+
+  gap:
+    6px !important;
+
+  padding:
+    0
+    11px !important;
+
+  border:
+    1px solid transparent !important;
+
+  border-radius:
+    9px !important;
+
+  color:
+    #746e68 !important;
+
+  background:
+    transparent !important;
+
+  font-size:
+    10px !important;
+
+  line-height:
+    1 !important;
+
+  font-weight:
+    700 !important;
+
+  cursor:
+    pointer !important;
+
+  transition:
+    color .16s ease,
+    background .16s ease,
+    border-color .16s ease,
+    transform .16s ease !important;
+}
+
+
+.unifiedNotificationFilters button:hover {
+  color:
+    #463c33 !important;
+
+  background:
+    #f2eee9 !important;
+}
+
+
+.unifiedNotificationFilters button.active {
+  border-color:
+    #ddcbb8 !important;
+
+  color:
+    #6e4f35 !important;
+
+  background:
+    #f6ede3 !important;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255,255,255,.55) !important;
+}
+
+
+.unifiedNotificationFilters button span {
+  display:
+    grid !important;
+
+  place-items:
+    center !important;
+
+  min-width:
+    19px !important;
+
+  height:
+    19px !important;
+
+  padding:
+    0
+    5px !important;
+
+  border-radius:
+    999px !important;
+
+  background:
+    rgba(93, 73, 54, .08) !important;
+
+  color:
+    inherit !important;
+
+  font-size:
+    8px !important;
+
+  font-weight:
+    800 !important;
+}
+
+
+.unifiedNotificationFilters button.active span {
+  background:
+    rgba(111, 77, 47, .11) !important;
+}
+
+
+/* ---------------------------------------------------------
+   STATUS / ERROR MESSAGE
+--------------------------------------------------------- */
+
+.unifiedNotificationStatus {
+  margin:
+    12px
+    15px
+    0 !important;
+
+  padding:
+    10px
+    12px !important;
+
+  border:
+    1px solid #ead8c8 !important;
+
+  border-radius:
+    10px !important;
+
+  color:
+    #7b5940 !important;
+
+  background:
+    #fff8f0 !important;
+
+  font-size:
+    10px !important;
+
+  line-height:
+    1.45 !important;
+}
+
+
+/* ---------------------------------------------------------
+   LIST
+--------------------------------------------------------- */
+
+.unifiedNotificationList {
+  min-height:
+    190px !important;
+
+  overflow-y:
+    auto !important;
+
+  overscroll-behavior:
+    contain !important;
+
+  background:
+    #fff !important;
+
+  scrollbar-width:
+    thin !important;
+
+  scrollbar-color:
+    #d8d3cd transparent !important;
+}
+
+
+.unifiedNotificationList::-webkit-scrollbar {
+  width:
+    6px !important;
+}
+
+
+.unifiedNotificationList::-webkit-scrollbar-track {
+  background:
+    transparent !important;
+}
+
+
+.unifiedNotificationList::-webkit-scrollbar-thumb {
+  border-radius:
+    999px !important;
+
+  background:
+    #d8d3cd !important;
+}
+
+
+/* ---------------------------------------------------------
+   NOTIFICATION ITEM
+--------------------------------------------------------- */
+
+.unifiedNotificationItem {
+  position:
+    relative !important;
+
+  border-bottom:
+    1px solid #efebe7 !important;
+
+  background:
+    #ffffff !important;
+
+  transition:
+    background .16s ease,
+    box-shadow .16s ease !important;
+}
+
+
+.unifiedNotificationItem:last-child {
+  border-bottom:
+    0 !important;
+}
+
+
+.unifiedNotificationItem:hover {
+  background:
+    #fcfaf8 !important;
+}
+
+
+/* unread */
+
+.unifiedNotificationItem.unread {
+  background:
+    linear-gradient(
+      90deg,
+      #fffaf4 0%,
+      #ffffff 62%
+    ) !important;
+}
+
+
+.unifiedNotificationItem.unread::before {
+  content: "" !important;
+
+  position:
+    absolute !important;
+
+  top:
+    18px !important;
+
+  left:
+    0 !important;
+
+  width:
+    3px !important;
+
+  height:
+    38px !important;
+
+  border-radius:
+    0
+    4px
+    4px
+    0 !important;
+
+  background:
+    #a77b55 !important;
+}
+
+
+/* priority indicators */
+
+.unifiedNotificationItem.priority-critical {
+  box-shadow:
+    inset 3px 0 0
+    #a95050 !important;
+}
+
+
+.unifiedNotificationItem.priority-high {
+  box-shadow:
+    inset 3px 0 0
+    #bd833e !important;
+}
+
+
+/* ---------------------------------------------------------
+   MAIN CLICKABLE CONTENT
+--------------------------------------------------------- */
+
+.unifiedNotificationMain {
+  display:
+    grid !important;
+
+  grid-template-columns:
+    42px
+    minmax(0, 1fr)
+    16px !important;
+
+  align-items:
+    flex-start !important;
+
+  gap:
+    12px !important;
+
+  width:
+    100% !important;
+
+  padding:
+    16px
+    17px !important;
+
+  border:
+    0 !important;
+
+  color:
+    inherit !important;
+
+  background:
+    transparent !important;
+
+  text-align:
+    left !important;
+
+  cursor:
+    pointer !important;
+
+  transition:
+    background .15s ease !important;
+}
+
+
+/* existing CSS accidentally escaped :hover.
+   This restores the real pseudo-class. */
+
+.unifiedNotificationMain:hover {
+  background:
+    rgba(248, 244, 239, .58) !important;
+}
+
+
+/* CATEGORY ICON */
+
+.unifiedNotificationMain > i {
+  display:
+    grid !important;
+
+  width:
+    42px !important;
+
+  height:
+    42px !important;
+
+  place-items:
+    center !important;
+
+  border:
+    1px solid #e6ddd3 !important;
+
+  border-radius:
+    12px !important;
+
+  color:
+    #72583f !important;
+
+  background:
+    #f8f2eb !important;
+
+  box-shadow:
+    0 3px 10px rgba(42, 34, 28, .04) !important;
+
+  font-size:
+    10px !important;
+
+  font-style:
+    normal !important;
+
+  font-weight:
+    850 !important;
+
+  letter-spacing:
+    .03em !important;
+}
+
+
+/* Content */
+
+.unifiedNotificationMain > span {
+  display:
+    grid !important;
+
+  min-width:
+    0 !important;
+
+  gap:
+    6px !important;
+}
+
+
+/* ---------------------------------------------------------
+   META LINE
+--------------------------------------------------------- */
+
+.unifiedNotificationMeta {
+  display:
+    flex !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    space-between !important;
+
+  gap:
+    12px !important;
+}
+
+
+.unifiedNotificationMeta b {
+  overflow:
+    hidden !important;
+
+  color:
+    #87715d !important;
+
+  font-size:
+    8px !important;
+
+  line-height:
+    1.2 !important;
+
+  font-weight:
+    850 !important;
+
+  letter-spacing:
+    .11em !important;
+
+  text-transform:
+    uppercase !important;
+
+  text-overflow:
+    ellipsis !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+.unifiedNotificationMeta small {
+  flex:
+    none !important;
+
+  color:
+    #a49d96 !important;
+
+  font-size:
+    9px !important;
+
+  font-weight:
+    500 !important;
+}
+
+
+/* ---------------------------------------------------------
+   TITLE
+--------------------------------------------------------- */
+
+.unifiedNotificationMain > span > strong {
+  display:
+    block !important;
+
+  overflow:
+    hidden !important;
+
+  color:
+    #302c28 !important;
+
+  font-size:
+    12px !important;
+
+  line-height:
+    1.35 !important;
+
+  font-weight:
+    720 !important;
+
+  letter-spacing:
+    -.005em !important;
+
+  text-overflow:
+    ellipsis !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+.unifiedNotificationItem:not(.unread)
+.unifiedNotificationMain > span > strong {
+  color:
+    #514b46 !important;
+
+  font-weight:
+    650 !important;
+}
+
+
+/* ---------------------------------------------------------
+   MESSAGE
+--------------------------------------------------------- */
+
+.unifiedNotificationMain p {
+  display:
+    -webkit-box !important;
+
+  margin:
+    0 !important;
+
+  overflow:
+    hidden !important;
+
+  color:
+    #817a73 !important;
+
+  font-size:
+    10px !important;
+
+  line-height:
+    1.55 !important;
+
+  -webkit-box-orient:
+    vertical !important;
+
+  -webkit-line-clamp:
+    2 !important;
+}
+
+
+/* RIGHT ARROW */
+
+.unifiedNotificationMain > strong {
+  align-self:
+    center !important;
+
+  color:
+    #aaa39c !important;
+
+  font-size:
+    14px !important;
+
+  font-weight:
+    500 !important;
+
+  transition:
+    transform .16s ease,
+    color .16s ease !important;
+}
+
+
+.unifiedNotificationMain:hover > strong {
+  color:
+    #6e5947 !important;
+
+  transform:
+    translateX(2px) !important;
+}
+
+
+/* ---------------------------------------------------------
+   BADGES
+--------------------------------------------------------- */
+
+.unifiedNotificationBadges {
+  display:
+    flex !important;
+
+  align-items:
+    center !important;
+
+  flex-wrap:
+    wrap !important;
+
+  gap:
+    5px !important;
+
+  margin-top:
+    1px !important;
+}
+
+
+.unifiedNotificationBadges em {
+  display:
+    inline-flex !important;
+
+  align-items:
+    center !important;
+
+  min-height:
+    21px !important;
+
+  padding:
+    0
+    7px !important;
+
+  border:
+    1px solid #e4e0dc !important;
+
+  border-radius:
+    999px !important;
+
+  color:
+    #746d67 !important;
+
+  background:
+    #f6f4f2 !important;
+
+  font-size:
+    8px !important;
+
+  line-height:
+    1 !important;
+
+  font-style:
+    normal !important;
+
+  font-weight:
+    700 !important;
+
+  text-transform:
+    capitalize !important;
+}
+
+
+.unifiedNotificationBadges em.priority {
+  border-color:
+    #eed8ba !important;
+
+  color:
+    #8b5d2c !important;
+
+  background:
+    #fff4e3 !important;
+}
+
+
+.unifiedNotificationBadges em.acknowledgement {
+  border-color:
+    #efd0d0 !important;
+
+  color:
+    #994f4f !important;
+
+  background:
+    #fff0f0 !important;
+}
+
+
+.unifiedNotificationBadges em.acknowledged {
+  border-color:
+    #cfe5d7 !important;
+
+  color:
+    #467458 !important;
+
+  background:
+    #eef8f1 !important;
+}
+
+
+/* ---------------------------------------------------------
+   ITEM ACTIONS
+--------------------------------------------------------- */
+
+.unifiedNotificationItem > footer {
+  display:
+    flex !important;
+
+  justify-content:
+    flex-end !important;
+
+  flex-wrap:
+    wrap !important;
+
+  gap:
+    7px !important;
+
+  padding:
+    0
+    17px
+    13px
+    71px !important;
+}
+
+
+.unifiedNotificationItem > footer a,
+.unifiedNotificationItem > footer button {
+  display:
+    inline-flex !important;
+
+  min-height:
+    30px !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    center !important;
+
+  padding:
+    0
+    10px !important;
+
+  border:
+    1px solid #ddd7d1 !important;
+
+  border-radius:
+    8px !important;
+
+  color:
+    #665342 !important;
+
+  background:
+    #fff !important;
+
+  font-size:
+    8px !important;
+
+  font-weight:
+    800 !important;
+
+  text-decoration:
+    none !important;
+
+  cursor:
+    pointer !important;
+
+  transition:
+    border-color .16s ease,
+    background .16s ease,
+    transform .16s ease !important;
+}
+
+
+.unifiedNotificationItem > footer a:hover,
+.unifiedNotificationItem > footer button:hover {
+  border-color:
+    #cdbba9 !important;
+
+  background:
+    #faf4ed !important;
+
+  transform:
+    translateY(-1px) !important;
+}
+
+
+/* ---------------------------------------------------------
+   LOADING
+--------------------------------------------------------- */
+
+.unifiedNotificationLoading {
+  display:
+    grid !important;
+
+  gap:
+    10px !important;
+
+  padding:
+    15px !important;
+}
+
+
+.unifiedNotificationLoading span {
+  min-height:
+    88px !important;
+
+  border:
+    1px solid #eeeae6 !important;
+
+  border-radius:
+    13px !important;
+
+  background:
+    linear-gradient(
+      100deg,
+      #f3f0ed 25%,
+      #fbfaf9 43%,
+      #f3f0ed 60%
+    ) !important;
+
+  background-size:
+    220% 100% !important;
+}
+
+
+/* ---------------------------------------------------------
+   EMPTY STATE
+--------------------------------------------------------- */
+
+.unifiedNotificationEmpty {
+  display:
+    grid !important;
+
+  min-height:
+    280px !important;
+
+  place-items:
+    center !important;
+
+  align-content:
+    center !important;
+
+  gap:
+    8px !important;
+
+  padding:
+    36px
+    24px !important;
+
+  text-align:
+    center !important;
+}
+
+
+.unifiedNotificationEmpty i {
+  display:
+    grid !important;
+
+  width:
+    52px !important;
+
+  height:
+    52px !important;
+
+  place-items:
+    center !important;
+
+  margin-bottom:
+    4px !important;
+
+  border:
+    1px solid #d8e8dc !important;
+
+  border-radius:
+    15px !important;
+
+  color:
+    #47735a !important;
+
+  background:
+    #edf7f0 !important;
+
+  font-style:
+    normal !important;
+
+  font-size:
+    16px !important;
+
+  font-weight:
+    850 !important;
+}
+
+
+.unifiedNotificationEmpty strong {
+  color:
+    #3b3733 !important;
+
+  font-size:
+    13px !important;
+
+  font-weight:
+    720 !important;
+}
+
+
+.unifiedNotificationEmpty p {
+  max-width:
+    290px !important;
+
+  margin:
+    0 !important;
+
+  color:
+    #928b84 !important;
+
+  font-size:
+    10px !important;
+
+  line-height:
+    1.55 !important;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER
+--------------------------------------------------------- */
+
+.unifiedNotificationFooter {
+  display:
+    flex !important;
+
+  min-height:
+    58px !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    space-between !important;
+
+  gap:
+    14px !important;
+
+  padding:
+    11px
+    16px !important;
+
+  border-top:
+    1px solid #e9e5e0 !important;
+
+  background:
+    #faf9f7 !important;
+}
+
+
+.unifiedNotificationFooter > span {
+  display:
+    inline-flex !important;
+
+  align-items:
+    center !important;
+
+  gap:
+    7px !important;
+
+  color:
+    #77716b !important;
+
+  font-size:
+    9px !important;
+
+  font-weight:
+    600 !important;
+}
+
+
+.unifiedNotificationFooter > span i {
+  width:
+    7px !important;
+
+  height:
+    7px !important;
+
+  border-radius:
+    50% !important;
+
+  background:
+    #45a36d !important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(69, 163, 109, .10) !important;
+}
+
+
+.unifiedNotificationFooter button {
+  min-height:
+    33px !important;
+
+  padding:
+    0
+    12px !important;
+
+  border:
+    1px solid #ddd7d1 !important;
+
+  border-radius:
+    9px !important;
+
+  color:
+    #654f3d !important;
+
+  background:
+    #fff !important;
+
+  font-size:
+    9px !important;
+
+  font-weight:
+    800 !important;
+
+  cursor:
+    pointer !important;
+
+  transition:
+    border-color .16s ease,
+    background .16s ease !important;
+}
+
+
+.unifiedNotificationFooter button:hover {
+  border-color:
+    #cdbba9 !important;
+
+  background:
+    #faf4ed !important;
+}
+
+
+/* Original stylesheet has button\:disabled,
+   which is not the desired pseudo-class. */
+
+.unifiedNotificationFooter button:disabled {
+  cursor:
+    default !important;
+
+  opacity:
+    .45 !important;
+
+  transform:
+    none !important;
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+--------------------------------------------------------- */
+
+@media (max-width: 620px) {
+
+  .unifiedNotificationCenter {
+    position:
+      fixed !important;
+
+    top:
+      66px !important;
+
+    right:
+      10px !important;
+
+    bottom:
+      12px !important;
+
+    left:
+      10px !important;
+
+    width:
+      auto !important;
+
+    max-height:
+      none !important;
+
+    border-radius:
+      20px !important;
+  }
+
+
+  .unifiedNotificationHeader {
+    padding:
+      19px
+      17px
+      15px !important;
+  }
+
+
+  .unifiedNotificationHeader h3 {
+    font-size:
+      19px !important;
+  }
+
+
+  .unifiedNotificationHeader p {
+    font-size:
+      10px !important;
+  }
+
+
+  .unifiedNotificationFilters {
+    padding:
+      10px
+      12px !important;
+  }
+
+
+  .unifiedNotificationList {
+    min-height:
+      0 !important;
+  }
+
+
+  .unifiedNotificationMain {
+    grid-template-columns:
+      40px
+      minmax(0,1fr)
+      13px !important;
+
+    gap:
+      10px !important;
+
+    padding:
+      14px
+      13px !important;
+  }
+
+
+  .unifiedNotificationMain > i {
+    width:
+      40px !important;
+
+    height:
+      40px !important;
+  }
+
+
+  .unifiedNotificationItem > footer {
+    padding:
+      0
+      13px
+      12px
+      63px !important;
+  }
+
+
+  .unifiedNotificationFooter {
+    padding:
+      10px
+      13px !important;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   REDUCED MOTION
+--------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .unifiedNotificationCenter,
+  .unifiedNotificationMain,
+  .unifiedNotificationHeader > button,
+  .unifiedNotificationFilters button,
+  .unifiedNotificationItem > footer a,
+  .unifiedNotificationItem > footer button {
+    animation:
+      none !important;
+
+    transition:
+      none !important;
+  }
+}
+
+
+/* =========================================================
+   ENTERPRISE NOTIFICATION CENTER V1 END
+========================================================= */
+
+
+/* =========================================================
+   CAMPUSCONNECT — NOTIFICATION DATE GROUPS V1
+========================================================= */
+
+.unifiedNotificationDateGroup {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  min-height: 38px;
+
+  padding:
+    0
+    17px;
+
+  border-top:
+    1px solid #eee9e4;
+
+  border-bottom:
+    1px solid #ebe6e0;
+
+  background:
+    rgba(250, 248, 245, .96);
+
+  backdrop-filter:
+    blur(10px);
+
+  -webkit-backdrop-filter:
+    blur(10px);
+}
+
+
+.unifiedNotificationDateGroup:first-child {
+  border-top: 0;
+}
+
+
+.unifiedNotificationDateGroup > span {
+  color:
+    #625142;
+
+  font-size:
+    9px;
+
+  line-height:
+    1;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .12em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.unifiedNotificationDateGroup > small {
+  color:
+    #9a9189;
+
+  font-size:
+    8px;
+
+  font-weight:
+    600;
+}
+
+
+@media (max-width: 620px) {
+
+  .unifiedNotificationDateGroup {
+    min-height:
+      36px;
+
+    padding:
+      0
+      13px;
+  }
+
+
+  .unifiedNotificationDateGroup > small {
+    display:
+      none;
+  }
+}
+
+/* =========================================================
+   NOTIFICATION DATE GROUPS V1 END
+========================================================= */
+
+
+/* =========================================================
+   CAMPUSCONNECT — NOTIFICATION FOOTER ACTIONS V1
+========================================================= */
+
+.unifiedNotificationFooterActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.unifiedNotificationFooterActions button {
+  white-space: nowrap;
+}
+
+.unifiedNotificationFooterActions button.active {
+  background: #27221e;
+  border-color: #27221e;
+  color: #fff;
+}
+
+@media (max-width: 520px) {
+  .unifiedNotificationFooterActions {
+    gap: 6px;
+  }
+}
+
+/* NOTIFICATION FOOTER ACTIONS V1 END */
+
+/* =========================================================
+   CAMPUSCONNECT — NOTIFICATION LAYOUT FINAL FIX
+   Keeps footer permanently visible.
+========================================================= */
+
+.unifiedNotificationCenter {
+  display: grid !important;
+
+  grid-template-rows:
+    auto
+    auto
+    auto
+    minmax(0, 1fr)
+    auto !important;
+
+  overflow: hidden !important;
+}
+
+
+/* Only notification cards scroll */
+.unifiedNotificationList {
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain;
+
+  scrollbar-width: thin;
+}
+
+
+/* Footer always remains visible */
+.unifiedNotificationFooter {
+  position: relative !important;
+  z-index: 20 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  flex-shrink: 0 !important;
+
+  gap: 12px !important;
+
+  min-height: 58px !important;
+
+  padding:
+    10px
+    14px !important;
+
+  border-top:
+    1px solid rgba(62, 54, 46, .10) !important;
+
+  background:
+    rgba(255, 255, 255, .98) !important;
+
+  box-shadow:
+    0 -8px 24px
+    rgba(31, 27, 23, .035) !important;
+}
+
+
+/* Security indicator */
+.unifiedNotificationFooter > span {
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 6px !important;
+
+  flex-shrink: 0 !important;
+
+  white-space: nowrap !important;
+}
+
+
+/* Right-side actions */
+.unifiedNotificationFooterActions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+
+  margin-left: auto !important;
+}
+
+
+/* Both footer buttons */
+.unifiedNotificationFooterActions > button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  min-height: 34px !important;
+
+  padding:
+    7px
+    11px !important;
+
+  border:
+    1px solid rgba(62, 54, 46, .14) !important;
+
+  border-radius:
+    9px !important;
+
+  background:
+    #fff !important;
+
+  color:
+    #51483f !important;
+
+  font: inherit !important;
+  font-size:
+    9px !important;
+
+  font-weight:
+    800 !important;
+
+  white-space:
+    nowrap !important;
+
+  cursor:
+    pointer !important;
+
+  opacity:
+    1 !important;
+
+  visibility:
+    visible !important;
+}
+
+
+/* Hide-read active state */
+.unifiedNotificationFooterActions > button.active {
+  border-color:
+    #2f2b27 !important;
+
+  background:
+    #2f2b27 !important;
+
+  color:
+    #fff !important;
+}
+
+
+/* Disabled Mark all read */
+.unifiedNotificationFooterActions > button:disabled {
+  cursor:
+    default !important;
+
+  opacity:
+    .45 !important;
+}
+
+
+@media (max-width: 620px) {
+
+  .unifiedNotificationFooter {
+    min-height:
+      56px !important;
+
+    padding:
+      9px
+      12px !important;
+  }
+
+
+  .unifiedNotificationFooter > span {
+    font-size:
+      8px !important;
+  }
+
+
+  .unifiedNotificationFooterActions {
+    gap:
+      6px !important;
+  }
+
+
+  .unifiedNotificationFooterActions > button {
+    min-height:
+      32px !important;
+
+    padding:
+      6px
+      9px !important;
+  }
+}
+
+
+@media (max-width: 440px) {
+
+  .unifiedNotificationFooter > span {
+    display:
+      none !important;
+  }
+
+
+  .unifiedNotificationFooterActions {
+    width:
+      100% !important;
+  }
+
+
+  .unifiedNotificationFooterActions > button {
+    flex:
+      1 1 0 !important;
+  }
+}
+
+/* =========================================================
+   NOTIFICATION LAYOUT FINAL FIX END
+========================================================= */
+
+
+/* =========================================================
+   CAMPUSCONNECT — PINNED NOTIFICATION FOOTER V2
+========================================================= */
+
+.unifiedNotificationCenter {
+  position: absolute !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  height: min(720px, calc(100vh - 96px)) !important;
+  max-height: min(720px, calc(100vh - 96px)) !important;
+
+  overflow: hidden !important;
+}
+
+
+/* Header and filters never shrink */
+.unifiedNotificationHeader,
+.unifiedNotificationFilters,
+.unifiedNotificationStatus {
+  flex:
+    0 0 auto !important;
+}
+
+
+/* This becomes the ONLY scrolling area */
+.unifiedNotificationList {
+  position: relative !important;
+
+  flex:
+    1 1 auto !important;
+
+  min-height:
+    0 !important;
+
+  width:
+    100% !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  padding-bottom:
+    8px !important;
+
+  overscroll-behavior:
+    contain !important;
+}
+
+
+/* Footer is always part of the visible panel */
+.unifiedNotificationFooter {
+  position:
+    relative !important;
+
+  z-index:
+    100 !important;
+
+  flex:
+    0 0 auto !important;
+
+  display:
+    flex !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    space-between !important;
+
+  width:
+    100% !important;
+
+  min-height:
+    60px !important;
+
+  box-sizing:
+    border-box !important;
+
+  padding:
+    10px
+    14px !important;
+
+  margin:
+    0 !important;
+
+  border-top:
+    1px solid
+    rgba(62, 54, 46, .12) !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 -10px 30px
+    rgba(31, 27, 23, .06) !important;
+
+  opacity:
+    1 !important;
+
+  visibility:
+    visible !important;
+}
+
+
+/* RLS indicator */
+.unifiedNotificationFooter > span {
+  display:
+    inline-flex !important;
+
+  align-items:
+    center !important;
+
+  gap:
+    6px !important;
+
+  color:
+    #84796f !important;
+
+  font-size:
+    8px !important;
+
+  font-weight:
+    700 !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+/* Action container */
+.unifiedNotificationFooterActions {
+  display:
+    flex !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    flex-end !important;
+
+  gap:
+    8px !important;
+
+  margin-left:
+    auto !important;
+}
+
+
+/* Footer controls */
+.unifiedNotificationFooterActions > button {
+  appearance:
+    none !important;
+
+  display:
+    inline-flex !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    center !important;
+
+  min-height:
+    34px !important;
+
+  padding:
+    7px
+    12px !important;
+
+  border:
+    1px solid
+    rgba(70, 58, 47, .16) !important;
+
+  border-radius:
+    9px !important;
+
+  background:
+    #faf8f5 !important;
+
+  color:
+    #574b40 !important;
+
+  font-size:
+    9px !important;
+
+  font-weight:
+    800 !important;
+
+  line-height:
+    1 !important;
+
+  white-space:
+    nowrap !important;
+
+  opacity:
+    1 !important;
+
+  visibility:
+    visible !important;
+
+  cursor:
+    pointer !important;
+}
+
+
+.unifiedNotificationFooterActions > button:hover:not(:disabled) {
+  border-color:
+    rgba(70, 58, 47, .30) !important;
+
+  background:
+    #f4efe9 !important;
+}
+
+
+.unifiedNotificationFooterActions > button.active {
+  border-color:
+    #49372a !important;
+
+  background:
+    #49372a !important;
+
+  color:
+    #ffffff !important;
+}
+
+
+.unifiedNotificationFooterActions > button:disabled {
+  opacity:
+    .42 !important;
+
+  cursor:
+    default !important;
+}
+
+
+@media (max-width: 620px) {
+
+  .unifiedNotificationCenter {
+    position:
+      fixed !important;
+
+    top:
+      72px !important;
+
+    right:
+      10px !important;
+
+    bottom:
+      82px !important;
+
+    left:
+      10px !important;
+
+    width:
+      auto !important;
+
+    height:
+      auto !important;
+
+    max-height:
+      none !important;
+  }
+
+
+  .unifiedNotificationFooter {
+    min-height:
+      58px !important;
+  }
+}
+
+
+@media (max-width: 440px) {
+
+  .unifiedNotificationFooter > span {
+    display:
+      none !important;
+  }
+
+
+  .unifiedNotificationFooterActions {
+    width:
+      100% !important;
+
+    margin-left:
+      0 !important;
+  }
+
+
+  .unifiedNotificationFooterActions > button {
+    flex:
+      1 1 0 !important;
+  }
+}
+
+/* =========================================================
+   PINNED NOTIFICATION FOOTER V2 END
+========================================================= */

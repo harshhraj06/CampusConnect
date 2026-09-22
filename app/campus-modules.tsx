@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useState, type ChangeEvent, type CSSProperties, type FormEvent, type ReactNode} from "react";
+import {useRef,useEffect, useState, type ChangeEvent, type CSSProperties, type FormEvent, type ReactNode} from "react";
 import {
   BarChart,
   Bar,
@@ -12,12 +12,17 @@ import {
   ReferenceLine,
 } from "recharts";
 import {QRCodeSVG} from "qrcode.react";
+import * as XLSX from "xlsx";
 import {getSupabaseClient} from "../lib/supabase";
 import CampusMessenger from "./campus-messenger";
 import {CommunityPosts} from "./community-posts";
 import {PlacementApplicantProfile} from "./placement-applicant-profile";
+import CampusWorkDelegation from "./campus-work-delegation";
+import CampusEventSecurePass from "./campus-event-secure-pass";
+import CampusMarketplace from "./campus-marketplace";
+import PersonalWorkspace from "./personal-workspace";
 
-export type CampusModuleView = "Announcements" | "Assignments" | "Attendance" | "Applications" | "Learning" | "Groups" | "Profile" | "Admin" | "Analytics";
+export type CampusModuleView = "Announcements" | "Assignments" | "Attendance" | "Applications" | "Learning" | "Groups" | "Marketplace" | "Notes & Tasks" | "Profile" | "Admin" | "Analytics";
 type Role = "Student" | "Faculty" | "Placement Cell" | "Coordinator" | "Volunteer" | "Main Admin";
 export type ModuleProfile = {
   name: string;
@@ -96,7 +101,7 @@ const canManageUsersRole = (role: Role) =>
   role === "Main Admin";
 
 
-export const campusModuleViews: CampusModuleView[] = ["Announcements", "Assignments", "Attendance", "Applications", "Learning", "Groups", "Profile", "Admin", "Analytics"];
+export const campusModuleViews: CampusModuleView[] = ["Announcements", "Assignments", "Attendance", "Applications", "Learning", "Groups", "Marketplace", "Notes & Tasks", "Profile", "Admin", "Analytics"];
 
 export function isCampusModuleView(view: string): view is CampusModuleView {
   return campusModuleViews.includes(view as CampusModuleView);
@@ -110,6 +115,8 @@ export function campusModuleSubtitle(view: CampusModuleView, role: Role) {
     Applications: role === "Placement Cell" ? "Track every student application through the recruitment pipeline." : "Manage your placement applications and interview progress.",
     Learning: "Subject videos, verified learning links and previous-year question papers.",
     Groups: "Role-aware communities for classes, projects, placements and campus discussions.",
+    Marketplace: "Buy and sell verified second-hand items safely within your campus community.",
+    "Notes & Tasks": "Keep private notes, reminders and important work organized in one personal workspace.",
     Profile: "Keep your campus identity, skills and private documents up to date.",
     Admin: "Manage trusted roles and monitor access across CampusConnect.",
     Analytics: role === "Student" ? "A personal view of academic and career progress." : "Campus activity and outcome signals for better decisions.",
@@ -117,14 +124,49 @@ export function campusModuleSubtitle(view: CampusModuleView, role: Role) {
   return copy[view];
 }
 
-export function CampusModule({view, profile, onProfileChange}: {view: CampusModuleView; profile: ModuleProfile; onProfileChange: (profile: ModuleProfile) => void}) {
+export function CampusModule({
+  view,
+  profile,
+  onProfileChange,
+  onOpenFacultyDiary,
+  onOpenSyllabusProgress,
+}: {
+  view: CampusModuleView;
+  profile: ModuleProfile;
+
+  onProfileChange: (
+    profile: ModuleProfile
+  ) => void;
+
+  onOpenFacultyDiary?: () => void;
+  onOpenSyllabusProgress?: () => void;
+}) {
   if (view === "Announcements") return <AnnouncementsModule profile={profile}/>;
   if (view === "Assignments") return <AssignmentsModule profile={profile}/>;
-  if (view === "Attendance") return <AttendanceModule profile={profile}/>;
+
+  if (view === "Attendance") {
+    return (
+      <AttendanceModule
+        profile={profile}
+        onOpenFacultyDiary={
+          onOpenFacultyDiary
+        }
+        onOpenSyllabusProgress={
+          onOpenSyllabusProgress
+        }
+      />
+    );
+  }
   if (view === "Applications") return <ApplicationsModule profile={profile}/>;
   if (view === "Learning") return <LearningModule profile={profile}/>;
   if (view === "Groups") {
     return <CommunityWorkspace profile={profile}/>;
+  }
+  if (view === "Marketplace") {
+    return <CampusMarketplace profile={profile}/>;
+  }
+  if (view === "Notes & Tasks") {
+    return <PersonalWorkspace/>;
   }
   if (view === "Profile") return <ProfileModule profile={profile} onProfileChange={onProfileChange}/>;
   if (view === "Admin") return <AdminModule profile={profile}/>;
@@ -133,7 +175,19 @@ export function CampusModule({view, profile, onProfileChange}: {view: CampusModu
 
 
 function CommunityWorkspace({profile}: {profile: ModuleProfile}) {
-  const [section, setSection] = useState<"Posts" | "Messages">("Posts");
+  const [section, setSection] =
+    useState<"Posts" | "Messages">(() => {
+      if (
+        typeof window !== "undefined" &&
+        window.sessionStorage.getItem(
+          "campusconnect-open-direct-chat"
+        )
+      ) {
+        return "Messages";
+      }
+
+      return "Posts";
+    });
 
   return (
     <div className="communityWorkspace">
@@ -222,6 +276,14 @@ type CampusEvent = {
   registration_deadline?: string | null;
   capacity?: number | null;
   allow_campus_registration?: boolean;
+
+  rnsit_registration_enabled?: boolean;
+  rnsit_fee_paise?: number;
+
+  external_registration_enabled?: boolean;
+  external_fee_paise?: number;
+
+  public_registration_slug?: string | null;
 };
 
 type EventRegistration = {
@@ -240,6 +302,13 @@ type EventRegistration = {
   checked_in: boolean;
   checked_in_at: string | null;
   checked_in_by: string | null;
+
+  // Organizer operations metadata.
+  // These fields do not contain QR/barcode/pass secrets.
+  registration_source?: "RNSIT" | "External";
+  college_name?: string;
+  payment_status?: string;
+  registration_status?: string;
 };
 
 
@@ -656,6 +725,12 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     registration_deadline: "",
     capacity: "",
     allow_campus_registration: true,
+
+    rnsit_registration_enabled: true,
+    rnsit_fee: "",
+
+    external_registration_enabled: false,
+    external_fee: "",
   });
 
   const [editEventBanner, setEditEventBanner] =
@@ -739,6 +814,12 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     registration_deadline: "",
     capacity: "",
     allow_campus_registration: true,
+
+    rnsit_registration_enabled: true,
+    rnsit_fee: "",
+
+    external_registration_enabled: false,
+    external_fee: "",
   });
 
   const [status, setStatus] = useState("");
@@ -765,11 +846,38 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
   const [eventRegistrations, setEventRegistrations] =
     useState<EventRegistration[]>([]);
 
+  const [
+    eventRegistrationCounts,
+    setEventRegistrationCounts,
+  ] = useState<Record<string, number>>({});
+
+  const [
+    eventOperationsRoster,
+    setEventOperationsRoster,
+  ] = useState<EventRegistration[]>([]);
+
   const [registrationBusyId, setRegistrationBusyId] =
     useState("");
 
+  const [eventRegistrationPopup, setEventRegistrationPopup] =
+    useState<{
+      eventId: string;
+      eventTitle: string;
+      mode: "free-success" | "payment-required" | "error";
+      campusUid: string;
+      feePaise: number;
+      message?: string;
+    } | null>(null);
+
+
   const [showAttendees, setShowAttendees] =
     useState(false);
+
+  const [eventRosterLoading, setEventRosterLoading] =
+    useState(false);
+
+  const [eventRosterError, setEventRosterError] =
+    useState("");
 
   const [showEventPass, setShowEventPass] =
     useState(false);
@@ -786,11 +894,99 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
   const [checkInMessage, setCheckInMessage] =
     useState("");
 
+  const [gateResult, setGateResult] =
+    useState<{
+      status: "success" | "duplicate" | "error";
+      studentName: string;
+      attendeeType: "RNSIT" | "External";
+      collegeName: string;
+      department: string;
+      graduationYear: string;
+      checkInMethod: string;
+      checkedInAt: string;
+      message: string;
+    } | null>(null);
+
+  const [gateScanCount, setGateScanCount] =
+    useState(0);
+
+  const gateInputRef =
+    useRef<HTMLInputElement | null>(null);
+
+  const gateResetTimerRef =
+    useRef<number | null>(null);
+
+  const gateCameraDecodeLockRef =
+    useRef(false);
+
+  const gateCameraUnlockTimerRef =
+    useRef<number | null>(null);
+
   const [scannerOpen, setScannerOpen] =
     useState(false);
 
   const [scannerError, setScannerError] =
     useState("");
+
+  const [
+    selectedEventCanScan,
+    setSelectedEventCanScan,
+  ] = useState(false);
+
+  const canOperateSelectedEvent =
+    canCheckInEventRole(profile.role) ||
+    selectedEventCanScan;
+
+  useEffect(() => {
+    let active = true;
+
+    if (!selectedEvent) {
+      setSelectedEventCanScan(false);
+
+      return () => {
+        active = false;
+      };
+    }
+
+    if (canCheckInEventRole(profile.role)) {
+      setSelectedEventCanScan(true);
+
+      return () => {
+        active = false;
+      };
+    }
+
+    const client = getSupabaseClient();
+
+    if (!client) {
+      setSelectedEventCanScan(false);
+
+      return () => {
+        active = false;
+      };
+    }
+
+    setSelectedEventCanScan(false);
+
+    void client
+      .rpc("can_scan_event_pass", {
+        p_event_id: selectedEvent.id,
+      })
+      .then(({data, error}) => {
+        if (!active) return;
+
+        setSelectedEventCanScan(
+          !error && data === true
+        );
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [
+    selectedEvent?.id,
+    profile.role,
+  ]);
 
   const canPublish =
     canPublishAnnouncementRole(
@@ -1132,7 +1328,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     }
   };
 
-  const loadEventOperationsRoster = async (
+  const loadEventRegistrationSummary = async (
     eventId: string
   ) => {
     const client = getSupabaseClient();
@@ -1140,7 +1336,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     if (!client || !eventId) return;
 
     const {data, error} = await client.rpc(
-      "get_event_operations_roster",
+      "get_event_registration_summary",
       {
         p_event_id: eventId,
       }
@@ -1148,28 +1344,248 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
 
     if (error) {
       console.error(
-        "Unable to load event operations roster:",
+        "Unable to load event registration summary:",
         error
       );
-
       return;
     }
 
-    const roster =
-      (data || []) as EventRegistration[];
+    const rows =
+      data as unknown as Array<{
+        registered_count:
+          number | string;
+      }> | null;
 
-    setEventRegistrations(current => {
-      const otherEvents =
-        current.filter(
+    const row = rows?.[0];
+
+    if (!row) return;
+
+    const count = Number(
+      row.registered_count || 0
+    );
+
+    setEventRegistrationCounts(current => ({
+      ...current,
+      [eventId]:
+        Number.isFinite(count)
+          ? count
+          : 0,
+    }));
+  };
+
+
+  const loadEventOperationsRoster = async (
+    eventId: string
+  ): Promise<EventRegistration[]> => {
+    const client = getSupabaseClient();
+
+    if (!client || !eventId) {
+      setEventRosterError(
+        "CampusConnect is not connected to Supabase."
+      );
+
+      return [];
+    }
+
+    setEventRosterLoading(true);
+    setEventRosterError("");
+
+    try {
+      const [
+        internalResult,
+        externalResult,
+      ] = await Promise.all([
+        client.rpc(
+          "get_event_operations_roster",
+          {
+            p_event_id: eventId,
+          }
+        ),
+
+        client.rpc(
+          "get_external_event_operations_roster",
+          {
+            p_event_id: eventId,
+          }
+        ),
+      ]);
+
+      if (internalResult.error) {
+        throw new Error(
+          internalResult.error.message ||
+            "Unable to load RNSIT attendees."
+        );
+      }
+
+      if (externalResult.error) {
+        throw new Error(
+          externalResult.error.message ||
+            "Unable to load external attendees."
+        );
+      }
+
+      const internalRoster =
+        (
+          (internalResult.data || []) as EventRegistration[]
+        ).map(row => ({
+          ...row,
+
+          registration_source:
+            "RNSIT" as const,
+
+          college_name:
+            "RNSIT",
+        }));
+
+      type ExternalEventOperationsRow = {
+        id: string;
+        event_id: string;
+
+        full_name: string;
+        email: string;
+        phone: string;
+
+        college_name: string;
+        department: string;
+        graduation_year: string;
+
+        fee_amount_paise: number;
+        payment_status: string;
+        registration_status: string;
+
+        registered_at: string;
+
+        checked_in: boolean;
+        checked_in_at: string | null;
+        checked_in_by: string | null;
+
+        updated_at: string;
+      };
+
+      const externalRoster =
+        (
+          (externalResult.data || []) as ExternalEventOperationsRow[]
+        ).map(
           row =>
-            row.event_id !== eventId
+            ({
+              id:
+                row.id,
+
+              event_id:
+                row.event_id,
+
+              // External attendees do not have
+              // a CampusConnect student account.
+              student_id:
+                "",
+
+              student_name:
+                row.full_name || "Attendee",
+
+              student_email:
+                row.email || "",
+
+              department:
+                row.department || "",
+
+              graduation_year:
+                row.graduation_year || "",
+
+              // Reuse the existing roster helper.
+              // Only Confirmed external registrations
+              // behave as active/Going attendees.
+              status:
+                row.registration_status ===
+                "Confirmed"
+                  ? "Going"
+                  : "Cancelled",
+
+              registered_at:
+                row.registered_at,
+
+              updated_at:
+                row.updated_at ||
+                row.registered_at,
+
+              // Never expose an external pass secret
+              // through the organizer roster.
+              check_in_code:
+                "",
+
+              checked_in:
+                Boolean(row.checked_in),
+
+              checked_in_at:
+                row.checked_in_at,
+
+              checked_in_by:
+                row.checked_in_by,
+
+              registration_source:
+                "External",
+
+              college_name:
+                row.college_name ||
+                "External college",
+
+              payment_status:
+                row.payment_status,
+
+              registration_status:
+                row.registration_status,
+            } satisfies EventRegistration)
         );
 
-      return [
-        ...otherEvents,
-        ...roster,
-      ];
-    });
+      const roster = [
+        ...internalRoster,
+        ...externalRoster,
+      ].sort(
+        (a, b) =>
+          new Date(
+            a.registered_at
+          ).getTime() -
+          new Date(
+            b.registered_at
+          ).getTime()
+      );
+
+      setEventOperationsRoster(current => {
+        const otherEvents =
+          current.filter(
+            row =>
+              row.event_id !== eventId
+          );
+
+        return [
+          ...otherEvents,
+          ...roster,
+        ];
+      });
+
+      return roster;
+
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to load registered attendees.";
+
+      console.error(
+        "Unable to load combined event operations roster:",
+        error
+      );
+
+      setEventRosterError(
+        message
+      );
+
+      return [];
+
+    } finally {
+      setEventRosterLoading(
+        false
+      );
+    }
   };
 
 
@@ -1195,8 +1611,16 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
   useEffect(() => {
     if (!selectedEvent) return;
 
-    const operationalRole =
-      canCheckInEventRole(profile.role);
+    void loadEventRegistrationSummary(
+      selectedEvent.id
+    );
+  }, [
+    selectedEvent?.id,
+  ]);
+
+
+  useEffect(() => {
+    if (!selectedEvent) return;
 
     const ownsEvent =
       Boolean(
@@ -1206,8 +1630,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
       );
 
     if (
-      operationalRole ||
-      profile.role === "Main Admin" ||
+      canOperateSelectedEvent ||
       ownsEvent
     ) {
       void loadEventOperationsRoster(
@@ -1218,6 +1641,7 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     selectedEvent?.id,
     currentUserId,
     profile.role,
+    selectedEventCanScan,
   ]);
 
 
@@ -1765,8 +2189,25 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
         toDateTimeLocal(item.registration_deadline || null),
       capacity:
         item.capacity != null ? String(item.capacity) : "",
+
       allow_campus_registration:
         item.allow_campus_registration !== false,
+
+      rnsit_registration_enabled:
+        item.rnsit_registration_enabled !== false,
+
+      rnsit_fee:
+        item.rnsit_fee_paise != null
+          ? String(item.rnsit_fee_paise / 100)
+          : "",
+
+      external_registration_enabled:
+        item.external_registration_enabled === true,
+
+      external_fee:
+        item.external_fee_paise != null
+          ? String(item.external_fee_paise / 100)
+          : "",
     });
 
     setEditEventBanner(null);
@@ -1810,6 +2251,56 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     if (scheduleError) {
       return rejectEventEdit(
         scheduleError
+      );
+    }
+
+    const rnsitFee =
+      eventEditForm.rnsit_fee.trim() === ""
+        ? 0
+        : Number(eventEditForm.rnsit_fee);
+
+    const externalFee =
+      eventEditForm.external_fee.trim() === ""
+        ? 0
+        : Number(eventEditForm.external_fee);
+
+    if (
+      !Number.isFinite(rnsitFee) ||
+      rnsitFee < 0
+    ) {
+      return rejectEventEdit(
+        "Enter a valid RNSIT registration fee."
+      );
+    }
+
+    if (
+      !Number.isFinite(externalFee) ||
+      externalFee < 0
+    ) {
+      return rejectEventEdit(
+        "Enter a valid external registration fee."
+      );
+    }
+
+    if (
+      eventEditForm.rnsit_fee.trim() &&
+      !/^\d+(\.\d{1,2})?$/.test(
+        eventEditForm.rnsit_fee.trim()
+      )
+    ) {
+      return rejectEventEdit(
+        "RNSIT registration fee can have at most two decimal places."
+      );
+    }
+
+    if (
+      eventEditForm.external_fee.trim() &&
+      !/^\d+(\.\d{1,2})?$/.test(
+        eventEditForm.external_fee.trim()
+      )
+    ) {
+      return rejectEventEdit(
+        "External registration fee can have at most two decimal places."
       );
     }
 
@@ -1963,6 +2454,22 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
 
         allow_campus_registration:
           eventEditForm.allow_campus_registration,
+
+        rnsit_registration_enabled:
+          eventEditForm.rnsit_registration_enabled,
+
+        rnsit_fee_paise:
+          eventEditForm.rnsit_registration_enabled
+            ? Math.round(rnsitFee * 100)
+            : 0,
+
+        external_registration_enabled:
+          eventEditForm.external_registration_enabled,
+
+        external_fee_paise:
+          eventEditForm.external_registration_enabled
+            ? Math.round(externalFee * 100)
+            : 0,
 
         updated_at:
           new Date().toISOString(),
@@ -2381,6 +2888,56 @@ if (scheduleError) {
   );
 }
 
+const rnsitFee =
+  eventForm.rnsit_fee.trim() === ""
+    ? 0
+    : Number(eventForm.rnsit_fee);
+
+const externalFee =
+  eventForm.external_fee.trim() === ""
+    ? 0
+    : Number(eventForm.external_fee);
+
+if (
+  !Number.isFinite(rnsitFee) ||
+  rnsitFee < 0
+) {
+  return setStatus(
+    "Enter a valid RNSIT registration fee."
+  );
+}
+
+if (
+  !Number.isFinite(externalFee) ||
+  externalFee < 0
+) {
+  return setStatus(
+    "Enter a valid external registration fee."
+  );
+}
+
+if (
+  eventForm.rnsit_fee.trim() &&
+  !/^\d+(\.\d{1,2})?$/.test(
+    eventForm.rnsit_fee.trim()
+  )
+) {
+  return setStatus(
+    "RNSIT registration fee can have at most two decimal places."
+  );
+}
+
+if (
+  eventForm.external_fee.trim() &&
+  !/^\d+(\.\d{1,2})?$/.test(
+    eventForm.external_fee.trim()
+  )
+) {
+  return setStatus(
+    "External registration fee can have at most two decimal places."
+  );
+}
+
     const client = getSupabaseClient();
 
     if (!client) {
@@ -2489,6 +3046,22 @@ if (scheduleError) {
         allow_campus_registration:
           eventForm.allow_campus_registration,
 
+        rnsit_registration_enabled:
+          eventForm.rnsit_registration_enabled,
+
+        rnsit_fee_paise:
+          eventForm.rnsit_registration_enabled
+            ? Math.round(rnsitFee * 100)
+            : 0,
+
+        external_registration_enabled:
+          eventForm.external_registration_enabled,
+
+        external_fee_paise:
+          eventForm.external_registration_enabled
+            ? Math.round(externalFee * 100)
+            : 0,
+
         created_by:
           userData.user.id,
         created_by_name:
@@ -2546,6 +3119,12 @@ if (scheduleError) {
         registration_deadline: "",
         capacity: "",
         allow_campus_registration: true,
+
+        rnsit_registration_enabled: true,
+        rnsit_fee: "",
+
+        external_registration_enabled: false,
+        external_fee: "",
       });
 
       setEventBanner(null);
@@ -2860,6 +3439,15 @@ if (scheduleError) {
         item.status === "Going"
     );
 
+  const eventOperationsGoingRegistrations = (
+    eventId: string
+  ) =>
+    eventOperationsRoster.filter(
+      item =>
+        item.event_id === eventId &&
+        item.status === "Going"
+    );
+
   const currentRegistration = (eventId: string) =>
     eventRegistrations.find(
       item =>
@@ -2876,9 +3464,11 @@ const registrationClosedReason =
   ) => {
     if (
       item.allow_campus_registration ===
+        false ||
+      item.rnsit_registration_enabled ===
         false
     ) {
-      return "Campus registration disabled";
+      return "RNSIT registration disabled";
     }
 
     if (
@@ -2999,49 +3589,83 @@ const registrationClosed =
         );
       }
 
-      const payload = {
-        event_id: item.id,
-        student_id: auth.user.id,
-        student_name: profile.name,
-        student_email: auth.user.email || "",
-        department: profile.department || "",
-        graduation_year: profile.year || "",
-        status: "Going",
-        updated_at: new Date().toISOString(),
+      const {data, error} =
+        await client.rpc(
+          "register_for_campus_event",
+          {
+            p_event_id: item.id,
+          }
+        );
+
+      if (error) {
+        throw error;
+      }
+
+      const result = data as {
+        success?: boolean;
+        registration_id?: string;
+        registration_source?: string;
+        campus_uid?: string;
+        fee_amount_paise?: number;
+        fee_amount_rupees?: number;
+        payment_required?: boolean;
+        payment_status?: string;
+        registration_status?: string;
       };
 
-      const {data, error} = await client
-        .from("event_registrations")
-        .upsert(payload, {
-          onConflict: "event_id,student_id",
-        })
-        .select()
-        .single();
+      await loadEventRegistrations();
 
-      if (error) throw error;
-
-      const saved = data as EventRegistration;
-
-      setEventRegistrations(current => [
-        ...current.filter(
-          row =>
-            !(
-              row.event_id === item.id &&
-              row.student_id === auth.user.id
-            )
-        ),
-        saved,
-      ]);
-
-      setStatus(
-        `You are registered for ${item.title}.`
+      await loadEventRegistrationSummary(
+        item.id
       );
+
+      const verifiedUid =
+        result.campus_uid ||
+        profile.campus_uid ||
+        "";
+
+      if (result.payment_required) {
+        setStatus("");
+
+        setEventRegistrationPopup({
+          eventId: item.id,
+          eventTitle: item.title,
+          mode: "payment-required",
+          campusUid: verifiedUid,
+          feePaise:
+            result.fee_amount_paise || 0,
+        });
+
+        return;
+      }
+
+      setStatus("");
+
+      setEventRegistrationPopup({
+        eventId: item.id,
+        eventTitle: item.title,
+        mode: "free-success",
+        campusUid: verifiedUid,
+        feePaise: 0,
+      });
     } catch (error) {
-      setStatus(
+      const message =
         error instanceof Error
           ? error.message
-          : "Unable to register for this event."
-      );
+          : "Unable to register for this event.";
+
+      setStatus("");
+
+      setEventRegistrationPopup({
+        eventId: item.id,
+        eventTitle: item.title,
+        mode: "error",
+        campusUid:
+          profile.campus_uid || "",
+        feePaise:
+          item.rnsit_fee_paise || 0,
+        message,
+      });
     } finally {
       setRegistrationBusyId("");
     }
@@ -3091,9 +3715,176 @@ const registrationClosed =
       )
     );
 
+    await loadEventRegistrationSummary(
+      item.id
+    );
+
     setStatus(
       `Registration cancelled for ${item.title}.`
     );
+  };
+
+  useEffect(() => {
+    return () => {
+      if (gateResetTimerRef.current) {
+        window.clearTimeout(
+          gateResetTimerRef.current
+        );
+      }
+
+      if (gateCameraUnlockTimerRef.current) {
+        window.clearTimeout(
+          gateCameraUnlockTimerRef.current
+        );
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      showCheckInPanel &&
+      selectedEvent &&
+      canOperateSelectedEvent &&
+      !scannerOpen
+    ) {
+      window.setTimeout(() => {
+        gateInputRef.current?.focus();
+      }, 80);
+    }
+  }, [
+    showCheckInPanel,
+    selectedEvent?.id,
+    canOperateSelectedEvent,
+    scannerOpen,
+  ]);
+
+  const playGateTone = (
+    type: "success" | "duplicate" | "error"
+  ) => {
+    try {
+      const AudioContextClass =
+        window.AudioContext ||
+        (
+          window as typeof window & {
+            webkitAudioContext?: typeof AudioContext;
+          }
+        ).webkitAudioContext;
+
+      if (!AudioContextClass) return;
+
+      const context =
+        new AudioContextClass();
+
+      const playOscillator = (
+        frequency: number,
+        start: number,
+        duration: number
+      ) => {
+        const oscillator =
+          context.createOscillator();
+
+        const gain =
+          context.createGain();
+
+        oscillator.type = "sine";
+        oscillator.frequency.value =
+          frequency;
+
+        gain.gain.setValueAtTime(
+          0.0001,
+          context.currentTime + start
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+          0.18,
+          context.currentTime + start + 0.01
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+          0.0001,
+          context.currentTime + start + duration
+        );
+
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+
+        oscillator.start(
+          context.currentTime + start
+        );
+
+        oscillator.stop(
+          context.currentTime +
+            start +
+            duration +
+            0.03
+        );
+      };
+
+      if (type === "success") {
+        playOscillator(
+          660,
+          0,
+          0.1
+        );
+
+        playOscillator(
+          880,
+          0.11,
+          0.13
+        );
+      } else if (type === "duplicate") {
+        playOscillator(
+          520,
+          0,
+          0.14
+        );
+
+        playOscillator(
+          420,
+          0.16,
+          0.15
+        );
+      } else {
+        playOscillator(
+          260,
+          0,
+          0.18
+        );
+
+        playOscillator(
+          220,
+          0.2,
+          0.2
+        );
+      }
+
+      window.setTimeout(() => {
+        void context.close();
+      }, 700);
+    } catch {
+      // Audio feedback is optional.
+    }
+  };
+
+  const queueNextGateScan = (
+    delay = 2200
+  ) => {
+    if (gateResetTimerRef.current) {
+      window.clearTimeout(
+        gateResetTimerRef.current
+      );
+    }
+
+    gateResetTimerRef.current =
+      window.setTimeout(() => {
+        setGateResult(null);
+        setCheckInMessage("");
+        setCheckInCode("");
+
+        window.setTimeout(() => {
+          gateInputRef.current?.focus();
+        }, 50);
+      }, delay);
   };
 
   useEffect(() => {
@@ -3108,6 +3899,9 @@ const registrationClosed =
     const startScanner = async () => {
       try {
         setScannerError("");
+
+        gateCameraDecodeLockRef.current =
+          false;
 
         const {Html5Qrcode} = await import("html5-qrcode");
 
@@ -3139,17 +3933,41 @@ const registrationClosed =
             },
           },
           decodedText => {
-            if (!active) return;
+            if (
+              !active ||
+              gateCameraDecodeLockRef.current
+            ) {
+              return;
+            }
 
-            setCheckInCode(decodedText.trim());
-            setScannerOpen(false);
+            const decoded =
+              decodedText.trim();
 
-            window.setTimeout(() => {
-              void checkInEventAttendeeWithCode(
-                selectedEvent,
-                decodedText.trim()
+            if (!decoded) return;
+
+            gateCameraDecodeLockRef.current =
+              true;
+
+            setCheckInCode(decoded);
+
+            void checkInEventAttendeeWithCode(
+              selectedEvent,
+              decoded
+            );
+
+            if (
+              gateCameraUnlockTimerRef.current
+            ) {
+              window.clearTimeout(
+                gateCameraUnlockTimerRef.current
               );
-            }, 50);
+            }
+
+            gateCameraUnlockTimerRef.current =
+              window.setTimeout(() => {
+                gateCameraDecodeLockRef.current =
+                  false;
+              }, 2600);
           },
           () => {
             // Ignore normal scan-frame failures.
@@ -3209,7 +4027,7 @@ const registrationClosed =
 
     try {
       const {data, error} = await client.rpc(
-        "check_in_event_pass",
+        "check_in_any_event_pass",
         {
           p_event_id: item.id,
           p_pass_value: code,
@@ -3223,7 +4041,9 @@ const registrationClosed =
         already_checked_in?: boolean;
         code?: string;
         message?: string;
+        attendee_type?: string;
         student_name?: string;
+        college_name?: string;
         department?: string;
         graduation_year?: string;
         checked_in_at?: string;
@@ -3238,15 +4058,68 @@ const registrationClosed =
         );
       }
 
-      setCheckInMessage(
+      const attendeeType =
+        result.attendee_type === "External"
+          ? "External"
+          : "RNSIT";
+
+      const successMessage =
         result.already_checked_in
           ? `${result.student_name || "Student"} is already checked in.`
-          : `✓ ${result.student_name || "Student"} checked in successfully.`
+          : `✓ ${result.student_name || "Student"} checked in successfully.`;
+
+      setCheckInMessage(successMessage);
+
+      playGateTone(
+        result.already_checked_in
+          ? "duplicate"
+          : "success"
       );
+
+      setGateResult({
+        status: result.already_checked_in
+          ? "duplicate"
+          : "success",
+        studentName:
+          result.student_name || "Student",
+        attendeeType,
+        collegeName:
+          attendeeType === "External"
+            ? result.college_name || "External college"
+            : "RNS Institute of Technology",
+        department:
+          result.department || "Department",
+        graduationYear:
+          result.graduation_year || "Student",
+        checkInMethod:
+          result.check_in_method || "Manual",
+        checkedInAt:
+          result.checked_in_at ||
+          new Date().toISOString(),
+        message: successMessage,
+      });
+
+      if (!result.already_checked_in) {
+        setGateScanCount(current => current + 1);
+      }
 
       setCheckInCode("");
 
-      await loadEventRegistrations();
+      queueNextGateScan(
+        result.already_checked_in
+          ? 2600
+          : 1800
+      );
+
+        await Promise.all([
+          loadEventOperationsRoster(
+            item.id
+          ),
+          loadEventRegistrationSummary(
+            item.id
+          ),
+          loadEventRegistrations(),
+        ]);
     } catch (error) {
       const message =
         error instanceof Error
@@ -3269,6 +4142,22 @@ const registrationClosed =
       );
 
       setCheckInMessage(message);
+
+      playGateTone("error");
+
+      setGateResult({
+        status: "error",
+        studentName: "",
+        attendeeType: "RNSIT",
+        collegeName: "",
+        department: "",
+        graduationYear: "",
+        checkInMethod: "",
+        checkedInAt: "",
+        message,
+      });
+
+      queueNextGateScan(3000);
     } finally {
       setCheckInBusy(false);
     }
@@ -3283,14 +4172,30 @@ const registrationClosed =
     );
   };
 
-  const exportEventAttendees = (item: CampusEvent) => {
-    const attendees =
-      eventGoingRegistrations(item.id);
+  const exportEventAttendees = async (
+    item: CampusEvent
+  ) => {
+    let attendees =
+      eventOperationsGoingRegistrations(item.id);
 
     if (!attendees.length) {
-      return setStatus(
-        "There are no registrations to export."
-      );
+      const roster =
+        await loadEventOperationsRoster(item.id);
+
+      attendees =
+        roster.filter(
+          row => row.status === "Going"
+        );
+    }
+
+    if (!attendees.length) {
+      if (!eventRosterError) {
+        setStatus(
+          "There are no registrations to export."
+        );
+      }
+
+      return;
     }
 
     const escapeCsv = (value: unknown) => {
@@ -4126,7 +5031,249 @@ const registrationClosed =
                 </small>
               </span>
             </label>
-          </section>
+
+              <div className="eventPricingArchitecture">
+                <div className="eventPricingIntro">
+                  <span>REGISTRATION &amp; PRICING</span>
+
+                  <div>
+                    <h4>
+                      Configure registration access
+                    </h4>
+
+                    <p>
+                      RNSIT and external students can have
+                      independent registration fees.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="eventPricingCards">
+                  <article
+                    className={`eventPricingCard ${
+                      eventForm.rnsit_registration_enabled
+                        ? "isEnabled"
+                        : "isDisabled"
+                    }`}
+                  >
+                    <div className="eventPricingCardTop">
+                      <div className="eventPricingIdentity">
+                        <span className="eventPricingEyebrow">
+                          RNSIT STUDENTS
+                        </span>
+
+                        <strong>
+                          CampusConnect registration
+                        </strong>
+
+                        <small>
+                          Student identity and eligibility are
+                          verified automatically using the
+                          signed-in Campus UID.
+                        </small>
+                      </div>
+
+                      <label className="eventPricingSwitch">
+                        <input
+                          type="checkbox"
+                          checked={
+                            eventForm.rnsit_registration_enabled
+                          }
+                          onChange={event =>
+                            setEventForm({
+                              ...eventForm,
+                              rnsit_registration_enabled:
+                                event.target.checked,
+                            })
+                          }
+                        />
+
+                        <span className="eventPricingSwitchTrack">
+                          <i />
+                        </span>
+
+                        <b>
+                          {eventForm.rnsit_registration_enabled
+                            ? "Enabled"
+                            : "Disabled"}
+                        </b>
+                      </label>
+                    </div>
+
+                    <div className="eventPricingTrust">
+                      <span>✓</span>
+
+                      <div>
+                        <b>Verified RNSIT identity</b>
+                        <small>
+                          Campus UID is checked server-side.
+                          Students cannot manually choose this
+                          pricing tier.
+                        </small>
+                      </div>
+                    </div>
+
+                    <label className="eventPricingFeeField">
+                      <span>RNSIT registration fee</span>
+
+                      <div className="eventPricingMoneyInput">
+                        <b>₹</b>
+
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          inputMode="decimal"
+                          disabled={
+                            !eventForm.rnsit_registration_enabled
+                          }
+                          value={eventForm.rnsit_fee}
+                          onChange={event =>
+                            setEventForm({
+                              ...eventForm,
+                              rnsit_fee:
+                                event.target.value,
+                            })
+                          }
+                          placeholder="0"
+                        />
+
+                        <em>
+                          {Number(
+                            eventForm.rnsit_fee || 0
+                          ) > 0
+                            ? "PAID"
+                            : "FREE"}
+                        </em>
+                      </div>
+
+                      <small>
+                        Enter 0 to keep RNSIT registration free.
+                      </small>
+                    </label>
+                  </article>
+
+                  <article
+                    className={`eventPricingCard ${
+                      eventForm.external_registration_enabled
+                        ? "isEnabled"
+                        : "isDisabled"
+                    }`}
+                  >
+                    <div className="eventPricingCardTop">
+                      <div className="eventPricingIdentity">
+                        <span className="eventPricingEyebrow">
+                          EXTERNAL / INTER-COLLEGE
+                        </span>
+
+                        <strong>
+                          Public event registration
+                        </strong>
+
+                        <small>
+                          Students from other colleges can join
+                          without a CampusConnect account.
+                        </small>
+                      </div>
+
+                      <label className="eventPricingSwitch">
+                        <input
+                          type="checkbox"
+                          checked={
+                            eventForm.external_registration_enabled
+                          }
+                          onChange={event =>
+                            setEventForm({
+                              ...eventForm,
+                              external_registration_enabled:
+                                event.target.checked,
+                            })
+                          }
+                        />
+
+                        <span className="eventPricingSwitchTrack">
+                          <i />
+                        </span>
+
+                        <b>
+                          {eventForm.external_registration_enabled
+                            ? "Enabled"
+                            : "Disabled"}
+                        </b>
+                      </label>
+                    </div>
+
+                    <div className="eventPricingTrust">
+                      <span>↗</span>
+
+                      <div>
+                        <b>Shareable public registration</b>
+                        <small>
+                          CampusConnect generates a stable public
+                          event link after the event is created.
+                        </small>
+                      </div>
+                    </div>
+
+                    <label className="eventPricingFeeField">
+                      <span>External registration fee</span>
+
+                      <div className="eventPricingMoneyInput">
+                        <b>₹</b>
+
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          inputMode="decimal"
+                          disabled={
+                            !eventForm.external_registration_enabled
+                          }
+                          value={eventForm.external_fee}
+                          onChange={event =>
+                            setEventForm({
+                              ...eventForm,
+                              external_fee:
+                                event.target.value,
+                            })
+                          }
+                          placeholder="0"
+                        />
+
+                        <em>
+                          {Number(
+                            eventForm.external_fee || 0
+                          ) > 0
+                            ? "PAID"
+                            : "FREE"}
+                        </em>
+                      </div>
+
+                      <small>
+                        This fee is independent from the RNSIT fee.
+                      </small>
+                    </label>
+
+                    {eventForm.external_registration_enabled && (
+                      <div className="eventGeneratedLinkPending">
+                        <span>PUBLIC LINK</span>
+
+                        <div>
+                          <strong>
+                            Generated after publishing
+                          </strong>
+
+                          <small>
+                            You will be able to copy and share it
+                            with other colleges.
+                          </small>
+                        </div>
+                      </div>
+                    )}
+                  </article>
+                </div>
+              </div>
+</section>
 
           <Field label="Registration link">
             <input
@@ -4634,114 +5781,517 @@ const registrationClosed =
 
       {(activeTab === "All" ||
         activeTab === "Announcements") && (
-        <section className="campusAnnouncementsSection">
+        <section className="campusAnnouncementsSection announcementStudio">
 
-          <header className="campusSectionHeading">
-            <div>
-              <span>OFFICIAL COMMUNICATION</span>
-              <h3>Latest announcements</h3>
+          <section className="announcementHero">
+
+            <div className="announcementHeroCopy">
+
+              <span className="announcementHeroEyebrow">
+                VERIFIED CAMPUS COMMUNICATION
+              </span>
+
+              <h2>
+                Stay informed.
+                <br/>
+                Never miss what matters.
+              </h2>
+
               <p>
-                Verified academic, placement and campus notices.
+                Academic updates, placement opportunities,
+                campus notices and important alerts —
+                verified and organized in one place.
+              </p>
+
+              <div className="announcementHeroAccent">
+                <span/>
+                <span/>
+                <span/>
+                <span/>
+              </div>
+
+            </div>
+
+            <div className="announcementHeroVisual" aria-hidden="true">
+
+              <div className="announcementHeroPaper paperOne">
+                <span>ACADEMIC</span>
+                <b>Official updates</b>
+                <i/>
+                <i/>
+                <i/>
+              </div>
+
+              <div className="announcementHeroPaper paperTwo">
+                <span>PLACEMENTS</span>
+                <b>Career notices</b>
+                <i/>
+                <i/>
+              </div>
+
+              <div className="announcementHeroSeal">
+                <strong>
+                  {filteredAnnouncements.length}
+                </strong>
+                <small>
+                  LIVE
+                </small>
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <section className="announcementOverview">
+
+            <div className="announcementOverviewCard navy">
+              <span className="announcementOverviewIcon">
+                A
+              </span>
+
+              <div>
+                <strong>
+                  {items.length}
+                </strong>
+
+                <small>
+                  Total notices
+                </small>
+              </div>
+            </div>
+
+            <div className="announcementOverviewCard gold">
+              <span className="announcementOverviewIcon">
+                P
+              </span>
+
+              <div>
+                <strong>
+                  {
+                    items.filter(
+                      item =>
+                        item.is_pinned
+                    ).length
+                  }
+                </strong>
+
+                <small>
+                  Pinned updates
+                </small>
+              </div>
+            </div>
+
+            <div className="announcementOverviewCard sage">
+              <span className="announcementOverviewIcon">
+                D
+              </span>
+
+              <div>
+                <strong>
+                  {
+                    new Set(
+                      items
+                        .map(
+                          item =>
+                            item.department
+                        )
+                        .filter(Boolean)
+                    ).size
+                  }
+                </strong>
+
+                <small>
+                  Departments
+                </small>
+              </div>
+            </div>
+
+            <div className="announcementOverviewCard terracotta">
+              <span className="announcementOverviewIcon">
+                !
+              </span>
+
+              <div>
+                <strong>
+                  {
+                    items.filter(
+                      item =>
+                        item.announcement_type ===
+                          "Emergency" ||
+                        item.category ===
+                          "Emergency"
+                    ).length
+                  }
+                </strong>
+
+                <small>
+                  Priority alerts
+                </small>
+              </div>
+            </div>
+
+          </section>
+
+
+          <header className="announcementSectionHeader">
+
+            <div>
+              <span>
+                OFFICIAL COMMUNICATION
+              </span>
+
+              <h3>
+                Latest announcements
+              </h3>
+
+              <p>
+                Verified notices from your campus,
+                departments and authorized teams.
               </p>
             </div>
 
-            <strong>
-              {items.length}
-              <small> notices</small>
-            </strong>
+            <div className="announcementResultCount">
+              <strong>
+                {filteredAnnouncements.length}
+              </strong>
+
+              <small>
+                showing
+              </small>
+            </div>
+
           </header>
 
-          <div className="announcementFeed">
-            {filteredAnnouncements.map(item => (
-              <article
-                className={`announcementCard card ${
-                  item.is_pinned ? "pinned" : ""
-                }`}
-                key={item.id}
-              >
-                <div
-                  className={`moduleIcon ${item.category.toLowerCase()}`}
-                >
-                  {item.category.slice(0, 1)}
-                </div>
 
-                <div>
-                  <div className="itemMeta">
-                    <span>{item.category}</span>
+          <div className="announcementFeed professionalAnnouncementFeed">
 
-                    <span>
-                      {item.audience} · {item.department}
-                    </span>
+            {filteredAnnouncements.map(
+              item => {
 
-                    <time>
-                      {friendlyDate(item.created_at)}
-                    </time>
-                  </div>
+                const itemAttachments =
+                  attachments.filter(
+                    attachment =>
+                      attachment.entity_type ===
+                        "announcement" &&
+                      attachment.entity_id ===
+                        item.id
+                  );
 
-                  <h3>{item.title}</h3>
+                const type =
+                  item.announcement_type ||
+                  "Normal";
 
-                  <p>{item.body}</p>
+                const cardTone =
+                  type === "Emergency" ||
+                  item.category === "Emergency"
+                    ? "emergency"
+                    : type === "Festival"
+                    ? "festival"
+                    : type === "Featured"
+                    ? "featured"
+                    : item.category
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-");
 
-                  <small>
-                    Published by {item.author_name}
-                  </small>
-                </div>
+                return (
+                  <article
+                    className={`announcementCard professionalAnnouncementCard ${cardTone} ${
+                      item.is_pinned
+                        ? "pinned"
+                        : ""
+                    }`}
+                    key={item.id}
+                  >
 
-                <div className="announcementCardActions">
-                  {item.is_pinned && (
-                    <b className="pinBadge">
-                      Pinned
-                    </b>
-                  )}
+                    <div className="announcementCardStripe"/>
 
-                  {canManageAnnouncement(item) && (
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openAnnouncementEditor(item)
+                    <header className="announcementCardHeader">
+
+                      <div className={`announcementCategoryIcon ${cardTone}`}>
+                        {
+                          item.category
+                            .trim()
+                            .slice(0, 1)
+                            .toUpperCase()
                         }
-                      >
-                        Edit
-                      </button>
+                      </div>
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          void toggleAnnouncementPin(item)
-                        }
-                      >
-                        {item.is_pinned ? "Unpin" : "Pin"}
-                      </button>
+                      <div className="announcementCardHeading">
 
-                      <button
-                        type="button"
-                        className="danger"
-                        onClick={() =>
-                          void deleteAnnouncement(item)
-                        }
-                      >
-                        Delete
-                      </button>
+                        <div className="announcementBadgeRow">
+
+                          <span className={`announcementCategoryBadge ${cardTone}`}>
+                            {item.category}
+                          </span>
+
+                          {type !== "Normal" && (
+                            <span className={`announcementTypeBadge ${type.toLowerCase()}`}>
+                              {type}
+                            </span>
+                          )}
+
+                          {item.is_pinned && (
+                            <span className="announcementPinnedBadge">
+                              <span>
+                                ◆
+                              </span>
+                              Pinned
+                            </span>
+                          )}
+
+                        </div>
+
+                        <h3>
+                          {item.title}
+                        </h3>
+
+                      </div>
+
+                      <time className="announcementCardDate">
+                        <span>
+                          {friendlyDate(item.created_at)}
+                        </span>
+
+                        <small>
+                          Published
+                        </small>
+                      </time>
+
+                    </header>
+
+
+                    <div className="announcementCardBody">
+
+                      <p>
+                        {item.body}
+                      </p>
+
                     </div>
-                  )}
-                </div>
-              </article>
-            ))}
+
+
+                    <div className="announcementMetadata">
+
+                      <div>
+                        <span className="announcementMetaIcon">
+                          P
+                        </span>
+
+                        <p>
+                          <small>
+                            PUBLISHED BY
+                          </small>
+
+                          <b>
+                            {item.author_name}
+                          </b>
+                        </p>
+                      </div>
+
+                      <div>
+                        <span className="announcementMetaIcon">
+                          A
+                        </span>
+
+                        <p>
+                          <small>
+                            AUDIENCE
+                          </small>
+
+                          <b>
+                            {item.audience}
+                          </b>
+                        </p>
+                      </div>
+
+                      <div>
+                        <span className="announcementMetaIcon">
+                          D
+                        </span>
+
+                        <p>
+                          <small>
+                            DEPARTMENT
+                          </small>
+
+                          <b>
+                            {item.department || "All"}
+                          </b>
+                        </p>
+                      </div>
+
+                    </div>
+
+
+                    {itemAttachments.length > 0 && (
+                      <section className="announcementAttachments">
+
+                        <header>
+                          <span>
+                            ATTACHMENTS
+                          </span>
+
+                          <small>
+                            {itemAttachments.length}
+                            {" "}
+                            {
+                              itemAttachments.length ===
+                                1
+                                ? "file"
+                                : "files"
+                            }
+                          </small>
+                        </header>
+
+                        <div className="announcementAttachmentGrid">
+
+                          {itemAttachments.map(
+                            attachment => (
+                              <button
+                                type="button"
+                                key={attachment.id}
+                                onClick={() =>
+                                  void openCampusAttachment(
+                                    attachment
+                                  )
+                                }
+                              >
+
+                                <span className="announcementFileIcon">
+                                  {
+                                    attachment.file_type
+                                      .slice(0, 3)
+                                      .toUpperCase()
+                                  }
+                                </span>
+
+                                <span>
+                                  <b>
+                                    {attachment.file_name}
+                                  </b>
+
+                                  <small>
+                                    {
+                                      formatAttachmentSize(
+                                        attachment.file_size
+                                      )
+                                    }
+                                  </small>
+                                </span>
+
+                                <i>
+                                  ↗
+                                </i>
+
+                              </button>
+                            )
+                          )}
+
+                        </div>
+
+                      </section>
+                    )}
+
+
+                    <footer className="announcementCardFooter">
+
+                      <div className="announcementVerifiedPublisher">
+
+                        <span>
+                          ✓
+                        </span>
+
+                        <p>
+                          <b>
+                            Verified communication
+                          </b>
+
+                          <small>
+                            CampusConnect official channel
+                          </small>
+                        </p>
+
+                      </div>
+
+                      {canManageAnnouncement(item) && (
+                        <div className="announcementCardActions">
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openAnnouncementEditor(
+                                item
+                              )
+                            }
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void toggleAnnouncementPin(
+                                item
+                              )
+                            }
+                          >
+                            {
+                              item.is_pinned
+                                ? "Unpin"
+                                : "Pin"
+                            }
+                          </button>
+
+                          <button
+                            type="button"
+                            className="danger"
+                            onClick={() =>
+                              void deleteAnnouncement(
+                                item
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+
+                        </div>
+                      )}
+
+                    </footer>
+
+                  </article>
+                );
+              }
+            )}
 
             {!filteredAnnouncements.length && (
-              <EmptyState
-                title="No matching announcements"
-                text={
-                  query || categoryFilter !== "All"
-                    ? "Try changing your search or filters."
-                    : "Verified campus updates will appear here."
-                }
-              />
+              <div className="announcementEmptyState">
+
+                <span>
+                  A
+                </span>
+
+                <h3>
+                  No matching announcements
+                </h3>
+
+                <p>
+                  {
+                    query ||
+                    categoryFilter !== "All"
+                      ? "Try changing your search or category filters."
+                      : "Verified campus updates will appear here."
+                  }
+                </p>
+
+              </div>
             )}
+
           </div>
+
         </section>
       )}
+
 
       {editingAnnouncement && (
         <div
@@ -4856,7 +6406,7 @@ const registrationClosed =
                 </Field>
               </div>
 
-              
+
               {editingAnnouncement.announcement_type ===
                 "Festival" &&
                 profile.role ===
@@ -5366,7 +6916,7 @@ const registrationClosed =
 
       {scannerOpen &&
         selectedEvent &&
-        canCheckInEventRole(profile.role) && (
+        canOperateSelectedEvent && (
           <div
             className="eventScannerScrim"
             role="presentation"
@@ -5425,8 +6975,8 @@ const registrationClosed =
 
               <footer>
                 <small>
-                  Hold the complete QR inside the frame.
-                  Successful passes are checked in only once.
+                  Continuous Gate Mode is active. After each result,
+                  move the scanned pass away before presenting the next pass.
                 </small>
 
                 <button
@@ -5701,7 +7251,272 @@ const registrationClosed =
                     </small>
                   </span>
                 </label>
-              </section>
+
+              <div className="eventPricingArchitecture">
+                <div className="eventPricingIntro">
+                  <span>REGISTRATION &amp; PRICING</span>
+
+                  <div>
+                    <h4>
+                      Registration access
+                    </h4>
+
+                    <p>
+                      Manage RNSIT and external pricing
+                      independently.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="eventPricingCards">
+                  <article
+                    className={`eventPricingCard ${
+                      eventEditForm.rnsit_registration_enabled
+                        ? "isEnabled"
+                        : "isDisabled"
+                    }`}
+                  >
+                    <div className="eventPricingCardTop">
+                      <div className="eventPricingIdentity">
+                        <span className="eventPricingEyebrow">
+                          RNSIT STUDENTS
+                        </span>
+
+                        <strong>
+                          CampusConnect registration
+                        </strong>
+
+                        <small>
+                          RNSIT pricing requires authenticated
+                          Campus UID verification.
+                        </small>
+                      </div>
+
+                      <label className="eventPricingSwitch">
+                        <input
+                          type="checkbox"
+                          checked={
+                            eventEditForm.rnsit_registration_enabled
+                          }
+                          onChange={event =>
+                            setEventEditForm({
+                              ...eventEditForm,
+                              rnsit_registration_enabled:
+                                event.target.checked,
+                            })
+                          }
+                        />
+
+                        <span className="eventPricingSwitchTrack">
+                          <i />
+                        </span>
+
+                        <b>
+                          {eventEditForm.rnsit_registration_enabled
+                            ? "Enabled"
+                            : "Disabled"}
+                        </b>
+                      </label>
+                    </div>
+
+                    <div className="eventPricingTrust">
+                      <span>✓</span>
+
+                      <div>
+                        <b>Campus UID verified</b>
+                        <small>
+                          Verification happens on the server,
+                          not from a manually entered UID.
+                        </small>
+                      </div>
+                    </div>
+
+                    <label className="eventPricingFeeField">
+                      <span>RNSIT registration fee</span>
+
+                      <div className="eventPricingMoneyInput">
+                        <b>₹</b>
+
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          inputMode="decimal"
+                          disabled={
+                            !eventEditForm.rnsit_registration_enabled
+                          }
+                          value={eventEditForm.rnsit_fee}
+                          onChange={event =>
+                            setEventEditForm({
+                              ...eventEditForm,
+                              rnsit_fee:
+                                event.target.value,
+                            })
+                          }
+                          placeholder="0"
+                        />
+
+                        <em>
+                          {Number(
+                            eventEditForm.rnsit_fee || 0
+                          ) > 0
+                            ? "PAID"
+                            : "FREE"}
+                        </em>
+                      </div>
+
+                      <small>
+                        Enter 0 for free RNSIT registration.
+                      </small>
+                    </label>
+                  </article>
+
+                  <article
+                    className={`eventPricingCard ${
+                      eventEditForm.external_registration_enabled
+                        ? "isEnabled"
+                        : "isDisabled"
+                    }`}
+                  >
+                    <div className="eventPricingCardTop">
+                      <div className="eventPricingIdentity">
+                        <span className="eventPricingEyebrow">
+                          EXTERNAL / INTER-COLLEGE
+                        </span>
+
+                        <strong>
+                          Public registration
+                        </strong>
+
+                        <small>
+                          Configure the public registration
+                          experience for students outside RNSIT.
+                        </small>
+                      </div>
+
+                      <label className="eventPricingSwitch">
+                        <input
+                          type="checkbox"
+                          checked={
+                            eventEditForm.external_registration_enabled
+                          }
+                          onChange={event =>
+                            setEventEditForm({
+                              ...eventEditForm,
+                              external_registration_enabled:
+                                event.target.checked,
+                            })
+                          }
+                        />
+
+                        <span className="eventPricingSwitchTrack">
+                          <i />
+                        </span>
+
+                        <b>
+                          {eventEditForm.external_registration_enabled
+                            ? "Enabled"
+                            : "Disabled"}
+                        </b>
+                      </label>
+                    </div>
+
+                    <div className="eventPricingTrust">
+                      <span>↗</span>
+
+                      <div>
+                        <b>External registration link</b>
+                        <small>
+                          Share this with colleges, WhatsApp
+                          groups, posters and social media.
+                        </small>
+                      </div>
+                    </div>
+
+                    <label className="eventPricingFeeField">
+                      <span>External registration fee</span>
+
+                      <div className="eventPricingMoneyInput">
+                        <b>₹</b>
+
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          inputMode="decimal"
+                          disabled={
+                            !eventEditForm.external_registration_enabled
+                          }
+                          value={eventEditForm.external_fee}
+                          onChange={event =>
+                            setEventEditForm({
+                              ...eventEditForm,
+                              external_fee:
+                                event.target.value,
+                            })
+                          }
+                          placeholder="0"
+                        />
+
+                        <em>
+                          {Number(
+                            eventEditForm.external_fee || 0
+                          ) > 0
+                            ? "PAID"
+                            : "FREE"}
+                        </em>
+                      </div>
+
+                      <small>
+                        External pricing does not affect the RNSIT fee.
+                      </small>
+                    </label>
+
+                    {eventEditForm.external_registration_enabled && (
+                      <div className="eventGeneratedPublicLink">
+                        <span>PUBLIC REGISTRATION LINK</span>
+
+                        {editingEvent?.public_registration_slug ? (
+                          <>
+                            <strong>
+                              {`${window.location.origin}/events/join/${editingEvent.public_registration_slug}`}
+                            </strong>
+
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const publicUrl =
+                                  `${window.location.origin}/events/join/${editingEvent.public_registration_slug}`;
+
+                                try {
+                                  await navigator.clipboard.writeText(
+                                    publicUrl
+                                  );
+
+                                  setStatus(
+                                    "Public registration link copied."
+                                  );
+                                } catch {
+                                  setStatus(
+                                    "Unable to copy registration link."
+                                  );
+                                }
+                              }}
+                            >
+                              Copy link
+                            </button>
+                          </>
+                        ) : (
+                          <strong>
+                            Save the event to generate the public link.
+                          </strong>
+                        )}
+                      </div>
+                    )}
+                  </article>
+                </div>
+              </div>
+</section>
 
               <Field label="Registration link">
                 <input
@@ -5898,64 +7713,6 @@ const registrationClosed =
           </aside>
         )}
 
-      {scannerOpen && selectedEvent && (
-        <div
-          className="eventScannerScrim"
-          onClick={() => setScannerOpen(false)}
-        >
-          <section
-            className="eventScannerModal"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Scan attendee QR pass"
-            onClick={event => event.stopPropagation()}
-          >
-            <header>
-              <div>
-                <span>LIVE EVENT CHECK-IN</span>
-                <h2>Scan attendee pass</h2>
-                <p>
-                  Point the camera at the CampusConnect QR pass.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setScannerOpen(false)}
-                aria-label="Close scanner"
-              >
-                ×
-              </button>
-            </header>
-
-            <div
-              id="campus-event-qr-reader"
-              className="eventScannerViewport"
-            />
-
-            {scannerError && (
-              <p className="eventScannerError">
-                {scannerError}
-              </p>
-            )}
-
-            <footer>
-              <small>
-                Camera access is used only while this scanner is open.
-              </small>
-
-              <button
-                type="button"
-                className="ghost"
-                onClick={() => setScannerOpen(false)}
-              >
-                Cancel
-              </button>
-            </footer>
-          </section>
-        </div>
-      )}
-
       {selectedEvent && (
         <div
           className="eventModalScrim"
@@ -6055,10 +7812,15 @@ const registrationClosed =
               {selectedEvent.allow_campus_registration !== false && (
                 <section className="eventRegistrationPanel">
                   {(() => {
-                    const going =
-                      eventGoingRegistrations(
-                        selectedEvent.id
-                      ).length;
+                    const localGoing =
+                          eventGoingRegistrations(
+                            selectedEvent.id
+                          ).length;
+
+                        const going =
+                          eventRegistrationCounts[
+                            selectedEvent.id
+                          ] ?? localGoing;
 
                     const capacity =
                       selectedEvent.capacity || 0;
@@ -6079,6 +7841,18 @@ const registrationClosed =
                       registrationClosed(
                         selectedEvent
                       );
+
+                    const rnsitFeePaise =
+                      selectedEvent.rnsit_fee_paise || 0;
+
+                    const rnsitFee =
+                      rnsitFeePaise / 100;
+
+                    const externalFeePaise =
+                      selectedEvent.external_fee_paise || 0;
+
+                    const externalFee =
+                      externalFeePaise / 100;
 
                     const progress =
                       capacity > 0
@@ -6120,6 +7894,55 @@ const registrationClosed =
                                 : " going"}
                             </small>
                           </strong>
+                        </div>
+
+                        <div className="studentEventPricing">
+                          <article className="studentEventPriceCard primaryTier">
+                            <div>
+                              <span>RNSIT STUDENTS</span>
+
+                              <strong>
+                                {rnsitFeePaise > 0
+                                  ? `₹${rnsitFee.toLocaleString("en-IN", {
+                                      maximumFractionDigits: 2,
+                                    })}`
+                                  : "FREE"}
+                              </strong>
+                            </div>
+
+                            <p>
+                              <b>✓ Campus UID verified</b>
+                              <small>
+                                Your RNSIT price is assigned
+                                automatically from your signed-in
+                                CampusConnect account.
+                              </small>
+                            </p>
+                          </article>
+
+                          {selectedEvent.external_registration_enabled && (
+                            <article className="studentEventPriceCard">
+                              <div>
+                                <span>EXTERNAL / INTER-COLLEGE</span>
+
+                                <strong>
+                                  {externalFeePaise > 0
+                                    ? `₹${externalFee.toLocaleString("en-IN", {
+                                        maximumFractionDigits: 2,
+                                      })}`
+                                    : "FREE"}
+                                </strong>
+                              </div>
+
+                              <p>
+                                <b>Public registration</b>
+                                <small>
+                                  Pricing for students joining from
+                                  other colleges.
+                                </small>
+                              </p>
+                            </article>
+                          )}
                         </div>
 
                         {capacity > 0 && (
@@ -6195,10 +8018,302 @@ const registrationClosed =
                                   ? registrationClosedReason(
                                       selectedEvent
                                     )
-                                  : "Register for event →"}
+                                  : rnsitFeePaise > 0
+                                  ? `Continue to payment · ₹${rnsitFee.toLocaleString(
+                                      "en-IN",
+                                      {
+                                        maximumFractionDigits: 2,
+                                      }
+                                    )} →`
+                                  : "Register Free →"}
                               </button>
                             )}
                             </div>
+
+                            {eventRegistrationPopup &&
+                              eventRegistrationPopup.eventId ===
+                                selectedEvent.id && (
+                                <div
+                                  className="eventRegistrationPopupOverlay"
+                                  role="dialog"
+                                  aria-modal="true"
+                                  aria-label="Event registration status"
+                                  onMouseDown={event => {
+                                    if (
+                                      event.target ===
+                                      event.currentTarget
+                                    ) {
+                                      setEventRegistrationPopup(
+                                        null
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <div className="eventRegistrationPopupCard">
+                                    <div className="eventRegistrationPopupTop">
+                                      <div
+                                        className={`eventRegistrationPopupIcon ${
+                                          eventRegistrationPopup.mode ===
+                                          "error"
+                                            ? "isError"
+                                            : "isSuccess"
+                                        }`}
+                                      >
+                                        {eventRegistrationPopup.mode ===
+                                        "error"
+                                          ? "!"
+                                          : "✓"}
+                                      </div>
+
+                                      <button
+                                        type="button"
+                                        className="eventRegistrationPopupClose"
+                                        aria-label="Close registration popup"
+                                        onClick={() =>
+                                          setEventRegistrationPopup(
+                                            null
+                                          )
+                                        }
+                                      >
+                                        ×
+                                      </button>
+                                    </div>
+
+                                    {eventRegistrationPopup.mode ===
+                                    "payment-required" ? (
+                                      <>
+                                        <div className="eventRegistrationPopupHeading">
+                                          <span>
+                                            CAMPUS UID VERIFIED
+                                          </span>
+
+                                          <h2>
+                                            Complete your registration
+                                          </h2>
+
+                                          <p>
+                                            Your RNSIT identity has
+                                            been verified. Payment is
+                                            required before your seat
+                                            is confirmed.
+                                          </p>
+                                        </div>
+
+                                        <div className="eventRegistrationPopupEvent">
+                                          <small>EVENT</small>
+
+                                          <strong>
+                                            {
+                                              eventRegistrationPopup.eventTitle
+                                            }
+                                          </strong>
+                                        </div>
+
+                                        <div className="eventRegistrationPopupDetails">
+                                          <div>
+                                            <span>
+                                              RNSIT STUDENT
+                                            </span>
+
+                                            <strong>
+                                              ₹
+                                              {(
+                                                eventRegistrationPopup.feePaise /
+                                                100
+                                              ).toLocaleString(
+                                                "en-IN",
+                                                {
+                                                  maximumFractionDigits: 2,
+                                                }
+                                              )}
+                                            </strong>
+                                          </div>
+
+                                          <div>
+                                            <span>
+                                              CAMPUS UID
+                                            </span>
+
+                                            <strong>
+                                              {eventRegistrationPopup.campusUid ||
+                                                "Verified"}
+                                            </strong>
+                                          </div>
+                                        </div>
+
+                                        <div className="eventRegistrationPaymentNotice">
+                                          <div>
+                                            <span>₹</span>
+                                          </div>
+
+                                          <p>
+                                            <b>
+                                              Payment required
+                                            </b>
+
+                                            <small>
+                                              Your event pass will
+                                              become available only
+                                              after payment is
+                                              securely verified.
+                                            </small>
+                                          </p>
+                                        </div>
+
+                                        <button
+                                          type="button"
+                                          className="primary eventRegistrationPopupPrimary"
+                                          onClick={() => {
+                                            setStatus(
+                                              "Secure payment checkout is the next step."
+                                            );
+                                          }}
+                                        >
+                                          Continue to payment · ₹
+                                          {(
+                                            eventRegistrationPopup.feePaise /
+                                            100
+                                          ).toLocaleString(
+                                            "en-IN",
+                                            {
+                                              maximumFractionDigits: 2,
+                                            }
+                                          )}
+                                          →
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          className="eventRegistrationPopupSecondary"
+                                          onClick={() =>
+                                            setEventRegistrationPopup(
+                                              null
+                                            )
+                                          }
+                                        >
+                                          Pay later
+                                        </button>
+
+                                        <p className="eventRegistrationPopupSecurity">
+                                          Secure payment verification
+                                          required before check-in
+                                          access is issued.
+                                        </p>
+                                      </>
+                                    ) : eventRegistrationPopup.mode ===
+                                      "free-success" ? (
+                                      <>
+                                        <div className="eventRegistrationPopupHeading">
+                                          <span>
+                                            REGISTRATION CONFIRMED
+                                          </span>
+
+                                          <h2>
+                                            You're going!
+                                          </h2>
+
+                                          <p>
+                                            Your RNSIT identity has
+                                            been verified and your
+                                            registration is confirmed.
+                                          </p>
+                                        </div>
+
+                                        <div className="eventRegistrationPopupEvent">
+                                          <small>EVENT</small>
+
+                                          <strong>
+                                            {
+                                              eventRegistrationPopup.eventTitle
+                                            }
+                                          </strong>
+                                        </div>
+
+                                        <div className="eventRegistrationPopupDetails">
+                                          <div>
+                                            <span>
+                                              REGISTRATION
+                                            </span>
+
+                                            <strong>
+                                              FREE
+                                            </strong>
+                                          </div>
+
+                                          <div>
+                                            <span>
+                                              CAMPUS UID
+                                            </span>
+
+                                            <strong>
+                                              {eventRegistrationPopup.campusUid ||
+                                                "Verified"}
+                                            </strong>
+                                          </div>
+                                        </div>
+
+                                        <div className="eventRegistrationSuccessNotice">
+                                          <span>✓</span>
+
+                                          <p>
+                                            <b>
+                                              Seat confirmed
+                                            </b>
+
+                                            <small>
+                                              Your secure digital
+                                              event pass is now
+                                              available below.
+                                            </small>
+                                          </p>
+                                        </div>
+
+                                        <button
+                                          type="button"
+                                          className="primary eventRegistrationPopupPrimary"
+                                          onClick={() => {
+                                            setShowEventPass(true);
+                                            setEventRegistrationPopup(
+                                              null
+                                            );
+                                          }}
+                                        >
+                                          View event pass →
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <div className="eventRegistrationPopupHeading">
+                                          <span>
+                                            REGISTRATION ISSUE
+                                          </span>
+
+                                          <h2>
+                                            Registration couldn't be completed
+                                          </h2>
+
+                                          <p>
+                                            {eventRegistrationPopup.message ||
+                                              "Please try again."}
+                                          </p>
+                                        </div>
+
+                                        <button
+                                          type="button"
+                                          className="primary eventRegistrationPopupPrimary"
+                                          onClick={() =>
+                                            setEventRegistrationPopup(
+                                              null
+                                            )
+                                          }
+                                        >
+                                          Try again
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
 
                             {registered && (
                               <section className="eventPassSection">
@@ -6224,423 +8339,22 @@ const registrationClosed =
                                   </button>
                                 </div>
 
-                                {showEventPass && (() => {
-                                  const registration =
-                                    currentRegistration(selectedEvent.id);
-
-                                  if (!registration) return null;
-
-                                  return (
-                                    <div className="eventPassCard">
-                                      <div className="eventPassTop">
-                                        <div className="eventPassBrand">
-                                          <div className="eventPassBrandMark">
-                                            CC
-                                          </div>
-
-                                          <div>
-                                            <span>CAMPUSCONNECT</span>
-                                            <strong>
-                                              Verified Event Pass
-                                            </strong>
-                                          </div>
-                                        </div>
-
-                                        <div
-                                          className={
-                                            registration.checked_in
-                                              ? "eventPassValidity checked"
-                                              : "eventPassValidity"
-                                          }
-                                        >
-                                          <i>
-                                            {registration.checked_in
-                                              ? "✓"
-                                              : "●"}
-                                          </i>
-
-                                          <span>
-                                            {registration.checked_in
-                                              ? "CHECKED IN"
-                                              : "VALID PASS"}
-                                          </span>
-                                        </div>
-                                      </div>
-
-                                      {selectedEvent.banner_url && (
-                                        <div className="eventPassBanner">
-                                          <img
-                                            src={selectedEvent.banner_url}
-                                            alt=""
-                                          />
-
-                                          <div className="eventPassBannerShade" />
-
-                                          <div className="eventPassBannerContent">
-                                            <span>
-                                              {selectedEvent.category}
-                                            </span>
-
-                                            <h3>
-                                              {selectedEvent.title}
-                                            </h3>
-
-                                            <p>
-                                              {selectedEvent.organizer ||
-                                                "CampusConnect"}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {!selectedEvent.banner_url && (
-                                        <div className="eventPassEventHeader">
-                                          <span>
-                                            {selectedEvent.category}
-                                          </span>
-
-                                          <h3>
-                                            {selectedEvent.title}
-                                          </h3>
-
-                                          <p>
-                                            Hosted by{" "}
-                                            {selectedEvent.organizer ||
-                                              "CampusConnect"}
-                                          </p>
-                                        </div>
-                                      )}
-
-                                      <div className="eventPassBody">
-                                        <div className="eventPassMain">
-                                          <div className="eventPassAttendee">
-                                            <div className="eventPassAvatar">
-                                              {(registration.student_name ||
-                                                profile.name)
-                                                .split(/\s+/)
-                                                .filter(Boolean)
-                                                .slice(0, 2)
-                                                .map(name =>
-                                                  name
-                                                    .charAt(0)
-                                                    .toUpperCase()
-                                                )
-                                                .join("") || "ST"}
-                                            </div>
-
-                                            <div>
-                                              <span>
-                                                REGISTERED ATTENDEE
-                                              </span>
-
-                                              <h4>
-                                                {registration.student_name ||
-                                                  profile.name}
-                                              </h4>
-
-                                              <p>
-                                                {registration.department ||
-                                                  profile.department}
-                                                {" · "}
-                                                {registration.graduation_year ||
-                                                  profile.year}
-                                              </p>
-                                            </div>
-                                          </div>
-
-                                          <div className="eventPassDetails">
-                                            <div>
-                                              <span className="eventPassDetailIcon">
-                                                ◷
-                                              </span>
-
-                                              <p>
-                                                <small>
-                                                  DATE & TIME
-                                                </small>
-
-                                                <strong>
-                                                  {eventDateLabel(
-                                                    selectedEvent.event_date
-                                                  )}
-                                                </strong>
-
-                                                <em>
-                                                  {eventTimeLabel(
-                                                    selectedEvent.event_date
-                                                  )}
-                                                  {selectedEvent.end_date
-                                                    ? ` – ${eventTimeLabel(
-                                                        selectedEvent.end_date
-                                                      )}`
-                                                    : ""}
-                                                </em>
-                                              </p>
-                                            </div>
-
-                                            <div>
-                                              <span className="eventPassDetailIcon">
-                                                ◎
-                                              </span>
-
-                                              <p>
-                                                <small>VENUE</small>
-
-                                                <strong>
-                                                  {selectedEvent.venue ||
-                                                    "Venue to be announced"}
-                                                </strong>
-
-                                                <em>
-                                                  Campus event location
-                                                </em>
-                                              </p>
-                                            </div>
-
-                                            <div>
-                                              <span className="eventPassDetailIcon">
-                                                ◇
-                                              </span>
-
-                                              <p>
-                                                <small>ORGANIZER</small>
-
-                                                <strong>
-                                                  {selectedEvent.organizer ||
-                                                    "CampusConnect"}
-                                                </strong>
-
-                                                <em>
-                                                  Official event organizer
-                                                </em>
-                                              </p>
-                                            </div>
-
-                                            <div>
-                                              <span className="eventPassDetailIcon">
-                                                #
-                                              </span>
-
-                                              <p>
-                                                <small>PASS ID</small>
-
-                                                <strong>
-                                                  CC-
-                                                  {registration.id
-                                                    .replace(/-/g, "")
-                                                    .slice(0, 10)
-                                                    .toUpperCase()}
-                                                </strong>
-
-                                                <em>
-                                                  Unique attendee pass
-                                                </em>
-                                              </p>
-                                            </div>
-                                          </div>
-
-                                          <div className="eventPassSecurity">
-                                            <span>✓</span>
-
-                                            <p>
-                                              <strong>
-                                                Identity verified through CampusConnect
-                                              </strong>
-
-                                              <small>
-                                                This digital pass is linked to your
-                                                CampusConnect registration and cannot
-                                                be transferred.
-                                              </small>
-                                            </p>
-                                          </div>
-                                        </div>
-
-                                        <div className="eventPassQrColumn">
-                                          <div className="eventPassQrLabel">
-                                            <span>ENTRY QR</span>
-                                            <small>
-                                              Scan at check-in
-                                            </small>
-                                          </div>
-
-                                          <div className="eventPassQr">
-                                            <QRCodeSVG
-                                              value={
-                                                registration.check_in_code
-                                              }
-                                              size={190}
-                                              level="M"
-                                              includeMargin
-                                            />
-                                          </div>
-
-                                          <strong className="eventPassScanText">
-                                            Present this QR at entry
-                                          </strong>
-
-                                          <span className="eventPassCode">
-                                            {registration.check_in_code
-                                              .slice(0, 18)
-                                              .toUpperCase()}
-                                          </span>
-                                        </div>
-                                      </div>
-
-                                      <div className="eventPassPerforation">
-                                        <span />
-                                        <i />
-                                        <span />
-                                      </div>
-
-                                      <div className="eventPassFooter">
-                                        <div>
-                                          <span>
-                                            CAMPUSCONNECT DIGITAL PASS
-                                          </span>
-
-                                          <small>
-                                            Issued{" "}
-                                            {friendlyDate(
-                                              registration.registered_at
-                                            )}
-                                          </small>
-                                        </div>
-
-                                        <p>
-                                          <i>✓</i>
-                                          Secure · Verified · Single attendee
-                                        </p>
-                                      </div>
-
-                                      <div className="eventPassActions">
-                                        <div>
-                                          <span>PASS ACTIONS</span>
-
-                                          <small>
-                                            Save your pass before arriving at the venue.
-                                          </small>
-                                        </div>
-
-                                        <div className="eventPassActionButtons">
-                                          <button
-                                            type="button"
-                                            className="eventPassActionButton"
-                                            onClick={() => {
-                                              const passId =
-                                                `CC-${registration.id
-                                                  .replace(/-/g, "")
-                                                  .slice(0, 10)
-                                                  .toUpperCase()}`;
-
-                                              void navigator.clipboard
-                                                .writeText(passId)
-                                                .then(() =>
-                                                  setStatus(
-                                                    "Event Pass ID copied."
-                                                  )
-                                                )
-                                                .catch(() =>
-                                                  setStatus(
-                                                    "Unable to copy Event Pass ID."
-                                                  )
-                                                );
-                                            }}
-                                          >
-                                            <span>⌘</span>
-                                            Copy Pass ID
-                                          </button>
-
-                                          <button
-                                            type="button"
-                                            className="eventPassActionButton primaryPassAction"
-                                            onClick={() => {
-                                              const pass =
-                                                document.querySelector(
-                                                  ".eventPassCard"
-                                                );
-
-                                              if (
-                                                !(pass instanceof HTMLElement)
-                                              ) {
-                                                setStatus(
-                                                  "Unable to prepare the Event Pass."
-                                                );
-                                                return;
-                                              }
-
-                                              const oldRoot =
-                                                document.getElementById(
-                                                  "campus-event-print-root"
-                                                );
-
-                                              oldRoot?.remove();
-
-                                              const printRoot =
-                                                document.createElement(
-                                                  "div"
-                                                );
-
-                                              printRoot.id =
-                                                "campus-event-print-root";
-
-                                              const passClone =
-                                                pass.cloneNode(
-                                                  true
-                                                ) as HTMLElement;
-
-                                              passClone
-                                                .querySelector(
-                                                  ".eventPassActions"
-                                                )
-                                                ?.remove();
-
-                                              printRoot.appendChild(
-                                                passClone
-                                              );
-
-                                              document.body.appendChild(
-                                                printRoot
-                                              );
-
-                                              const cleanup = () => {
-                                                printRoot.remove();
-
-                                                document.body.classList.remove(
-                                                  "campusEventPrintMode"
-                                                );
-
-                                                window.removeEventListener(
-                                                  "afterprint",
-                                                  cleanup
-                                                );
-                                              };
-
-                                              document.body.classList.add(
-                                                "campusEventPrintMode"
-                                              );
-
-                                              window.addEventListener(
-                                                "afterprint",
-                                                cleanup
-                                              );
-
-                                              window.setTimeout(
-                                                () => {
-                                                  window.print();
-                                                },
-                                                150
-                                              );
-                                            }}
-                                          >
-                                            <span>↓</span>
-                                            Print / Save PDF
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })()}
+                                {showEventPass && (
+                                  <CampusEventSecurePass
+                                    eventId={selectedEvent.id}
+                                    refreshKey={
+                                      currentRegistration(
+                                        selectedEvent.id
+                                      )?.updated_at
+                                    }
+                                    eventBannerUrl={
+                                      selectedEvent.banner_url
+                                    }
+                                    eventCategory={
+                                      selectedEvent.category
+                                    }
+                                  />
+                                )}
                               </section>
                             )}
                           </>
@@ -6648,7 +8362,7 @@ const registrationClosed =
 
                         {/* EVENT CHECK-IN PANEL: START */}
 
-                        {canCheckInEventRole(profile.role) && (
+                        {canOperateSelectedEvent && (
                           <section className="eventCheckInPanel">
                             <div className="eventCheckInHeader">
                               <div>
@@ -6661,7 +8375,8 @@ const registrationClosed =
                                 <p>
                                   Scan the secure QR or enter the manual
                                   pass code. Access is limited to volunteers,
-                                  coordinators and Main Admin.
+                                  coordinators, Main Admin and accounts with
+                                  an active event-specific delegation.
                                 </p>
                               </div>
 
@@ -6669,10 +8384,24 @@ const registrationClosed =
                                 type="button"
                                 className="ghost"
                                 onClick={() => {
+                                  const opening =
+                                    !showCheckInPanel;
+
                                   setShowCheckInPanel(
-                                    value => !value
+                                    opening
                                   );
+
                                   setCheckInMessage("");
+
+                                  if (opening) {
+                                    void loadEventOperationsRoster(
+                                      selectedEvent.id
+                                    );
+
+                                    void loadEventRegistrationSummary(
+                                      selectedEvent.id
+                                    );
+                                  }
                                 }}
                               >
                                 {showCheckInPanel
@@ -6697,7 +8426,7 @@ const registrationClosed =
 
                                     <strong>
                                       {
-                                        eventGoingRegistrations(
+                                        eventOperationsGoingRegistrations(
                                           selectedEvent.id
                                         ).filter(
                                           row => row.checked_in
@@ -6711,7 +8440,7 @@ const registrationClosed =
 
                                     <strong>
                                       {
-                                        eventGoingRegistrations(
+                                        eventOperationsGoingRegistrations(
                                           selectedEvent.id
                                         ).filter(
                                           row => !row.checked_in
@@ -6732,17 +8461,17 @@ const registrationClosed =
                                       setScannerOpen(true);
                                     }}
                                   >
-                                    Scan attendee QR
+                                    Open camera scanner
                                   </button>
 
                                   <small>
-                                    Camera permission is required only while
-                                    the scanner is open.
+                                    QR camera, USB/Bluetooth barcode scanner and manual pass codes are supported.
                                   </small>
                                 </div>
 
                                 <div className="eventCheckInEntry">
                                   <input
+                                    ref={gateInputRef}
                                     value={checkInCode}
                                     onChange={event =>
                                       setCheckInCode(
@@ -6761,9 +8490,13 @@ const registrationClosed =
                                         );
                                       }
                                     }}
-                                    placeholder="Enter manual pass code"
-                                    aria-label="Event pass manual code"
+                                    placeholder="Scan barcode or enter pass code"
+                                    aria-label="Scan barcode or enter event pass code"
                                     autoComplete="off"
+                                    autoCapitalize="characters"
+                                    spellCheck={false}
+                                    inputMode="text"
+                                    autoFocus
                                   />
 
                                   <button
@@ -6795,11 +8528,144 @@ const registrationClosed =
                                   </p>
                                 )}
 
+                                <div className="eventGateStatusBar">
+                                  <div>
+                                    <span>GATE MODE</span>
+                                    <strong>
+                                      {gateScanCount}
+                                    </strong>
+                                    <small>
+                                      checked in this session
+                                    </small>
+                                  </div>
+
+                                  <div>
+                                    <span>INPUT READY</span>
+                                    <strong>
+                                      QR · BARCODE · CODE
+                                    </strong>
+                                    <small>
+                                      RNSIT + External
+                                    </small>
+                                  </div>
+                                </div>
+
+                                {gateResult && (
+                                  <section
+                                    className={`eventGateResult eventGateResult--${gateResult.status}`}
+                                    role="status"
+                                    aria-live="polite"
+                                  >
+                                    <div className="eventGateResultIcon">
+                                      {gateResult.status === "success"
+                                        ? "✓"
+                                        : gateResult.status === "duplicate"
+                                          ? "!"
+                                          : "×"}
+                                    </div>
+
+                                    <div className="eventGateResultBody">
+                                      <div className="eventGateResultTop">
+                                        <div>
+                                          <span>
+                                            {gateResult.status === "success"
+                                              ? "ENTRY APPROVED"
+                                              : gateResult.status === "duplicate"
+                                                ? "ALREADY CHECKED IN"
+                                                : "PASS REJECTED"}
+                                          </span>
+
+                                          <h3>
+                                            {gateResult.studentName ||
+                                              "Unable to verify pass"}
+                                          </h3>
+                                        </div>
+
+                                        {gateResult.status !== "error" && (
+                                          <b
+                                            className={`eventGateSource eventGateSource--${gateResult.attendeeType.toLowerCase()}`}
+                                          >
+                                            {gateResult.attendeeType}
+                                          </b>
+                                        )}
+                                      </div>
+
+                                      {gateResult.status !== "error" ? (
+                                        <div className="eventGateResultFacts">
+                                          <div>
+                                            <small>COLLEGE</small>
+                                            <strong>
+                                              {gateResult.collegeName}
+                                            </strong>
+                                          </div>
+
+                                          <div>
+                                            <small>DEPARTMENT</small>
+                                            <strong>
+                                              {gateResult.department}
+                                            </strong>
+                                          </div>
+
+                                          <div>
+                                            <small>YEAR</small>
+                                            <strong>
+                                              {gateResult.graduationYear}
+                                            </strong>
+                                          </div>
+
+                                          <div>
+                                            <small>METHOD</small>
+                                            <strong>
+                                              {gateResult.checkInMethod}
+                                            </strong>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <p className="eventGateRejectMessage">
+                                          {gateResult.message}
+                                        </p>
+                                      )}
+
+                                      <div className="eventGateResultFooter">
+                                        <small>
+                                          {gateResult.status === "success"
+                                            ? "Attendee may enter the event."
+                                            : gateResult.status === "duplicate"
+                                              ? "Do not create another check-in."
+                                              : "Verify the pass and try again."}
+                                        </small>
+
+                                        <button
+                                          type="button"
+                                          className="ghost"
+                                          onClick={() => {
+                                            if (gateResetTimerRef.current) {
+                                              window.clearTimeout(
+                                                gateResetTimerRef.current
+                                              );
+                                            }
+
+                                            setGateResult(null);
+                                            setCheckInMessage("");
+                                            setCheckInCode("");
+
+                                            window.setTimeout(() => {
+                                              gateInputRef.current?.focus();
+                                            }, 50);
+                                          }}
+                                        >
+                                          Ready for next attendee
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </section>
+                                )}
+
                                 <div className="eventRecentCheckIns">
                                   <span>RECENT CHECK-INS</span>
 
                                   {
-                                    eventGoingRegistrations(
+                                    eventOperationsGoingRegistrations(
                                       selectedEvent.id
                                     )
                                       .filter(
@@ -6857,7 +8723,7 @@ const registrationClosed =
                                   }
 
                                   {
-                                    eventGoingRegistrations(
+                                    eventOperationsGoingRegistrations(
                                       selectedEvent.id
                                     ).filter(
                                       row => row.checked_in
@@ -6876,7 +8742,7 @@ const registrationClosed =
                         {/* EVENT CHECK-IN PANEL: END */}
 
                         {(canManageEvent(selectedEvent) ||
-                          canCheckInEventRole(profile.role)) && (
+                          canOperateSelectedEvent) && (
                           <div className="eventOrganizerRegistration">
                             <div>
                               <b>
@@ -6892,13 +8758,25 @@ const registrationClosed =
                               <button
                                 type="button"
                                 className="ghost"
-                                onClick={() =>
-                                  setShowAttendees(
-                                    value => !value
-                                  )
-                                }
+                                disabled={eventRosterLoading}
+                                onClick={async () => {
+                                  if (showAttendees) {
+                                    setShowAttendees(false);
+                                    return;
+                                  }
+
+                                  setEventRosterError("");
+
+                                  await loadEventOperationsRoster(
+                                    selectedEvent.id
+                                  );
+
+                                  setShowAttendees(true);
+                                }}
                               >
-                                {showAttendees
+                                {eventRosterLoading
+                                  ? "Loading attendees..."
+                                  : showAttendees
                                   ? "Hide attendees"
                                   : "View attendees"}
                               </button>
@@ -6907,7 +8785,7 @@ const registrationClosed =
                                 type="button"
                                 className="ghost"
                                 onClick={() =>
-                                  exportEventAttendees(
+                                  void exportEventAttendees(
                                     selectedEvent
                                   )
                                 }
@@ -6920,9 +8798,9 @@ const registrationClosed =
 
                         {showAttendees &&
                           (canManageEvent(selectedEvent) ||
-                            canCheckInEventRole(profile.role)) && (
+                            canOperateSelectedEvent) && (
                             <div className="eventAttendeeList">
-                              {eventGoingRegistrations(
+                              {eventOperationsGoingRegistrations(
                                 selectedEvent.id
                               ).map(registration => (
                                 <div
@@ -6949,11 +8827,25 @@ const registrationClosed =
                                     </b>
 
                                     <small>
-                                      {registration.department ||
-                                        "Department"}{" "}
-                                      ·{" "}
-                                      {registration.graduation_year ||
-                                        "Year"}
+                                      {registration.registration_source ===
+                                      "External"
+                                        ? `External · ${
+                                            registration.college_name ||
+                                            "External college"
+                                          } · ${
+                                            registration.department ||
+                                            "Department"
+                                          } · ${
+                                            registration.graduation_year ||
+                                            "Year"
+                                          }`
+                                        : `RNSIT · ${
+                                            registration.department ||
+                                            "Department"
+                                          } · ${
+                                            registration.graduation_year ||
+                                            "Year"
+                                          }`}
                                     </small>
                                   </p>
 
@@ -6965,13 +8857,32 @@ const registrationClosed =
                                 </div>
                               ))}
 
-                              {!eventGoingRegistrations(
-                                selectedEvent.id
-                              ).length && (
+                              {eventRosterLoading && (
                                 <p className="eventNoAttendees">
-                                  No students have registered yet.
+                                  Loading registered students...
                                 </p>
                               )}
+
+                              {!eventRosterLoading &&
+                                eventRosterError && (
+                                  <p
+                                    className="eventNoAttendees"
+                                    role="alert"
+                                  >
+                                    Unable to load attendees:{" "}
+                                    {eventRosterError}
+                                  </p>
+                                )}
+
+                              {!eventRosterLoading &&
+                                !eventRosterError &&
+                                !eventOperationsGoingRegistrations(
+                                  selectedEvent.id
+                                ).length && (
+                                  <p className="eventNoAttendees">
+                                    No students have registered yet.
+                                  </p>
+                                )}
                             </div>
                           )}
                       </>
@@ -7090,7 +9001,78 @@ const registrationClosed =
   );
 }
 
-type Assignment = {id: string; title: string; subject: string; description: string; due_at: string; audience_department: string; created_by_name: string; kind: string; created_at: string};
+type Assignment = {
+  id: string;
+  title: string;
+  subject: string;
+  description: string;
+  due_at: string;
+  audience_department: string;
+  audience_batch_id?: string | null;
+
+  batch_subject_id?:
+    string | null;
+
+  created_by?: string;
+  created_by_name: string;
+  kind: string;
+  created_at: string;
+  batch_name?: string | null;
+  batch_section?: string | null;
+};
+
+type AssignmentBatchOption = {
+  id: string;
+  batch_name: string;
+  section: string;
+  department: string;
+  academic_year: string;
+  semester: string;
+};
+
+type AssignmentSubjectOption = {
+  id: string;
+  batch_id: string;
+  subject_name: string;
+  subject_code: string;
+  subject_type: string;
+};
+
+
+type AssignmentSubmissionProgressRow = {
+  assignment_id: string;
+  student_id: string;
+  student_name: string;
+  status: string;
+  submission_url: string;
+  submission_file_path?: string | null;
+  submission_file_name?: string | null;
+  submission_file_type?: string | null;
+  submission_file_size?: number | null;
+  submitted_at: string;
+};
+
+
+type AssignmentBatchRosterRow = {
+  batch_id: string;
+  student_id: string;
+  student_name: string;
+  campus_uid: string;
+  roll_number: string;
+};
+
+
+type AssignmentAttachment = {
+  id: string;
+  assignment_id: string;
+  owner_id: string;
+  file_name: string;
+  file_path: string;
+  file_type: string;
+  mime_type: string;
+  file_size: number;
+  created_at: string;
+};
 
 const emptyAssignments: Assignment[]  = [];
 
@@ -7108,6 +9090,49 @@ function AssignmentsModule({
   const [submissionLinks, setSubmissionLinks] =
     useState<Record<string, string>>({});
 
+
+  const [
+    submissionFiles,
+    setSubmissionFiles,
+  ] = useState<
+    Record<
+      string,
+      {
+        path: string;
+        name: string;
+      }
+    >
+  >({});
+
+
+  const [
+    submissionDraftAssignment,
+    setSubmissionDraftAssignment,
+  ] = useState<Assignment | null>(
+    null
+  );
+
+
+  const [
+    submissionDraftLink,
+    setSubmissionDraftLink,
+  ] = useState("");
+
+
+  const [
+    submissionDraftFile,
+    setSubmissionDraftFile,
+  ] = useState<File | null>(
+    null
+  );
+
+
+  const [
+    submittingAssignmentId,
+    setSubmittingAssignmentId,
+  ] = useState("");
+
+
   const [showForm, setShowForm] =
     useState(false);
 
@@ -7123,6 +9148,89 @@ function AssignmentsModule({
   const [status, setStatus] =
     useState("");
 
+  const [
+    assignmentBatches,
+    setAssignmentBatches,
+  ] = useState<AssignmentBatchOption[]>([]);
+
+  const [
+    assignmentFiles,
+    setAssignmentFiles,
+  ] = useState<File[]>([]);
+
+  const [
+    assignmentAttachments,
+    setAssignmentAttachments,
+  ] = useState<AssignmentAttachment[]>([]);
+
+
+  const [
+    assignmentSubjects,
+    setAssignmentSubjects,
+  ] = useState<
+    AssignmentSubjectOption[]
+  >([]);
+
+
+  const [
+    assignmentSubjectsLoading,
+    setAssignmentSubjectsLoading,
+  ] = useState(false);
+
+
+  const [
+    assignmentProgressSubmissions,
+    setAssignmentProgressSubmissions,
+  ] = useState<
+    AssignmentSubmissionProgressRow[]
+  >([]);
+
+
+  const [
+    assignmentProgressRoster,
+    setAssignmentProgressRoster,
+  ] = useState<
+    AssignmentBatchRosterRow[]
+  >([]);
+
+
+  const [
+    assignmentProgressLoading,
+    setAssignmentProgressLoading,
+  ] = useState(false);
+
+
+  const [
+    assignmentProgressError,
+    setAssignmentProgressError,
+  ] = useState("");
+
+
+  const [
+    assignmentReview,
+    setAssignmentReview,
+  ] = useState<
+    Assignment | null
+  >(null);
+
+
+  const [
+    assignmentReminderBusyId,
+    setAssignmentReminderBusyId,
+  ] = useState("");
+
+
+  const [
+    assignmentReminderResult,
+    setAssignmentReminderResult,
+  ] = useState<{
+    assignmentId: string;
+    pendingStudents: number;
+    remindersCreated: number;
+    remindersAlreadyExisting: number;
+  } | null>(null);
+
+
   const defaultForm = {
     title: "",
     subject: "",
@@ -7130,6 +9238,8 @@ function AssignmentsModule({
     due_at: "",
     audience_department:
       profile.department || "All",
+    audience_batch_id: "",
+    batch_subject_id: "",
     kind: "Academic",
   };
 
@@ -7140,6 +9250,181 @@ function AssignmentsModule({
     canCreateAssignmentRole(
       profile.role
     );
+
+
+  /*
+   * Faculty assignment subjects are loaded from the same
+   * authoritative batch-subject records used by Attendance,
+   * Timetable, Diary and Syllabus.
+   *
+   * Do not add a frontend faculty_id filter:
+   * RLS already supports direct assignments and active
+   * faculty_teaching_allocations / co-teaching.
+   */
+  useEffect(
+    () => {
+      if (
+        profile.role !==
+          "Faculty" ||
+        !form.audience_batch_id
+      ) {
+        setAssignmentSubjects(
+          []
+        );
+
+        setAssignmentSubjectsLoading(
+          false
+        );
+
+        return;
+      }
+
+
+      let active =
+        true;
+
+
+      const loadAssignedSubjects =
+        async () => {
+          const client =
+            getSupabaseClient();
+
+          if (!client) {
+            return;
+          }
+
+
+          setAssignmentSubjectsLoading(
+            true
+          );
+
+
+          const {
+            data,
+            error,
+          } = await client
+            .from(
+              "attendance_batch_subjects"
+            )
+            .select(
+              "id,batch_id,subject_name,subject_code,subject_type"
+            )
+            .eq(
+              "batch_id",
+              form.audience_batch_id
+            )
+            .order(
+              "subject_name",
+              {
+                ascending: true,
+              }
+            );
+
+
+          if (!active) {
+            return;
+          }
+
+
+          setAssignmentSubjectsLoading(
+            false
+          );
+
+
+          if (error) {
+            console.error(
+              "Assignment subjects:",
+              error
+            );
+
+            setAssignmentSubjects(
+              []
+            );
+
+            setStatus(
+              `Unable to load assigned subjects: ${error.message}`
+            );
+
+            return;
+          }
+
+
+          const rows =
+            (
+              data ||
+              []
+            ) as AssignmentSubjectOption[];
+
+
+          setAssignmentSubjects(
+            rows
+          );
+
+
+          /*
+           * Preserve a valid subject while editing.
+           *
+           * For a newly selected batch we intentionally do not
+           * auto-select anything; Faculty must explicitly choose
+           * the subject they are publishing against.
+           */
+          setForm(
+            current => {
+              if (
+                !current.batch_subject_id
+              ) {
+                return current;
+              }
+
+
+              const currentSubject =
+                rows.find(
+                  item =>
+                    item.id ===
+                    current.batch_subject_id
+                );
+
+
+              if (
+                currentSubject
+              ) {
+                return {
+                  ...current,
+
+                  subject:
+                    currentSubject
+                      .subject_name,
+                };
+              }
+
+
+              return {
+                ...current,
+
+                batch_subject_id:
+                  "",
+
+                subject:
+                  "",
+              };
+            }
+          );
+        };
+
+
+      void loadAssignedSubjects();
+
+
+      return () => {
+        active =
+          false;
+      };
+    },
+    [
+      profile.role,
+      form.audience_batch_id,
+    ]
+  );
 
 
   const loadAssignments =
@@ -7163,19 +9448,111 @@ function AssignmentsModule({
         );
       }
 
-      const {
-        data,
-        error,
-      } =
-        await client
-          .from("assignments")
+      const [
+        assignmentResult,
+        batchResult,
+        attachmentResult,
+      ] = await Promise.all([
+        profile.role === "Student"
+          ? client.rpc(
+              "get_my_assignments"
+            )
+          : client
+              .from("assignments")
+              .select("*")
+              .order(
+                "due_at",
+                {
+                  ascending: true,
+                }
+              ),
+
+        canCreate
+          ? client
+              .from("attendance_batches")
+              .select(
+                "id,batch_name,section,department,academic_year,semester"
+              )
+              .order(
+                "batch_name",
+                {
+                  ascending: true,
+                }
+              )
+          : Promise.resolve({
+              data: [],
+              error: null,
+            }),
+
+        client
+          .from(
+            "assignment_attachments"
+          )
           .select("*")
           .order(
-            "due_at",
+            "created_at",
             {
               ascending: true,
             }
-          );
+          ),
+      ]);
+
+      const {
+        data,
+        error,
+      } = assignmentResult;
+
+      console.log(
+        "[ASSIGNMENTS LOAD] role:",
+        profile.role
+      );
+
+      console.log(
+        "[ASSIGNMENTS LOAD] user:",
+        auth.user?.id || null
+      );
+
+      console.log(
+        "[ASSIGNMENTS LOAD] result:",
+        data,
+        error
+      );
+
+      if (
+        profile.role === "Student" &&
+        auth.user
+      ) {
+        const {
+          data: studentBatchesDebug,
+          error: studentBatchesDebugError,
+        } = await client.rpc(
+          "get_my_attendance_batches"
+        );
+
+        console.log(
+          "[ASSIGNMENTS LOAD] student batches:",
+          studentBatchesDebug,
+          studentBatchesDebugError
+        );
+      }
+
+      if (
+        !batchResult.error
+      ) {
+        setAssignmentBatches(
+          (batchResult.data || []) as
+            AssignmentBatchOption[]
+        );
+      }
+
+      if (
+        !attachmentResult.error
+      ) {
+        setAssignmentAttachments(
+          (attachmentResult.data || []) as
+            AssignmentAttachment[]
+        );
+      }
 
       if (error) {
         setStatus(
@@ -7202,7 +9579,7 @@ function AssignmentsModule({
               "assignment_submissions"
             )
             .select(
-              "assignment_id,submission_url"
+              "assignment_id,submission_url,submission_file_path,submission_file_name"
             )
             .eq(
               "student_id",
@@ -7216,6 +9593,8 @@ function AssignmentsModule({
           ) as {
             assignment_id: string;
             submission_url: string;
+            submission_file_path?: string | null;
+            submission_file_name?: string | null;
           }[];
 
         setSubmittedIds(
@@ -7227,12 +9606,46 @@ function AssignmentsModule({
 
         setSubmissionLinks(
           Object.fromEntries(
-            rows.map(
-              row => [
-                row.assignment_id,
-                row.submission_url,
-              ]
-            )
+            rows
+              .filter(
+                row =>
+                  Boolean(
+                    row.submission_url
+                  )
+              )
+              .map(
+                row => [
+                  row.assignment_id,
+                  row.submission_url,
+                ]
+              )
+          )
+        );
+
+
+        setSubmissionFiles(
+          Object.fromEntries(
+            rows
+              .filter(
+                row =>
+                  Boolean(
+                    row.submission_file_path
+                  )
+              )
+              .map(
+                row => [
+                  row.assignment_id,
+                  {
+                    path:
+                      row.submission_file_path ||
+                      "",
+
+                    name:
+                      row.submission_file_name ||
+                      "Submitted file",
+                  },
+                ]
+              )
           )
         );
       }
@@ -7240,8 +9653,119 @@ function AssignmentsModule({
 
 
   useEffect(() => {
-    void loadAssignments();
-  }, []);
+    let mounted = true;
+
+    const refreshAssignments =
+      () => {
+        if (!mounted) {
+          return;
+        }
+
+        void loadAssignments();
+      };
+
+    /*
+     * Initial load.
+     */
+    refreshAssignments();
+
+
+    /*
+     * Refresh when the user returns to the browser/tab.
+     * This prevents stale assignments when faculty creates
+     * or edits an assignment while the student is elsewhere.
+     */
+    const handleWindowFocus =
+      () => {
+        refreshAssignments();
+      };
+
+    const handleVisibilityChange =
+      () => {
+        if (
+          document.visibilityState ===
+          "visible"
+        ) {
+          refreshAssignments();
+        }
+      };
+
+    window.addEventListener(
+      "focus",
+      handleWindowFocus
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
+
+
+    /*
+     * Realtime refresh for assignment changes.
+     *
+     * RLS still controls what the authenticated user
+     * is allowed to read when loadAssignments() runs.
+     */
+    const client =
+      getSupabaseClient();
+
+    const channel =
+      client
+        ? client
+            .channel(
+              `campusconnect-assignments-${profile.role}`
+            )
+            .on(
+              "postgres_changes",
+              {
+                event: "*",
+                schema: "public",
+                table: "assignments",
+              },
+              () => {
+                refreshAssignments();
+              }
+            )
+            .on(
+              "postgres_changes",
+              {
+                event: "*",
+                schema: "public",
+                table:
+                  "assignment_attachments",
+              },
+              () => {
+                refreshAssignments();
+              }
+            )
+            .subscribe()
+        : null;
+
+
+    return () => {
+      mounted = false;
+
+      window.removeEventListener(
+        "focus",
+        handleWindowFocus
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
+
+      if (
+        client &&
+        channel
+      ) {
+        void client.removeChannel(
+          channel
+        );
+      }
+    };
+  }, [profile.role]);
 
 
   const resetAssignmentForm =
@@ -7254,12 +9778,16 @@ function AssignmentsModule({
         audience_department:
           profile.department ||
           "All",
+        audience_batch_id: "",
+        batch_subject_id: "",
         kind: "Academic",
       });
 
       setEditingAssignment(
         null
       );
+
+      setAssignmentFiles([]);
     };
 
 
@@ -7320,6 +9848,14 @@ function AssignmentsModule({
           item.audience_department ||
           "All",
 
+        audience_batch_id:
+          item.audience_batch_id ||
+          "",
+
+        batch_subject_id:
+          item.batch_subject_id ||
+          "",
+
         kind:
           item.kind ||
           "Academic",
@@ -7349,6 +9885,56 @@ function AssignmentsModule({
       ) {
         return setStatus(
           "ERROR: Title, subject and deadline are required."
+        );
+      }
+
+      if (
+        !form.audience_batch_id
+      ) {
+        return setStatus(
+          "ERROR: Select the batch that should receive this assignment."
+        );
+      }
+
+
+      if (
+        profile.role ===
+          "Faculty" &&
+        !form.batch_subject_id
+      ) {
+        return setStatus(
+          "ERROR: Select one of your assigned subjects for this batch."
+        );
+      }
+
+
+      const invalidFile =
+        assignmentFiles.find(
+          file => {
+            const extension =
+              file.name
+                .split(".")
+                .pop()
+                ?.toLowerCase() ||
+              "";
+
+            return (
+              ![
+                "pdf",
+                "jpg",
+                "jpeg",
+                "png",
+                "webp",
+              ].includes(extension) ||
+              file.size >
+                15 * 1024 * 1024
+            );
+          }
+        );
+
+      if (invalidFile) {
+        return setStatus(
+          `ERROR: ${invalidFile.name} must be PDF, JPG, PNG or WEBP and smaller than 15 MB.`
         );
       }
 
@@ -7399,9 +9985,48 @@ function AssignmentsModule({
           audience_department:
             form.audience_department,
 
+          audience_batch_id:
+            form.audience_batch_id,
+
+          ...(
+            profile.role ===
+              "Faculty"
+              ? {
+                  batch_subject_id:
+                    form.batch_subject_id,
+                }
+              : {}
+          ),
+
           kind:
             form.kind,
         };
+
+
+        console.log(
+          "[ASSIGNMENT SAVE] role:",
+          profile.role
+        );
+
+        console.log(
+          "[ASSIGNMENT SAVE] user:",
+          auth.user.id
+        );
+
+        console.log(
+          "[ASSIGNMENT SAVE] form:",
+          form
+        );
+
+        console.log(
+          "[ASSIGNMENT SAVE] payload:",
+          payload
+        );
+
+        console.log(
+          "[ASSIGNMENT SAVE] available batches:",
+          assignmentBatches
+        );
 
 
         if (editingAssignment) {
@@ -7501,6 +10126,153 @@ function AssignmentsModule({
 
           setStatus(
             "Assignment created successfully."
+          );
+        }
+
+        const savedAssignment =
+          editingAssignment
+            ? editingAssignment
+            : (
+                await client
+                  .from("assignments")
+                  .select("*")
+                  .eq(
+                    "created_by",
+                    auth.user.id
+                  )
+                  .eq(
+                    "title",
+                    form.title.trim()
+                  )
+                  .eq(
+                    "audience_batch_id",
+                    form.audience_batch_id
+                  )
+                  .order(
+                    "created_at",
+                    {
+                      ascending: false,
+                    }
+                  )
+                  .limit(1)
+                  .maybeSingle()
+              ).data as Assignment | null;
+
+        if (
+          savedAssignment &&
+          assignmentFiles.length
+        ) {
+          const uploadedRows:
+            AssignmentAttachment[] = [];
+
+          for (
+            const file of
+            assignmentFiles
+          ) {
+            const extension =
+              file.name
+                .split(".")
+                .pop()
+                ?.toLowerCase() ||
+              "file";
+
+            const safeName =
+              file.name
+                .replace(
+                  /[^a-zA-Z0-9._-]+/g,
+                  "-"
+                )
+                .slice(0, 100);
+
+            const storagePath =
+              `${auth.user.id}/${savedAssignment.id}/` +
+              `${crypto.randomUUID()}-${safeName}`;
+
+            const {
+              error: uploadError,
+            } =
+              await client.storage
+                .from(
+                  "assignment-files"
+                )
+                .upload(
+                  storagePath,
+                  file,
+                  {
+                    upsert: false,
+                    cacheControl:
+                      "3600",
+                    contentType:
+                      file.type ||
+                      "application/octet-stream",
+                  }
+                );
+
+            if (uploadError) {
+              throw uploadError;
+            }
+
+            const {
+              data:
+                attachmentData,
+              error:
+                attachmentError,
+            } =
+              await client
+                .from(
+                  "assignment_attachments"
+                )
+                .insert({
+                  assignment_id:
+                    savedAssignment.id,
+
+                  owner_id:
+                    auth.user.id,
+
+                  file_name:
+                    file.name,
+
+                  file_path:
+                    storagePath,
+
+                  file_type:
+                    extension,
+
+                  mime_type:
+                    file.type ||
+                    "application/octet-stream",
+
+                  file_size:
+                    file.size,
+                })
+                .select()
+                .single();
+
+            if (
+              attachmentError
+            ) {
+              await client.storage
+                .from(
+                  "assignment-files"
+                )
+                .remove([
+                  storagePath,
+                ]);
+
+              throw attachmentError;
+            }
+
+            uploadedRows.push(
+              attachmentData as
+                AssignmentAttachment
+            );
+          }
+
+          setAssignmentAttachments(
+            current => [
+              ...current,
+              ...uploadedRows,
+            ]
           );
         }
 
@@ -7606,11 +10378,11 @@ function AssignmentsModule({
     };
 
 
-  const submitAssignment =
-    async (
-      assignment:
-        Assignment
+  const openAssignmentSubmission =
+    (
+      assignment: Assignment
     ) => {
+
       if (
         submittedIds.includes(
           assignment.id
@@ -7619,24 +10391,55 @@ function AssignmentsModule({
         return;
       }
 
-      const submissionUrl =
-        window.prompt(
-          "Paste your submission link (Google Drive, GitHub, OneDrive, etc.)"
-        );
+
+      setSubmissionDraftAssignment(
+        assignment
+      );
+
+      setSubmissionDraftLink(
+        ""
+      );
+
+      setSubmissionDraftFile(
+        null
+      );
+
+      setStatus("");
+    };
+
+
+  const closeAssignmentSubmission =
+    () => {
 
       if (
-        !submissionUrl ||
-        !/^https:\/\//i.test(
-          submissionUrl
-        )
+        submittingAssignmentId
       ) {
-        return setStatus(
-          "ERROR: A valid HTTPS submission link is required."
-        );
+        return;
       }
+
+
+      setSubmissionDraftAssignment(
+        null
+      );
+
+      setSubmissionDraftLink(
+        ""
+      );
+
+      setSubmissionDraftFile(
+        null
+      );
+    };
+
+
+  const openStoredAssignmentSubmission =
+    async (
+      filePath: string
+    ) => {
 
       const client =
         getSupabaseClient();
+
 
       if (!client) {
         return setStatus(
@@ -7644,82 +10447,1143 @@ function AssignmentsModule({
         );
       }
 
+
+      const {
+        data,
+        error,
+      } =
+        await client.storage
+          .from(
+            "assignment-files"
+          )
+          .createSignedUrl(
+            filePath,
+            120
+          );
+
+
+      if (
+        error ||
+        !data?.signedUrl
+      ) {
+        return setStatus(
+          `ERROR: ${
+            error?.message ||
+            "Unable to open submitted file."
+          }`
+        );
+      }
+
+
+      window.open(
+        data.signedUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    };
+
+
+  const submitAssignment =
+    async () => {
+
+      const assignment =
+        submissionDraftAssignment;
+
+
+      if (!assignment) {
+        return;
+      }
+
+
+      const submissionUrl =
+        submissionDraftLink.trim();
+
+
+      if (
+        !submissionDraftFile &&
+        !submissionUrl
+      ) {
+        return setStatus(
+          "ERROR: Upload a PDF/image or provide a submission link."
+        );
+      }
+
+
+      if (
+        submissionUrl &&
+        !/^https:\/\//i.test(
+          submissionUrl
+        )
+      ) {
+        return setStatus(
+          "ERROR: Submission link must begin with https://"
+        );
+      }
+
+
+      const file =
+        submissionDraftFile;
+
+
+      if (file) {
+
+        const extension =
+          file.name
+            .split(".")
+            .pop()
+            ?.toLowerCase() ||
+          "";
+
+
+        const allowedExtensions =
+          [
+            "pdf",
+            "jpg",
+            "jpeg",
+            "png",
+            "webp",
+          ];
+
+
+        const allowedMimeTypes =
+          [
+            "application/pdf",
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+          ];
+
+
+        if (
+          !allowedExtensions.includes(
+            extension
+          ) ||
+          !allowedMimeTypes.includes(
+            file.type
+          )
+        ) {
+          return setStatus(
+            "ERROR: Submission file must be PDF, JPG, JPEG, PNG or WEBP."
+          );
+        }
+
+
+        if (
+          file.size >
+          15 * 1024 * 1024
+        ) {
+          return setStatus(
+            "ERROR: Submission file must be 15 MB or smaller."
+          );
+        }
+      }
+
+
+      const client =
+        getSupabaseClient();
+
+
+      if (!client) {
+        return setStatus(
+          "ERROR: CampusConnect is not connected to Supabase."
+        );
+      }
+
+
       const {
         data: auth,
+        error: authError,
       } =
         await client.auth
           .getUser();
 
-      if (!auth.user) {
+
+      if (
+        authError ||
+        !auth.user
+      ) {
         return setStatus(
           "ERROR: Sign in to submit work."
         );
       }
 
-      const {
-        error,
-      } =
-        await client
-          .from(
-            "assignment_submissions"
-          )
-          .upsert(
+
+      setSubmittingAssignmentId(
+        assignment.id
+      );
+
+      setStatus("");
+
+
+      let uploadedPath = "";
+
+
+      try {
+
+        if (file) {
+
+          const safeName =
+            file.name
+              .trim()
+              .replace(
+                /[^a-zA-Z0-9._-]+/g,
+                "-"
+              )
+              .replace(
+                /-+/g,
+                "-"
+              );
+
+
+          uploadedPath =
+            `${auth.user.id}/submissions/${assignment.id}/${Date.now()}-${safeName}`;
+
+
+          const {
+            error:
+              uploadError,
+          } =
+            await client.storage
+              .from(
+                "assignment-files"
+              )
+              .upload(
+                uploadedPath,
+                file,
+                {
+                  cacheControl:
+                    "3600",
+
+                  contentType:
+                    file.type,
+
+                  upsert:
+                    false,
+                }
+              );
+
+
+          if (uploadError) {
+            throw uploadError;
+          }
+        }
+
+
+        const {
+          data,
+          error,
+        } =
+          await client.rpc(
+            "submit_assignment_work",
             {
-              assignment_id:
+              target_assignment_id:
                 assignment.id,
 
-              student_id:
-                auth.user.id,
-
-              student_name:
-                profile.name,
-
-              status:
-                "Submitted",
-
-              submission_url:
+              target_submission_url:
                 submissionUrl,
 
-              submitted_at:
-                new Date()
-                  .toISOString(),
-            },
-            {
-              onConflict:
-                "assignment_id,student_id",
+              target_file_path:
+                uploadedPath ||
+                null,
+
+              target_file_name:
+                file?.name ||
+                null,
+
+              target_file_type:
+                file?.type ||
+                null,
+
+              target_file_size:
+                file?.size ||
+                null,
             }
           );
 
-      if (error) {
-        return setStatus(
-          `ERROR: ${error.message}`
+
+        if (error) {
+          throw error;
+        }
+
+
+        const row =
+          Array.isArray(data)
+            ? data[0]
+            : data;
+
+
+        setSubmittedIds(
+          current => [
+            ...current.filter(
+              id =>
+                id !==
+                assignment.id
+            ),
+
+            assignment.id,
+          ]
+        );
+
+
+        if (submissionUrl) {
+          setSubmissionLinks(
+            current => ({
+              ...current,
+
+              [assignment.id]:
+                submissionUrl,
+            })
+          );
+        }
+
+
+        if (
+          row?.submission_file_path
+        ) {
+          setSubmissionFiles(
+            current => ({
+              ...current,
+
+              [assignment.id]: {
+                path:
+                  row.submission_file_path,
+
+                name:
+                  row.submission_file_name ||
+                  file?.name ||
+                  "Submitted file",
+              },
+            })
+          );
+        }
+
+
+        setSubmissionDraftAssignment(
+          null
+        );
+
+        setSubmissionDraftFile(
+          null
+        );
+
+        setSubmissionDraftLink(
+          ""
+        );
+
+
+        setStatus(
+          `${assignment.title} submitted successfully.`
+        );
+
+
+      } catch (
+        submissionError
+      ) {
+
+        /*
+         * If Storage succeeded but DB submission failed,
+         * remove the orphaned private file.
+         */
+        if (uploadedPath) {
+          await client.storage
+            .from(
+              "assignment-files"
+            )
+            .remove([
+              uploadedPath,
+            ]);
+        }
+
+
+        console.error(
+          "ASSIGNMENT_SUBMISSION_RAW_ERROR",
+          submissionError
+        );
+
+
+        let submissionErrorMessage =
+          "Unknown submission error";
+
+
+        if (
+          submissionError instanceof
+            Error
+        ) {
+
+          submissionErrorMessage =
+            submissionError.message;
+
+        } else if (
+          typeof submissionError ===
+            "string"
+        ) {
+
+          submissionErrorMessage =
+            submissionError;
+
+        } else if (
+          submissionError &&
+          typeof submissionError ===
+            "object"
+        ) {
+
+          const value =
+            submissionError as {
+              message?: unknown;
+              details?: unknown;
+              hint?: unknown;
+              code?: unknown;
+              statusCode?: unknown;
+              error?: unknown;
+            };
+
+
+          submissionErrorMessage =
+            [
+              value.message
+                ? String(
+                    value.message
+                  )
+                : "",
+
+              value.details
+                ? `Details: ${String(
+                    value.details
+                  )}`
+                : "",
+
+              value.hint
+                ? `Hint: ${String(
+                    value.hint
+                  )}`
+                : "",
+
+              value.code
+                ? `Code: ${String(
+                    value.code
+                  )}`
+                : "",
+
+              value.statusCode
+                ? `Status: ${String(
+                    value.statusCode
+                  )}`
+                : "",
+
+              value.error
+                ? `Error: ${String(
+                    value.error
+                  )}`
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" · ");
+
+
+          if (
+            !submissionErrorMessage
+          ) {
+
+            try {
+
+              submissionErrorMessage =
+                JSON.stringify(
+                  submissionError
+                );
+
+            } catch {
+
+              submissionErrorMessage =
+                String(
+                  submissionError
+                );
+            }
+          }
+        }
+
+
+        setStatus(
+          `ERROR DEBUG: ${submissionErrorMessage}`
+        );
+
+      } finally {
+
+        setSubmittingAssignmentId(
+          ""
         );
       }
+    };
 
-      setSubmittedIds(
-        current => [
-          ...current.filter(
-            id =>
-              id !==
-              assignment.id
-          ),
 
-          assignment.id,
-        ]
+  /*
+   * Faculty Assignment Progress
+   *
+   * Source of truth:
+   *   - Total students: attendance_batch_students
+   *   - Submitted: assignment_submissions
+   *   - Pending: current roster minus unique submitters
+   *   - Late: actual submitted_at after assignment due_at
+   *
+   * RLS independently restricts both sources.
+   */
+  useEffect(
+    () => {
+      if (
+        profile.role !== "Faculty"
+      ) {
+        setAssignmentProgressSubmissions(
+          []
+        );
+
+        setAssignmentProgressRoster(
+          []
+        );
+
+        setAssignmentProgressLoading(
+          false
+        );
+
+        setAssignmentProgressError(
+          ""
+        );
+
+        return;
+      }
+
+
+      const facultyAssignments =
+        items.filter(
+          item =>
+            Boolean(
+              item.audience_batch_id
+            )
+        );
+
+
+      if (!facultyAssignments.length) {
+        setAssignmentProgressSubmissions(
+          []
+        );
+
+        setAssignmentProgressRoster(
+          []
+        );
+
+        setAssignmentProgressLoading(
+          false
+        );
+
+        setAssignmentProgressError(
+          ""
+        );
+
+        return;
+      }
+
+
+      const assignmentIds =
+        Array.from(
+          new Set(
+            facultyAssignments.map(
+              item =>
+                item.id
+            )
+          )
+        );
+
+
+      const batchIds =
+        Array.from(
+          new Set(
+            facultyAssignments
+              .map(
+                item =>
+                  item.audience_batch_id
+              )
+              .filter(
+                (
+                  value
+                ): value is string =>
+                  Boolean(value)
+              )
+          )
+        );
+
+
+      let active =
+        true;
+
+
+      const loadFacultyAssignmentProgress =
+        async () => {
+          const client =
+            getSupabaseClient();
+
+          if (!client) {
+            return;
+          }
+
+
+          setAssignmentProgressLoading(
+            true
+          );
+
+          setAssignmentProgressError(
+            ""
+          );
+
+
+          const [
+            submissionResult,
+            rosterResult,
+          ] =
+            await Promise.all([
+              client
+                .from(
+                  "assignment_submissions"
+                )
+                .select(
+                  "assignment_id,student_id,student_name,status,submission_url,submission_file_path,submission_file_name,submission_file_type,submission_file_size,submitted_at"
+                )
+                .in(
+                  "assignment_id",
+                  assignmentIds
+                ),
+
+              client
+                .from(
+                  "attendance_batch_students"
+                )
+                .select(
+                  "batch_id,student_id,student_name,campus_uid,roll_number"
+                )
+                .in(
+                  "batch_id",
+                  batchIds
+                ),
+            ]);
+
+
+          if (!active) {
+            return;
+          }
+
+
+          setAssignmentProgressLoading(
+            false
+          );
+
+
+          setAssignmentProgressSubmissions(
+            (
+              submissionResult.data ||
+              []
+            ) as AssignmentSubmissionProgressRow[]
+          );
+
+
+          setAssignmentProgressRoster(
+            (
+              rosterResult.data ||
+              []
+            ) as AssignmentBatchRosterRow[]
+          );
+
+
+          const errors =
+            [
+              submissionResult.error
+                ? `Submissions: ${submissionResult.error.message}`
+                : "",
+
+              rosterResult.error
+                ? `Roster: ${rosterResult.error.message}`
+                : "",
+            ].filter(Boolean);
+
+
+          setAssignmentProgressError(
+            errors.join(" · ")
+          );
+
+
+          if (errors.length) {
+            console.error(
+              "Faculty assignment progress:",
+              errors
+            );
+          }
+        };
+
+
+      void loadFacultyAssignmentProgress();
+
+
+      return () => {
+        active =
+          false;
+      };
+    },
+    [
+      profile.role,
+      items,
+    ]
+  );
+
+
+  const assignmentProgressFor =
+    (
+      item: Assignment
+    ) => {
+
+      if (
+        !item.audience_batch_id
+      ) {
+        return {
+          total: 0,
+          submitted: 0,
+          pending: 0,
+          late: 0,
+          overduePending: 0,
+          percentage: 0,
+        };
+      }
+
+
+      const roster =
+        assignmentProgressRoster.filter(
+          student =>
+            student.batch_id ===
+            item.audience_batch_id
+        );
+
+
+      const rosterStudentIds =
+        new Set(
+          roster.map(
+            student =>
+              student.student_id
+          )
+        );
+
+
+      /*
+       * Only count submissions from students who are currently
+       * members of this target batch.
+       */
+      const submissions =
+        assignmentProgressSubmissions.filter(
+          submission =>
+            submission.assignment_id ===
+              item.id &&
+            rosterStudentIds.has(
+              submission.student_id
+            )
+        );
+
+
+      const submittedStudentIds =
+        new Set(
+          submissions.map(
+            submission =>
+              submission.student_id
+          )
+        );
+
+
+      const total =
+        rosterStudentIds.size;
+
+
+      const submitted =
+        submittedStudentIds.size;
+
+
+      const pending =
+        Math.max(
+          total - submitted,
+          0
+        );
+
+
+      const dueTime =
+        new Date(
+          item.due_at
+        ).getTime();
+
+
+      const late =
+        submissions.filter(
+          submission => {
+            const submittedTime =
+              new Date(
+                submission.submitted_at
+              ).getTime();
+
+            return (
+              Number.isFinite(
+                dueTime
+              ) &&
+              Number.isFinite(
+                submittedTime
+              ) &&
+              submittedTime >
+                dueTime
+            );
+          }
+        ).length;
+
+
+      const overduePending =
+        isOverdue(
+          item.due_at
+        )
+          ? pending
+          : 0;
+
+
+      const percentage =
+        total > 0
+          ? Math.min(
+              100,
+              Math.round(
+                (
+                  submitted /
+                  total
+                ) *
+                  100
+              )
+            )
+          : 0;
+
+
+      return {
+        total,
+        submitted,
+        pending,
+        late,
+        overduePending,
+        percentage,
+      };
+    };
+
+
+  const assignmentSubmissionRowsFor =
+    (
+      item: Assignment
+    ) => {
+
+      if (
+        !item.audience_batch_id
+      ) {
+        return [];
+      }
+
+
+      const dueTime =
+        new Date(
+          item.due_at
+        ).getTime();
+
+
+      const submissionsByStudent =
+        new Map(
+          assignmentProgressSubmissions
+            .filter(
+              submission =>
+                submission.assignment_id ===
+                item.id
+            )
+            .map(
+              submission => [
+                submission.student_id,
+                submission,
+              ]
+            )
+        );
+
+
+      return assignmentProgressRoster
+        .filter(
+          student =>
+            student.batch_id ===
+            item.audience_batch_id
+        )
+        .map(
+          student => {
+
+            const submission =
+              submissionsByStudent.get(
+                student.student_id
+              ) ||
+              null;
+
+
+            const submittedTime =
+              submission
+                ? new Date(
+                    submission.submitted_at
+                  ).getTime()
+                : NaN;
+
+
+            const late =
+              Boolean(
+                submission
+              ) &&
+              Number.isFinite(
+                dueTime
+              ) &&
+              Number.isFinite(
+                submittedTime
+              ) &&
+              submittedTime >
+                dueTime;
+
+
+            const overduePending =
+              !submission &&
+              isOverdue(
+                item.due_at
+              );
+
+
+            return {
+              student,
+              submission,
+              late,
+              overduePending,
+            };
+          })
+        .sort(
+          (a, b) => {
+
+            /*
+             * Faculty attention order:
+             * 1. overdue pending
+             * 2. pending
+             * 3. late submissions
+             * 4. on-time submissions
+             */
+            const rank =
+              (
+                row: typeof a
+              ) => {
+                if (
+                  row.overduePending
+                ) {
+                  return 0;
+                }
+
+                if (
+                  !row.submission
+                ) {
+                  return 1;
+                }
+
+                if (row.late) {
+                  return 2;
+                }
+
+                return 3;
+              };
+
+
+            const rankDifference =
+              rank(a) -
+              rank(b);
+
+
+            if (rankDifference) {
+              return rankDifference;
+            }
+
+
+            return (
+              a.student.roll_number ||
+              a.student.student_name
+            ).localeCompare(
+              b.student.roll_number ||
+              b.student.student_name
+            );
+          }
+        );
+    };
+
+
+  const remindPendingAssignmentStudents =
+    async (
+      item: Assignment
+    ) => {
+
+      if (
+        profile.role !==
+          "Faculty"
+      ) {
+        return;
+      }
+
+
+      const progress =
+        assignmentProgressFor(
+          item
+        );
+
+
+      if (
+        progress.pending <= 0
+      ) {
+        setAssignmentReminderResult({
+          assignmentId:
+            item.id,
+
+          pendingStudents:
+            0,
+
+          remindersCreated:
+            0,
+
+          remindersAlreadyExisting:
+            0,
+        });
+
+        return;
+      }
+
+
+      const confirmed =
+        window.confirm(
+          `Send an in-app CampusConnect reminder to ${progress.pending} pending student${progress.pending === 1 ? "" : "s"} for "${item.title}"?`
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      const client =
+        getSupabaseClient();
+
+
+      if (!client) {
+        setStatus(
+          "ERROR: CampusConnect is not connected to Supabase."
+        );
+
+        return;
+      }
+
+
+      setAssignmentReminderBusyId(
+        item.id
       );
 
-      setSubmissionLinks(
-        current => ({
-          ...current,
-
-          [assignment.id]:
-            submissionUrl,
-        })
+      setAssignmentReminderResult(
+        null
       );
 
-      setStatus(
-        `${assignment.title} submitted successfully.`
-      );
+
+      try {
+
+        const {
+          data,
+          error,
+        } = await client.rpc(
+          "remind_assignment_pending_students",
+          {
+            target_assignment_id:
+              item.id,
+          }
+        );
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        const row =
+          Array.isArray(data)
+            ? data[0]
+            : data;
+
+
+        const pendingStudents =
+          Number(
+            row?.pending_students
+          ) || 0;
+
+
+        const remindersCreated =
+          Number(
+            row?.reminders_created
+          ) || 0;
+
+
+        const remindersAlreadyExisting =
+          Number(
+            row?.reminders_already_existing
+          ) || 0;
+
+
+        setAssignmentReminderResult({
+          assignmentId:
+            item.id,
+
+          pendingStudents,
+
+          remindersCreated,
+
+          remindersAlreadyExisting,
+        });
+
+
+        if (
+          pendingStudents === 0
+        ) {
+          setStatus(
+            `${item.title}: no pending students need a reminder.`
+          );
+
+        } else if (
+          remindersCreated > 0
+        ) {
+          setStatus(
+            `${remindersCreated} assignment reminder${remindersCreated === 1 ? "" : "s"} created.`
+          );
+
+        } else {
+          setStatus(
+            `${item.title}: all pending students had already been reminded.`
+          );
+        }
+
+      } catch (
+        reminderError
+      ) {
+
+        console.error(
+          "Assignment reminders:",
+          reminderError
+        );
+
+
+        setStatus(
+          `ERROR: ${
+            reminderError instanceof
+              Error
+              ? reminderError.message
+              : "Unable to create assignment reminders."
+          }`
+        );
+
+      } finally {
+
+        setAssignmentReminderBusyId(
+          ""
+        );
+      }
     };
 
 
@@ -7821,23 +11685,97 @@ function AssignmentsModule({
 
 
             <Field label="Subject">
-              <input
-                value={
-                  form.subject
-                }
-                onChange={
-                  event =>
-                    setForm(
-                      current => ({
-                        ...current,
-                        subject:
-                          event.target.value,
-                      })
+
+              {profile.role ===
+              "Faculty" ? (
+
+                <select
+                  value={
+                    form.batch_subject_id
+                  }
+                  disabled={
+                    !form.audience_batch_id ||
+                    assignmentSubjectsLoading
+                  }
+                  onChange={
+                    event => {
+                      const selectedSubject =
+                        assignmentSubjects.find(
+                          item =>
+                            item.id ===
+                            event.target.value
+                        );
+
+                      setForm(
+                        current => ({
+                          ...current,
+
+                          batch_subject_id:
+                            event.target.value,
+
+                          subject:
+                            selectedSubject
+                              ?.subject_name ||
+                            "",
+                        })
+                      );
+                    }
+                  }
+                  required
+                >
+
+                  <option value="">
+                    {!form.audience_batch_id
+                      ? "Select target batch first"
+                      : assignmentSubjectsLoading
+                      ? "Loading assigned subjects..."
+                      : assignmentSubjects.length
+                      ? "Select assigned subject"
+                      : "No assigned subjects available"}
+                  </option>
+
+
+                  {assignmentSubjects.map(
+                    item => (
+                      <option
+                        key={item.id}
+                        value={item.id}
+                      >
+                        {item.subject_code
+                          ? `${item.subject_code} · `
+                          : ""}
+                        {item.subject_name}
+                        {item.subject_type
+                          ? ` · ${item.subject_type}`
+                          : ""}
+                      </option>
                     )
-                }
-                placeholder="Subject"
-                required
-              />
+                  )}
+
+                </select>
+
+              ) : (
+
+                <input
+                  value={
+                    form.subject
+                  }
+                  onChange={
+                    event =>
+                      setForm(
+                        current => ({
+                          ...current,
+                          subject:
+                            event.target.value,
+                        })
+                      )
+                  }
+                  placeholder="Subject"
+                  required
+                />
+
+              )}
+
             </Field>
 
           </div>
@@ -7890,30 +11828,78 @@ function AssignmentsModule({
             </Field>
 
 
-            <Field label="Department">
+            <Field label="Target batch">
 
               <select
                 value={
-                  form.audience_department
+                  form.audience_batch_id
                 }
                 onChange={
-                  event =>
+                  event => {
+                    const batch =
+                      assignmentBatches.find(
+                        item =>
+                          item.id ===
+                          event.target.value
+                      );
+
                     setForm(
                       current => ({
                         ...current,
-                        audience_department:
+
+                        audience_batch_id:
                           event.target.value,
+
+                        audience_department:
+                          batch
+                            ?.department ||
+                          current
+                            .audience_department,
+
+                        ...(
+                          profile.role ===
+                            "Faculty"
+                            ? {
+                                batch_subject_id:
+                                  "",
+                                subject:
+                                  "",
+                              }
+                            : {}
+                        ),
                       })
-                    )
+                    );
+                  }
                 }
+                required
               >
-                <option>All</option>
-                <option>ECE</option>
-                <option>CSE</option>
-                <option>ISE</option>
-                <option>EEE</option>
-                <option>ME</option>
-                <option>CE</option>
+
+                <option value="">
+                  Select batch / section
+                </option>
+
+                {assignmentBatches.map(
+                  batch => (
+                    <option
+                      value={
+                        batch.id
+                      }
+                      key={
+                        batch.id
+                      }
+                    >
+                      {batch.batch_name}
+                      {" · "}
+                      {batch.department}
+                      {" · Section "}
+                      {batch.section}
+                      {batch.semester
+                        ? ` · Sem ${batch.semester}`
+                        : ""}
+                    </option>
+                  )
+                )}
+
               </select>
 
             </Field>
@@ -7952,6 +11938,51 @@ function AssignmentsModule({
             </Field>
 
           </div>
+
+
+          <Field label="Assignment files">
+
+            <div className="assignmentFileUploader">
+
+              <input
+                type="file"
+                multiple
+                accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
+                onChange={
+                  event =>
+                    setAssignmentFiles(
+                      Array.from(
+                        event.target
+                          .files ||
+                        []
+                      )
+                    )
+                }
+              />
+
+              <small>
+                PDF, JPG, PNG or WEBP · maximum 15 MB per file
+              </small>
+
+              {!!assignmentFiles.length && (
+                <div className="assignmentSelectedFiles">
+
+                  {assignmentFiles.map(
+                    file => (
+                      <span
+                        key={`${file.name}-${file.size}`}
+                      >
+                        {file.name}
+                      </span>
+                    )
+                  )}
+
+                </div>
+              )}
+
+            </div>
+
+          </Field>
 
 
           <div className="assignmentFormActions">
@@ -8009,6 +12040,15 @@ function AssignmentsModule({
               canManageAssignment(
                 item
               );
+
+
+            const progress =
+              profile.role ===
+                "Faculty"
+                ? assignmentProgressFor(
+                    item
+                  )
+                : null;
 
 
             return (
@@ -8112,7 +12152,20 @@ function AssignmentsModule({
                   </span>
 
                   <span>
-                    {item.audience_department}
+                    {item.audience_batch_id
+                      ? (() => {
+                          const batch =
+                            assignmentBatches.find(
+                              candidate =>
+                                candidate.id ===
+                                item.audience_batch_id
+                            );
+
+                          return batch
+                            ? `${batch.batch_name} · Section ${batch.section}`
+                            : item.audience_department;
+                        })()
+                      : item.audience_department}
                   </span>
 
                   {(
@@ -8133,6 +12186,84 @@ function AssignmentsModule({
                 </div>
 
 
+                {assignmentAttachments.some(
+                  attachment =>
+                    attachment.assignment_id ===
+                    item.id
+                ) && (
+                  <div className="assignmentAttachmentList">
+
+                    {assignmentAttachments
+                      .filter(
+                        attachment =>
+                          attachment.assignment_id ===
+                          item.id
+                      )
+                      .map(
+                        attachment => (
+                          <button
+                            type="button"
+                            key={
+                              attachment.id
+                            }
+                            onClick={async () => {
+                              const client =
+                                getSupabaseClient();
+
+                              if (!client) {
+                                return;
+                              }
+
+                              const {
+                                data,
+                                error,
+                              } =
+                                await client
+                                  .storage
+                                  .from(
+                                    "assignment-files"
+                                  )
+                                  .createSignedUrl(
+                                    attachment.file_path,
+                                    120
+                                  );
+
+                              if (
+                                error ||
+                                !data
+                                  ?.signedUrl
+                              ) {
+                                setStatus(
+                                  `ERROR: ${
+                                    error
+                                      ?.message ||
+                                    "Unable to open assignment file."
+                                  }`
+                                );
+                                return;
+                              }
+
+                              window.open(
+                                data.signedUrl,
+                                "_blank",
+                                "noopener,noreferrer"
+                              );
+                            }}
+                          >
+                            <span>
+                              {attachment.file_type
+                                .toUpperCase()}
+                            </span>
+
+                            {attachment.file_name}
+                          </button>
+                        )
+                      )}
+
+                  </div>
+                )}
+
+
                 <div className="assignmentFoot">
 
                   {profile.role ===
@@ -8150,7 +12281,7 @@ function AssignmentsModule({
                           overdue
                         }
                         onClick={() =>
-                          void submitAssignment(
+                          openAssignmentSubmission(
                             item
                           )
                         }
@@ -8161,6 +12292,26 @@ function AssignmentsModule({
                           ? "Deadline passed"
                           : "Submit work"}
                       </button>
+
+
+                      {submitted &&
+                        submissionFiles[
+                          item.id
+                        ] && (
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() =>
+                            void openStoredAssignmentSubmission(
+                              submissionFiles[
+                                item.id
+                              ].path
+                            )
+                          }
+                        >
+                          Open file ↗
+                        </button>
+                      )}
 
 
                       {submitted &&
@@ -8177,15 +12328,208 @@ function AssignmentsModule({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Open submission ↗
+                          Open link ↗
                         </a>
                       )}
 
                     </>
+                  ) : profile.role ===
+                    "Faculty" &&
+                    progress ? (
+
+                    <div className="facultyAssignmentProgress">
+
+                      <div className="facultyAssignmentProgressHead">
+
+                        <div>
+                          <span>
+                            SUBMISSION PROGRESS
+                          </span>
+
+                          <strong>
+                            {assignmentProgressLoading
+                              ? "Loading..."
+                              : `${progress.percentage}%`}
+                          </strong>
+                        </div>
+
+
+                        <small>
+                          {progress.submitted}
+                          /
+                          {progress.total}{" "}
+                          submitted
+                        </small>
+
+                      </div>
+
+
+                      <div
+                        className="facultyAssignmentProgressBar"
+                        role="progressbar"
+                        aria-label={`Submission progress for ${item.title}`}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={
+                          progress.percentage
+                        }
+                      >
+                        <span
+                          style={{
+                            width:
+                              `${progress.percentage}%`,
+                          }}
+                        />
+                      </div>
+
+
+                      <div className="facultyAssignmentMetricGrid">
+
+                        <article>
+                          <span>
+                            TOTAL
+                          </span>
+
+                          <strong>
+                            {progress.total}
+                          </strong>
+
+                          <small>
+                            Students
+                          </small>
+                        </article>
+
+
+                        <article data-state="submitted">
+                          <span>
+                            SUBMITTED
+                          </span>
+
+                          <strong>
+                            {progress.submitted}
+                          </strong>
+
+                          <small>
+                            Received
+                          </small>
+                        </article>
+
+
+                        <article
+                          data-state={
+                            progress.pending
+                              ? "pending"
+                              : "complete"
+                          }
+                        >
+                          <span>
+                            PENDING
+                          </span>
+
+                          <strong>
+                            {progress.pending}
+                          </strong>
+
+                          <small>
+                            Awaiting work
+                          </small>
+                        </article>
+
+
+                        <article
+                          data-state={
+                            progress.late
+                              ? "late"
+                              : "normal"
+                          }
+                        >
+                          <span>
+                            LATE
+                          </span>
+
+                          <strong>
+                            {progress.late}
+                          </strong>
+
+                          <small>
+                            Submitted late
+                          </small>
+                        </article>
+
+                      </div>
+
+
+                      {progress.overduePending >
+                        0 && (
+                        <div className="facultyAssignmentOverdueNotice">
+
+                          <b>
+                            !
+                          </b>
+
+                          <span>
+                            <strong>
+                              {progress.overduePending}{" "}
+                              overdue pending
+                            </strong>
+
+                            <small>
+                              Deadline passed without submission
+                            </small>
+                          </span>
+
+                        </div>
+                      )}
+
+
+                      {assignmentProgressError && (
+                        <small className="facultyAssignmentProgressError">
+                          Progress data could not be fully loaded.
+                        </small>
+                      )}
+
+
+                      <div className="facultyAssignmentProgressActions">
+
+                        <button
+                          type="button"
+                          disabled={
+                            assignmentProgressLoading ||
+                            !item.audience_batch_id
+                          }
+                          onClick={() => {
+                            setAssignmentReminderResult(
+                              null
+                            );
+
+                            setAssignmentReview(
+                              item
+                            );
+                          }}
+                        >
+                          <span>
+                            Review students
+                          </span>
+
+                          <strong>
+                            View submissions
+                          </strong>
+
+                          <i>
+                            →
+                          </i>
+                        </button>
+
+                      </div>
+
+                    </div>
+
                   ) : (
+
                     <small>
                       Assignment management enabled
                     </small>
+
                   )}
 
                 </div>
@@ -8196,6 +12540,780 @@ function AssignmentsModule({
         )}
 
       </section>
+
+
+      {profile.role ===
+        "Student" &&
+        submissionDraftAssignment && (
+
+        <div
+          className="studentAssignmentSubmissionScrim"
+          role="presentation"
+          onMouseDown={
+            event => {
+              if (
+                event.target ===
+                  event.currentTarget &&
+                !submittingAssignmentId
+              ) {
+                closeAssignmentSubmission();
+              }
+            }
+          }
+        >
+
+          <section
+            className="studentAssignmentSubmissionModal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Submit ${submissionDraftAssignment.title}`}
+          >
+
+            <header>
+
+              <div>
+                <span>
+                  SUBMIT ASSIGNMENT
+                </span>
+
+                <h2>
+                  {
+                    submissionDraftAssignment
+                      .title
+                  }
+                </h2>
+
+                <p>
+                  {
+                    submissionDraftAssignment
+                      .subject
+                  }
+                  {" · Due "}
+                  {formatDateTime(
+                    submissionDraftAssignment
+                      .due_at
+                  )}
+                </p>
+              </div>
+
+
+              <button
+                type="button"
+                aria-label="Close submission"
+                disabled={
+                  Boolean(
+                    submittingAssignmentId
+                  )
+                }
+                onClick={
+                  closeAssignmentSubmission
+                }
+              >
+                ×
+              </button>
+
+            </header>
+
+
+            <div className="studentAssignmentSubmissionBody">
+
+              <label className="studentAssignmentUploadBox">
+
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
+                  disabled={
+                    Boolean(
+                      submittingAssignmentId
+                    )
+                  }
+                  onChange={
+                    event => {
+
+                      const file =
+                        event.target
+                          .files?.[0] ||
+                        null;
+
+
+                      setSubmissionDraftFile(
+                        file
+                      );
+                    }
+                  }
+                />
+
+                <i>
+                  ↑
+                </i>
+
+                <strong>
+                  {submissionDraftFile
+                    ? submissionDraftFile.name
+                    : "Upload your assignment"}
+                </strong>
+
+                <span>
+                  {submissionDraftFile
+                    ? `${(
+                        submissionDraftFile.size /
+                        1024 /
+                        1024
+                      ).toFixed(2)} MB`
+                    : "PDF, JPG, JPEG, PNG or WEBP · maximum 15 MB"}
+                </span>
+
+                <b>
+                  {submissionDraftFile
+                    ? "Choose another file"
+                    : "Browse file"}
+                </b>
+
+              </label>
+
+
+              <div className="studentAssignmentSubmissionDivider">
+                <span>
+                  OR
+                </span>
+              </div>
+
+
+              <label className="studentAssignmentLinkField">
+
+                <span>
+                  Optional submission link
+                </span>
+
+                <input
+                  type="url"
+                  value={
+                    submissionDraftLink
+                  }
+                  disabled={
+                    Boolean(
+                      submittingAssignmentId
+                    )
+                  }
+                  onChange={
+                    event =>
+                      setSubmissionDraftLink(
+                        event.target.value
+                      )
+                  }
+                  placeholder="https://drive.google.com/... or https://github.com/..."
+                />
+
+                <small>
+                  You can upload a file, provide a link, or submit both.
+                </small>
+
+              </label>
+
+
+              {submissionDraftFile && (
+                <div className="studentAssignmentSelectedFile">
+
+                  <div>
+                    <i>
+                      {submissionDraftFile.type ===
+                      "application/pdf"
+                        ? "PDF"
+                        : "IMG"}
+                    </i>
+
+                    <span>
+                      <strong>
+                        {
+                          submissionDraftFile
+                            .name
+                        }
+                      </strong>
+
+                      <small>
+                        {(
+                          submissionDraftFile.size /
+                          1024 /
+                          1024
+                        ).toFixed(2)}{" "}
+                        MB
+                      </small>
+                    </span>
+                  </div>
+
+
+                  <button
+                    type="button"
+                    disabled={
+                      Boolean(
+                        submittingAssignmentId
+                      )
+                    }
+                    onClick={() =>
+                      setSubmissionDraftFile(
+                        null
+                      )
+                    }
+                  >
+                    Remove
+                  </button>
+
+                </div>
+              )}
+
+            </div>
+
+
+            <footer>
+
+              <button
+                type="button"
+                className="ghost"
+                disabled={
+                  Boolean(
+                    submittingAssignmentId
+                  )
+                }
+                onClick={
+                  closeAssignmentSubmission
+                }
+              >
+                Cancel
+              </button>
+
+
+              <button
+                type="button"
+                className="primary"
+                disabled={
+                  Boolean(
+                    submittingAssignmentId
+                  ) ||
+                  (
+                    !submissionDraftFile &&
+                    !submissionDraftLink.trim()
+                  )
+                }
+                onClick={() =>
+                  void submitAssignment()
+                }
+              >
+                {submittingAssignmentId
+                  ? "Submitting..."
+                  : "Submit work"}
+              </button>
+
+            </footer>
+
+          </section>
+
+        </div>
+      )}
+
+
+      {profile.role ===
+        "Faculty" &&
+        assignmentReview && (() => {
+
+          const reviewRows =
+            assignmentSubmissionRowsFor(
+              assignmentReview
+            );
+
+          const reviewProgress =
+            assignmentProgressFor(
+              assignmentReview
+            );
+
+          const reviewBatch =
+            assignmentBatches.find(
+              batch =>
+                batch.id ===
+                assignmentReview
+                  .audience_batch_id
+            );
+
+
+          return (
+            <div
+              className="facultyAssignmentSubmissionScrim"
+              role="presentation"
+              onMouseDown={
+                event => {
+                  if (
+                    event.target ===
+                    event.currentTarget
+                  ) {
+                    setAssignmentReview(
+                      null
+                    );
+                  }
+                }
+              }
+            >
+
+              <section
+                className="facultyAssignmentSubmissionModal"
+                role="dialog"
+                aria-modal="true"
+                aria-label={`Submissions for ${assignmentReview.title}`}
+              >
+
+                <header className="facultyAssignmentSubmissionHeader">
+
+                  <div>
+
+                    <span>
+                      ASSIGNMENT SUBMISSIONS
+                    </span>
+
+                    <h2>
+                      {assignmentReview.title}
+                    </h2>
+
+                    <p>
+                      {assignmentReview.subject}
+
+                      {reviewBatch
+                        ? ` · ${reviewBatch.batch_name} · Section ${reviewBatch.section}`
+                        : ""}
+                    </p>
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    aria-label="Close submission review"
+                    title="Close"
+                    onClick={() =>
+                      setAssignmentReview(
+                        null
+                      )
+                    }
+                  >
+                    ×
+                  </button>
+
+                </header>
+
+
+                <div className="facultyAssignmentSubmissionSummary">
+
+                  <article>
+                    <span>
+                      TOTAL
+                    </span>
+
+                    <strong>
+                      {reviewProgress.total}
+                    </strong>
+
+                    <small>
+                      Students
+                    </small>
+                  </article>
+
+
+                  <article data-state="submitted">
+                    <span>
+                      SUBMITTED
+                    </span>
+
+                    <strong>
+                      {reviewProgress.submitted}
+                    </strong>
+
+                    <small>
+                      Received
+                    </small>
+                  </article>
+
+
+                  <article
+                    data-state={
+                      reviewProgress.pending
+                        ? "pending"
+                        : "complete"
+                    }
+                  >
+                    <span>
+                      PENDING
+                    </span>
+
+                    <strong>
+                      {reviewProgress.pending}
+                    </strong>
+
+                    <small>
+                      Awaiting
+                    </small>
+                  </article>
+
+
+                  <article
+                    data-state={
+                      reviewProgress.late
+                        ? "late"
+                        : "normal"
+                    }
+                  >
+                    <span>
+                      LATE
+                    </span>
+
+                    <strong>
+                      {reviewProgress.late}
+                    </strong>
+
+                    <small>
+                      Submitted late
+                    </small>
+                  </article>
+
+                </div>
+
+
+                <div className="facultyAssignmentSubmissionTableHead">
+
+                  <span>
+                    STUDENT
+                  </span>
+
+                  <span>
+                    IDENTITY
+                  </span>
+
+                  <span>
+                    STATUS
+                  </span>
+
+                  <span>
+                    SUBMISSION
+                  </span>
+
+                </div>
+
+
+                <div className="facultyAssignmentSubmissionList">
+
+                  {reviewRows.map(
+                    row => {
+
+                      const submitted =
+                        Boolean(
+                          row.submission
+                        );
+
+
+                      return (
+                        <article
+                          key={
+                            row.student
+                              .student_id
+                          }
+                          className="facultyAssignmentSubmissionRow"
+                        >
+
+                          <div className="facultyAssignmentStudentIdentity">
+
+                            <i>
+                              {row.student
+                                .student_name
+                                .split(
+                                  /\s+/
+                                )
+                                .filter(
+                                  Boolean
+                                )
+                                .slice(
+                                  0,
+                                  2
+                                )
+                                .map(
+                                  word =>
+                                    word
+                                      .charAt(
+                                        0
+                                      )
+                                      .toUpperCase()
+                                )
+                                .join(
+                                  ""
+                                ) ||
+                                "ST"}
+                            </i>
+
+                            <span>
+                              <strong>
+                                {
+                                  row.student
+                                    .student_name
+                                }
+                              </strong>
+
+                              <small>
+                                {
+                                  row.student
+                                    .roll_number
+                                }
+                              </small>
+                            </span>
+
+                          </div>
+
+
+                          <div className="facultyAssignmentStudentMeta">
+
+                            <strong>
+                              {
+                                row.student
+                                  .campus_uid
+                              }
+                            </strong>
+
+                            <small>
+                              {
+                                row.student
+                                  .roll_number ||
+                                "No roll number"
+                              }
+                            </small>
+
+                          </div>
+
+
+                          <div className="facultyAssignmentSubmissionStatus">
+
+                            <span
+                              data-state={
+                                !submitted
+                                  ? row.overduePending
+                                    ? "overdue"
+                                    : "pending"
+                                  : row.late
+                                  ? "late"
+                                  : "submitted"
+                              }
+                            >
+                              {!submitted
+                                ? row.overduePending
+                                  ? "Overdue"
+                                  : "Pending"
+                                : row.late
+                                ? "Late"
+                                : "Submitted"}
+                            </span>
+
+
+                            <small>
+                              {row.submission
+                                ? formatDateTime(
+                                    row.submission
+                                      .submitted_at
+                                  )
+                                : row.overduePending
+                                ? "Deadline passed"
+                                : "Not submitted yet"}
+                            </small>
+
+                          </div>
+
+
+                          <div className="facultyAssignmentSubmissionAction">
+
+                            {row.submission
+                              ?.submission_file_path && (
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  void openStoredAssignmentSubmission(
+                                    row.submission
+                                      ?.submission_file_path ||
+                                      ""
+                                  )
+                                }
+                              >
+                                Open file
+                                <span>
+                                  ↗
+                                </span>
+                              </button>
+
+                            )}
+
+
+                            {row.submission
+                              ?.submission_url && (
+
+                              <a
+                                href={
+                                  row.submission
+                                    .submission_url
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                Open link
+                                <span>
+                                  ↗
+                                </span>
+                              </a>
+
+                            )}
+
+
+                            {!row.submission
+                              ?.submission_file_path &&
+                              !row.submission
+                                ?.submission_url && (
+
+                              <span>
+                                —
+                              </span>
+
+                            )}
+
+                          </div>
+
+                        </article>
+                      );
+                    }
+                  )}
+
+
+                  {!reviewRows.length && (
+                    <div className="facultyAssignmentSubmissionEmpty">
+
+                      <i>
+                        ◌
+                      </i>
+
+                      <strong>
+                        No students found
+                      </strong>
+
+                      <span>
+                        The target batch does not currently have a readable roster.
+                      </span>
+
+                    </div>
+                  )}
+
+                </div>
+
+
+                {assignmentReminderResult &&
+                  assignmentReminderResult.assignmentId ===
+                    assignmentReview.id && (
+
+                  <div className="facultyAssignmentReminderResult">
+
+                    <i>
+                      ✓
+                    </i>
+
+                    <div>
+
+                      <strong>
+                        Reminder processing complete
+                      </strong>
+
+                      <span>
+                        {
+                          assignmentReminderResult
+                            .pendingStudents
+                        }{" "}
+                        pending
+                        {" · "}
+                        {
+                          assignmentReminderResult
+                            .remindersCreated
+                        }{" "}
+                        new reminder{
+                          assignmentReminderResult
+                            .remindersCreated ===
+                          1
+                            ? ""
+                            : "s"
+                        }
+                        {" · "}
+                        {
+                          assignmentReminderResult
+                            .remindersAlreadyExisting
+                        }{" "}
+                        already reminded
+                      </span>
+
+                    </div>
+
+                  </div>
+                )}
+
+
+                <footer className="facultyAssignmentSubmissionFooter">
+
+                  <span>
+                    Due{" "}
+                    {formatDateTime(
+                      assignmentReview
+                        .due_at
+                    )}
+                  </span>
+
+
+                  <div className="facultyAssignmentSubmissionFooterActions">
+
+                    <button
+                      type="button"
+                      className="facultyAssignmentReminderButton"
+                      disabled={
+                        assignmentReminderBusyId ===
+                          assignmentReview.id ||
+                        reviewProgress.pending <=
+                          0
+                      }
+                      onClick={() =>
+                        void remindPendingAssignmentStudents(
+                          assignmentReview
+                        )
+                      }
+                    >
+                      {assignmentReminderBusyId ===
+                      assignmentReview.id
+                        ? "Processing..."
+                        : reviewProgress.pending <=
+                          0
+                        ? "No pending students"
+                        : `Remind ${reviewProgress.pending} pending`}
+                    </button>
+
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAssignmentReview(
+                          null
+                        );
+
+                        setAssignmentReminderResult(
+                          null
+                        );
+                      }}
+                    >
+                      Close
+                    </button>
+
+                  </div>
+
+                </footer>
+
+              </section>
+
+            </div>
+          );
+        })()}
 
 
       {!items.length && (
@@ -8260,6 +13378,41 @@ type AttendanceStudentLookup = {
   email: string;
 };
 
+type AttendanceGuardianContact = {
+  guardian_name: string;
+  relationship: string;
+  email: string;
+  phone: string;
+  sms_enabled: boolean;
+  email_enabled: boolean;
+};
+
+const emptyAttendanceGuardianContact:
+  AttendanceGuardianContact = {
+    guardian_name: "",
+    relationship: "Parent",
+    email: "",
+    phone: "",
+    sms_enabled: true,
+    email_enabled: true,
+  };
+
+type BatchStudentImportStatus =
+  | "ready"
+  | "already-in-batch"
+  | "not-found"
+  | "duplicate-file"
+  | "invalid";
+
+type BatchStudentImportRow = {
+  rowNumber: number;
+  sourceUid: string;
+  sourceName: string;
+  student: AttendanceStudentLookup | null;
+  status: BatchStudentImportStatus;
+  message: string;
+};
+
 type AttendanceStatus =
   | "Present"
   | "Absent"
@@ -8291,18 +13444,251 @@ type AttendanceSessionEntry = {
   marked_at: string;
 };
 
+
+type AttendanceNotificationDeliverySummary = {
+  channel: string;
+  notification_type: string;
+  delivery_status:
+    | "Pending"
+    | "Processing"
+    | "Sent"
+    | "Failed"
+    | "Skipped";
+  notification_count: number;
+};
+
+type StudentAttendanceSubject = {
+  id: string;
+  subject_code: string;
+  subject_name: string;
+  semester: number | null;
+  academic_year: string;
+  credits: number | null;
+  faculty_name: string;
+  subject_type: string;
+};
+
+type AttendanceBatchSubject = {
+  id: string;
+  batch_id: string;
+  subject_name: string;
+  subject_code: string;
+  credits: number;
+  subject_type: "Theory" | "Lab" | "Theory + Lab";
+  faculty_id: string;
+  faculty_name: string;
+  faculty_avatar_url?: string | null;
+};
+
+
+type AttendanceSyllabusUnit = {
+  id: string;
+  batch_subject_id: string;
+  unit_number: number;
+  unit_title: string;
+  description: string;
+};
+
+
+type AttendanceSyllabusTopic = {
+  id: string;
+  unit_id: string;
+  batch_subject_id: string;
+  topic_order: number;
+  topic_title: string;
+  description: string;
+  planned_periods: number;
+};
+
+
+type AttendanceFacultyOption = {
+  id: string;
+  full_name: string;
+  avatar_url?: string | null;
+  department?: string | null;
+};
+
+type AttendanceFacultyProfile = {
+  id: string;
+  full_name: string;
+  avatar_url?: string | null;
+  cover_url?: string | null;
+  headline?: string | null;
+  department?: string | null;
+  role?: string | null;
+  bio?: string | null;
+  skills?: string[] | null;
+  location?: string | null;
+  linkedin_url?: string | null;
+  github_url?: string | null;
+  portfolio_url?: string | null;
+};
+
+type StudentAttendanceBatch = {
+  batch_id: string;
+  batch_name: string;
+  section: string;
+  department: string;
+  academic_year: string;
+  semester: string;
+  total_students: number;
+  joined_at: string;
+};
+
+type StudentLiveAttendance = {
+  subject: string;
+  classes_conducted: number;
+  counted_classes: number;
+  attended_classes: number;
+  present_count: number;
+  absent_count: number;
+  late_count: number;
+  excused_count: number;
+  attendance_percentage: number;
+};
+
+type StudentAttendanceHistoryItem = {
+  session_id: string;
+  subject: string;
+  attendance_date: string;
+  period_name: string;
+  topic: string;
+  attendance_status: AttendanceStatus;
+  marked_at: string;
+  faculty_name: string;
+};
+
+
+type AttendancePostClassSummary = {
+  batchName: string;
+  section: string;
+
+  subject: string;
+  topic: string;
+
+  present: number;
+  absent: number;
+  late: number;
+  excused: number;
+  total: number;
+
+  diaryUpdated: boolean;
+  notificationsProcessed: boolean;
+
+  syllabusLinked: boolean;
+  syllabusCoveredClasses: number;
+  syllabusPlannedClasses: number;
+
+  createdAt: number;
+};
+
+
 const emptyAttendance:
   AttendanceRecord[] = [];
 
 function AttendanceModule({
   profile,
+  onOpenFacultyDiary,
+  onOpenSyllabusProgress,
 }: {
   profile: ModuleProfile;
+
+  onOpenFacultyDiary?: () => void;
+  onOpenSyllabusProgress?: () => void;
 }) {
+  const [
+    postClassSummary,
+    setPostClassSummary,
+  ] = useState<
+    AttendancePostClassSummary | null
+  >(null);
+
+
   const [records, setRecords] =
     useState<AttendanceRecord[]>(
       emptyAttendance
     );
+
+  const [
+    studentSubjects,
+    setStudentSubjects,
+  ] = useState<StudentAttendanceSubject[]>([]);
+
+  const [
+    batchSubjects,
+    setBatchSubjects,
+  ] = useState<AttendanceBatchSubject[]>([]);
+
+  const [
+    facultyOptions,
+    setFacultyOptions,
+  ] = useState<AttendanceFacultyOption[]>([]);
+
+  const [
+    selectedFacultyProfile,
+    setSelectedFacultyProfile,
+  ] = useState<AttendanceFacultyProfile | null>(null);
+
+  const [
+    facultyProfileLoading,
+    setFacultyProfileLoading,
+  ] = useState(false);
+
+  const [
+    facultyProfileError,
+    setFacultyProfileError,
+  ] = useState("");
+
+  const [showSubjectManager, setShowSubjectManager] =
+    useState(false);
+
+  const [editingBatchSubjectId, setEditingBatchSubjectId] =
+    useState("");
+
+  const [batchSubjectSaving, setBatchSubjectSaving] =
+    useState(false);
+
+  const [batchSubjectForm, setBatchSubjectForm] =
+    useState({
+      subject_name: "",
+      subject_code: "",
+      credits: 3,
+      subject_type: "Theory" as
+        | "Theory"
+        | "Lab"
+        | "Theory + Lab",
+      faculty_id: "",
+    });
+
+  const [
+    studentBatches,
+    setStudentBatches,
+  ] = useState<StudentAttendanceBatch[]>([]);
+
+  const [
+    studentBatchSubjects,
+    setStudentBatchSubjects,
+  ] = useState<AttendanceBatchSubject[]>([]);
+
+  const [
+    liveStudentAttendance,
+    setLiveStudentAttendance,
+  ] = useState<StudentLiveAttendance[]>([]);
+
+  const [
+    studentAttendanceHistory,
+    setStudentAttendanceHistory,
+  ] = useState<StudentAttendanceHistoryItem[]>([]);
+
+  const [
+    showStudentAttendanceHistory,
+    setShowStudentAttendanceHistory,
+  ] = useState(false);
+
+  const [
+    attendanceHistorySubject,
+    setAttendanceHistorySubject,
+  ] = useState("All");
 
   const [batches, setBatches] =
     useState<AttendanceBatch[]>([]);
@@ -8310,8 +13696,314 @@ function AttendanceModule({
   const [batchStudents, setBatchStudents] =
     useState<AttendanceBatchStudent[]>([]);
 
+  const [
+    guardianStudent,
+    setGuardianStudent,
+  ] = useState<AttendanceBatchStudent | null>(
+    null
+  );
+
+  const [
+    guardianContact,
+    setGuardianContact,
+  ] = useState<AttendanceGuardianContact>(
+    emptyAttendanceGuardianContact
+  );
+
+  const [
+    guardianContactExists,
+    setGuardianContactExists,
+  ] = useState(false);
+
+  const [
+    guardianLoading,
+    setGuardianLoading,
+  ] = useState(false);
+
+  const [
+    guardianSaving,
+    setGuardianSaving,
+  ] = useState(false);
+
+  const [
+    guardianError,
+    setGuardianError,
+  ] = useState("");
+
+  const [
+    guardianMessage,
+    setGuardianMessage,
+  ] = useState("");
+
+  const [
+    guardianKnownStudents,
+    setGuardianKnownStudents,
+  ] = useState<Set<string>>(
+    () => new Set()
+  );
+
   const [selectedBatchId, setSelectedBatchId] =
     useState("");
+
+
+  const [
+    attendanceClassHandoff,
+    setAttendanceClassHandoff,
+  ] =
+    useState<{
+      batchId: string;
+      batchSubjectId: string;
+      subjectName: string;
+      subjectCode: string;
+      publicationId: string;
+      timetableEntryId: string;
+
+      periodStart: number;
+      periodEnd: number;
+
+      startTime: string;
+      endTime: string;
+
+      room: string;
+      classType: string;
+      subgroup: string;
+
+      source:
+        | "timetable"
+        | "syllabus";
+
+      syllabusTopicId: string;
+      syllabusTopicTitle: string;
+
+      requestedAt: number;
+    } | null>(
+      () => {
+
+        if (
+          typeof window ===
+          "undefined"
+        ) {
+          return null;
+        }
+
+
+        try {
+
+          const raw =
+            window.sessionStorage.getItem(
+              "campusconnect:faculty-attendance-class"
+            );
+
+
+          if (!raw) {
+            return null;
+          }
+
+
+          const parsed =
+            JSON.parse(
+              raw
+            ) as {
+              batchId?: unknown;
+              batchSubjectId?: unknown;
+              subjectName?: unknown;
+              subjectCode?: unknown;
+              publicationId?: unknown;
+              timetableEntryId?: unknown;
+
+              periodStart?: unknown;
+              periodEnd?: unknown;
+
+              startTime?: unknown;
+              endTime?: unknown;
+
+              room?: unknown;
+              classType?: unknown;
+              subgroup?: unknown;
+
+              source?: unknown;
+
+              syllabusTopicId?: unknown;
+              syllabusTopicTitle?: unknown;
+
+              requestedAt?: unknown;
+            };
+
+
+          if (
+            typeof parsed.batchId !==
+              "string" ||
+            typeof parsed.batchSubjectId !==
+              "string" ||
+            !parsed.batchId ||
+            !parsed.batchSubjectId
+          ) {
+
+            window.sessionStorage.removeItem(
+              "campusconnect:faculty-attendance-class"
+            );
+
+            return null;
+          }
+
+
+          /*
+           * Ignore stale handoffs older than 10 minutes.
+           */
+          const requestedAt =
+            Number(
+              parsed.requestedAt ||
+              0
+            );
+
+
+          if (
+            requestedAt > 0 &&
+            Date.now() -
+              requestedAt >
+              10 * 60 * 1000
+          ) {
+
+            window.sessionStorage.removeItem(
+              "campusconnect:faculty-attendance-class"
+            );
+
+            return null;
+          }
+
+
+          return {
+            batchId:
+              parsed.batchId,
+
+            batchSubjectId:
+              parsed.batchSubjectId,
+
+            subjectName:
+              typeof parsed.subjectName ===
+              "string"
+                ? parsed.subjectName
+                : "",
+
+            subjectCode:
+              typeof parsed.subjectCode ===
+              "string"
+                ? parsed.subjectCode
+                : "",
+
+            publicationId:
+              typeof parsed.publicationId ===
+              "string"
+                ? parsed.publicationId
+                : "",
+
+            timetableEntryId:
+              typeof parsed.timetableEntryId ===
+              "string"
+                ? parsed.timetableEntryId
+                : "",
+
+            periodStart:
+              Number.isFinite(
+                Number(
+                  parsed.periodStart
+                )
+              )
+                ? Number(
+                    parsed.periodStart
+                  )
+                : 1,
+
+            periodEnd:
+              Number.isFinite(
+                Number(
+                  parsed.periodEnd
+                )
+              )
+                ? Number(
+                    parsed.periodEnd
+                  )
+                : Number.isFinite(
+                    Number(
+                      parsed.periodStart
+                    )
+                  )
+                  ? Number(
+                      parsed.periodStart
+                    )
+                  : 1,
+
+            startTime:
+              typeof parsed.startTime ===
+              "string"
+                ? parsed.startTime
+                : "",
+
+            endTime:
+              typeof parsed.endTime ===
+              "string"
+                ? parsed.endTime
+                : "",
+
+            room:
+              typeof parsed.room ===
+              "string"
+                ? parsed.room
+                : "",
+
+            classType:
+              typeof parsed.classType ===
+              "string"
+                ? parsed.classType
+                : "",
+
+            subgroup:
+              typeof parsed.subgroup ===
+              "string"
+                ? parsed.subgroup
+                : "",
+
+            source:
+              parsed.source ===
+              "syllabus"
+                ? "syllabus"
+                : "timetable",
+
+            syllabusTopicId:
+              typeof parsed.syllabusTopicId ===
+              "string"
+                ? parsed.syllabusTopicId
+                : "",
+
+            syllabusTopicTitle:
+              typeof parsed.syllabusTopicTitle ===
+              "string"
+                ? parsed.syllabusTopicTitle
+                : "",
+
+            requestedAt,
+          };
+
+        } catch (
+          storageError
+        ) {
+
+          console.error(
+            "[Attendance handoff read]",
+            storageError
+          );
+
+
+          window.sessionStorage.removeItem(
+            "campusconnect:faculty-attendance-class"
+          );
+
+
+          return null;
+        }
+      }
+    );
+
 
   const [subject, setSubject] =
     useState("Digital Communication");
@@ -8348,8 +14040,63 @@ function AttendanceModule({
   const [lookupBusy, setLookupBusy] =
     useState(false);
 
+  const [
+    batchImportRows,
+    setBatchImportRows,
+  ] = useState<BatchStudentImportRow[]>([]);
+
+  const [
+    batchImportFileName,
+    setBatchImportFileName,
+  ] = useState("");
+
+  const [
+    batchImportScanning,
+    setBatchImportScanning,
+  ] = useState(false);
+
+  const [
+    batchImportSaving,
+    setBatchImportSaving,
+  ] = useState(false);
+
+  const [
+    batchImportError,
+    setBatchImportError,
+  ] = useState("");
+
   const [sessions, setSessions] =
     useState<AttendanceSession[]>([]);
+
+  const [
+    notificationDeliveryBySession,
+    setNotificationDeliveryBySession,
+  ] = useState<
+    Record<
+      string,
+      AttendanceNotificationDeliverySummary[]
+    >
+  >({});
+
+  const [
+    notificationDeliveryLoading,
+    setNotificationDeliveryLoading,
+  ] = useState<Record<string, boolean>>({});
+
+  const [
+    notificationDeliveryError,
+    setNotificationDeliveryError,
+  ] = useState<Record<string, string>>({});
+
+  const [
+    showRecentAttendance,
+    setShowRecentAttendance,
+  ] = useState(false);
+
+  const [
+    deletingSessionId,
+    setDeletingSessionId,
+  ] = useState("");
 
   const [showAttendanceSession, setShowAttendanceSession] =
     useState(false);
@@ -8366,6 +14113,64 @@ function AttendanceModule({
   const [originalSessionMarks, setOriginalSessionMarks] =
     useState<Record<string, AttendanceStatus>>({});
 
+
+  const [
+    sessionStudentSearch,
+    setSessionStudentSearch,
+  ] = useState("");
+
+
+  const [
+    showChangedAttendanceOnly,
+    setShowChangedAttendanceOnly,
+  ] = useState(false);
+
+
+  const [
+    sessionFromPublishedTimetable,
+    setSessionFromPublishedTimetable,
+  ] = useState(false);
+
+
+  const [
+    syllabusUnits,
+    setSyllabusUnits,
+  ] = useState<
+    AttendanceSyllabusUnit[]
+  >([]);
+
+
+  const [
+    syllabusTopics,
+    setSyllabusTopics,
+  ] = useState<
+    AttendanceSyllabusTopic[]
+  >([]);
+
+
+  const [
+    syllabusTopicCoverageCounts,
+    setSyllabusTopicCoverageCounts,
+  ] = useState<
+    Record<
+      string,
+      number
+    >
+  >({});
+
+
+  const [
+    syllabusLoading,
+    setSyllabusLoading,
+  ] = useState(false);
+
+
+  const [
+    selectedSyllabusTopicId,
+    setSelectedSyllabusTopicId,
+  ] = useState("");
+
+
   const [sessionForm, setSessionForm] =
     useState({
       subject: "Digital Communication",
@@ -8375,6 +14180,163 @@ function AttendanceModule({
       period_name: "1",
       topic: "",
     });
+
+
+  const recommendedSyllabusTopic =
+    (() => {
+
+      if (
+        !syllabusTopics.length
+      ) {
+        return null;
+      }
+
+
+      const unitOrder =
+        new Map(
+          syllabusUnits.map(
+            unit => [
+              unit.id,
+              unit.unit_number,
+            ]
+          )
+        );
+
+
+      const orderedTopics =
+        [...syllabusTopics].sort(
+          (
+            a,
+            b
+          ) => {
+
+            const unitDifference =
+              (
+                unitOrder.get(
+                  a.unit_id
+                ) ||
+                9999
+              ) -
+              (
+                unitOrder.get(
+                  b.unit_id
+                ) ||
+                9999
+              );
+
+
+            if (
+              unitDifference
+            ) {
+              return unitDifference;
+            }
+
+
+            return (
+              a.topic_order -
+              b.topic_order
+            );
+          }
+        );
+
+
+      const incompleteTopics =
+        orderedTopics.filter(
+          topic => {
+
+            const taught =
+              syllabusTopicCoverageCounts[
+                topic.id
+              ] ||
+              0;
+
+
+            const planned =
+              Math.max(
+                1,
+                Number(
+                  topic.planned_periods
+                ) ||
+                  1
+              );
+
+
+            return (
+              taught <
+              planned
+            );
+          }
+        );
+
+
+      /*
+       * Continue an already-started topic before moving forward.
+       *
+       * Example:
+       * Sampling Theorem 2/3
+       * should be recommended before a later untouched topic.
+       */
+      const inProgressTopic =
+        incompleteTopics.find(
+          topic =>
+            (
+              syllabusTopicCoverageCounts[
+                topic.id
+              ] ||
+              0
+            ) >
+            0
+        );
+
+
+      return (
+        inProgressTopic ||
+        incompleteTopics[0] ||
+        null
+      );
+    })();
+
+
+  const recommendedSyllabusUnit =
+    recommendedSyllabusTopic
+      ? syllabusUnits.find(
+          unit =>
+            unit.id ===
+            recommendedSyllabusTopic.unit_id
+        ) ||
+        null
+      : null;
+
+
+  const recommendedSyllabusTaught =
+    recommendedSyllabusTopic
+      ? syllabusTopicCoverageCounts[
+          recommendedSyllabusTopic.id
+        ] ||
+        0
+      : 0;
+
+
+  const recommendedSyllabusPlanned =
+    recommendedSyllabusTopic
+      ? Math.max(
+          1,
+          Number(
+            recommendedSyllabusTopic
+              .planned_periods
+          ) ||
+            1
+        )
+      : 0;
+
+
+  const recommendedSyllabusCredited =
+    recommendedSyllabusTopic
+      ? Math.min(
+          recommendedSyllabusTaught,
+          recommendedSyllabusPlanned
+        )
+      : 0;
 
   const [batchForm, setBatchForm] =
     useState({
@@ -8391,12 +14353,1114 @@ function AttendanceModule({
       profile.role
     );
 
+  const canManageAcademicStructure =
+    profile.role === "Main Admin";
+
   const selectedBatch =
     batches.find(
       batch =>
         batch.id ===
         selectedBatchId
     );
+
+  const studentBatch =
+    studentBatches[0] || null;
+
+
+  const selectedAttendanceBatchSubject =
+    batchSubjects.find(
+      item => {
+
+        const currentSubject =
+          subject
+            .trim()
+            .toLowerCase();
+
+
+        return (
+          item.subject_name
+            .trim()
+            .toLowerCase() ===
+            currentSubject
+          ||
+          item.subject_code
+            .trim()
+            .toLowerCase() ===
+            currentSubject
+        );
+      }
+    ) || null;
+
+
+  const selectAttendanceSubject =
+    (
+      item: AttendanceBatchSubject
+    ) => {
+      const nextSubject =
+        item.subject_name.trim() ||
+        item.subject_code.trim();
+
+      if (!nextSubject) {
+        return;
+      }
+
+      setSubject(
+        nextSubject
+      );
+
+
+      setSelectedSyllabusTopicId(
+        ""
+      );
+
+      setSyllabusUnits(
+        []
+      );
+
+      setSyllabusTopics(
+        []
+      );
+
+      setSyllabusTopicCoverageCounts(
+        {}
+      );
+
+
+      if (!showAttendanceSession) {
+        setSessionForm(
+          current => ({
+            ...current,
+            subject:
+              nextSubject,
+          })
+        );
+      }
+
+      setStatus(
+        `${item.subject_code
+          ? `${item.subject_code} · `
+          : ""}${item.subject_name} selected for attendance.`
+      );
+    };
+
+
+  const loadBatchSubjects =
+    async (batchId: string) => {
+      if (!staff || !batchId) {
+        setBatchSubjects([]);
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      /*
+       * Do not apply a frontend faculty_id filter here.
+       *
+       * attendance_batch_subjects RLS already authorizes
+       * Faculty through either the direct faculty_id assignment
+       * or an active faculty_teaching_allocations row.
+       *
+       * Adding .eq("faculty_id", auth.uid()) here would hide
+       * valid allocation-based / co-teaching assignments.
+       */
+      const batchSubjectQuery =
+        client
+          .from("attendance_batch_subjects")
+          .select(
+            "id,batch_id,subject_name,subject_code,credits,subject_type,faculty_id,faculty_name"
+          )
+          .eq("batch_id", batchId);
+
+      const {
+        data,
+        error,
+      } = await batchSubjectQuery
+        .order("subject_name", {
+          ascending: true,
+        });
+
+      if (error) {
+        console.error(
+          "Batch subjects:",
+          error
+        );
+
+        setStatus(
+          `Unable to load batch subjects: ${error.message}`
+        );
+
+        return;
+      }
+
+      const rows =
+        (data || []) as AttendanceBatchSubject[];
+
+      const facultyIds =
+        Array.from(
+          new Set(
+            rows
+              .map(item => item.faculty_id)
+              .filter(Boolean)
+          )
+        );
+
+      let avatarMap =
+        new Map<string, string | null>();
+
+      if (facultyIds.length) {
+        const {
+          data: facultyProfiles,
+        } = await client
+          .from("profiles")
+          .select(
+            "id,avatar_url"
+          )
+          .in(
+            "id",
+            facultyIds
+          );
+
+        avatarMap =
+          new Map(
+            (facultyProfiles || []).map(
+              (item: any) => [
+                item.id,
+                item.avatar_url || null,
+              ]
+            )
+          );
+      }
+
+      setBatchSubjects(
+        rows.map(item => ({
+          ...item,
+          credits:
+            Number(item.credits) || 3,
+          faculty_avatar_url:
+            avatarMap.get(
+              item.faculty_id
+            ) || null,
+        }))
+      );
+    };
+
+
+  const loadAttendanceSyllabus =
+    async (
+      batchSubjectId: string
+    ) => {
+
+      if (
+        profile.role !==
+          "Faculty" ||
+        !batchSubjectId
+      ) {
+        setSyllabusUnits(
+          []
+        );
+
+        setSyllabusTopics(
+          []
+        );
+
+        setSyllabusTopicCoverageCounts(
+          {}
+        );
+
+        return;
+      }
+
+
+      const client =
+        getSupabaseClient();
+
+
+      if (!client) {
+        return;
+      }
+
+
+      setSyllabusLoading(
+        true
+      );
+
+
+      try {
+
+        const [
+          unitResult,
+          topicResult,
+          completionResult,
+        ] = await Promise.all([
+
+          client
+            .from(
+              "faculty_syllabus_units"
+            )
+            .select(
+              "id,batch_subject_id,unit_number,unit_title,description"
+            )
+            .eq(
+              "batch_subject_id",
+              batchSubjectId
+            )
+            .order(
+              "unit_number",
+              {
+                ascending: true,
+              }
+            ),
+
+          client
+            .from(
+              "faculty_syllabus_topics"
+            )
+            .select(
+              "id,unit_id,batch_subject_id,topic_order,topic_title,description,planned_periods"
+            )
+            .eq(
+              "batch_subject_id",
+              batchSubjectId
+            )
+            .order(
+              "topic_order",
+              {
+                ascending: true,
+              }
+            ),
+
+          client
+            .from(
+              "faculty_syllabus_topic_completions"
+            )
+            .select(
+              "topic_id"
+            )
+            .eq(
+              "batch_subject_id",
+              batchSubjectId
+            ),
+        ]);
+
+
+        if (
+          unitResult.error
+        ) {
+          throw unitResult.error;
+        }
+
+
+        if (
+          topicResult.error
+        ) {
+          throw topicResult.error;
+        }
+
+
+        if (
+          completionResult.error
+        ) {
+          throw completionResult.error;
+        }
+
+
+        const nextUnits =
+          (
+            unitResult.data ||
+            []
+          ) as AttendanceSyllabusUnit[];
+
+
+        const nextTopics =
+          (
+            topicResult.data ||
+            []
+          ) as AttendanceSyllabusTopic[];
+
+
+        setSyllabusUnits(
+          nextUnits
+        );
+
+        setSyllabusTopics(
+          nextTopics
+        );
+
+        const nextCoverageCounts =
+          (
+            completionResult.data ||
+            []
+          ).reduce<
+            Record<
+              string,
+              number
+            >
+          >(
+            (
+              counts,
+              item
+            ) => {
+
+              const topicId =
+                String(
+                  item.topic_id ||
+                  ""
+                );
+
+
+              if (!topicId) {
+                return counts;
+              }
+
+
+              counts[
+                topicId
+              ] =
+                (
+                  counts[
+                    topicId
+                  ] ||
+                  0
+                ) +
+                1;
+
+
+              return counts;
+            },
+            {}
+          );
+
+
+        setSyllabusTopicCoverageCounts(
+          nextCoverageCounts
+        );
+
+
+        /*
+         * If the existing Topic field already exactly matches a
+         * syllabus topic (for example when editing attendance),
+         * reflect that link in the selector automatically.
+         */
+        const currentTopic =
+          sessionForm.topic
+            .trim()
+            .toLowerCase();
+
+
+        const matchingTopic =
+          currentTopic
+            ? nextTopics.find(
+                item =>
+                  item.topic_title
+                    .trim()
+                    .toLowerCase() ===
+                  currentTopic
+              )
+            : null;
+
+
+        setSelectedSyllabusTopicId(
+          matchingTopic?.id ||
+          ""
+        );
+
+      } catch (
+        syllabusError
+      ) {
+
+        console.error(
+          "Attendance syllabus:",
+          syllabusError
+        );
+
+
+        setSyllabusUnits(
+          []
+        );
+
+        setSyllabusTopics(
+          []
+        );
+
+        setSyllabusTopicCoverageCounts(
+          {}
+        );
+
+
+        setStatus(
+          syllabusError instanceof Error
+            ? `Unable to load syllabus: ${syllabusError.message}`
+            : "Unable to load syllabus topics."
+        );
+
+      } finally {
+
+        setSyllabusLoading(
+          false
+        );
+      }
+    };
+
+
+  const openAttendanceFacultyProfile =
+    async (facultyId: string) => {
+      if (!facultyId) {
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      setFacultyProfileLoading(true);
+      setFacultyProfileError("");
+      setSelectedFacultyProfile(null);
+
+      try {
+        const {
+          data,
+          error,
+        } = await client.rpc(
+          "get_campus_public_profile",
+          {
+            target_user:
+              facultyId,
+          }
+        );
+
+        if (error) {
+          throw error;
+        }
+
+        const row =
+          Array.isArray(data)
+            ? data[0]
+            : data;
+
+        if (!row) {
+          throw new Error(
+            "Faculty profile is not available."
+          );
+        }
+
+        setSelectedFacultyProfile({
+          id:
+            String(row.id || facultyId),
+
+          full_name:
+            String(
+              row.full_name ||
+              "Faculty"
+            ),
+
+          avatar_url:
+            row.avatar_url || null,
+
+          cover_url:
+            row.cover_url || null,
+
+          headline:
+            row.headline || null,
+
+          department:
+            row.department || null,
+
+          role:
+            row.role || "Faculty",
+
+          bio:
+            row.bio || null,
+
+          skills:
+            Array.isArray(row.skills)
+              ? row.skills
+              : [],
+
+          location:
+            row.location || null,
+
+          linkedin_url:
+            row.linkedin_url || null,
+
+          github_url:
+            row.github_url || null,
+
+          portfolio_url:
+            row.portfolio_url || null,
+        });
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof error === "object" &&
+              error !== null &&
+              "message" in error
+            ? String(
+                (
+                  error as {
+                    message?: unknown;
+                  }
+                ).message ||
+                  "Unable to load faculty profile."
+              )
+            : "Unable to load faculty profile.";
+
+        console.error(
+          "Faculty profile:",
+          error
+        );
+
+        setFacultyProfileError(
+          message
+        );
+      } finally {
+        setFacultyProfileLoading(false);
+      }
+    };
+
+
+  const closeAttendanceFacultyProfile =
+    () => {
+      setSelectedFacultyProfile(null);
+      setFacultyProfileError("");
+      setFacultyProfileLoading(false);
+    };
+
+
+  const loadAttendanceFacultyOptions =
+    async () => {
+      if (!staff) {
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      const {
+        data,
+        error,
+      } = await client
+        .from("profiles")
+        .select(
+          "id,full_name,avatar_url,department,role"
+        )
+        .eq("role", "Faculty")
+        .order("full_name", {
+          ascending: true,
+        });
+
+      if (error) {
+        console.error(
+          "Attendance faculty directory:",
+          error
+        );
+
+        return;
+      }
+
+      setFacultyOptions(
+        (data || []).map(
+          (item: any) => ({
+            id: item.id,
+            full_name:
+              item.full_name ||
+              "Faculty",
+            avatar_url:
+              item.avatar_url || null,
+            department:
+              item.department || null,
+          })
+        )
+      );
+    };
+
+
+  const resetBatchSubjectForm =
+    () => {
+      setEditingBatchSubjectId("");
+
+      setBatchSubjectForm({
+        subject_name: "",
+        subject_code: "",
+        credits: 3,
+        subject_type: "Theory",
+        faculty_id: "",
+      });
+    };
+
+
+  const openBatchSubjectCreator =
+    async () => {
+      if (!canManageAcademicStructure) {
+        setStatus(
+          "Only Main Admin can configure batch subjects."
+        );
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      const {
+        data: auth,
+      } =
+        await client.auth.getUser();
+
+      resetBatchSubjectForm();
+
+      setBatchSubjectForm(
+        current => ({
+          ...current,
+          faculty_id:
+            auth.user?.id || "",
+        })
+      );
+
+      setShowSubjectManager(
+        true
+      );
+
+      setStatus("");
+    };
+
+
+  const editBatchSubject =
+    (
+      item: AttendanceBatchSubject
+    ) => {
+      if (!canManageAcademicStructure) {
+        setStatus(
+          "Only Main Admin can edit batch subjects."
+        );
+        return;
+      }
+
+      setEditingBatchSubjectId(
+        item.id
+      );
+
+      setBatchSubjectForm({
+        subject_name:
+          item.subject_name,
+        subject_code:
+          item.subject_code,
+        credits:
+          Number(
+            item.credits
+          ) || 3,
+        subject_type:
+          item.subject_type,
+        faculty_id:
+          item.faculty_id,
+      });
+
+      setShowSubjectManager(
+        true
+      );
+
+      setStatus("");
+    };
+
+
+  const saveBatchSubject =
+    async () => {
+      if (!selectedBatch) {
+        return;
+      }
+
+      const subjectName =
+        batchSubjectForm.subject_name.trim();
+
+      const subjectCode =
+        batchSubjectForm.subject_code
+          .trim()
+          .toUpperCase();
+
+      if (!subjectName) {
+        setStatus(
+          "Enter the subject name."
+        );
+        return;
+      }
+
+      if (!subjectCode) {
+        setStatus(
+          "Enter the subject code."
+        );
+        return;
+      }
+
+      if (
+        batchSubjectForm.credits < 1 ||
+        batchSubjectForm.credits > 4
+      ) {
+        setStatus(
+          "Credits must be between 1 and 4."
+        );
+        return;
+      }
+
+      if (
+        !batchSubjectForm.faculty_id
+      ) {
+        setStatus(
+          "Select the faculty assigned to this subject."
+        );
+        return;
+      }
+
+      const selectedFaculty =
+        facultyOptions.find(
+          item =>
+            item.id ===
+            batchSubjectForm.faculty_id
+        );
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      const {
+        data: auth,
+        error: authError,
+      } =
+        await client.auth.getUser();
+
+      if (
+        authError ||
+        !auth.user
+      ) {
+        setStatus(
+          "Please sign in again."
+        );
+        return;
+      }
+
+      if (!canManageAcademicStructure) {
+        setStatus(
+          "Only Main Admin can add or change batch subject assignments."
+        );
+        return;
+      }
+
+      setBatchSubjectSaving(
+        true
+      );
+
+      setStatus("");
+
+      const payload = {
+        batch_id:
+          selectedBatch.id,
+        subject_name:
+          subjectName,
+        subject_code:
+          subjectCode,
+        credits:
+          batchSubjectForm.credits,
+        subject_type:
+          batchSubjectForm.subject_type,
+        faculty_id:
+          batchSubjectForm.faculty_id,
+        faculty_name:
+          selectedFaculty?.full_name ||
+          "Faculty",
+        updated_at:
+          new Date().toISOString(),
+      };
+
+      const result =
+        editingBatchSubjectId
+          ? await client
+              .from(
+                "attendance_batch_subjects"
+              )
+              .update(payload)
+              .eq(
+                "id",
+                editingBatchSubjectId
+              )
+          : await client
+              .from(
+                "attendance_batch_subjects"
+              )
+              .insert(payload);
+
+      setBatchSubjectSaving(
+        false
+      );
+
+      if (result.error) {
+        console.error(
+          "Save batch subject:",
+          result.error
+        );
+
+        setStatus(
+          `Unable to save subject: ${result.error.message}`
+        );
+
+        return;
+      }
+
+      await loadBatchSubjects(
+        selectedBatch.id
+      );
+
+      setSubject(
+        subjectName
+      );
+
+      setSessionForm(
+        current => ({
+          ...current,
+          subject:
+            subjectName,
+        })
+      );
+
+      resetBatchSubjectForm();
+
+      setShowSubjectManager(
+        false
+      );
+
+      setStatus(
+        editingBatchSubjectId
+          ? "Subject updated."
+          : "Subject added to this batch."
+      );
+    };
+
+
+  const deleteBatchSubject =
+    async (
+      item: AttendanceBatchSubject
+    ) => {
+      if (!canManageAcademicStructure) {
+        setStatus(
+          "Only Main Admin can remove batch subjects."
+        );
+        return;
+      }
+
+      if (
+        !window.confirm(
+          `Remove ${item.subject_name} from ${selectedBatch?.batch_name || "this batch"}?`
+        )
+      ) {
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      const {
+        error,
+      } = await client
+        .from(
+          "attendance_batch_subjects"
+        )
+        .delete()
+        .eq(
+          "id",
+          item.id
+        );
+
+      if (error) {
+        setStatus(
+          `Unable to remove subject: ${error.message}`
+        );
+        return;
+      }
+
+      await loadBatchSubjects(
+        item.batch_id
+      );
+
+      setStatus(
+        "Subject removed from batch."
+      );
+    };
+
+
+  const loadStudentAttendanceWorkspace =
+    async () => {
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      const {
+        data: auth,
+        error: authError,
+      } =
+        await client.auth.getUser();
+
+      if (
+        authError ||
+        !auth.user
+      ) {
+        return;
+      }
+
+      const [
+        subjectsResult,
+        batchesResult,
+        attendanceResult,
+      ] =
+        await Promise.all([
+          client
+            .from("college_subjects")
+            .select(
+              "id,subject_code,subject_name,semester,academic_year,credits,faculty_name,subject_type"
+            )
+            .eq(
+              "student_id",
+              auth.user.id
+            )
+            .order(
+              "subject_name",
+              {ascending: true}
+            ),
+
+          client.rpc(
+            "get_my_attendance_batches"
+          ),
+
+          client.rpc(
+            "get_my_live_attendance_summary"
+          ),
+        ]);
+
+      if (
+        subjectsResult.error
+      ) {
+        console.error(
+          "Student subjects:",
+          subjectsResult.error
+        );
+      } else {
+        setStudentSubjects(
+          (
+            subjectsResult.data ||
+            []
+          ) as StudentAttendanceSubject[]
+        );
+      }
+
+      if (
+        batchesResult.error
+      ) {
+        console.error(
+          "Student batches:",
+          batchesResult.error
+        );
+      } else {
+        setStudentBatches(
+          (
+            batchesResult.data ||
+            []
+          ) as StudentAttendanceBatch[]
+        );
+      }
+
+      if (
+        attendanceResult.error
+      ) {
+        console.error(
+          "Student live attendance:",
+          attendanceResult.error
+        );
+      } else {
+        const rows =
+          (
+            attendanceResult.data ||
+            []
+          ).map(
+            (row: any) => ({
+              ...row,
+
+              classes_conducted:
+                Number(
+                  row.classes_conducted ||
+                  0
+                ),
+
+              counted_classes:
+                Number(
+                  row.counted_classes ||
+                  0
+                ),
+
+              attended_classes:
+                Number(
+                  row.attended_classes ||
+                  0
+                ),
+
+              present_count:
+                Number(
+                  row.present_count ||
+                  0
+                ),
+
+              absent_count:
+                Number(
+                  row.absent_count ||
+                  0
+                ),
+
+              late_count:
+                Number(
+                  row.late_count ||
+                  0
+                ),
+
+              excused_count:
+                Number(
+                  row.excused_count ||
+                  0
+                ),
+
+              attendance_percentage:
+                Number(
+                  row.attendance_percentage ||
+                  0
+                ),
+            })
+          ) as StudentLiveAttendance[];
+
+        setLiveStudentAttendance(
+          rows
+        );
+      }
+    };
 
 
   const loadAttendanceRecords =
@@ -8555,16 +15619,58 @@ function AttendanceModule({
 
 
   useEffect(() => {
+
+    if (!showAttendanceSession) {
+      return;
+    }
+
+
+    /*
+     * Always present Take Attendance from the beginning,
+     * regardless of where the Faculty previously scrolled.
+     */
+    const frame =
+      window.requestAnimationFrame(
+        () => {
+
+          const scrim =
+            document.querySelector<HTMLElement>(
+              ".attendanceSessionScrim"
+            );
+
+
+          if (scrim) {
+            scrim.scrollTop = 0;
+          }
+        }
+      );
+
+
+    return () =>
+      window.cancelAnimationFrame(
+        frame
+      );
+
+  }, [
+    showAttendanceSession,
+  ]);
+
+
+  useEffect(() => {
     let active = true;
 
     const load =
       async () => {
         setLoading(true);
 
-        await loadAttendanceRecords();
-
         if (staff) {
-          await loadBatches();
+          await Promise.all([
+            loadAttendanceRecords(),
+            loadBatches(),
+            loadAttendanceFacultyOptions(),
+          ]);
+        } else {
+          await loadStudentAttendanceWorkspace();
         }
 
         if (active) {
@@ -8581,6 +15687,120 @@ function AttendanceModule({
 
 
   useEffect(() => {
+    if (staff) {
+      setStudentAttendanceHistory([]);
+      setShowStudentAttendanceHistory(false);
+      return;
+    }
+
+    let active = true;
+
+    const loadStudentAttendanceHistory =
+      async () => {
+        const client =
+          getSupabaseClient();
+
+        if (!client) {
+          return;
+        }
+
+        const {
+          data,
+          error,
+        } = await client.rpc(
+          "get_my_attendance_history"
+        );
+
+        if (!active) {
+          return;
+        }
+
+        if (error) {
+          console.error(
+            "Student attendance history:",
+            error
+          );
+
+          setStudentAttendanceHistory([]);
+          return;
+        }
+
+        setStudentAttendanceHistory(
+          (data || []) as
+            StudentAttendanceHistoryItem[]
+        );
+      };
+
+    void loadStudentAttendanceHistory();
+
+    return () => {
+      active = false;
+    };
+  }, [staff]);
+
+
+  useEffect(() => {
+    if (staff) {
+      setStudentBatchSubjects([]);
+      return;
+    }
+
+    let active = true;
+
+    const loadStudentBatchSubjects =
+      async () => {
+        const client =
+          getSupabaseClient();
+
+        if (!client) {
+          return;
+        }
+
+        const {
+          data,
+          error,
+        } = await client.rpc(
+          "get_my_batch_subjects"
+        );
+
+        if (!active) {
+          return;
+        }
+
+        if (error) {
+          console.error(
+            "Student batch subjects:",
+            error
+          );
+
+          setStudentBatchSubjects([]);
+          return;
+        }
+
+        setStudentBatchSubjects(
+          (
+            (data || []) as
+              AttendanceBatchSubject[]
+          ).map(item => ({
+            ...item,
+            credits:
+              Number(item.credits) || 3,
+            faculty_avatar_url:
+              item.faculty_avatar_url ||
+              null,
+          }))
+        );
+      };
+
+    void loadStudentBatchSubjects();
+
+    return () => {
+      active = false;
+    };
+  }, [staff]);
+
+
+  useEffect(() => {
     if (!staff) {
       return;
     }
@@ -8588,10 +15808,228 @@ function AttendanceModule({
     void loadBatchStudents(
       selectedBatchId
     );
+
+    void loadBatchSubjects(
+      selectedBatchId
+    );
+
+    if (!selectedBatchId) {
+      setBatchSubjects([]);
+    }
+
+    resetBatchSubjectForm();
+
+    setShowSubjectManager(
+      false
+    );
   }, [
     selectedBatchId,
     staff,
   ]);
+
+
+  useEffect(() => {
+    if (!staff) {
+      return;
+    }
+
+    if (!batchSubjects.length) {
+      if (!showAttendanceSession) {
+        setSubject("");
+
+        setSessionForm(
+          current => ({
+            ...current,
+            subject: "",
+          })
+        );
+      }
+
+      return;
+    }
+
+    const normalizedCurrent =
+      subject
+        .trim()
+        .toLowerCase();
+
+    const matchingSubject =
+      batchSubjects.find(
+        item =>
+          item.subject_name
+            .trim()
+            .toLowerCase() ===
+            normalizedCurrent ||
+          (
+            item.subject_code ||
+            ""
+          )
+            .trim()
+            .toLowerCase() ===
+            normalizedCurrent
+      ) || null;
+
+    if (matchingSubject) {
+      return;
+    }
+
+    const fallbackSubject =
+      batchSubjects[0];
+
+    const nextSubject =
+      fallbackSubject.subject_name.trim() ||
+      fallbackSubject.subject_code.trim();
+
+    if (!nextSubject) {
+      return;
+    }
+
+    setSubject(
+      nextSubject
+    );
+
+    if (!showAttendanceSession) {
+      setSessionForm(
+        current => ({
+          ...current,
+          subject:
+            nextSubject,
+        })
+      );
+    }
+  }, [
+    batchSubjects,
+    subject,
+    staff,
+    showAttendanceSession,
+  ]);
+
+
+  const loadAttendanceNotificationDelivery =
+    async (
+      sessionId: string
+    ) => {
+      if (!sessionId) {
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+      setNotificationDeliveryLoading(
+        current => ({
+          ...current,
+          [sessionId]: true,
+        })
+      );
+
+      setNotificationDeliveryError(
+        current => ({
+          ...current,
+          [sessionId]: "",
+        })
+      );
+
+      try {
+        const {
+          data,
+          error,
+        } = await client.rpc(
+          "get_attendance_notification_delivery_summary",
+          {
+            target_session_id:
+              sessionId,
+          }
+        );
+
+        if (error) {
+          console.error(
+            "Attendance notification delivery summary:",
+            error
+          );
+
+          setNotificationDeliveryError(
+            current => ({
+              ...current,
+              [sessionId]:
+                error.message ||
+                "Unable to load notification status.",
+            })
+          );
+
+          return;
+        }
+
+        setNotificationDeliveryBySession(
+          current => ({
+            ...current,
+
+            [sessionId]:
+              (
+                data || []
+              ).map(
+                (row: {
+                  channel?: string | null;
+                  notification_type?: string | null;
+                  delivery_status?: string | null;
+                  notification_count?: number | string | null;
+                }) => ({
+                  channel:
+                    String(
+                      row.channel ||
+                      ""
+                    ),
+
+                  notification_type:
+                    String(
+                      row.notification_type ||
+                      ""
+                    ),
+
+                  delivery_status:
+                    String(
+                      row.delivery_status ||
+                      "Pending"
+                    ) as
+                      AttendanceNotificationDeliverySummary["delivery_status"],
+
+                  notification_count:
+                    Number(
+                      row.notification_count ||
+                      0
+                    ),
+                })
+              ),
+          })
+        );
+      } catch (error) {
+        console.error(
+          "Attendance notification delivery summary:",
+          error
+        );
+
+        setNotificationDeliveryError(
+          current => ({
+            ...current,
+            [sessionId]:
+              error instanceof Error
+                ? error.message
+                : "Unable to load notification status.",
+          })
+        );
+      } finally {
+        setNotificationDeliveryLoading(
+          current => ({
+            ...current,
+            [sessionId]: false,
+          })
+        );
+      }
+    };
 
 
   const loadAttendanceSessions =
@@ -8614,17 +16052,93 @@ function AttendanceModule({
       }
 
       const {
+        data: auth,
+      } = await client.auth.getUser();
+
+      let sessionQuery =
+        client
+          .from(
+            "attendance_sessions"
+          )
+          .select("*")
+          .eq(
+            "batch_id",
+            batchId
+          );
+
+      if (
+        profile.role === "Faculty" &&
+        auth.user?.id
+      ) {
+        const {
+          data: assignedSubjects,
+          error: assignedSubjectsError,
+        } = await client
+          .from(
+            "attendance_batch_subjects"
+          )
+          .select(
+            "subject_name"
+          )
+          .eq(
+            "batch_id",
+            batchId
+          )
+          .eq(
+            "faculty_id",
+            auth.user.id
+          );
+
+        if (
+          assignedSubjectsError
+        ) {
+          console.error(
+            "Assigned attendance subjects:",
+            assignedSubjectsError
+          );
+
+          setSessions([]);
+
+          setStatus(
+            `Unable to load assigned subjects: ${assignedSubjectsError.message}`
+          );
+
+          return;
+        }
+
+        const allowedSubjects =
+          Array.from(
+            new Set(
+              (assignedSubjects || [])
+                .map(
+                  item =>
+                    String(
+                      item.subject_name ||
+                      ""
+                    ).trim()
+                )
+                .filter(Boolean)
+            )
+          );
+
+        if (
+          !allowedSubjects.length
+        ) {
+          setSessions([]);
+          return;
+        }
+
+        sessionQuery =
+          sessionQuery.in(
+            "subject",
+            allowedSubjects
+          );
+      }
+
+      const {
         data,
         error,
-      } = await client
-        .from(
-          "attendance_sessions"
-        )
-        .select("*")
-        .eq(
-          "batch_id",
-          batchId
-        )
+      } = await sessionQuery
         .order(
           "attendance_date",
           {
@@ -8661,8 +16175,11 @@ function AttendanceModule({
       !selectedBatchId
     ) {
       setSessions([]);
+      setShowRecentAttendance(false);
       return;
     }
+
+    setShowRecentAttendance(false);
 
     void loadAttendanceSessions(
       selectedBatchId
@@ -8674,8 +16191,112 @@ function AttendanceModule({
   ]);
 
 
+  const deleteAttendanceSession =
+    async (
+      session: AttendanceSession
+    ) => {
+      const confirmed =
+        window.confirm(
+          `Delete attendance for ${session.subject} on ${session.attendance_date}?\n\nThis will permanently remove this attendance session and its recorded student marks.`
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        setStatus(
+          "Unable to connect to CampusConnect."
+        );
+        return;
+      }
+
+      setDeletingSessionId(
+        session.id
+      );
+
+      setStatus("");
+
+      try {
+        const {
+          error,
+        } = await client
+          .from(
+            "attendance_sessions"
+          )
+          .delete()
+          .eq(
+            "id",
+            session.id
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        setSessions(
+          current =>
+            current.filter(
+              item =>
+                item.id !==
+                session.id
+            )
+        );
+
+        await Promise.all([
+          loadAttendanceSessions(
+            session.batch_id
+          ),
+          loadAttendanceRecords(),
+        ]);
+
+        setStatus(
+          "Attendance session deleted."
+        );
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof error === "object" &&
+              error !== null &&
+              "message" in error
+            ? String(
+                (
+                  error as {
+                    message?: unknown;
+                  }
+                ).message ||
+                  "Unknown error"
+              )
+            : "Unknown error";
+
+        console.error(
+          "Delete attendance session:",
+          error
+        );
+
+        setStatus(
+          `Unable to delete attendance: ${message}`
+        );
+      } finally {
+        setDeletingSessionId("");
+      }
+    };
+
+
   const openNewAttendanceSession =
-    () => {
+    (
+      prefill?: {
+        subject?: string;
+        periodName?: string;
+        fromPublishedTimetable?: boolean;
+        topic?: string;
+        syllabusTopicId?: string;
+      }
+    ) => {
       if (!selectedBatch) {
         return setStatus(
           "Select a batch first."
@@ -8704,6 +16325,23 @@ function AttendanceModule({
 
       setEditingSessionId("");
 
+      setSelectedSyllabusTopicId(
+        prefill?.syllabusTopicId ||
+        ""
+      );
+
+
+      setSessionFromPublishedTimetable(
+        Boolean(
+          prefill?.fromPublishedTimetable
+        )
+      );
+
+      setSessionStudentSearch("");
+      setShowChangedAttendanceOnly(
+        false
+      );
+
       setSessionMarks(
         initialMarks
       );
@@ -8714,9 +16352,17 @@ function AttendanceModule({
 
       setSessionForm({
         subject:
+          prefill?.subject?.trim() ||
           subject.trim() ||
           "Digital Communication",
 
+        /*
+         * Always use the real current calendar date.
+         *
+         * The local timetable Test Day selector is only
+         * for previewing published schedules and must
+         * never fabricate an attendance date.
+         */
         attendance_date:
           new Intl.DateTimeFormat(
             "en-CA"
@@ -8725,9 +16371,11 @@ function AttendanceModule({
           ),
 
         period_name:
+          prefill?.periodName?.trim() ||
           "1",
 
         topic:
+          prefill?.topic?.trim() ||
           "",
       });
 
@@ -8801,6 +16449,15 @@ function AttendanceModule({
 
         setEditingSessionId(
           session.id
+        );
+
+        setSessionFromPublishedTimetable(
+          false
+        );
+
+        setSessionStudentSearch("");
+        setShowChangedAttendanceOnly(
+          false
         );
 
         setSessionForm({
@@ -8903,6 +16560,82 @@ function AttendanceModule({
         : 1;
 
 
+  const changedAttendanceStudentIds =
+    new Set(
+      batchStudents
+        .filter(
+          student => {
+            const currentMark =
+              sessionMarks[
+                student.student_id
+              ] ||
+              "Present";
+
+            const originalMark =
+              originalSessionMarks[
+                student.student_id
+              ] ||
+              "Present";
+
+            return (
+              currentMark !==
+              originalMark
+            );
+          }
+        )
+        .map(
+          student =>
+            student.student_id
+        )
+    );
+
+
+  const normalizedSessionStudentSearch =
+    sessionStudentSearch
+      .trim()
+      .toLowerCase();
+
+
+  const visibleSessionStudents =
+    batchStudents.filter(
+      student => {
+
+        if (
+          showChangedAttendanceOnly &&
+          !changedAttendanceStudentIds.has(
+            student.student_id
+          )
+        ) {
+          return false;
+        }
+
+
+        if (
+          !normalizedSessionStudentSearch
+        ) {
+          return true;
+        }
+
+
+        return [
+          student.student_name,
+          student.campus_uid,
+          student.roll_number,
+          student.department,
+        ]
+          .filter(Boolean)
+          .some(
+            value =>
+              String(value)
+                .toLowerCase()
+                .includes(
+                  normalizedSessionStudentSearch
+                )
+          );
+      }
+    );
+
+
   const saveAttendanceSession =
     async () => {
       if (
@@ -8943,6 +16676,59 @@ function AttendanceModule({
           "This batch has no students."
         );
       }
+
+
+      const presentCount =
+        sessionStatusCount(
+          "Present"
+        );
+
+      const absentCount =
+        sessionStatusCount(
+          "Absent"
+        );
+
+      const lateCount =
+        sessionStatusCount(
+          "Late"
+        );
+
+      const excusedCount =
+        sessionStatusCount(
+          "Excused"
+        );
+
+
+      const confirmed =
+        window.confirm(
+          [
+            editingSessionId
+              ? "Confirm attendance update"
+              : "Confirm attendance submission",
+            "",
+            `${selectedBatch.batch_name} · Section ${selectedBatch.section}`,
+            sessionForm.subject.trim(),
+            `Period ${sessionForm.period_name.trim()}`,
+            sessionForm.attendance_date,
+            "",
+            `Present: ${presentCount}`,
+            `Absent: ${absentCount}`,
+            `Late: ${lateCount}`,
+            `Excused: ${excusedCount}`,
+            "",
+            `Changed from initial state: ${changedAttendanceStudentIds.size}`,
+            "",
+            editingSessionId
+              ? "Save these attendance changes?"
+              : "Save this attendance?",
+          ].join("\n")
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
 
       const client =
         getSupabaseClient();
@@ -9069,6 +16855,24 @@ function AttendanceModule({
         }
 
 
+        const marksSnapshot = {
+          ...sessionMarks,
+        };
+
+        const missingMarks =
+          batchStudents.filter(
+            student =>
+              !marksSnapshot[
+                student.student_id
+              ]
+          );
+
+        if (missingMarks.length) {
+          throw new Error(
+            `Attendance status missing for ${missingMarks.length} student(s).`
+          );
+        }
+
         const entryRows =
           batchStudents.map(
             student => ({
@@ -9085,10 +16889,9 @@ function AttendanceModule({
                 student.campus_uid,
 
               attendance_status:
-                sessionMarks[
+                marksSnapshot[
                   student.student_id
-                ] ||
-                "Present",
+                ],
 
               marked_at:
                 new Date()
@@ -9136,10 +16939,9 @@ function AttendanceModule({
                 );
 
               const newMark =
-                sessionMarks[
+                marksSnapshot[
                   student.student_id
-                ] ||
-                "Present";
+                ];
 
               const oldMark =
                 originalSessionMarks[
@@ -9236,6 +17038,334 @@ function AttendanceModule({
         }
 
 
+        /*
+         * Faculty Diary automation
+         *
+         * Attendance is the source of truth for this workflow.
+         * Diary generation is intentionally isolated so a diary
+         * failure can never make successfully saved attendance
+         * appear to have failed.
+         *
+         * attendance_session_id is unique in faculty_class_diary,
+         * therefore editing attendance updates the same diary row
+         * instead of creating a duplicate.
+         */
+        let diaryWarning = "";
+
+
+        if (
+          profile.role ===
+          "Faculty"
+        ) {
+
+          try {
+
+            const normalizedSubjectKey =
+              normalizedSubject
+                .trim()
+                .toLowerCase();
+
+
+            const diaryBatchSubject =
+              batchSubjects.find(
+                item =>
+                  item.subject_name
+                    .trim()
+                    .toLowerCase() ===
+                    normalizedSubjectKey ||
+                  (
+                    item.subject_code ||
+                    ""
+                  )
+                    .trim()
+                    .toLowerCase() ===
+                    normalizedSubjectKey
+              ) || null;
+
+
+            /*
+             * Preserve the original source when editing an
+             * existing diary row. Otherwise an attendance record
+             * originally created from the published timetable
+             * could incorrectly become "Manual" during editing.
+             */
+            let diarySource =
+              sessionFromPublishedTimetable
+                ? "Published Timetable"
+                : "Manual";
+
+
+            if (editingSessionId) {
+
+              const {
+                data:
+                  existingDiary,
+                error:
+                  existingDiaryError,
+              } = await client
+                .from(
+                  "faculty_class_diary"
+                )
+                .select(
+                  "source"
+                )
+                .eq(
+                  "attendance_session_id",
+                  session.id
+                )
+                .maybeSingle();
+
+
+              if (
+                existingDiaryError
+              ) {
+                throw existingDiaryError;
+              }
+
+
+              if (
+                existingDiary?.source ===
+                  "Published Timetable" ||
+                existingDiary?.source ===
+                  "Manual"
+              ) {
+                diarySource =
+                  existingDiary.source;
+              }
+            }
+
+
+            const {
+              error:
+                diaryError,
+            } = await client
+              .from(
+                "faculty_class_diary"
+              )
+              .upsert(
+                {
+                  attendance_session_id:
+                    session.id,
+
+                  batch_id:
+                    session.batch_id,
+
+                  batch_subject_id:
+                    diaryBatchSubject?.id ||
+                    null,
+
+                  faculty_id:
+                    session.faculty_id,
+
+                  faculty_name:
+                    session.faculty_name,
+
+                  class_date:
+                    session.attendance_date,
+
+                  period_name:
+                    session.period_name,
+
+                  subject:
+                    normalizedSubject,
+
+                  topic:
+                    sessionForm.topic
+                      .trim(),
+
+                  present_count:
+                    presentCount,
+
+                  absent_count:
+                    absentCount,
+
+                  late_count:
+                    lateCount,
+
+                  excused_count:
+                    excusedCount,
+
+                  total_students:
+                    batchStudents.length,
+
+                  source:
+                    diarySource,
+
+                  updated_at:
+                    new Date()
+                      .toISOString(),
+                },
+                {
+                  onConflict:
+                    "attendance_session_id",
+                }
+              );
+
+
+            if (diaryError) {
+              throw diaryError;
+            }
+
+          } catch (
+            diaryError
+          ) {
+
+            console.error(
+              "Faculty diary automation failed:",
+              diaryError
+            );
+
+
+            diaryWarning =
+              " Attendance was saved, but the Faculty Diary could not be updated.";
+          }
+        }
+
+
+        // Attendance itself is now saved successfully.
+        //
+        // Notification generation is intentionally isolated from
+        // attendance persistence. If notification queueing fails,
+        // we keep the saved attendance and show Faculty a warning
+        // instead of incorrectly reporting that attendance failed.
+        let notificationWarning = "";
+
+        try {
+          const {
+            error:
+              notificationError,
+          } = await client.rpc(
+            "generate_attendance_notifications",
+            {
+              target_session_id:
+                session.id,
+            }
+          );
+
+          if (notificationError) {
+            console.error(
+              "Attendance notification generation failed:",
+              notificationError
+            );
+
+            notificationWarning =
+              " Attendance was saved, but notifications could not be queued.";
+          }
+        } catch (
+          notificationError
+        ) {
+          console.error(
+            "Attendance notification generation failed:",
+            notificationError
+          );
+
+          notificationWarning =
+            " Attendance was saved, but notifications could not be queued.";
+        }
+
+
+        if (!notificationWarning) {
+          await loadAttendanceNotificationDelivery(
+            session.id
+          );
+        }
+
+
+        /*
+         * Verify syllabus progress from the real completion table.
+         *
+         * We only report syllabus coverage when:
+         *   1. a syllabus topic is actually selected
+         *   2. Faculty Diary automation succeeded
+         *   3. the selected topic still exists
+         */
+        let syllabusLinked =
+          false;
+
+        let syllabusCoveredClasses =
+          0;
+
+        let syllabusPlannedClasses =
+          0;
+
+
+        if (
+          selectedSyllabusTopicId &&
+          !diaryWarning
+        ) {
+
+          try {
+
+            const selectedTopic =
+              syllabusTopics.find(
+                item =>
+                  item.id ===
+                  selectedSyllabusTopicId
+              ) ||
+              null;
+
+
+            if (selectedTopic) {
+
+              syllabusPlannedClasses =
+                Math.max(
+                  1,
+                  Number(
+                    selectedTopic
+                      .planned_periods
+                  ) ||
+                    1
+                );
+
+
+              const {
+                data:
+                  syllabusCoverageRows,
+                error:
+                  syllabusCoverageError,
+              } = await client
+                .from(
+                  "faculty_syllabus_topic_completions"
+                )
+                .select(
+                  "id"
+                )
+                .eq(
+                  "topic_id",
+                  selectedSyllabusTopicId
+                );
+
+
+              if (
+                syllabusCoverageError
+              ) {
+                throw syllabusCoverageError;
+              }
+
+
+              syllabusCoveredClasses =
+                (
+                  syllabusCoverageRows ||
+                  []
+                ).length;
+
+
+              syllabusLinked =
+                true;
+            }
+
+          } catch (
+            syllabusSummaryError
+          ) {
+
+            console.error(
+              "Post-class syllabus summary:",
+              syllabusSummaryError
+            );
+          }
+        }
+
+
         const updatedRecords =
           (
             aggregateData ||
@@ -9301,11 +17431,70 @@ function AttendanceModule({
           normalizedSubject
         );
 
+
+        /*
+         * Preserve the completed class result before clearing the
+         * Attendance modal state. This summary is derived only from
+         * the actual successful save path.
+         */
+        setPostClassSummary({
+          batchName:
+            selectedBatch.batch_name,
+
+          section:
+            selectedBatch.section,
+
+          subject:
+            normalizedSubject,
+
+          topic:
+            sessionForm.topic.trim(),
+
+          present:
+            presentCount,
+
+          absent:
+            absentCount,
+
+          late:
+            lateCount,
+
+          excused:
+            excusedCount,
+
+          total:
+            batchStudents.length,
+
+          diaryUpdated:
+            !Boolean(
+              diaryWarning
+            ),
+
+          notificationsProcessed:
+            !Boolean(
+              notificationWarning
+            ),
+
+          syllabusLinked,
+
+          syllabusCoveredClasses,
+
+          syllabusPlannedClasses,
+
+          createdAt:
+            Date.now(),
+        });
+
+
         setShowAttendanceSession(
           false
         );
 
         setEditingSessionId("");
+
+        setSessionFromPublishedTimetable(
+          false
+        );
 
         setOriginalSessionMarks(
           {}
@@ -9316,21 +17505,107 @@ function AttendanceModule({
         );
 
         setStatus(
-          editingSessionId
-            ? "Attendance updated successfully."
-            : `Attendance saved for ${selectedBatch.batch_name} · Section ${selectedBatch.section}.`
+          (
+            editingSessionId
+              ? "Attendance updated successfully."
+              : `Attendance saved for ${selectedBatch.batch_name} · Section ${selectedBatch.section}.`
+          ) +
+            notificationWarning +
+            diaryWarning
         );
 
       } catch (error) {
-        setStatus(
-          error instanceof Error
+        console.error(
+          "Attendance save failed:",
+          error
+        );
+
+        const message =
+          error &&
+          typeof error === "object" &&
+          "message" in error &&
+          typeof error.message === "string"
             ? error.message
-            : "Unable to save attendance."
+            : error instanceof Error
+            ? error.message
+            : "Unable to save attendance.";
+
+        setStatus(
+          `Unable to save attendance: ${message}`
         );
       } finally {
         setSessionSaving(false);
       }
     };
+
+
+  useEffect(
+    () => {
+
+      if (
+        !showAttendanceSession ||
+        profile.role !==
+          "Faculty"
+      ) {
+        return;
+      }
+
+
+      const normalizedSubject =
+        sessionForm.subject
+          .trim()
+          .toLowerCase();
+
+
+      const targetSubject =
+        batchSubjects.find(
+          item =>
+            item.subject_name
+              .trim()
+              .toLowerCase() ===
+              normalizedSubject
+            ||
+            item.subject_code
+              .trim()
+              .toLowerCase() ===
+              normalizedSubject
+        );
+
+
+      if (!targetSubject) {
+
+        setSyllabusUnits(
+          []
+        );
+
+        setSyllabusTopics(
+          []
+        );
+
+        setSyllabusTopicCoverageCounts(
+          {}
+        );
+
+        setSelectedSyllabusTopicId(
+          ""
+        );
+
+        return;
+      }
+
+
+      void loadAttendanceSyllabus(
+        targetSubject.id
+      );
+
+    },
+    [
+      showAttendanceSession,
+      sessionForm.subject,
+      batchSubjects,
+      profile.role,
+    ]
+  );
 
 
   const createBatch =
@@ -9340,8 +17615,10 @@ function AttendanceModule({
     ) => {
       event.preventDefault();
 
-      if (!staff) {
-        return;
+      if (!canManageAcademicStructure) {
+        return setStatus(
+          "Only Main Admin can create academic batches."
+        );
       }
 
       if (
@@ -9545,6 +17822,742 @@ function AttendanceModule({
         );
       } finally {
         setLookupBusy(false);
+      }
+    };
+
+
+  const normalizeImportHeader =
+    (value: string) =>
+      value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "");
+
+  const scanBatchStudentExcel =
+    async (
+      event: ChangeEvent<HTMLInputElement>
+    ) => {
+      const file =
+        event.target.files?.[0];
+
+      event.target.value = "";
+
+      if (!file) {
+        return;
+      }
+
+      if (!selectedBatchId) {
+        setBatchImportError(
+          "Select a batch before importing students."
+        );
+        return;
+      }
+
+      const extension =
+        file.name
+          .split(".")
+          .pop()
+          ?.toLowerCase();
+
+      if (
+        extension !== "xlsx" &&
+        extension !== "xls"
+      ) {
+        setBatchImportError(
+          "Upload an Excel .xlsx or .xls file."
+        );
+        return;
+      }
+
+      setBatchImportScanning(true);
+      setBatchImportError("");
+      setBatchImportRows([]);
+      setBatchImportFileName(file.name);
+      setStatus("");
+
+      try {
+        const buffer =
+          await file.arrayBuffer();
+
+        const workbook =
+          XLSX.read(buffer, {
+            type: "array",
+          });
+
+        const firstSheet =
+          workbook.SheetNames[0];
+
+        if (!firstSheet) {
+          throw new Error(
+            "The Excel file does not contain a worksheet."
+          );
+        }
+
+        const worksheet =
+          workbook.Sheets[firstSheet];
+
+        const rawRows =
+          XLSX.utils.sheet_to_json<
+            Record<string, unknown>
+          >(worksheet, {
+            defval: "",
+          });
+
+        if (!rawRows.length) {
+          throw new Error(
+            "The Excel worksheet is empty."
+          );
+        }
+
+        const uidAliases =
+          new Set([
+            "campusuid",
+            "campusconnectuid",
+            "uid",
+            "usn",
+            "universityseatnumber",
+            "studentid",
+            "studentuid",
+            "registrationnumber",
+            "registrationno",
+            "regno",
+          ]);
+
+        const nameAliases =
+          new Set([
+            "name",
+            "studentname",
+            "fullname",
+            "studentfullname",
+          ]);
+
+        const firstRowKeys =
+          Object.keys(rawRows[0]);
+
+        const uidKey =
+          firstRowKeys.find(key =>
+            uidAliases.has(
+              normalizeImportHeader(key)
+            )
+          );
+
+        const nameKey =
+          firstRowKeys.find(key =>
+            nameAliases.has(
+              normalizeImportHeader(key)
+            )
+          );
+
+        if (!uidKey) {
+          throw new Error(
+            "Campus UID/USN column was not detected. Use a heading such as Campus UID, CampusConnect UID, UID or USN."
+          );
+        }
+
+        const client =
+          getSupabaseClient();
+
+        if (!client) {
+          throw new Error(
+            "CampusConnect is not connected to Supabase."
+          );
+        }
+
+        const existingUids =
+          new Set(
+            batchStudents.map(student =>
+              student.campus_uid
+                .trim()
+                .toUpperCase()
+            )
+          );
+
+        const seenUids =
+          new Set<string>();
+
+        const parsed:
+          BatchStudentImportRow[] = [];
+
+        for (
+          let index = 0;
+          index < rawRows.length;
+          index += 1
+        ) {
+          const raw =
+            rawRows[index];
+
+          const uid =
+            String(
+              raw[uidKey] ?? ""
+            )
+              .trim()
+              .toUpperCase();
+
+          const sourceName =
+            nameKey
+              ? String(
+                  raw[nameKey] ?? ""
+                ).trim()
+              : "";
+
+          if (!uid) {
+            parsed.push({
+              rowNumber: index + 2,
+              sourceUid: "",
+              sourceName,
+              student: null,
+              status: "invalid",
+              message:
+                "Campus UID is missing.",
+            });
+
+            continue;
+          }
+
+          if (seenUids.has(uid)) {
+            parsed.push({
+              rowNumber: index + 2,
+              sourceUid: uid,
+              sourceName,
+              student: null,
+              status: "duplicate-file",
+              message:
+                "Duplicate UID in this Excel file.",
+            });
+
+            continue;
+          }
+
+          seenUids.add(uid);
+
+          if (existingUids.has(uid)) {
+            parsed.push({
+              rowNumber: index + 2,
+              sourceUid: uid,
+              sourceName,
+              student: null,
+              status: "already-in-batch",
+              message:
+                "Already in this batch.",
+            });
+
+            continue;
+          }
+
+          const {
+            data,
+            error,
+          } = await client.rpc(
+            "find_attendance_student_by_uid",
+            {
+              target_uid: uid,
+            }
+          );
+
+          if (error) {
+            throw error;
+          }
+
+          const student =
+            Array.isArray(data)
+              ? (
+                  data[0] as
+                    | AttendanceStudentLookup
+                    | undefined
+                )
+              : undefined;
+
+          if (!student) {
+            parsed.push({
+              rowNumber: index + 2,
+              sourceUid: uid,
+              sourceName,
+              student: null,
+              status: "not-found",
+              message:
+                "No registered CampusConnect student found.",
+            });
+
+            continue;
+          }
+
+          parsed.push({
+            rowNumber: index + 2,
+            sourceUid: uid,
+            sourceName,
+            student,
+            status: "ready",
+            message:
+              "Verified and ready to add.",
+          });
+        }
+
+        setBatchImportRows(parsed);
+
+        const ready =
+          parsed.filter(
+            row =>
+              row.status === "ready"
+          ).length;
+
+        setStatus(
+          `${parsed.length} row${parsed.length === 1 ? "" : "s"} scanned · ${ready} verified student${ready === 1 ? "" : "s"} ready to import.`
+        );
+      } catch (error) {
+        setBatchImportRows([]);
+
+        setBatchImportError(
+          error instanceof Error
+            ? error.message
+            : "Unable to scan Excel file."
+        );
+      } finally {
+        setBatchImportScanning(false);
+      }
+    };
+
+
+  const importVerifiedBatchStudents =
+    async () => {
+      if (
+        !selectedBatchId ||
+        batchImportSaving
+      ) {
+        return;
+      }
+
+      const readyRows =
+        batchImportRows.filter(
+          row =>
+            row.status === "ready" &&
+            row.student
+        );
+
+      if (!readyRows.length) {
+        setBatchImportError(
+          "There are no verified students ready to import."
+        );
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        setBatchImportError(
+          "CampusConnect is not connected to Supabase."
+        );
+        return;
+      }
+
+      setBatchImportSaving(true);
+      setBatchImportError("");
+      setStatus("");
+
+      try {
+        const {
+          data: auth,
+        } =
+          await client.auth.getUser();
+
+        if (!auth.user) {
+          throw new Error(
+            "Your session has expired. Sign in again."
+          );
+        }
+
+        const payload =
+          readyRows.map(row => {
+            const student =
+              row.student as AttendanceStudentLookup;
+
+            return {
+              batch_id:
+                selectedBatchId,
+
+              student_id:
+                student.id,
+
+              student_name:
+                student.full_name,
+
+              campus_uid:
+                student.campus_uid,
+
+              department:
+                student.department || "",
+
+              graduation_year:
+                student.graduation_year || "",
+
+              added_by:
+                auth.user!.id,
+            };
+          });
+
+        const {
+          error,
+        } = await client
+          .from(
+            "attendance_batch_students"
+          )
+          .insert(payload);
+
+        if (error) {
+          throw error;
+        }
+
+        await loadBatchStudents(
+          selectedBatchId
+        );
+
+        await loadBatches();
+
+        const imported =
+          payload.length;
+
+        setBatchImportRows([]);
+        setBatchImportFileName("");
+
+        setStatus(
+          `${imported} verified student${imported === 1 ? "" : "s"} added to ${selectedBatch?.batch_name || "the batch"}.`
+        );
+      } catch (error) {
+        setBatchImportError(
+          error instanceof Error
+            ? error.message
+            : "Unable to import students."
+        );
+      } finally {
+        setBatchImportSaving(false);
+      }
+    };
+
+
+  const closeGuardianContact =
+    () => {
+      if (guardianSaving) {
+        return;
+      }
+
+      setGuardianStudent(null);
+      setGuardianContact({
+        ...emptyAttendanceGuardianContact,
+      });
+      setGuardianContactExists(false);
+      setGuardianError("");
+      setGuardianMessage("");
+    };
+
+
+  const openGuardianContact =
+    async (
+      student:
+        AttendanceBatchStudent
+    ) => {
+      if (
+        profile.role !== "Faculty" &&
+        profile.role !== "Main Admin"
+      ) {
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        setStatus(
+          "CampusConnect is not connected to Supabase."
+        );
+        return;
+      }
+
+      setGuardianStudent(student);
+      setGuardianContact({
+        ...emptyAttendanceGuardianContact,
+      });
+      setGuardianContactExists(false);
+      setGuardianLoading(true);
+      setGuardianSaving(false);
+      setGuardianError("");
+      setGuardianMessage("");
+
+      try {
+        const {
+          data,
+          error,
+        } = await client
+          .from(
+            "student_guardian_contacts"
+          )
+          .select(
+            "guardian_name,relationship,email,phone,sms_enabled,email_enabled"
+          )
+          .eq(
+            "student_id",
+            student.student_id
+          )
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          setGuardianContact({
+            guardian_name:
+              data.guardian_name || "",
+
+            relationship:
+              data.relationship ||
+              "Parent",
+
+            email:
+              data.email || "",
+
+            phone:
+              data.phone || "",
+
+            sms_enabled:
+              data.sms_enabled !== false,
+
+            email_enabled:
+              data.email_enabled !== false,
+          });
+
+          setGuardianContactExists(true);
+
+          setGuardianKnownStudents(
+            current => {
+              const next =
+                new Set(current);
+
+              next.add(
+                student.student_id
+              );
+
+              return next;
+            }
+          );
+        }
+
+      } catch (error) {
+        setGuardianError(
+          error instanceof Error
+            ? error.message
+            : "Unable to load guardian contact."
+        );
+      } finally {
+        setGuardianLoading(false);
+      }
+    };
+
+
+  const saveGuardianContact =
+    async (
+      event:
+        FormEvent<HTMLFormElement>
+    ) => {
+      event.preventDefault();
+
+      if (
+        !guardianStudent ||
+        guardianSaving
+      ) {
+        return;
+      }
+
+      if (
+        profile.role !== "Faculty" &&
+        profile.role !== "Main Admin"
+      ) {
+        setGuardianError(
+          "You do not have permission to manage guardian contacts."
+        );
+        return;
+      }
+
+      const guardianName =
+        guardianContact.guardian_name
+          .trim();
+
+      const relationship =
+        guardianContact.relationship
+          .trim() || "Parent";
+
+      const email =
+        guardianContact.email
+          .trim()
+          .toLowerCase();
+
+      const rawPhone =
+        guardianContact.phone.trim();
+
+      const phone =
+        rawPhone.replace(
+          /[\s()-]/g,
+          ""
+        );
+
+      if (!guardianName) {
+        setGuardianError(
+          "Enter the parent or guardian name."
+        );
+        return;
+      }
+
+      if (
+        guardianContact.email_enabled &&
+        !email
+      ) {
+        setGuardianError(
+          "Guardian email is required while email alerts are enabled."
+        );
+        return;
+      }
+
+      if (
+        email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+          email
+        )
+      ) {
+        setGuardianError(
+          "Enter a valid guardian email address."
+        );
+        return;
+      }
+
+      if (
+        guardianContact.sms_enabled &&
+        !phone
+      ) {
+        setGuardianError(
+          "Guardian mobile number is required while SMS alerts are enabled."
+        );
+        return;
+      }
+
+      if (
+        phone &&
+        !/^\+?[0-9]{8,15}$/.test(
+          phone
+        )
+      ) {
+        setGuardianError(
+          "Enter a valid guardian mobile number including country code when required."
+        );
+        return;
+      }
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        setGuardianError(
+          "CampusConnect is not connected to Supabase."
+        );
+        return;
+      }
+
+      setGuardianSaving(true);
+      setGuardianError("");
+      setGuardianMessage("");
+
+      try {
+        const {
+          data,
+          error,
+        } = await client
+          .from(
+            "student_guardian_contacts"
+          )
+          .upsert(
+            {
+              student_id:
+                guardianStudent.student_id,
+
+              guardian_name:
+                guardianName,
+
+              relationship,
+
+              email,
+
+              phone,
+
+              sms_enabled:
+                guardianContact.sms_enabled,
+
+              email_enabled:
+                guardianContact.email_enabled,
+
+              updated_at:
+                new Date()
+                  .toISOString(),
+            },
+            {
+              onConflict:
+                "student_id",
+            }
+          )
+          .select(
+            "guardian_name,relationship,email,phone,sms_enabled,email_enabled"
+          )
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        setGuardianContact({
+          guardian_name:
+            data.guardian_name || "",
+
+          relationship:
+            data.relationship ||
+            "Parent",
+
+          email:
+            data.email || "",
+
+          phone:
+            data.phone || "",
+
+          sms_enabled:
+            data.sms_enabled !== false,
+
+          email_enabled:
+            data.email_enabled !== false,
+        });
+
+        setGuardianContactExists(true);
+
+        setGuardianKnownStudents(
+          current => {
+            const next =
+              new Set(current);
+
+            next.add(
+              guardianStudent.student_id
+            );
+
+            return next;
+          }
+        );
+
+        setGuardianMessage(
+          "Guardian contact saved successfully."
+        );
+
+      } catch (error) {
+        setGuardianError(
+          error instanceof Error
+            ? error.message
+            : "Unable to save guardian contact."
+        );
+      } finally {
+        setGuardianSaving(false);
       }
     };
 
@@ -9922,6 +18935,13 @@ function AttendanceModule({
       batch:
         AttendanceBatch
     ) => {
+      if (!canManageAcademicStructure) {
+        setStatus(
+          "Only Main Admin can delete academic batches."
+        );
+        return;
+      }
+
       const confirmed =
         window.confirm(
           `Delete ${batch.batch_name} · Section ${batch.section}? The batch roster will also be removed. Attendance history will remain available.`
@@ -10067,46 +19087,389 @@ function AttendanceModule({
       );
 
 
-  const studentRecords =
-    staff
-      ? records
-      : records;
+  const normalizeAttendanceSubject =
+    (value: string) =>
+      value
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ");
 
 
-  const attendanceChartData =
-    studentRecords.map(
-      item => ({
-        subject:
-          item.subject,
+  const attendanceBySubject =
+    new Map<
+      string,
+      StudentLiveAttendance
+    >();
 
-        attendance:
-          item.total
-            ? Math.round(
-                (
-                  item.attended /
-                  item.total
-                ) *
-                100
-              )
-            : 0,
-      })
+  liveStudentAttendance.forEach(
+    item => {
+      const key =
+        normalizeAttendanceSubject(
+          item.subject
+        );
+
+      const existing =
+        attendanceBySubject.get(
+          key
+        );
+
+      if (!existing) {
+        attendanceBySubject.set(
+          key,
+          {
+            ...item,
+          }
+        );
+
+        return;
+      }
+
+      const classesConducted =
+        existing.classes_conducted +
+        item.classes_conducted;
+
+      const countedClasses =
+        existing.counted_classes +
+        item.counted_classes;
+
+      const attendedClasses =
+        existing.attended_classes +
+        item.attended_classes;
+
+      attendanceBySubject.set(
+        key,
+        {
+          ...existing,
+
+          classes_conducted:
+            classesConducted,
+
+          counted_classes:
+            countedClasses,
+
+          attended_classes:
+            attendedClasses,
+
+          present_count:
+            existing.present_count +
+            item.present_count,
+
+          absent_count:
+            existing.absent_count +
+            item.absent_count,
+
+          late_count:
+            existing.late_count +
+            item.late_count,
+
+          excused_count:
+            existing.excused_count +
+            item.excused_count,
+
+          attendance_percentage:
+            countedClasses
+              ? (
+                  attendedClasses /
+                  countedClasses
+                ) * 100
+              : 0,
+        }
+      );
+    }
+  );
+
+
+  const configuredStudentSubjects =
+    studentBatchSubjects.length
+      ? studentBatchSubjects.map(
+          item => ({
+            id: item.id,
+            subject_name:
+              item.subject_name,
+            subject_code:
+              item.subject_code,
+            credits:
+              item.credits,
+            subject_type:
+              item.subject_type,
+            faculty_name:
+              item.faculty_name,
+            faculty_id:
+              item.faculty_id,
+            faculty_avatar_url:
+              item.faculty_avatar_url ||
+              null,
+            semester:
+              studentBatch?.semester ||
+              null,
+            academic_year:
+              studentBatch
+                ?.academic_year ||
+              "",
+          })
+        )
+      : studentSubjects.map(
+          item => ({
+            ...item,
+            faculty_id:
+              "",
+            faculty_avatar_url:
+              null as string | null,
+          })
+        );
+
+
+  const academicSubjectKeys =
+    new Set(
+      configuredStudentSubjects.map(
+        item =>
+          normalizeAttendanceSubject(
+            item.subject_name
+          )
+      )
     );
 
 
-  const average =
-    attendanceChartData.length
-      ? Math.round(
-          attendanceChartData
-            .reduce(
-              (
-                sum,
-                item
-              ) =>
-                sum +
-                item.attendance,
+  const studentSubjectCards = [
+    ...configuredStudentSubjects.map(
+      item => {
+        const attendance =
+          attendanceBySubject.get(
+            normalizeAttendanceSubject(
+              item.subject_name
+            )
+          );
+
+        return {
+          id:
+            item.id,
+
+          subject:
+            item.subject_name,
+
+          subject_code:
+            item.subject_code,
+
+          credits:
+            item.credits,
+
+          subject_type:
+            item.subject_type ||
+            "Theory",
+
+          faculty_name:
+            item.faculty_name,
+
+          faculty_id:
+            item.faculty_id,
+
+          faculty_avatar_url:
+            item.faculty_avatar_url ||
+            null,
+
+          semester:
+            item.semester,
+
+          academic_year:
+            item.academic_year,
+
+          classes_conducted:
+            attendance
+              ?.classes_conducted ||
+            0,
+
+          counted_classes:
+            attendance
+              ?.counted_classes ||
+            0,
+
+          attended_classes:
+            attendance
+              ?.attended_classes ||
+            0,
+
+          present_count:
+            attendance
+              ?.present_count ||
+            0,
+
+          absent_count:
+            attendance
+              ?.absent_count ||
+            0,
+
+          late_count:
+            attendance
+              ?.late_count ||
+            0,
+
+          excused_count:
+            attendance
+              ?.excused_count ||
+            0,
+
+          attendance_percentage:
+            attendance
+              ?.attendance_percentage ||
+            0,
+        };
+      }
+    ),
+
+    ...liveStudentAttendance
+      .filter(
+        item =>
+          !academicSubjectKeys.has(
+            normalizeAttendanceSubject(
+              item.subject
+            )
+          )
+      )
+      .map(item => ({
+        ...item,
+
+        id:
+          `attendance-${item.subject}`,
+
+        subject_code:
+          "",
+
+        credits:
+          null,
+
+        subject_type:
+          "Theory",
+
+        faculty_name:
+          "",
+
+        faculty_id:
+          "",
+
+        faculty_avatar_url:
+          null as string | null,
+
+        semester:
+          null,
+
+        academic_year:
+          "",
+      })),
+  ];
+
+
+  const attendanceHistorySubjects =
+    Array.from(
+      new Set(
+        studentAttendanceHistory
+          .map(item => item.subject)
+          .filter(Boolean)
+      )
+    ).sort(
+      (a, b) =>
+        a.localeCompare(b)
+    );
+
+
+  const visibleStudentAttendanceHistory =
+    attendanceHistorySubject === "All"
+      ? studentAttendanceHistory
+      : studentAttendanceHistory.filter(
+          item =>
+            normalizeAttendanceSubject(
+              item.subject
+            ) ===
+            normalizeAttendanceSubject(
+              attendanceHistorySubject
+            )
+        );
+
+
+  const attendanceChartData =
+    staff
+      ? records.map(
+          item => ({
+            subject:
+              item.subject,
+
+            attendance:
+              item.total
+                ? Math.round(
+                    (
+                      item.attended /
+                      item.total
+                    ) *
+                    100
+                  )
+                : 0,
+
+            classes:
+              item.total,
+
+            attended:
+              item.attended,
+          })
+        )
+      : studentSubjectCards
+          .filter(
+            item =>
+              item.counted_classes >
               0
-            ) /
-          attendanceChartData.length
+          )
+          .map(
+            item => ({
+              subject:
+                item.subject,
+
+              attendance:
+                Math.round(
+                  item.attendance_percentage
+                ),
+
+              classes:
+                item.counted_classes,
+
+              attended:
+                item.attended_classes,
+            })
+          );
+
+
+  /*
+   * Calculate overall attendance using the total number of
+   * recorded classes as the weight. This keeps the Attendance
+   * Center consistent with the dashboard percentage.
+   */
+  const totalRecordedClasses =
+    attendanceChartData.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        item.classes,
+      0
+    );
+
+  const totalAttendedClasses =
+    attendanceChartData.reduce(
+      (
+        sum,
+        item
+      ) =>
+        sum +
+        item.attended,
+      0
+    );
+
+  const average =
+    totalRecordedClasses > 0
+      ? Math.round(
+          (
+            totalAttendedClasses /
+            totalRecordedClasses
+          ) *
+          100
         )
       : 0;
 
@@ -10114,16 +19477,18 @@ function AttendanceModule({
   const safeSubjects =
     attendanceChartData.filter(
       item =>
+        item.classes > 0 &&
         item.attendance >=
-        75
+        85
     ).length;
 
 
   const shortageSubjects =
     attendanceChartData.filter(
       item =>
+        item.classes > 0 &&
         item.attendance <
-        75
+        85
     ).length;
 
 
@@ -10168,7 +19533,7 @@ function AttendanceModule({
             </strong>
 
             <small>
-              Attendance ≥ 75%
+              Attendance ≥ 85%
             </small>
 
           </article>
@@ -10185,7 +19550,7 @@ function AttendanceModule({
             </strong>
 
             <small>
-              Subjects below 75%
+              Subjects below 85%
             </small>
 
           </article>
@@ -10193,57 +19558,312 @@ function AttendanceModule({
         </section>
 
 
+        <section className="studentAttendanceBatchCard card">
+
+          <div className="studentAttendanceBatchHeading">
+
+            <div>
+              <span>
+                MY BATCH
+              </span>
+
+              <h2>
+                {studentBatch
+                  ? studentBatch.batch_name
+                  : "Batch not assigned"}
+              </h2>
+
+              <p>
+                {studentBatch
+                  ? [
+                      studentBatch.department,
+                      studentBatch.section
+                        ? `Section ${studentBatch.section}`
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")
+                  : "Ask your faculty to add you to an attendance batch."}
+              </p>
+            </div>
+
+            {studentBatch && (
+              <strong>
+                {studentBatch.total_students}
+                <small>
+                  students
+                </small>
+              </strong>
+            )}
+
+          </div>
+
+
+          {studentBatch && (
+            <div className="studentAttendanceBatchMeta">
+
+              <div>
+                <span>
+                  SEMESTER
+                </span>
+
+                <strong>
+                  {studentBatch.semester ||
+                    "—"}
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  ACADEMIC YEAR
+                </span>
+
+                <strong>
+                  {studentBatch.academic_year ||
+                    "—"}
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  SECTION
+                </span>
+
+                <strong>
+                  {studentBatch.section ||
+                    "—"}
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  DEPARTMENT
+                </span>
+
+                <strong>
+                  {studentBatch.department ||
+                    profile.department ||
+                    "—"}
+                </strong>
+              </div>
+
+            </div>
+          )}
+
+        </section>
+
+
+        <section className="studentAttendanceSubjectsHeader">
+
+          <div>
+            <span>
+              MY SUBJECTS
+            </span>
+
+            <h2>
+              Subject attendance
+            </h2>
+
+            <p>
+              Credits, class type and live attendance from your faculty sessions.
+            </p>
+          </div>
+
+          <strong>
+            {studentSubjectCards.length}
+            <small>
+              subjects
+            </small>
+          </strong>
+
+        </section>
+
+
         <section className="attendanceSubjectGrid">
 
-          {records.map(
+          {studentSubjectCards.map(
             item => {
               const percent =
-                item.total
-                  ? Math.round(
-                      (
-                        item.attended /
-                        item.total
-                      ) *
-                      100
-                    )
-                  : 0;
+                Math.round(
+                  item.attendance_percentage
+                );
+
+              const hasClasses =
+                item.classes_conducted >
+                0;
+
+              const subjectType =
+                String(
+                  item.subject_type ||
+                  "Theory"
+                );
+
+              const hasLab =
+                /lab|practical/i.test(
+                  subjectType
+                );
 
               return (
                 <article
-                  className="attendanceSubjectCard card"
+                  className={
+                    hasClasses
+                      ? "attendanceSubjectCard card"
+                      : "attendanceSubjectCard attendanceSubjectCardEmpty card"
+                  }
                   key={item.id}
                 >
 
-                  <div>
-                    <span>
-                      {percent >= 75
-                        ? "ON TRACK"
-                        : "ATTENTION"}
-                    </span>
+                  <div className="attendanceSubjectIdentity">
+
+                    <div className="attendanceSubjectBadges">
+
+                      <span>
+                        {!hasClasses
+                          ? "NO CLASSES YET"
+                          : percent >= 85
+                          ? "ON TRACK"
+                          : "ATTENTION"}
+                      </span>
+
+                      <em>
+                        {subjectType}
+                      </em>
+
+                      {hasLab && (
+                        <em className="lab">
+                          LAB
+                        </em>
+                      )}
+
+                    </div>
 
                     <h3>
                       {item.subject}
                     </h3>
+
+                    <small className="attendanceSubjectCode">
+                      {item.subject_code
+                        ? `Course code · ${item.subject_code}`
+                        : "Course code not assigned"}
+                    </small>
+
+
+                    <button
+                      type="button"
+                      className="studentSubjectFaculty studentSubjectFacultyButton"
+                      disabled={
+                        !item.faculty_id
+                      }
+                      onClick={() =>
+                        void openAttendanceFacultyProfile(
+                          item.faculty_id
+                        )
+                      }
+                    >
+
+                      {item.faculty_avatar_url ? (
+                        <img
+                          src={
+                            item.faculty_avatar_url
+                          }
+                          alt={
+                            item.faculty_name ||
+                            "Faculty"
+                          }
+                        />
+                      ) : (
+                        <i>
+                          {(item.faculty_name ||
+                            "F")
+                            .trim()
+                            .charAt(0)
+                            .toUpperCase()}
+                        </i>
+                      )}
+
+                      <div>
+
+                        <span>
+                          COURSE FACULTY
+                        </span>
+
+                        <strong>
+                          {item.faculty_name ||
+                            "Faculty not assigned"}
+                        </strong>
+
+                        {item.faculty_id && (
+                          <small>
+                            View faculty profile
+                          </small>
+                        )}
+
+                      </div>
+
+                      {item.faculty_id && (
+                        <b aria-hidden="true">
+                          →
+                        </b>
+                      )}
+
+                    </button>
+
                   </div>
 
-                  <strong>
-                    {percent}%
-                  </strong>
 
-                  <p>
-                    {item.attended} present
-                    out of {item.total}
-                    {" "}classes
-                  </p>
+                  <div className="attendanceSubjectScore">
+
+                    <strong>
+                      {hasClasses
+                        ? `${percent}%`
+                        : "—"}
+                    </strong>
+
+                    <small className="attendanceSubjectCredits">
+                      {item.credits !== null &&
+                      item.credits !== undefined &&
+                      Number(item.credits) >= 1 &&
+                      Number(item.credits) <= 4
+                        ? `${Number(item.credits)} ${
+                            Number(item.credits) === 1
+                              ? "Credit"
+                              : "Credits"
+                          }`
+                        : "Credit not assigned"}
+                    </small>
+
+                  </div>
+
+
+                  <div className="attendanceSubjectCompactInfo">
+
+                    <p>
+                      {hasClasses
+                        ? `${item.attended_classes} attended of ${item.counted_classes} counted ${item.counted_classes === 1 ? "class" : "classes"}`
+                        : "Attendance will appear after the first recorded class."}
+                    </p>
+
+                    <span>
+                      {hasClasses
+                        ? `${item.classes_conducted} ${item.classes_conducted === 1 ? "class" : "classes"} conducted`
+                        : "No classes conducted yet"}
+                    </span>
+
+                  </div>
+
 
                   <i>
                     <span
                       style={{
                         width:
-                          `${Math.min(
-                            100,
-                            percent
-                          )}%`,
+                          hasClasses
+                            ? percent === 0
+                              ? "2%"
+                              : `${Math.min(
+                                  100,
+                                  percent
+                                )}%`
+                            : "0%",
                       }}
                     />
                   </i>
@@ -10256,7 +19876,205 @@ function AttendanceModule({
         </section>
 
 
-        {!records.length &&
+        <section className="studentAttendanceHistory card">
+
+          <header className="studentAttendanceHistoryHeader">
+
+            <div>
+              <span>
+                ATTENDANCE HISTORY
+              </span>
+
+              <h2>
+                Class-by-class attendance
+              </h2>
+
+              <p>
+                Review each recorded class with your attendance status, date and recorded time.
+              </p>
+            </div>
+
+
+            <button
+              type="button"
+              className="studentAttendanceHistoryToggle"
+              aria-expanded={
+                showStudentAttendanceHistory
+              }
+              onClick={() =>
+                setShowStudentAttendanceHistory(
+                  current => !current
+                )
+              }
+            >
+              {showStudentAttendanceHistory
+                ? "Hide history"
+                : "Show history"}
+            </button>
+
+          </header>
+
+
+          {showStudentAttendanceHistory && (
+            <div className="studentAttendanceHistoryContent">
+
+              {!!attendanceHistorySubjects.length && (
+                <div className="studentAttendanceHistoryFilters">
+
+                  <button
+                    type="button"
+                    className={
+                      attendanceHistorySubject === "All"
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() =>
+                      setAttendanceHistorySubject(
+                        "All"
+                      )
+                    }
+                  >
+                    All
+                  </button>
+
+                  {attendanceHistorySubjects.map(
+                    item => (
+                      <button
+                        type="button"
+                        key={item}
+                        className={
+                          attendanceHistorySubject === item
+                            ? "active"
+                            : ""
+                        }
+                        onClick={() =>
+                          setAttendanceHistorySubject(
+                            item
+                          )
+                        }
+                      >
+                        {item}
+                      </button>
+                    )
+                  )}
+
+                </div>
+              )}
+
+
+              {visibleStudentAttendanceHistory.length ? (
+                <div className="studentAttendanceHistoryList">
+
+                  {visibleStudentAttendanceHistory.map(
+                    item => {
+                      const markedDate =
+                        item.marked_at
+                          ? new Date(
+                              item.marked_at
+                            )
+                          : null;
+
+                      const statusClass =
+                        item.attendance_status
+                          .toLowerCase();
+
+                      return (
+                        <article
+                          className="studentAttendanceHistoryRow"
+                          key={`${item.session_id}-${item.marked_at}`}
+                        >
+
+                          <div className="studentAttendanceHistoryDate">
+
+                            <strong>
+                              {new Intl.DateTimeFormat(
+                                "en-IN",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                }
+                              ).format(
+                                new Date(
+                                  `${item.attendance_date}T00:00:00`
+                                )
+                              )}
+                            </strong>
+
+                            <span>
+                              {markedDate
+                                ? new Intl.DateTimeFormat(
+                                    "en-IN",
+                                    {
+                                      hour: "numeric",
+                                      minute: "2-digit",
+                                      hour12: true,
+                                    }
+                                  ).format(
+                                    markedDate
+                                  )
+                                : "—"}
+                            </span>
+
+                          </div>
+
+
+                          <div className="studentAttendanceHistoryInfo">
+
+                            <span>
+                              PERIOD {item.period_name || "—"}
+                            </span>
+
+                            <h3>
+                              {item.subject}
+                            </h3>
+
+                            <p>
+                              {item.topic ||
+                                "No topic added"}
+                            </p>
+
+                            {item.faculty_name && (
+                              <small>
+                                {item.faculty_name}
+                              </small>
+                            )}
+
+                          </div>
+
+
+                          <strong
+                            className={`studentAttendanceHistoryStatus ${statusClass}`}
+                          >
+                            {item.attendance_status}
+                          </strong>
+
+                        </article>
+                      );
+                    }
+                  )}
+
+                </div>
+              ) : (
+                <div className="studentAttendanceHistoryEmpty">
+
+                  <strong>
+                    No attendance history yet
+                  </strong>
+
+                  <p>
+                    Your class history will appear after faculty records attendance.
+                  </p>
+
+                </div>
+              )}
+
+            </div>
+          )}
+
+        </section>
+
+
+        {!studentSubjectCards.length &&
           !loading && (
           <EmptyState
             title="No attendance records yet"
@@ -10264,13 +20082,813 @@ function AttendanceModule({
           />
         )}
 
+      {(
+        facultyProfileLoading ||
+        facultyProfileError ||
+        selectedFacultyProfile
+      ) && (
+        <div
+          className="attendanceFacultyProfileScrim"
+          role="presentation"
+          onClick={
+            closeAttendanceFacultyProfile
+          }
+        >
+
+          <section
+            className="attendanceFacultyProfileModal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Faculty profile"
+            onClick={
+              event =>
+                event.stopPropagation()
+            }
+          >
+
+            <button
+              type="button"
+              className="attendanceFacultyProfileClose"
+              aria-label="Close faculty profile"
+              onClick={
+                closeAttendanceFacultyProfile
+              }
+            >
+              ×
+            </button>
+
+
+            {facultyProfileLoading ? (
+              <div className="attendanceFacultyProfileLoading">
+                <span />
+                <strong>
+                  Loading faculty profile...
+                </strong>
+              </div>
+            ) : facultyProfileError ? (
+              <div className="attendanceFacultyProfileError">
+
+                <strong>
+                  Profile unavailable
+                </strong>
+
+                <p>
+                  {facultyProfileError}
+                </p>
+
+              </div>
+            ) : selectedFacultyProfile && (
+              <>
+
+                <div className="attendanceFacultyProfileCover">
+
+                  {selectedFacultyProfile.cover_url && (
+                    <img
+                      src={
+                        selectedFacultyProfile.cover_url
+                      }
+                      alt=""
+                    />
+                  )}
+
+                </div>
+
+
+                <div className="attendanceFacultyProfileBody">
+
+                  <div className="attendanceFacultyProfileIdentity">
+
+                    {selectedFacultyProfile.avatar_url ? (
+                      <img
+                        src={
+                          selectedFacultyProfile.avatar_url
+                        }
+                        alt={
+                          selectedFacultyProfile.full_name
+                        }
+                      />
+                    ) : (
+                      <i>
+                        {selectedFacultyProfile.full_name
+                          .charAt(0)
+                          .toUpperCase()}
+                      </i>
+                    )}
+
+
+                    <div>
+
+                      <span>
+                        FACULTY PROFILE
+                      </span>
+
+                      <h2>
+                        {selectedFacultyProfile.full_name}
+                      </h2>
+
+                      <p>
+                        {selectedFacultyProfile.headline ||
+                          [
+                            selectedFacultyProfile.role,
+                            selectedFacultyProfile.department,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ") ||
+                          "CampusConnect Faculty"}
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="attendanceFacultyProfileMeta">
+
+                    {selectedFacultyProfile.department && (
+                      <div>
+                        <span>
+                          DEPARTMENT
+                        </span>
+
+                        <strong>
+                          {selectedFacultyProfile.department}
+                        </strong>
+                      </div>
+                    )}
+
+                    {selectedFacultyProfile.role && (
+                      <div>
+                        <span>
+                          ROLE
+                        </span>
+
+                        <strong>
+                          {selectedFacultyProfile.role}
+                        </strong>
+                      </div>
+                    )}
+
+                    {selectedFacultyProfile.location && (
+                      <div>
+                        <span>
+                          LOCATION
+                        </span>
+
+                        <strong>
+                          {selectedFacultyProfile.location}
+                        </strong>
+                      </div>
+                    )}
+
+                  </div>
+
+
+                  <section className="attendanceFacultyAbout">
+
+                    <span>
+                      ABOUT
+                    </span>
+
+                    <h3>
+                      About this faculty
+                    </h3>
+
+                    <p>
+                      {selectedFacultyProfile.bio ||
+                        "This faculty member has not added an about section yet."}
+                    </p>
+
+                  </section>
+
+
+                  {!!selectedFacultyProfile.skills?.length && (
+                    <section className="attendanceFacultySkills">
+
+                      <span>
+                        EXPERTISE
+                      </span>
+
+                      <div>
+                        {selectedFacultyProfile.skills.map(
+                          skill => (
+                            <small
+                              key={skill}
+                            >
+                              {skill}
+                            </small>
+                          )
+                        )}
+                      </div>
+
+                    </section>
+                  )}
+
+
+                  {(
+                    selectedFacultyProfile.linkedin_url ||
+                    selectedFacultyProfile.github_url ||
+                    selectedFacultyProfile.portfolio_url
+                  ) && (
+                    <div className="attendanceFacultyProfileLinks">
+
+                      {selectedFacultyProfile.linkedin_url && (
+                        <a
+                          href={
+                            selectedFacultyProfile.linkedin_url
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          LinkedIn
+                        </a>
+                      )}
+
+                      {selectedFacultyProfile.github_url && (
+                        <a
+                          href={
+                            selectedFacultyProfile.github_url
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          GitHub
+                        </a>
+                      )}
+
+                      {selectedFacultyProfile.portfolio_url && (
+                        <a
+                          href={
+                            selectedFacultyProfile.portfolio_url
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Portfolio
+                        </a>
+                      )}
+
+                    </div>
+                  )}
+
+                </div>
+
+              </>
+            )}
+
+          </section>
+
+        </div>
+      )}
+
+
       </div>
     );
   }
 
 
+  /*
+   * Today's Classes → Attendance handoff
+   *
+   * Step 1:
+   * Select the exact timetable batch once the Faculty-accessible
+   * batch list is available.
+   */
+  useEffect(
+    () => {
+
+      if (
+        !attendanceClassHandoff ||
+        !batches.length
+      ) {
+        return;
+      }
+
+
+      const targetBatch =
+        batches.find(
+          batch =>
+            batch.id ===
+            attendanceClassHandoff.batchId
+        );
+
+
+      if (!targetBatch) {
+
+        setStatus(
+          "This scheduled class is not available in your Faculty attendance access."
+        );
+
+
+        try {
+          window.sessionStorage.removeItem(
+            "campusconnect:faculty-attendance-class"
+          );
+        } catch {
+          // Storage cleanup is non-critical.
+        }
+
+
+        setAttendanceClassHandoff(
+          null
+        );
+
+        return;
+      }
+
+
+      if (
+        selectedBatchId !==
+        targetBatch.id
+      ) {
+
+        setSelectedBatchId(
+          targetBatch.id
+        );
+
+      }
+
+    },
+    [
+      attendanceClassHandoff,
+      batches,
+      selectedBatchId,
+    ]
+  );
+
+
+  /*
+   * Step 2:
+   * loadBatchSubjects() already reacts to selectedBatchId.
+   *
+   * Wait until those subjects arrive, then resolve the exact
+   * batch_subject_id supplied by the published timetable.
+   */
+  useEffect(
+    () => {
+
+      if (
+        !attendanceClassHandoff ||
+        selectedBatchId !==
+          attendanceClassHandoff.batchId ||
+        !batchSubjects.length
+      ) {
+        return;
+      }
+
+
+      /*
+       * selectedBatchId can change one render before the
+       * async subject loader replaces batchSubjects.
+       *
+       * During that short window batchSubjects may still
+       * belong to the previously selected batch. Do not
+       * reject the timetable handoff until the subject
+       * collection actually belongs to the requested batch.
+       */
+      const subjectsBelongToTargetBatch =
+        batchSubjects.every(
+          item =>
+            item.batch_id ===
+            attendanceClassHandoff.batchId
+        );
+
+
+      if (!subjectsBelongToTargetBatch) {
+        return;
+      }
+
+
+      const targetSubject =
+        batchSubjects.find(
+          item =>
+            item.id ===
+            attendanceClassHandoff
+              .batchSubjectId
+        );
+
+
+      if (!targetSubject) {
+
+        setStatus(
+          "The scheduled timetable subject is not available in this batch attendance workspace."
+        );
+
+
+        try {
+          window.sessionStorage.removeItem(
+            "campusconnect:faculty-attendance-class"
+          );
+        } catch {
+          // Storage cleanup is non-critical.
+        }
+
+
+        setAttendanceClassHandoff(
+          null
+        );
+
+        return;
+      }
+
+
+      setSubject(
+        targetSubject.subject_name
+      );
+
+
+      const periodName =
+        attendanceClassHandoff
+          .periodEnd >
+        attendanceClassHandoff
+          .periodStart
+          ? `${attendanceClassHandoff.periodStart}–${attendanceClassHandoff.periodEnd}`
+          : String(
+              attendanceClassHandoff.periodStart
+            );
+
+
+      const fromSyllabus =
+        attendanceClassHandoff.source ===
+        "syllabus";
+
+
+      /*
+       * Reuse the existing Attendance modal for both flows.
+       *
+       * Published timetable handoff:
+       *   - keeps official period context
+       *   - retains timetable locking behavior
+       *
+       * Syllabus handoff:
+       *   - selects the exact assigned batch + subject
+       *   - prefills the exact syllabus topic
+       *   - remains a normal editable Attendance session
+       */
+      openNewAttendanceSession({
+        subject:
+          targetSubject.subject_name,
+
+        periodName:
+          fromSyllabus
+            ? undefined
+            : periodName,
+
+        fromPublishedTimetable:
+          !fromSyllabus,
+
+        topic:
+          fromSyllabus
+            ? attendanceClassHandoff
+                .syllabusTopicTitle
+            : undefined,
+
+        syllabusTopicId:
+          fromSyllabus
+            ? attendanceClassHandoff
+                .syllabusTopicId
+            : undefined,
+      });
+
+
+      setStatus(
+        fromSyllabus
+          ? `${
+              targetSubject.subject_code
+                ? `${targetSubject.subject_code} · `
+                : ""
+            }${targetSubject.subject_name} loaded with ${
+              attendanceClassHandoff
+                .syllabusTopicTitle ||
+              "the selected syllabus topic"
+            }.`
+          : `${
+              targetSubject.subject_code
+                ? `${targetSubject.subject_code} · `
+                : ""
+            }${targetSubject.subject_name} loaded from today's published timetable.`
+      );
+
+
+      try {
+
+        window.sessionStorage.removeItem(
+          "campusconnect:faculty-attendance-class"
+        );
+
+      } catch {
+        // Storage cleanup is non-critical.
+      }
+
+
+      setAttendanceClassHandoff(
+        null
+      );
+
+    },
+    [
+      attendanceClassHandoff,
+      selectedBatchId,
+      batchSubjects,
+    ]
+  );
+
+
   return (
     <div className="moduleStack attendanceBatchWorkspace">
+
+      {postClassSummary && (
+        <section className="attendancePostClassSummary">
+
+          <div className="attendancePostClassSummaryIcon">
+            ✓
+          </div>
+
+
+          <div className="attendancePostClassSummaryContent">
+
+            <header className="attendancePostClassSummaryHeader">
+
+              <div>
+
+                <span>
+                  POST-CLASS AUTOMATION
+                </span>
+
+                <h3>
+                  Class completed successfully
+                </h3>
+
+                <p>
+                  {postClassSummary.subject}
+                  {" · "}
+                  {postClassSummary.batchName}
+
+                  {postClassSummary.section
+                    ? ` · Section ${postClassSummary.section}`
+                    : ""}
+                </p>
+
+
+                {postClassSummary.topic && (
+                  <small>
+                    Topic taught:{" "}
+                    <strong>
+                      {postClassSummary.topic}
+                    </strong>
+                  </small>
+                )}
+
+              </div>
+
+
+              <button
+                type="button"
+                aria-label="Dismiss post-class automation summary"
+                title="Dismiss"
+                onClick={() =>
+                  setPostClassSummary(
+                    null
+                  )
+                }
+              >
+                ×
+              </button>
+
+            </header>
+
+
+            <div className="attendancePostClassCounts">
+
+              <article className="present">
+                <strong>
+                  {postClassSummary.present}
+                </strong>
+
+                <span>
+                  Present
+                </span>
+              </article>
+
+
+              <article className="absent">
+                <strong>
+                  {postClassSummary.absent}
+                </strong>
+
+                <span>
+                  Absent
+                </span>
+              </article>
+
+
+              <article className="late">
+                <strong>
+                  {postClassSummary.late}
+                </strong>
+
+                <span>
+                  Late
+                </span>
+              </article>
+
+
+              <article className="excused">
+                <strong>
+                  {postClassSummary.excused}
+                </strong>
+
+                <span>
+                  Excused
+                </span>
+              </article>
+
+            </div>
+
+
+            <div className="attendancePostClassAutomationGrid">
+
+              <article
+                data-state="success"
+              >
+
+                <b>
+                  ✓
+                </b>
+
+                <div>
+                  <strong>
+                    Attendance recorded
+                  </strong>
+
+                  <span>
+                    {postClassSummary.total}{" "}
+                    student
+                    {postClassSummary.total === 1
+                      ? ""
+                      : "s"}{" "}
+                    processed successfully
+                  </span>
+                </div>
+
+              </article>
+
+
+              <article
+                data-state={
+                  postClassSummary.diaryUpdated
+                    ? "success"
+                    : "warning"
+                }
+              >
+
+                <b>
+                  {postClassSummary.diaryUpdated
+                    ? "✓"
+                    : "!"}
+                </b>
+
+                <div>
+                  <strong>
+                    Faculty Diary
+                  </strong>
+
+                  <span>
+                    {postClassSummary.diaryUpdated
+                      ? "Class diary updated automatically"
+                      : "Attendance saved, but Diary automation needs attention"}
+                  </span>
+                </div>
+
+              </article>
+
+
+              <article
+                data-state={
+                  postClassSummary.syllabusLinked
+                    ? "success"
+                    : "neutral"
+                }
+              >
+
+                <b>
+                  {postClassSummary.syllabusLinked
+                    ? "✓"
+                    : "—"}
+                </b>
+
+                <div>
+                  <strong>
+                    Syllabus progress
+                  </strong>
+
+                  <span>
+                    {postClassSummary.syllabusLinked
+                      ? `${postClassSummary.syllabusCoveredClasses}/${postClassSummary.syllabusPlannedClasses} planned classes covered`
+                      : postClassSummary.topic
+                      ? "No verified syllabus coverage found for this topic"
+                      : "No syllabus topic linked to this class"}
+                  </span>
+                </div>
+
+              </article>
+
+
+              <article
+                data-state={
+                  postClassSummary.notificationsProcessed
+                    ? "success"
+                    : "warning"
+                }
+              >
+
+                <b>
+                  {postClassSummary.notificationsProcessed
+                    ? "✓"
+                    : "!"}
+                </b>
+
+                <div>
+                  <strong>
+                    Notifications
+                  </strong>
+
+                  <span>
+                    {postClassSummary.notificationsProcessed
+                      ? "Notification processing completed"
+                      : "Attendance saved, but notifications could not be queued"}
+                  </span>
+                </div>
+
+              </article>
+
+            </div>
+
+
+            {(onOpenFacultyDiary ||
+              onOpenSyllabusProgress) && (
+              <div className="attendancePostClassActions">
+
+                {onOpenFacultyDiary && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => {
+                      setPostClassSummary(
+                        null
+                      );
+
+                      onOpenFacultyDiary();
+                    }}
+                  >
+                    <span>
+                      Faculty Diary
+                    </span>
+
+                    <b>
+                      Open diary
+                    </b>
+
+                    <i>
+                      →
+                    </i>
+                  </button>
+                )}
+
+
+                {onOpenSyllabusProgress && (
+                  <button
+                    type="button"
+                    className="primaryAction"
+                    onClick={() => {
+                      setPostClassSummary(
+                        null
+                      );
+
+                      onOpenSyllabusProgress();
+                    }}
+                  >
+                    <span>
+                      Syllabus Progress
+                    </span>
+
+                    <b>
+                      View updated progress
+                    </b>
+
+                    <i>
+                      →
+                    </i>
+                  </button>
+                )}
+
+              </div>
+            )}
+
+          </div>
+
+        </section>
+      )}
+
 
       <ModuleHero
         eyebrow="Faculty attendance workspace"
@@ -10279,19 +20897,21 @@ function AttendanceModule({
         action={
           <div className="attendanceHeroActions">
 
-            <button
-              type="button"
-              className="attendanceSecondaryAction"
-              onClick={() => {
-                setShowCreateBatch(
-                  true
-                );
+            {canManageAcademicStructure && (
+              <button
+                type="button"
+                className="attendanceSecondaryAction"
+                onClick={() => {
+                  setShowCreateBatch(
+                    true
+                  );
 
-                setStatus("");
-              }}
-            >
-              + Create batch
-            </button>
+                  setStatus("");
+                }}
+              >
+                + Create batch
+              </button>
+            )}
 
             <button
               type="button"
@@ -10300,8 +20920,8 @@ function AttendanceModule({
                 !selectedBatch ||
                 !batchStudents.length
               }
-              onClick={
-                openNewAttendanceSession
+              onClick={() =>
+                openNewAttendanceSession()
               }
             >
               Take attendance
@@ -10405,17 +21025,19 @@ function AttendanceModule({
               </h3>
             </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                setShowCreateBatch(
-                  true
-                )
-              }
-              title="Create batch"
-            >
-              +
-            </button>
+            {canManageAcademicStructure && (
+              <button
+                type="button"
+                onClick={() =>
+                  setShowCreateBatch(
+                    true
+                  )
+                }
+                title="Create batch"
+              >
+                +
+              </button>
+            )}
 
           </header>
 
@@ -10496,7 +21118,9 @@ function AttendanceModule({
                 No batches yet
               </b>
               <small>
-                Create your first batch to start.
+                {canManageAcademicStructure
+                  ? "Create your first batch to start."
+                  : "No academic batch is currently assigned to your faculty account."}
               </small>
             </div>
           )}
@@ -10595,43 +21219,544 @@ function AttendanceModule({
                   </label>
 
 
-                  <button
-                    type="button"
-                    className="primary"
-                    onClick={() => {
-                      setFoundStudent(
-                        null
-                      );
+                  {canManageAcademicStructure && (
+                    <>
+                      <button
+                        type="button"
+                        className="primary"
+                        onClick={() => {
+                          setFoundStudent(
+                            null
+                          );
 
-                      setUidQuery("");
+                          setUidQuery("");
 
-                      setShowAddStudent(
-                        true
-                      );
+                          setShowAddStudent(
+                            true
+                          );
 
-                      setStatus("");
-                    }}
-                  >
-                    + Add student
-                  </button>
+                          setStatus("");
+                        }}
+                      >
+                        + Add student
+                      </button>
 
-
-                  <button
-                    type="button"
-                    className="attendanceBatchDeleteButton"
-                    disabled={busy}
-                    onClick={() =>
-                      void deleteBatch(
-                        selectedBatch
-                      )
-                    }
-                  >
-                    Delete batch
-                  </button>
+                      <button
+                        type="button"
+                        className="attendanceBatchDeleteButton"
+                        disabled={busy}
+                        onClick={() =>
+                          void deleteBatch(
+                            selectedBatch
+                          )
+                        }
+                      >
+                        Delete batch
+                      </button>
+                    </>
+                  )}
 
                 </div>
 
               </section>
+
+
+              <section className="attendanceBatchSubjects card">
+
+                <header className="attendanceBatchSubjectsHeader">
+
+                  <div>
+                    <span>
+                      BATCH SUBJECTS
+                    </span>
+
+                    <h3>
+                      Subjects & faculty
+                    </h3>
+
+                    <p>
+                      Configure subject code, credits, class type and the faculty assigned specifically to this batch and section.
+                    </p>
+                  </div>
+
+                  {canManageAcademicStructure && (
+                    <button
+                      type="button"
+                      className="primary"
+                      onClick={() =>
+                        void openBatchSubjectCreator()
+                      }
+                    >
+                      + Add subject
+                    </button>
+                  )}
+
+                </header>
+
+
+                {batchSubjects.length ? (
+                  <div className="attendanceBatchSubjectGrid">
+
+                    {batchSubjects.map(
+                      item => {
+                        const isActiveSubject =
+                          item.subject_name
+                            .trim()
+                            .toLowerCase() ===
+                          subject
+                            .trim()
+                            .toLowerCase();
+
+                        return (
+                        <article
+                          className={
+                            isActiveSubject
+                              ? "attendanceBatchSubjectCard active"
+                              : "attendanceBatchSubjectCard"
+                          }
+                          key={item.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() =>
+                            selectAttendanceSubject(
+                              item
+                            )
+                          }
+                          onKeyDown={event => {
+                            if (
+                              event.key === "Enter" ||
+                              event.key === " "
+                            ) {
+                              event.preventDefault();
+                              selectAttendanceSubject(
+                                item
+                              );
+                            }
+                          }}
+                        >
+
+                          <div className="attendanceBatchSubjectTop">
+
+                            <div>
+                              <span>
+                                {item.subject_code ||
+                                  "NO CODE"}
+                              </span>
+
+                              <h4>
+                                {item.subject_name}
+                              </h4>
+                            </div>
+
+                            <strong>
+                              {item.credits}
+                              <small>
+                                {item.credits === 1
+                                  ? " credit"
+                                  : " credits"}
+                              </small>
+                            </strong>
+
+                          </div>
+
+
+                          <div className="attendanceBatchSubjectMeta">
+
+                            <span>
+                              {item.subject_type}
+                            </span>
+
+                            <span>
+                              {selectedBatch.department}
+                              {" · "}
+                              Section {selectedBatch.section}
+                            </span>
+
+                          </div>
+
+
+                          <div className="attendanceBatchSubjectFaculty">
+
+                            {item.faculty_avatar_url ? (
+                              <img
+                                src={item.faculty_avatar_url}
+                                alt=""
+                              />
+                            ) : (
+                              <i>
+                                {(item.faculty_name ||
+                                  "F")
+                                  .charAt(0)
+                                  .toUpperCase()}
+                              </i>
+                            )}
+
+                            <div>
+                              <small>
+                                ASSIGNED FACULTY
+                              </small>
+
+                              <b>
+                                {item.faculty_name ||
+                                  "Faculty"}
+                              </b>
+                            </div>
+
+                          </div>
+
+
+                          {canManageAcademicStructure && (
+                            <div className="attendanceBatchSubjectActions">
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  editBatchSubject(
+                                    item
+                                  )
+                                }
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                type="button"
+                                className="danger"
+                                onClick={() =>
+                                  void deleteBatchSubject(
+                                    item
+                                  )
+                                }
+                              >
+                                Remove
+                              </button>
+
+                            </div>
+                          )}
+
+                        </article>
+                        );
+                      }
+                    )}
+
+                  </div>
+                ) : (
+                  <div className="attendanceBatchSubjectEmpty">
+                    <strong>
+                      No subjects configured
+                    </strong>
+
+                    <p>
+                      Add the subjects taught to this specific batch and section.
+                    </p>
+                  </div>
+                )}
+
+              </section>
+
+
+              {canManageAcademicStructure &&
+                showSubjectManager && (
+                <section className="attendanceSubjectEditor card">
+
+                  <header>
+
+                    <div>
+                      <span>
+                        {editingBatchSubjectId
+                          ? "EDIT SUBJECT"
+                          : "NEW SUBJECT"}
+                      </span>
+
+                      <h3>
+                        {selectedBatch.batch_name}
+                      </h3>
+
+                      <p>
+                        {selectedBatch.department}
+                        {" · "}
+                        Section {selectedBatch.section}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        resetBatchSubjectForm();
+                        setShowSubjectManager(
+                          false
+                        );
+                      }}
+                    >
+                      Close
+                    </button>
+
+                  </header>
+
+
+                  <div className="attendanceSubjectEditorGrid">
+
+                    <label>
+                      <span>
+                        SUBJECT NAME
+                      </span>
+
+                      <input
+                        value={
+                          batchSubjectForm.subject_name
+                        }
+                        onChange={
+                          event =>
+                            setBatchSubjectForm(
+                              current => ({
+                                ...current,
+                                subject_name:
+                                  event.target.value,
+                              })
+                            )
+                        }
+                        placeholder="Digital Communication"
+                      />
+                    </label>
+
+
+                    <label>
+                      <span>
+                        SUBJECT CODE
+                      </span>
+
+                      <input
+                        value={
+                          batchSubjectForm.subject_code
+                        }
+                        onChange={
+                          event =>
+                            setBatchSubjectForm(
+                              current => ({
+                                ...current,
+                                subject_code:
+                                  event.target.value
+                                    .toUpperCase(),
+                              })
+                            )
+                        }
+                        placeholder="EC502"
+                      />
+                    </label>
+
+                  </div>
+
+
+                  <div className="attendanceSubjectEditorSection">
+
+                    <span>
+                      CREDITS
+                    </span>
+
+                    <div className="attendanceCreditSelector">
+
+                      {[1, 2, 3, 4].map(
+                        credit => (
+                          <button
+                            key={credit}
+                            type="button"
+                            className={
+                              batchSubjectForm.credits ===
+                              credit
+                                ? "active"
+                                : ""
+                            }
+                            onClick={() =>
+                              setBatchSubjectForm(
+                                current => ({
+                                  ...current,
+                                  credits:
+                                    credit,
+                                })
+                              )
+                            }
+                          >
+                            {credit}
+                          </button>
+                        )
+                      )}
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="attendanceSubjectEditorSection">
+
+                    <span>
+                      SUBJECT TYPE
+                    </span>
+
+                    <div className="attendanceTypeSelector">
+
+                      {[
+                        "Theory",
+                        "Lab",
+                        "Theory + Lab",
+                      ].map(type => (
+                        <button
+                          key={type}
+                          type="button"
+                          className={
+                            batchSubjectForm.subject_type ===
+                            type
+                              ? "active"
+                              : ""
+                          }
+                          onClick={() =>
+                            setBatchSubjectForm(
+                              current => ({
+                                ...current,
+                                subject_type:
+                                  type as
+                                    | "Theory"
+                                    | "Lab"
+                                    | "Theory + Lab",
+                              })
+                            )
+                          }
+                        >
+                          {type}
+                        </button>
+                      ))}
+
+                    </div>
+
+                  </div>
+
+
+                  <label className="attendanceFacultySelector">
+
+                    <span>
+                      ASSIGNED FACULTY
+                    </span>
+
+                    <select
+                      value={
+                        batchSubjectForm.faculty_id
+                      }
+                      onChange={
+                        event =>
+                          setBatchSubjectForm(
+                            current => ({
+                              ...current,
+                              faculty_id:
+                                event.target.value,
+                            })
+                          )
+                      }
+                    >
+                      <option value="">
+                        Select faculty
+                      </option>
+
+                      {facultyOptions.map(
+                        faculty => (
+                          <option
+                            value={faculty.id}
+                            key={faculty.id}
+                          >
+                            {faculty.full_name}
+                            {faculty.department
+                              ? ` · ${faculty.department}`
+                              : ""}
+                          </option>
+                        )
+                      )}
+
+                    </select>
+
+                  </label>
+
+
+                  {batchSubjectForm.faculty_id && (() => {
+                    const assigned =
+                      facultyOptions.find(
+                        item =>
+                          item.id ===
+                          batchSubjectForm.faculty_id
+                      );
+
+                    if (!assigned) {
+                      return null;
+                    }
+
+                    return (
+                      <div className="attendanceSelectedFaculty">
+
+                        {assigned.avatar_url ? (
+                          <img
+                            src={assigned.avatar_url}
+                            alt=""
+                          />
+                        ) : (
+                          <i>
+                            {assigned.full_name
+                              .charAt(0)
+                              .toUpperCase()}
+                          </i>
+                        )}
+
+                        <div>
+                          <small>
+                            ASSIGNED TO THIS SECTION
+                          </small>
+
+                          <strong>
+                            {assigned.full_name}
+                          </strong>
+
+                          <span>
+                            {assigned.department ||
+                              "Faculty"}
+                          </span>
+                        </div>
+
+                      </div>
+                    );
+                  })()}
+
+
+                  <footer className="attendanceSubjectEditorActions">
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        resetBatchSubjectForm();
+                        setShowSubjectManager(
+                          false
+                        );
+                      }}
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="button"
+                      className="primary"
+                      disabled={
+                        batchSubjectSaving
+                      }
+                      onClick={() =>
+                        void saveBatchSubject()
+                      }
+                    >
+                      {batchSubjectSaving
+                        ? "Saving..."
+                        : editingBatchSubjectId
+                        ? "Save changes"
+                        : "Add subject"}
+                    </button>
+
+                  </footer>
+
+                </section>
+              )}
 
 
               <section className="attendanceRoster card">
@@ -10749,7 +21874,7 @@ function AttendanceModule({
 
                             <strong
                               className={
-                                percent >= 75
+                                percent >= 85
                                   ? "safe"
                                   : record
                                   ? "risk"
@@ -10779,19 +21904,53 @@ function AttendanceModule({
                           </div>
 
 
-                          <button
-                            type="button"
-                            className="attendanceRosterRemove"
-                            disabled={busy}
-                            title="Remove student"
-                            onClick={() =>
-                              void removeStudentFromBatch(
-                                student
-                              )
-                            }
-                          >
-                            Remove
-                          </button>
+                          <div className="attendanceRosterActions">
+
+                            {(profile.role === "Faculty" ||
+                              profile.role === "Main Admin") && (
+                              <button
+                                type="button"
+                                className="attendanceGuardianButton"
+                                disabled={busy}
+                                onClick={() =>
+                                  void openGuardianContact(
+                                    student
+                                  )
+                                }
+                              >
+                                <span>
+                                  {guardianKnownStudents.has(
+                                    student.student_id
+                                  )
+                                    ? "Guardian added"
+                                    : "Guardian"}
+                                </span>
+
+                                <small>
+                                  {guardianKnownStudents.has(
+                                    student.student_id
+                                  )
+                                    ? "View / edit"
+                                    : "Add contact"}
+                                </small>
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              className="attendanceRosterRemove"
+                              disabled={busy}
+                              title="Remove student"
+                              onClick={() =>
+                                void removeStudentFromBatch(
+                                  student
+                                )
+                              }
+                            >
+                              Remove
+                            </button>
+
+                          </div>
 
                         </div>
                       );
@@ -10856,17 +22015,19 @@ function AttendanceModule({
                 Organize students by batch and section before recording attendance.
               </p>
 
-              <button
-                type="button"
-                className="primary"
-                onClick={() =>
-                  setShowCreateBatch(
-                    true
-                  )
-                }
-              >
-                + Create batch
-              </button>
+              {canManageAcademicStructure && (
+                <button
+                  type="button"
+                  className="primary"
+                  onClick={() =>
+                    setShowCreateBatch(
+                      true
+                    )
+                  }
+                >
+                  + Create batch
+                </button>
+              )}
 
             </section>
 
@@ -10878,7 +22039,13 @@ function AttendanceModule({
 
 
       {selectedBatch && (
-        <section className="attendanceSessionHistory card">
+        <section
+          className={
+            showRecentAttendance
+              ? "attendanceSessionHistory attendanceSessionHistoryOpen card"
+              : "attendanceSessionHistory attendanceSessionHistoryCollapsed card"
+          }
+        >
 
           <header className="attendanceSessionHistoryHeader">
 
@@ -10892,144 +22059,49 @@ function AttendanceModule({
               </h3>
 
               <p>
-                Every saved class is stored as one attendance session.
+                {showRecentAttendance
+                  ? "Every saved class is stored as one attendance session."
+                  : `${sessions.length} saved ${
+                      sessions.length === 1
+                        ? "session"
+                        : "sessions"
+                    } in this batch.`}
               </p>
             </div>
 
 
-            <button
-              type="button"
-              className="primary"
-              disabled={
-                !batchStudents.length
-              }
-              onClick={
-                openNewAttendanceSession
-              }
-            >
-              + New attendance
-            </button>
+            <div className="attendanceSessionHistoryActions">
 
-          </header>
+              <button
+                type="button"
+                className="attendanceRecentToggle"
+                aria-expanded={
+                  showRecentAttendance
+                }
+                onClick={() =>
+                  setShowRecentAttendance(
+                    current =>
+                      !current
+                  )
+                }
+              >
+                <span>
+                  {showRecentAttendance
+                    ? "Hide"
+                    : "Show"}
+                </span>
 
-
-          {sessions.length ? (
-            <div className="attendanceSessionList">
-
-              {sessions
-                .slice(0, 12)
-                .map(session => (
-                <article
-                  className="attendanceSessionCard"
-                  key={session.id}
+                <i
+                  className={
+                    showRecentAttendance
+                      ? "open"
+                      : ""
+                  }
                 >
+                  ↓
+                </i>
+              </button>
 
-                  <div className="attendanceSessionDate">
-                    <strong>
-                      {new Intl.DateTimeFormat(
-                        "en-IN",
-                        {
-                          day:
-                            "2-digit",
-                        }
-                      ).format(
-                        new Date(
-                          `${session.attendance_date}T00:00:00`
-                        )
-                      )}
-                    </strong>
-
-                    <span>
-                      {new Intl.DateTimeFormat(
-                        "en-IN",
-                        {
-                          month:
-                            "short",
-                        }
-                      ).format(
-                        new Date(
-                          `${session.attendance_date}T00:00:00`
-                        )
-                      )}
-                    </span>
-                  </div>
-
-
-                  <div className="attendanceSessionIdentity">
-
-                    <span>
-                      PERIOD {session.period_name}
-                    </span>
-
-                    <h4>
-                      {session.subject}
-                    </h4>
-
-                    <p>
-                      {session.topic ||
-                        "No class topic added"}
-                    </p>
-
-                  </div>
-
-
-                  <div className="attendanceSessionFaculty">
-
-                    <span>
-                      FACULTY
-                    </span>
-
-                    <b>
-                      {session.faculty_name ||
-                        "CampusConnect faculty"}
-                    </b>
-
-                  </div>
-
-
-                  <span
-                    className={
-                      session.status ===
-                      "Completed"
-                        ? "attendanceSessionStatus completed"
-                        : "attendanceSessionStatus"
-                    }
-                  >
-                    {session.status}
-                  </span>
-
-
-                  <button
-                    type="button"
-                    className="attendanceSessionEdit"
-                    disabled={busy}
-                    onClick={() =>
-                      void openAttendanceSession(
-                        session
-                      )
-                    }
-                  >
-                    View / edit
-                  </button>
-
-                </article>
-              ))}
-
-            </div>
-          ) : (
-            <div className="attendanceSessionEmpty">
-
-              <span>
-                ◇
-              </span>
-
-              <h3>
-                No attendance sessions yet
-              </h3>
-
-              <p>
-                Start a class session to record the full batch together.
-              </p>
 
               <button
                 type="button"
@@ -11037,12 +22109,334 @@ function AttendanceModule({
                 disabled={
                   !batchStudents.length
                 }
-                onClick={
-                  openNewAttendanceSession
+                onClick={() =>
+                  openNewAttendanceSession()
                 }
               >
-                Take first attendance
+                + New attendance
               </button>
+
+            </div>
+
+          </header>
+
+
+          {showRecentAttendance && (
+            <div className="attendanceRecentContent">
+
+              {sessions.length ? (
+                <div className="attendanceSessionList">
+
+                  {sessions
+                    .slice(0, 12)
+                    .map(session => (
+                    <article
+                      className="attendanceSessionCard"
+                      key={session.id}
+                    >
+
+                      <div className="attendanceSessionDate">
+
+                        <strong>
+                          {new Intl.DateTimeFormat(
+                            "en-IN",
+                            {
+                              day:
+                                "2-digit",
+                            }
+                          ).format(
+                            new Date(
+                              `${session.attendance_date}T00:00:00`
+                            )
+                          )}
+                        </strong>
+
+                        <span>
+                          {new Intl.DateTimeFormat(
+                            "en-IN",
+                            {
+                              month:
+                                "short",
+                            }
+                          ).format(
+                            new Date(
+                              `${session.attendance_date}T00:00:00`
+                            )
+                          )}
+                        </span>
+
+                      </div>
+
+
+                      <div className="attendanceSessionIdentity">
+
+                        <span>
+                          PERIOD {session.period_name}
+                        </span>
+
+                        <h4>
+                          {session.subject}
+                        </h4>
+
+                        <p>
+                          {session.topic ||
+                            "No class topic added"}
+                        </p>
+
+                      </div>
+
+
+                      <div className="attendanceSessionFaculty">
+
+                        <span>
+                          FACULTY
+                        </span>
+
+                        <b>
+                          {session.faculty_name ||
+                            "CampusConnect faculty"}
+                        </b>
+
+                      </div>
+
+
+                      <span
+                        className={
+                          session.status ===
+                          "Completed"
+                            ? "attendanceSessionStatus completed"
+                            : "attendanceSessionStatus"
+                        }
+                      >
+                        {session.status}
+                      </span>
+
+
+                      <div className="attendanceNotificationDelivery">
+
+                        <div className="attendanceNotificationDeliveryHeader">
+
+                          <span>
+                            NOTIFICATIONS
+                          </span>
+
+                          <button
+                            type="button"
+                            disabled={
+                              Boolean(
+                                notificationDeliveryLoading[
+                                  session.id
+                                ]
+                              )
+                            }
+                            onClick={() =>
+                              void loadAttendanceNotificationDelivery(
+                                session.id
+                              )
+                            }
+                          >
+                            {notificationDeliveryLoading[
+                              session.id
+                            ]
+                              ? "Checking..."
+                              : notificationDeliveryBySession[
+                                  session.id
+                                ]
+                              ? "Refresh"
+                              : "Check status"}
+                          </button>
+
+                        </div>
+
+
+                        {notificationDeliveryError[
+                          session.id
+                        ] ? (
+
+                          <p
+                            className="attendanceNotificationDeliveryError"
+                            role="alert"
+                          >
+                            {notificationDeliveryError[
+                              session.id
+                            ]}
+                          </p>
+
+                        ) : notificationDeliveryBySession[
+                          session.id
+                        ] ? (
+
+                          notificationDeliveryBySession[
+                            session.id
+                          ].length ? (
+
+                            <div className="attendanceNotificationDeliveryList">
+
+                              {notificationDeliveryBySession[
+                                session.id
+                              ].map(
+                                (
+                                  delivery,
+                                  index
+                                ) => {
+
+                                  const label =
+                                    delivery.notification_type ===
+                                    "absence_parent_email"
+                                      ? "Guardian email"
+                                      : delivery.notification_type ===
+                                        "excused_parent_email"
+                                      ? "Guardian email"
+                                      : delivery.notification_type ===
+                                        "absence_parent_sms"
+                                      ? "Guardian SMS"
+                                      : delivery.notification_type ===
+                                        "excused_parent_sms"
+                                      ? "Guardian SMS"
+                                      : delivery.notification_type ===
+                                        "low_attendance_student_email"
+                                      ? "Student email"
+                                      : delivery.notification_type ===
+                                        "low_attendance_student_in_app"
+                                      ? "Student alert"
+                                      : delivery.notification_type
+                                          .replaceAll(
+                                            "_",
+                                            " "
+                                          );
+
+                                  return (
+                                    <div
+                                      className="attendanceNotificationDeliveryRow"
+                                      key={`${session.id}-${delivery.channel}-${delivery.notification_type}-${delivery.delivery_status}-${index}`}
+                                    >
+
+                                      <div>
+                                        <strong>
+                                          {label}
+                                        </strong>
+
+                                        <small>
+                                          {delivery.channel.toUpperCase()}
+                                        </small>
+                                      </div>
+
+
+                                      <span
+                                        className={`attendanceDeliveryStatus ${delivery.delivery_status.toLowerCase()}`}
+                                      >
+                                        {delivery.delivery_status}
+
+                                        {delivery.notification_count >
+                                        1
+                                          ? ` · ${delivery.notification_count}`
+                                          : ""}
+                                      </span>
+
+                                    </div>
+                                  );
+                                }
+                              )}
+
+                            </div>
+
+                          ) : (
+
+                            <p className="attendanceNotificationDeliveryEmpty">
+                              No external notification jobs were generated for this class.
+                            </p>
+
+                          )
+
+                        ) : (
+
+                          <p className="attendanceNotificationDeliveryEmpty">
+                            Check the delivery state for this attendance session.
+                          </p>
+
+                        )}
+
+                      </div>
+
+
+                      <div className="attendanceSessionCardActions">
+
+                        <button
+                          type="button"
+                          className="attendanceSessionEdit"
+                          disabled={
+                            busy ||
+                            Boolean(
+                              deletingSessionId
+                            )
+                          }
+                          onClick={() =>
+                            void openAttendanceSession(
+                              session
+                            )
+                          }
+                        >
+                          View / edit
+                        </button>
+
+
+                        <button
+                          type="button"
+                          className="attendanceSessionDelete"
+                          disabled={
+                            busy ||
+                            Boolean(
+                              deletingSessionId
+                            )
+                          }
+                          onClick={() =>
+                            void deleteAttendanceSession(
+                              session
+                            )
+                          }
+                        >
+                          {deletingSessionId ===
+                          session.id
+                            ? "Deleting..."
+                            : "Delete"}
+                        </button>
+
+                      </div>
+
+                    </article>
+                  ))}
+
+                </div>
+              ) : (
+                <div className="attendanceSessionEmpty">
+
+                  <span>
+                    ◇
+                  </span>
+
+                  <h3>
+                    No attendance sessions yet
+                  </h3>
+
+                  <p>
+                    Start a class session to record the full batch together.
+                  </p>
+
+                  <button
+                    type="button"
+                    className="primary"
+                    disabled={
+                      !batchStudents.length
+                    }
+                    onClick={() =>
+                      openNewAttendanceSession()
+                    }
+                  >
+                    Take first attendance
+                  </button>
+
+                </div>
+              )}
 
             </div>
           )}
@@ -11051,10 +22445,385 @@ function AttendanceModule({
       )}
 
 
+      {guardianStudent && (
+        <div
+          className="attendanceGuardianScrim"
+          role="presentation"
+          onMouseDown={event => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeGuardianContact();
+            }
+          }}
+        >
+          <section
+            className="attendanceGuardianModal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="attendanceGuardianTitle"
+          >
+            <header className="attendanceGuardianHeader">
+
+              <div>
+                <span>
+                  ATTENDANCE NOTIFICATIONS
+                </span>
+
+                <h2
+                  id="attendanceGuardianTitle"
+                >
+                  Parent / Guardian Contact
+                </h2>
+
+                <p>
+                  Manage the private contact used
+                  for this student's attendance
+                  alerts.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                aria-label="Close guardian contact"
+                disabled={guardianSaving}
+                onClick={
+                  closeGuardianContact
+                }
+              >
+                ×
+              </button>
+
+            </header>
+
+
+            <div className="attendanceGuardianStudent">
+
+              <div className="attendanceGuardianAvatar">
+                {guardianStudent.student_name
+                  .charAt(0)
+                  .toUpperCase()}
+              </div>
+
+              <div>
+                <span>
+                  STUDENT
+                </span>
+
+                <strong>
+                  {guardianStudent.student_name}
+                </strong>
+
+                <small>
+                  {guardianStudent.campus_uid}
+
+                  {guardianStudent.department
+                    ? ` · ${guardianStudent.department}`
+                    : ""}
+                </small>
+              </div>
+
+              <i
+                className={
+                  guardianContactExists
+                    ? "saved"
+                    : ""
+                }
+              >
+                {guardianContactExists
+                  ? "Contact added"
+                  : "Not added"}
+              </i>
+
+            </div>
+
+
+            {guardianError && (
+              <p
+                className="attendanceGuardianError"
+                role="alert"
+              >
+                {guardianError}
+              </p>
+            )}
+
+
+            {guardianMessage && (
+              <p
+                className="attendanceGuardianSuccess"
+                role="status"
+              >
+                {guardianMessage}
+              </p>
+            )}
+
+
+            {guardianLoading ? (
+              <div
+                className="attendanceGuardianLoading"
+                aria-live="polite"
+              >
+                <span />
+                Loading guardian contact...
+              </div>
+            ) : (
+              <form
+                className="attendanceGuardianForm"
+                onSubmit={
+                  saveGuardianContact
+                }
+              >
+
+                <label>
+                  <span>
+                    GUARDIAN NAME
+                  </span>
+
+                  <input
+                    value={
+                      guardianContact.guardian_name
+                    }
+                    onChange={event =>
+                      setGuardianContact(
+                        current => ({
+                          ...current,
+                          guardian_name:
+                            event.target.value,
+                        })
+                      )
+                    }
+                    placeholder="Parent or guardian name"
+                    autoComplete="off"
+                    required
+                  />
+                </label>
+
+
+                <label>
+                  <span>
+                    RELATIONSHIP
+                  </span>
+
+                  <select
+                    value={
+                      guardianContact.relationship
+                    }
+                    onChange={event =>
+                      setGuardianContact(
+                        current => ({
+                          ...current,
+                          relationship:
+                            event.target.value,
+                        })
+                      )
+                    }
+                  >
+                    <option value="Parent">
+                      Parent
+                    </option>
+
+                    <option value="Father">
+                      Father
+                    </option>
+
+                    <option value="Mother">
+                      Mother
+                    </option>
+
+                    <option value="Guardian">
+                      Guardian
+                    </option>
+                  </select>
+                </label>
+
+
+                <label>
+                  <span>
+                    EMAIL
+                  </span>
+
+                  <input
+                    type="email"
+                    value={
+                      guardianContact.email
+                    }
+                    onChange={event =>
+                      setGuardianContact(
+                        current => ({
+                          ...current,
+                          email:
+                            event.target.value,
+                        })
+                      )
+                    }
+                    placeholder="parent@example.com"
+                    autoComplete="off"
+                  />
+                </label>
+
+
+                <label>
+                  <span>
+                    MOBILE
+                  </span>
+
+                  <input
+                    type="tel"
+                    inputMode="tel"
+                    value={
+                      guardianContact.phone
+                    }
+                    onChange={event =>
+                      setGuardianContact(
+                        current => ({
+                          ...current,
+                          phone:
+                            event.target.value,
+                        })
+                      )
+                    }
+                    placeholder="+91 9876543210"
+                    autoComplete="off"
+                  />
+                </label>
+
+
+                <section className="attendanceGuardianPreferences">
+
+                  <header>
+                    <strong>
+                      Alert preferences
+                    </strong>
+
+                    <small>
+                      Select how the guardian can
+                      receive absence alerts.
+                    </small>
+                  </header>
+
+
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={
+                        guardianContact.email_enabled
+                      }
+                      onChange={event =>
+                        setGuardianContact(
+                          current => ({
+                            ...current,
+                            email_enabled:
+                              event.target.checked,
+                          })
+                        )
+                      }
+                    />
+
+                    <span>
+                      <b>
+                        Email alerts
+                      </b>
+
+                      <small>
+                        Queue an email when an
+                        absence alert is generated.
+                      </small>
+                    </span>
+                  </label>
+
+
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={
+                        guardianContact.sms_enabled
+                      }
+                      onChange={event =>
+                        setGuardianContact(
+                          current => ({
+                            ...current,
+                            sms_enabled:
+                              event.target.checked,
+                          })
+                        )
+                      }
+                    />
+
+                    <span>
+                      <b>
+                        SMS alerts
+                      </b>
+
+                      <small>
+                        Queue an SMS when an
+                        absence alert is generated.
+                      </small>
+                    </span>
+                  </label>
+
+                </section>
+
+
+                <div className="attendanceGuardianPrivacy">
+                  <span>
+                    PRIVATE
+                  </span>
+
+                  <p>
+                    Guardian information is used
+                    for attendance communication
+                    and is protected by
+                    CampusConnect access rules.
+                  </p>
+                </div>
+
+
+                <footer className="attendanceGuardianFooter">
+
+                  <button
+                    type="button"
+                    className="ghost"
+                    disabled={
+                      guardianSaving
+                    }
+                    onClick={
+                      closeGuardianContact
+                    }
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="primary"
+                    disabled={
+                      guardianSaving
+                    }
+                  >
+                    {guardianSaving
+                      ? "Saving..."
+                      : guardianContactExists
+                      ? "Save changes"
+                      : "Save contact"}
+                  </button>
+
+                </footer>
+
+              </form>
+            )}
+
+          </section>
+        </div>
+      )}
+
+
       {showAttendanceSession &&
         selectedBatch && (
         <div
           className="attendanceSessionScrim"
+
+
           onClick={() => {
             if (!sessionSaving) {
               setShowAttendanceSession(
@@ -11121,6 +22890,34 @@ function AttendanceModule({
             </header>
 
 
+            <div className="attendanceSessionContent">
+
+
+            {sessionFromPublishedTimetable && (
+              <div className="attendancePublishedClassNotice">
+
+                <div>
+                  <span>
+                    PUBLISHED TIMETABLE CLASS
+                  </span>
+
+                  <strong>
+                    Verified class context
+                  </strong>
+
+                  <p>
+                    Subject, date and period are locked to prevent attendance from being recorded against the wrong class.
+                  </p>
+                </div>
+
+                <b>
+                  LOCKED
+                </b>
+
+              </div>
+            )}
+
+
             <div className="attendanceSessionSetup">
 
               <label>
@@ -11135,7 +22932,8 @@ function AttendanceModule({
                   disabled={
                     Boolean(
                       editingSessionId
-                    )
+                    ) ||
+                    sessionFromPublishedTimetable
                   }
                   onChange={
                     event =>
@@ -11165,7 +22963,8 @@ function AttendanceModule({
                   disabled={
                     Boolean(
                       editingSessionId
-                    )
+                    ) ||
+                    sessionFromPublishedTimetable
                   }
                   onChange={
                     event =>
@@ -11193,7 +22992,8 @@ function AttendanceModule({
                   disabled={
                     Boolean(
                       editingSessionId
-                    )
+                    ) ||
+                    sessionFromPublishedTimetable
                   }
                   onChange={
                     event =>
@@ -11210,9 +23010,356 @@ function AttendanceModule({
               </label>
 
 
+              {profile.role ===
+                "Faculty" && (
+                <label className="attendanceSyllabusTopicSelector">
+
+                  <span>
+                    SYLLABUS TOPIC
+                  </span>
+
+
+                  <select
+                    value={
+                      selectedSyllabusTopicId
+                    }
+                    disabled={
+                      syllabusLoading ||
+                      !selectedAttendanceBatchSubject
+                    }
+                    onChange={
+                      event => {
+
+                        const topicId =
+                          event.target.value;
+
+
+                        setSelectedSyllabusTopicId(
+                          topicId
+                        );
+
+
+                        if (!topicId) {
+                          return;
+                        }
+
+
+                        const selectedTopic =
+                          syllabusTopics.find(
+                            item =>
+                              item.id ===
+                              topicId
+                          );
+
+
+                        if (!selectedTopic) {
+                          return;
+                        }
+
+
+                        setSessionForm(
+                          current => ({
+                            ...current,
+                            topic:
+                              selectedTopic.topic_title,
+                          })
+                        );
+                      }
+                    }
+                  >
+
+                    <option value="">
+                      {syllabusLoading
+                        ? "Loading syllabus…"
+                        : syllabusTopics.length
+                        ? "Select syllabus topic"
+                        : "No syllabus topics configured"}
+                    </option>
+
+
+                    {syllabusUnits.map(
+                      unit => {
+
+                        const unitTopics =
+                          syllabusTopics.filter(
+                            topic =>
+                              topic.unit_id ===
+                              unit.id
+                          );
+
+
+                        if (
+                          !unitTopics.length
+                        ) {
+                          return null;
+                        }
+
+
+                        return (
+                          <optgroup
+                            key={
+                              unit.id
+                            }
+                            label={`Unit ${
+                              unit.unit_number
+                            } · ${
+                              unit.unit_title
+                            }`}
+                          >
+
+                            {unitTopics.map(
+                              topic => {
+
+                                const taughtClasses =
+                                  syllabusTopicCoverageCounts[
+                                    topic.id
+                                  ] ||
+                                  0;
+
+
+                                const plannedClasses =
+                                  Math.max(
+                                    1,
+                                    Number(
+                                      topic.planned_periods
+                                    ) ||
+                                      1
+                                  );
+
+
+                                const creditedClasses =
+                                  Math.min(
+                                    taughtClasses,
+                                    plannedClasses
+                                  );
+
+
+                                const completed =
+                                  creditedClasses >=
+                                  plannedClasses;
+
+
+                                const started =
+                                  taughtClasses >
+                                  0;
+
+
+                                return (
+                                  <option
+                                    key={
+                                      topic.id
+                                    }
+                                    value={
+                                      topic.id
+                                    }
+                                  >
+                                    {completed
+                                      ? "✓ "
+                                      : started
+                                      ? "◐ "
+                                      : "○ "}
+                                    {topic.topic_order}.{" "}
+                                    {
+                                      topic.topic_title
+                                    }
+                                    {" · "}
+                                    {
+                                      creditedClasses
+                                    }
+                                    /
+                                    {
+                                      plannedClasses
+                                    }
+                                  </option>
+                                );
+                              }
+                            )}
+
+                          </optgroup>
+                        );
+                      }
+                    )}
+
+                  </select>
+
+
+                  <small>
+                    {selectedSyllabusTopicId
+                      ? (() => {
+
+                          const selectedTopic =
+                            syllabusTopics.find(
+                              item =>
+                                item.id ===
+                                selectedSyllabusTopicId
+                            );
+
+
+                          if (!selectedTopic) {
+                            return "Linked to syllabus progress.";
+                          }
+
+
+                          const taught =
+                            syllabusTopicCoverageCounts[
+                              selectedTopic.id
+                            ] ||
+                            0;
+
+
+                          const planned =
+                            Math.max(
+                              1,
+                              Number(
+                                selectedTopic.planned_periods
+                              ) ||
+                                1
+                            );
+
+
+                          const credited =
+                            Math.min(
+                              taught,
+                              planned
+                            );
+
+
+                          return credited >= planned
+                            ? `Completed · ${credited}/${planned} planned classes covered. Additional classes will remain recorded without increasing progress above 100%.`
+                            : `In progress · ${credited}/${planned} planned classes covered. Saving this attendance will add one teaching class.`;
+                        })()
+                      : syllabusTopics.length
+                      ? "Choose a syllabus topic to fill Topic Taught automatically, or enter a custom topic below."
+                      : "No syllabus has been configured for this assigned subject yet."}
+                  </small>
+
+                </label>
+              )}
+
+
+              {profile.role ===
+                "Faculty" &&
+                recommendedSyllabusTopic &&
+                selectedAttendanceBatchSubject && (
+                <div className="attendanceSyllabusRecommendation">
+
+                  <div className="attendanceSyllabusRecommendationIcon">
+                    ↗
+                  </div>
+
+
+                  <div className="attendanceSyllabusRecommendationCopy">
+
+                    <span>
+                      RECOMMENDED NEXT TOPIC
+                    </span>
+
+
+                    <strong>
+                      {
+                        recommendedSyllabusTopic
+                          .topic_title
+                      }
+                    </strong>
+
+
+                    <p>
+                      {recommendedSyllabusUnit
+                        ? `Unit ${
+                            recommendedSyllabusUnit
+                              .unit_number
+                          } · ${
+                            recommendedSyllabusUnit
+                              .unit_title
+                          }`
+                        : "Assigned syllabus"}
+                      {" · "}
+                      {
+                        recommendedSyllabusCredited
+                      }
+                      /
+                      {
+                        recommendedSyllabusPlanned
+                      }
+                      {" classes covered"}
+                    </p>
+
+
+                    {recommendedSyllabusTaught >
+                      0 ? (
+                      <small>
+                        Continue this topic before moving to the next pending syllabus topic.
+                      </small>
+                    ) : (
+                      <small>
+                        This is the next pending topic in your syllabus sequence.
+                      </small>
+                    )}
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    disabled={
+                      selectedSyllabusTopicId ===
+                      recommendedSyllabusTopic.id
+                    }
+                    onClick={() => {
+
+                      setSelectedSyllabusTopicId(
+                        recommendedSyllabusTopic.id
+                      );
+
+
+                      setSessionForm(
+                        current => ({
+                          ...current,
+                          topic:
+                            recommendedSyllabusTopic
+                              .topic_title,
+                        })
+                      );
+                    }}
+                  >
+                    {selectedSyllabusTopicId ===
+                    recommendedSyllabusTopic.id
+                      ? "Selected"
+                      : "Use Topic"}
+                  </button>
+
+                </div>
+              )}
+
+
+              {profile.role ===
+                "Faculty" &&
+                syllabusTopics.length >
+                  0 &&
+                !recommendedSyllabusTopic && (
+                <div className="attendanceSyllabusAllComplete">
+
+                  <span>
+                    ✓
+                  </span>
+
+                  <div>
+                    <strong>
+                      Syllabus coverage complete
+                    </strong>
+
+                    <small>
+                      Every configured topic has reached its planned class coverage.
+                    </small>
+                  </div>
+
+                </div>
+              )}
+
+
               <label className="attendanceSessionTopic">
                 <span>
-                  TOPIC
+                  TOPIC TAUGHT
                 </span>
 
                 <input
@@ -11220,17 +23367,47 @@ function AttendanceModule({
                     sessionForm.topic
                   }
                   onChange={
-                    event =>
+                    event => {
+
+                      const nextTopic =
+                        event.target.value;
+
+
                       setSessionForm(
                         current => ({
                           ...current,
                           topic:
-                            event.target.value,
+                            nextTopic,
                         })
-                      )
+                      );
+
+
+                      const exactTopic =
+                        syllabusTopics.find(
+                          item =>
+                            item.topic_title
+                              .trim()
+                              .toLowerCase() ===
+                            nextTopic
+                              .trim()
+                              .toLowerCase()
+                        );
+
+
+                      setSelectedSyllabusTopicId(
+                        exactTopic?.id ||
+                        ""
+                      );
+                    }
                   }
                   placeholder="Today's class topic"
                 />
+
+                {selectedSyllabusTopicId && (
+                  <small className="attendanceSyllabusLinked">
+                    ✓ SYLLABUS LINKED
+                  </small>
+                )}
               </label>
 
             </div>
@@ -11334,6 +23511,90 @@ function AttendanceModule({
             </div>
 
 
+            <div className="attendanceSmartToolbar">
+
+              <label className="attendanceSmartSearch">
+
+                <span>
+                  FIND STUDENT
+                </span>
+
+                <input
+                  value={
+                    sessionStudentSearch
+                  }
+                  onChange={
+                    event =>
+                      setSessionStudentSearch(
+                        event.target.value
+                      )
+                  }
+                  placeholder="Name, Campus UID or roll number"
+                />
+
+              </label>
+
+
+              <button
+                type="button"
+                className={
+                  showChangedAttendanceOnly
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  setShowChangedAttendanceOnly(
+                    current =>
+                      !current
+                  )
+                }
+              >
+                Changed only
+                <strong>
+                  {
+                    changedAttendanceStudentIds
+                      .size
+                  }
+                </strong>
+              </button>
+
+
+              {(sessionStudentSearch ||
+                showChangedAttendanceOnly) && (
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => {
+                    setSessionStudentSearch(
+                      ""
+                    );
+
+                    setShowChangedAttendanceOnly(
+                      false
+                    );
+                  }}
+                >
+                  Clear filters
+                </button>
+              )}
+
+
+              <small>
+                Showing{" "}
+                {
+                  visibleSessionStudents
+                    .length
+                }
+                {" of "}
+                {
+                  batchStudents.length
+                }
+                {" students"}
+              </small>
+
+            </div>
+
+
             <div className="attendanceSessionRoster">
 
               <div className="attendanceSessionRosterHead">
@@ -11353,7 +23614,7 @@ function AttendanceModule({
               </div>
 
 
-              {batchStudents.map(
+              {visibleSessionStudents.map(
                 (
                   student,
                   index
@@ -11364,9 +23625,26 @@ function AttendanceModule({
                     ] ||
                     "Present";
 
+
+                  const originalMark =
+                    originalSessionMarks[
+                      student.student_id
+                    ] ||
+                    "Present";
+
+
+                  const changed =
+                    mark !==
+                    originalMark;
+
+
                   return (
                     <div
-                      className="attendanceSessionRosterRow"
+                      className={
+                        changed
+                          ? "attendanceSessionRosterRow changed"
+                          : "attendanceSessionRosterRow"
+                      }
                       key={
                         student.id
                       }
@@ -11388,6 +23666,12 @@ function AttendanceModule({
 
                           <b>
                             {student.student_name}
+
+                            {changed && (
+                              <em className="attendanceChangedBadge">
+                                Changed
+                              </em>
+                            )}
                           </b>
 
                           <small>
@@ -11455,6 +23739,26 @@ function AttendanceModule({
                 }
               )}
 
+
+              {!visibleSessionStudents.length && (
+                <div className="attendanceSmartEmpty">
+
+                  <strong>
+                    No students match this view
+                  </strong>
+
+                  <span>
+                    Change the search or clear the Changed only filter.
+                  </span>
+
+                </div>
+              )}
+
+            </div>
+
+
+
+
             </div>
 
 
@@ -11475,6 +23779,15 @@ function AttendanceModule({
 
                 <small>
                   Excused students are excluded from the attendance total.
+                </small>
+
+                <small className="attendanceChangedSummary">
+                  {
+                    changedAttendanceStudentIds
+                      .size
+                  }
+                  {" "}
+                  changed
                 </small>
 
               </div>
@@ -11524,7 +23837,7 @@ function AttendanceModule({
       )}
 
 
-      {showCreateBatch && (
+      {canManageAcademicStructure && showCreateBatch && (
         <div
           className="attendanceModalScrim"
           onClick={() =>
@@ -11898,6 +24211,322 @@ function AttendanceModule({
               </label>
 
             </div>
+
+
+            <section className="attendanceBulkStudentImport">
+              <div className="attendanceBulkStudentImportHeader">
+                <div>
+                  <span>
+                    BULK STUDENT IMPORT
+                  </span>
+
+                  <h3>
+                    Add students from Excel
+                  </h3>
+
+                  <p>
+                    Upload an Excel sheet containing CampusConnect UIDs.
+                    Every student is verified against CampusConnect before
+                    being added to this batch.
+                  </p>
+                </div>
+
+                <label
+                  className={`attendanceBulkUpload ${
+                    batchImportScanning ||
+                    (batchImportScanning || batchImportSaving)
+                      ? "disabled"
+                      : ""
+                  }`}
+                >
+                  <span>
+                    ↑
+                  </span>
+
+                  <div>
+                    <b>
+                      Upload Excel
+                    </b>
+
+                    <small>
+                      .xlsx or .xls
+                    </small>
+                  </div>
+
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                    disabled={
+                      batchImportScanning ||
+                      (batchImportScanning || batchImportSaving)
+                    }
+                    onChange={
+                      scanBatchStudentExcel
+                    }
+                  />
+                </label>
+              </div>
+
+              {batchImportFileName && (
+                <div className="attendanceBulkFile">
+                  <div>
+                    <span>
+                      EXCEL FILE
+                    </span>
+
+                    <strong>
+                      {batchImportFileName}
+                    </strong>
+                  </div>
+
+                  <small>
+                    {batchImportRows.length} row
+                    {batchImportRows.length === 1
+                      ? ""
+                      : "s"} scanned
+                  </small>
+                </div>
+              )}
+
+              {batchImportScanning && (
+                <div className="attendanceBulkProgress">
+                  <span className="attendanceBulkSpinner" />
+
+                  <div>
+                    <strong>
+                      Verifying students...
+                    </strong>
+
+                    <p>
+                      Checking every CampusConnect UID against verified
+                      student profiles.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {!batchImportScanning &&
+                batchImportRows.length > 0 && (
+                  <>
+                    <div className="attendanceBulkStats">
+                      <article>
+                        <span>
+                          TOTAL
+                        </span>
+
+                        <strong>
+                          {batchImportRows.length}
+                        </strong>
+
+                        <small>
+                          Excel rows
+                        </small>
+                      </article>
+
+                      <article>
+                        <span>
+                          VERIFIED
+                        </span>
+
+                        <strong>
+                          {
+                            batchImportRows.filter(
+                              item =>
+                                item.status ===
+                                "ready"
+                            ).length
+                          }
+                        </strong>
+
+                        <small>
+                          Ready to add
+                        </small>
+                      </article>
+
+                      <article>
+                        <span>
+                          ALREADY ADDED
+                        </span>
+
+                        <strong>
+                          {
+                            batchImportRows.filter(
+                              item =>
+                                item.status ===
+                                "already-in-batch"
+                            ).length
+                          }
+                        </strong>
+
+                        <small>
+                          In this batch
+                        </small>
+                      </article>
+
+                      <article>
+                        <span>
+                          NEEDS REVIEW
+                        </span>
+
+                        <strong>
+                          {
+                            batchImportRows.filter(
+                              item =>
+                                item.status ===
+                                  "not-found" ||
+                                item.status ===
+                                  "invalid"
+                            ).length
+                          }
+                        </strong>
+
+                        <small>
+                          Not importable
+                        </small>
+                      </article>
+                    </div>
+
+                    <div className="attendanceBulkTableWrap">
+                      <table className="attendanceBulkTable">
+                        <thead>
+                          <tr>
+                            <th>
+                              Row
+                            </th>
+
+                            <th>
+                              Campus UID
+                            </th>
+
+                            <th>
+                              Student
+                            </th>
+
+                            <th>
+                              Department
+                            </th>
+
+                            <th>
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          {batchImportRows.map(
+                            item => (
+                              <tr
+                                key={`${item.rowNumber}-${item.sourceUid}`}
+                              >
+                                <td>
+                                  {item.rowNumber}
+                                </td>
+
+                                <td>
+                                  <strong>
+                                    {item.sourceUid ||
+                                      "—"}
+                                  </strong>
+                                </td>
+
+                                <td>
+                                  {item.student
+                                    ?.full_name ||
+                                    "—"}
+                                </td>
+
+                                <td>
+                                  {item.student
+                                    ?.department ||
+                                    "—"}
+                                </td>
+
+                                <td>
+                                  <span
+                                    className={`attendanceBulkStatus ${item.status}`}
+                                  >
+                                    {item.status ===
+                                    "ready"
+                                      ? "Verified"
+                                      : item.status ===
+                                        "already-in-batch"
+                                      ? "Already added"
+                                      : item.status ===
+                                        "not-found"
+                                      ? "Not found"
+                                      : "Invalid"}
+                                  </span>
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="attendanceBulkActions">
+                      <button
+                        type="button"
+                        className="ghost"
+                        disabled={
+                          (batchImportScanning || batchImportSaving)
+                        }
+                        onClick={() => {
+                          setBatchImportRows(
+                            []
+                          );
+
+                          setBatchImportFileName(
+                            ""
+                          );
+                        }}
+                      >
+                        Clear
+                      </button>
+
+                      <button
+                        type="button"
+                        className="primary"
+                        disabled={
+                          (batchImportScanning || batchImportSaving) ||
+                          !batchImportRows.some(
+                            item =>
+                              item.status ===
+                              "ready"
+                          )
+                        }
+                        onClick={() =>
+                          void importVerifiedBatchStudents()
+                        }
+                      >
+                        {(batchImportScanning || batchImportSaving)
+                          ? "Adding students..."
+                          : `Add ${
+                              batchImportRows.filter(
+                                item =>
+                                  item.status ===
+                                  "ready"
+                              ).length
+                            } verified student${
+                              batchImportRows.filter(
+                                item =>
+                                  item.status ===
+                                  "ready"
+                              ).length === 1
+                                ? ""
+                                : "s"
+                            }`}
+                      </button>
+                    </div>
+                  </>
+                )}
+
+              {batchImportError && (
+                <p className="attendanceBulkMessage">
+                  {batchImportError}
+                </p>
+              )}
+            </section>
 
 
             {foundStudent && (
@@ -14207,6 +26836,18 @@ type ProfileDetails = {
   campus_uid?: string;
   avatar_url?: string;
   cover_url?: string;
+  headline: string;
+  location: string;
+  semester: string;
+  cgpa: string;
+  linkedin_url: string;
+  github_url: string;
+  portfolio_url: string;
+  profile_visibility:
+    | "campus"
+    | "connections"
+    | "private";
+  show_academics: boolean;
 };
 
 type ProfileDocument = {
@@ -14216,6 +26857,30 @@ type ProfileDocument = {
   file_size: number;
   document_type: string;
   created_at: string;
+};
+
+type ProfileAchievement = {
+  id: string;
+  owner_id: string;
+  title: string;
+  issuer: string;
+  achievement_type: string;
+  issued_at: string | null;
+  credential_url: string;
+  description: string;
+  created_at: string;
+};
+
+type ProfileAchievementAttachment = {
+  id: string;
+  achievement_id: string;
+  owner_id: string;
+  file_name: string;
+  file_path: string;
+  mime_type: string;
+  file_size: number;
+  created_at: string;
+  signed_url?: string;
 };
 
 function ProfileModule({
@@ -14233,10 +26898,44 @@ function ProfileModule({
     campus_uid: profile.campus_uid || "",
     avatar_url: "",
     cover_url: "",
+    headline: "",
+    location: "",
+    semester: "",
+    cgpa: "",
+    linkedin_url: "",
+    github_url: "",
+    portfolio_url: "",
+    profile_visibility: "campus",
+    show_academics: true,
   });
 
   const [documents, setDocuments] =
     useState<ProfileDocument[]>([]);
+
+  const [achievements, setAchievements] =
+    useState<ProfileAchievement[]>([]);
+
+  const [achievementAttachments, setAchievementAttachments] =
+    useState<ProfileAchievementAttachment[]>([]);
+
+  const [achievementForm, setAchievementForm] =
+    useState({
+      title: "",
+      issuer: "",
+      achievement_type: "Achievement",
+      issued_at: "",
+      credential_url: "",
+      description: "",
+    });
+
+  const [achievementFiles, setAchievementFiles] =
+    useState<File[]>([]);
+
+  const [savingAchievement, setSavingAchievement] =
+    useState(false);
+
+  const [showAchievementForm, setShowAchievementForm] =
+    useState(false);
 
   const [file, setFile] =
     useState<File | null>(null);
@@ -14284,7 +26983,7 @@ function ProfileModule({
       client
         .from("profiles")
         .select(
-          "bio,skills,phone,usn,campus_uid,avatar_url,cover_url"
+          "bio,skills,phone,usn,campus_uid,avatar_url,cover_url,headline,location,semester,cgpa,linkedin_url,github_url,portfolio_url,profile_visibility,show_academics"
         )
         .eq("id", data.user.id)
         .maybeSingle()
@@ -14309,6 +27008,41 @@ function ProfileModule({
 
               cover_url:
                 row.cover_url || "",
+
+              headline:
+                row.headline || "",
+
+              location:
+                row.location || "",
+
+              semester:
+                row.semester || "",
+
+              cgpa:
+                row.cgpa !== null &&
+                row.cgpa !== undefined
+                  ? String(row.cgpa)
+                  : "",
+
+              linkedin_url:
+                row.linkedin_url || "",
+
+              github_url:
+                row.github_url || "",
+
+              portfolio_url:
+                row.portfolio_url || "",
+
+              profile_visibility:
+                row.profile_visibility ===
+                  "connections" ||
+                row.profile_visibility ===
+                  "private"
+                  ? row.profile_visibility
+                  : "campus",
+
+              show_academics:
+                row.show_academics !== false,
             });
           }
         });
@@ -14327,6 +27061,99 @@ function ProfileModule({
           ) {
             setDocuments(
               (rows || []) as ProfileDocument[]
+            );
+          }
+        });
+
+      client
+        .from("profile_achievements")
+        .select("*")
+        .eq("owner_id", data.user.id)
+        .order("created_at", {
+          ascending: false,
+        })
+        .then(async ({data: rows, error}) => {
+          if (
+            !active ||
+            error
+          ) {
+            return;
+          }
+
+          const loadedAchievements =
+            (rows || []) as ProfileAchievement[];
+
+          setAchievements(
+            loadedAchievements
+          );
+
+          if (
+            loadedAchievements.length === 0
+          ) {
+            setAchievementAttachments([]);
+            return;
+          }
+
+          const {
+            data: attachmentRows,
+            error: attachmentError,
+          } = await client
+            .from(
+              "profile_achievement_attachments"
+            )
+            .select("*")
+            .in(
+              "achievement_id",
+              loadedAchievements.map(
+                item => item.id
+              )
+            )
+            .order(
+              "created_at",
+              {
+                ascending: true,
+              }
+            );
+
+          if (
+            attachmentError ||
+            !active
+          ) {
+            return;
+          }
+
+          const hydrated =
+            await Promise.all(
+              (
+                attachmentRows ||
+                []
+              ).map(
+                async row => {
+                  const {
+                    data: signed,
+                  } =
+                    await client.storage
+                      .from(
+                        "professional-media"
+                      )
+                      .createSignedUrl(
+                        row.file_path,
+                        3600
+                      );
+
+                  return {
+                    ...row,
+                    signed_url:
+                      signed?.signedUrl ||
+                      "",
+                  } as ProfileAchievementAttachment;
+                }
+              )
+            );
+
+          if (active) {
+            setAchievementAttachments(
+              hydrated
             );
           }
         });
@@ -14350,6 +27177,27 @@ function ProfileModule({
       );
     }
 
+    const cgpaText =
+      details.cgpa.trim();
+
+    const cgpaValue =
+      cgpaText
+        ? Number(cgpaText)
+        : null;
+
+    if (
+      cgpaValue !== null &&
+      (
+        !Number.isFinite(cgpaValue) ||
+        cgpaValue < 0 ||
+        cgpaValue > 10
+      )
+    ) {
+      return setStatus(
+        "CGPA must be between 0 and 10."
+      );
+    }
+
     setSaving(true);
     setStatus("");
 
@@ -14370,6 +27218,34 @@ function ProfileModule({
           skills: details.skills.trim(),
           phone: details.phone.trim(),
           usn: details.usn.trim(),
+
+          headline:
+            details.headline.trim(),
+
+          location:
+            details.location.trim(),
+
+          semester:
+            details.semester.trim(),
+
+          cgpa:
+            cgpaValue,
+
+          linkedin_url:
+            details.linkedin_url.trim(),
+
+          github_url:
+            details.github_url.trim(),
+
+          portfolio_url:
+            details.portfolio_url.trim(),
+
+          profile_visibility:
+            details.profile_visibility,
+
+          show_academics:
+            details.show_academics,
+
           updated_at:
             new Date().toISOString(),
         })
@@ -14404,6 +27280,350 @@ function ProfileModule({
       setSaving(false);
     }
   };
+
+  const createAchievement = async (
+    event: FormEvent
+  ) => {
+    event.preventDefault();
+
+    if (!achievementForm.title.trim()) {
+      return setStatus(
+        "Enter a title first."
+      );
+    }
+
+    if (
+      achievementFiles.length > 4
+    ) {
+      return setStatus(
+        "You can upload up to 4 files."
+      );
+    }
+
+    const oversized =
+      achievementFiles.find(
+        file =>
+          file.size >
+          15 * 1024 * 1024
+      );
+
+    if (oversized) {
+      return setStatus(
+        `${oversized.name} is larger than 15 MB.`
+      );
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return setStatus(
+        "CampusConnect is not connected to Supabase."
+      );
+    }
+
+    setSavingAchievement(true);
+    setStatus("");
+
+    try {
+      const {data: auth} =
+        await client.auth.getUser();
+
+      if (!auth.user) {
+        throw new Error(
+          "Sign in again."
+        );
+      }
+
+      const {
+        data: created,
+        error,
+      } = await client
+        .from(
+          "profile_achievements"
+        )
+        .insert({
+          owner_id:
+            auth.user.id,
+
+          title:
+            achievementForm.title.trim(),
+
+          issuer:
+            achievementForm.issuer.trim(),
+
+          achievement_type:
+            achievementForm.achievement_type,
+
+          issued_at:
+            achievementForm.issued_at ||
+            null,
+
+          credential_url:
+            achievementForm.credential_url.trim(),
+
+          description:
+            achievementForm.description.trim(),
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      const uploaded:
+        ProfileAchievementAttachment[] =
+        [];
+
+      try {
+        for (
+          const file of achievementFiles
+        ) {
+          const safeName =
+            file.name.replace(
+              /[^a-zA-Z0-9._-]/g,
+              "-"
+            );
+
+          const filePath =
+            `achievements/${auth.user.id}/${created.id}/${crypto.randomUUID()}-${safeName}`;
+
+          const {
+            error: uploadError,
+          } =
+            await client.storage
+              .from(
+                "professional-media"
+              )
+              .upload(
+                filePath,
+                file,
+                {
+                  upsert: false,
+                  contentType:
+                    file.type ||
+                    undefined,
+                }
+              );
+
+          if (uploadError) {
+            throw uploadError;
+          }
+
+          const {
+            data:
+              attachmentRow,
+            error:
+              attachmentError,
+          } =
+            await client
+              .from(
+                "profile_achievement_attachments"
+              )
+              .insert({
+                achievement_id:
+                  created.id,
+
+                owner_id:
+                  auth.user.id,
+
+                file_name:
+                  file.name,
+
+                file_path:
+                  filePath,
+
+                mime_type:
+                  file.type ||
+                  "",
+
+                file_size:
+                  file.size,
+              })
+              .select()
+              .single();
+
+          if (
+            attachmentError
+          ) {
+            await client.storage
+              .from(
+                "professional-media"
+              )
+              .remove([
+                filePath,
+              ]);
+
+            throw attachmentError;
+          }
+
+          const {
+            data: signed,
+          } =
+            await client.storage
+              .from(
+                "professional-media"
+              )
+              .createSignedUrl(
+                filePath,
+                3600
+              );
+
+          uploaded.push({
+            ...attachmentRow,
+            signed_url:
+              signed?.signedUrl ||
+              "",
+          } as ProfileAchievementAttachment);
+        }
+      } catch (
+        uploadError
+      ) {
+        await client
+          .from(
+            "profile_achievements"
+          )
+          .delete()
+          .eq(
+            "id",
+            created.id
+          );
+
+        throw uploadError;
+      }
+
+      setAchievements(
+        current => [
+          created as ProfileAchievement,
+          ...current,
+        ]
+      );
+
+      setAchievementAttachments(
+        current => [
+          ...uploaded,
+          ...current,
+        ]
+      );
+
+      setAchievementForm({
+        title: "",
+        issuer: "",
+        achievement_type:
+          "Achievement",
+        issued_at: "",
+        credential_url: "",
+        description: "",
+      });
+
+      setAchievementFiles([]);
+      setShowAchievementForm(false);
+
+      setStatus(
+        achievementForm.achievement_type ===
+          "Certificate"
+          ? "Certificate added successfully."
+          : "Achievement added successfully."
+      );
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "Unable to save achievement."
+      );
+    } finally {
+      setSavingAchievement(false);
+    }
+  };
+
+
+  const deleteAchievement = async (
+    achievement: ProfileAchievement
+  ) => {
+    if (
+      !window.confirm(
+        `Delete "${achievement.title}"?`
+      )
+    ) {
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) return;
+
+    setStatus("");
+
+    try {
+      const related =
+        achievementAttachments.filter(
+          item =>
+            item.achievement_id ===
+            achievement.id
+        );
+
+      const {error} =
+        await client
+          .from(
+            "profile_achievements"
+          )
+          .delete()
+          .eq(
+            "id",
+            achievement.id
+          );
+
+      if (error) {
+        throw error;
+      }
+
+      if (
+        related.length > 0
+      ) {
+        await client.storage
+          .from(
+            "professional-media"
+          )
+          .remove(
+            related.map(
+              item =>
+                item.file_path
+            )
+          );
+      }
+
+      setAchievements(
+        current =>
+          current.filter(
+            item =>
+              item.id !==
+              achievement.id
+          )
+      );
+
+      setAchievementAttachments(
+        current =>
+          current.filter(
+            item =>
+              item.achievement_id !==
+              achievement.id
+          )
+      );
+
+      setStatus(
+        "Profile item deleted."
+      );
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "Unable to delete item."
+      );
+    }
+  };
+
 
   const uploadDocument = async (
     event: FormEvent
@@ -15037,18 +28257,30 @@ function ProfileModule({
 
   const completionFields = [
     profile.name,
-    profile.email,
     profile.department,
     profile.year,
+
     details.campus_uid ||
       profile.campus_uid,
+
+    details.avatar_url,
+    details.cover_url,
+    details.headline,
     details.bio,
     details.skills,
-    details.phone,
-    details.usn,
-    documents.length
-      ? "document"
-      : "",
+    details.location,
+
+    profile.role === "Student"
+      ? details.semester
+      : "staff",
+
+    profile.role === "Student"
+      ? details.cgpa
+      : "staff",
+
+    details.linkedin_url ||
+      details.github_url ||
+      details.portfolio_url,
   ];
 
   const completion =
@@ -15156,8 +28388,15 @@ function ProfileModule({
             </h2>
 
             <p>
-              {profile.email}
+              {details.headline ||
+                profile.email}
             </p>
+
+            {details.headline && (
+              <small className="profileHeroEmail">
+                {profile.email}
+              </small>
+            )}
 
             <div className="profileMetaLine">
               <span>
@@ -15465,6 +28704,109 @@ function ProfileModule({
 
               </div>
 
+              <Field label="Professional headline">
+                <input
+                  value={
+                    details.headline
+                  }
+                  onChange={event =>
+                    setDetails({
+                      ...details,
+                      headline:
+                        event.target.value,
+                    })
+                  }
+                  placeholder="ECE student · Full-stack developer · Embedded systems"
+                  maxLength={160}
+                />
+              </Field>
+
+              <div className="profileEditGrid">
+
+                <Field label="Location">
+                  <input
+                    value={
+                      details.location
+                    }
+                    onChange={event =>
+                      setDetails({
+                        ...details,
+                        location:
+                          event.target.value,
+                      })
+                    }
+                    placeholder="Bengaluru, Karnataka"
+                  />
+                </Field>
+
+                <Field label="Semester">
+                  <input
+                    value={
+                      details.semester
+                    }
+                    onChange={event =>
+                      setDetails({
+                        ...details,
+                        semester:
+                          event.target.value,
+                      })
+                    }
+                    placeholder="5"
+                  />
+                </Field>
+
+                <Field label="CGPA">
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    step="0.01"
+                    value={
+                      details.cgpa
+                    }
+                    onChange={event =>
+                      setDetails({
+                        ...details,
+                        cgpa:
+                          event.target.value,
+                      })
+                    }
+                    placeholder="8.75"
+                  />
+                </Field>
+
+                <Field label="Profile visibility">
+                  <select
+                    value={
+                      details.profile_visibility
+                    }
+                    onChange={event =>
+                      setDetails({
+                        ...details,
+                        profile_visibility:
+                          event.target.value as
+                            | "campus"
+                            | "connections"
+                            | "private",
+                      })
+                    }
+                  >
+                    <option value="campus">
+                      Campus
+                    </option>
+
+                    <option value="connections">
+                      Connections only
+                    </option>
+
+                    <option value="private">
+                      Private
+                    </option>
+                  </select>
+                </Field>
+
+              </div>
+
               <Field label="Short bio">
                 <textarea
                   value={
@@ -15498,6 +28840,91 @@ function ProfileModule({
                   placeholder="React, Python, Embedded Systems, AI"
                 />
               </Field>
+
+              <div className="profileProfessionalLinksEditor">
+
+                <div className="profileEditGrid">
+
+                  <Field label="LinkedIn URL">
+                    <input
+                      type="url"
+                      value={
+                        details.linkedin_url
+                      }
+                      onChange={event =>
+                        setDetails({
+                          ...details,
+                          linkedin_url:
+                            event.target.value,
+                        })
+                      }
+                      placeholder="https://linkedin.com/in/..."
+                    />
+                  </Field>
+
+                  <Field label="GitHub URL">
+                    <input
+                      type="url"
+                      value={
+                        details.github_url
+                      }
+                      onChange={event =>
+                        setDetails({
+                          ...details,
+                          github_url:
+                            event.target.value,
+                        })
+                      }
+                      placeholder="https://github.com/..."
+                    />
+                  </Field>
+
+                </div>
+
+                <Field label="Portfolio URL">
+                  <input
+                    type="url"
+                    value={
+                      details.portfolio_url
+                    }
+                    onChange={event =>
+                      setDetails({
+                        ...details,
+                        portfolio_url:
+                          event.target.value,
+                      })
+                    }
+                    placeholder="https://yourportfolio.com"
+                  />
+                </Field>
+
+                <label className="profileAcademicVisibility">
+                  <input
+                    type="checkbox"
+                    checked={
+                      details.show_academics
+                    }
+                    onChange={event =>
+                      setDetails({
+                        ...details,
+                        show_academics:
+                          event.target.checked,
+                      })
+                    }
+                  />
+
+                  <span>
+                    <b>
+                      Show academic details
+                    </b>
+
+                    <small>
+                      Allow your CGPA and semester to appear on your professional CampusConnect profile.
+                    </small>
+                  </span>
+                </label>
+
+              </div>
 
               <div className="profileEditActions">
 
@@ -15591,6 +29018,515 @@ function ProfileModule({
           </section>
 
         </div>
+
+
+        <section className="professionalProfileCard profileAchievementsCard">
+
+          <header className="profileSectionHeader">
+            <div>
+              <span>
+                PROFESSIONAL RECORD
+              </span>
+
+              <h3>
+                Certificates & achievements
+              </h3>
+
+              <p>
+                Add verified accomplishments, certifications, awards and supporting files.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="primary"
+              onClick={() =>
+                setShowAchievementForm(
+                  value => !value
+                )
+              }
+            >
+              {showAchievementForm
+                ? "Close"
+                : "+ Add"}
+            </button>
+          </header>
+
+
+          {showAchievementForm && (
+            <form
+              className="profileAchievementEditor"
+              onSubmit={
+                createAchievement
+              }
+            >
+
+              <div className="profileEditGrid">
+
+                <Field label="Type">
+                  <select
+                    value={
+                      achievementForm.achievement_type
+                    }
+                    onChange={event =>
+                      setAchievementForm({
+                        ...achievementForm,
+                        achievement_type:
+                          event.target.value,
+                      })
+                    }
+                  >
+                    <option>
+                      Achievement
+                    </option>
+
+                    <option>
+                      Certificate
+                    </option>
+                  </select>
+                </Field>
+
+                <Field label="Title">
+                  <input
+                    value={
+                      achievementForm.title
+                    }
+                    onChange={event =>
+                      setAchievementForm({
+                        ...achievementForm,
+                        title:
+                          event.target.value,
+                      })
+                    }
+                    placeholder="AWS Cloud Practitioner"
+                    required
+                  />
+                </Field>
+
+                <Field label="Issuer / organization">
+                  <input
+                    value={
+                      achievementForm.issuer
+                    }
+                    onChange={event =>
+                      setAchievementForm({
+                        ...achievementForm,
+                        issuer:
+                          event.target.value,
+                      })
+                    }
+                    placeholder="AWS, IEEE, College..."
+                  />
+                </Field>
+
+                <Field label="Issue date">
+                  <input
+                    type="date"
+                    value={
+                      achievementForm.issued_at
+                    }
+                    onChange={event =>
+                      setAchievementForm({
+                        ...achievementForm,
+                        issued_at:
+                          event.target.value,
+                      })
+                    }
+                  />
+                </Field>
+
+              </div>
+
+
+              <Field label="Credential URL">
+                <input
+                  type="url"
+                  value={
+                    achievementForm.credential_url
+                  }
+                  onChange={event =>
+                    setAchievementForm({
+                      ...achievementForm,
+                      credential_url:
+                        event.target.value,
+                    })
+                  }
+                  placeholder="https://..."
+                />
+              </Field>
+
+
+              <Field label="Description">
+                <textarea
+                  value={
+                    achievementForm.description
+                  }
+                  onChange={event =>
+                    setAchievementForm({
+                      ...achievementForm,
+                      description:
+                        event.target.value,
+                    })
+                  }
+                  placeholder="Describe the certificate, competition, award or achievement..."
+                />
+              </Field>
+
+
+              <label className="profileAchievementUpload">
+
+                <input
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,.doc,.docx,.ppt,.pptx"
+                  onChange={event => {
+                    const selected =
+                      Array.from(
+                        event.target.files ||
+                        []
+                      );
+
+                    setAchievementFiles(
+                      current =>
+                        [
+                          ...current,
+                          ...selected,
+                        ].slice(
+                          0,
+                          4
+                        )
+                    );
+
+                    event.currentTarget.value =
+                      "";
+                  }}
+                />
+
+                <span>
+                  <b>
+                    📎 Add proof / certificate
+                  </b>
+
+                  <small>
+                    Images, PDF, DOC, DOCX, PPT or PPTX · Max 15 MB each
+                  </small>
+                </span>
+              </label>
+
+
+              {achievementFiles.length >
+                0 && (
+                <div className="profileAchievementSelectedFiles">
+
+                  {achievementFiles.map(
+                    (
+                      file,
+                      index
+                    ) => (
+                      <div
+                        key={`${file.name}-${index}`}
+                      >
+                        <span>
+                          {file.type.startsWith(
+                            "image/"
+                          )
+                            ? "🖼"
+                            : "📄"}
+                        </span>
+
+                        <p>
+                          <b>
+                            {file.name}
+                          </b>
+
+                          <small>
+                            {formatBytes(
+                              file.size
+                            )}
+                          </small>
+                        </p>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAchievementFiles(
+                              current =>
+                                current.filter(
+                                  (
+                                    _,
+                                    fileIndex
+                                  ) =>
+                                    fileIndex !==
+                                    index
+                                )
+                            )
+                          }
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )
+                  )}
+
+                </div>
+              )}
+
+
+              <div className="profileEditActions">
+
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => {
+                    setShowAchievementForm(
+                      false
+                    );
+
+                    setAchievementFiles(
+                      []
+                    );
+                  }}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="primary"
+                  disabled={
+                    savingAchievement
+                  }
+                >
+                  {savingAchievement
+                    ? "Saving..."
+                    : "Save"}
+                </button>
+
+              </div>
+
+            </form>
+          )}
+
+
+          <div className="profileAchievementList">
+
+            {achievements.map(
+              achievement => {
+
+                const files =
+                  achievementAttachments.filter(
+                    item =>
+                      item.achievement_id ===
+                      achievement.id
+                  );
+
+                return (
+                  <article
+                    key={
+                      achievement.id
+                    }
+                    className="profileAchievementItem"
+                  >
+
+                    <div className="profileAchievementIcon">
+                      {achievement.achievement_type ===
+                      "Certificate"
+                        ? "◈"
+                        : "★"}
+                    </div>
+
+                    <div className="profileAchievementContent">
+
+                      <div className="profileAchievementTitleRow">
+
+                        <div>
+                          <span>
+                            {
+                              achievement.achievement_type
+                            }
+                          </span>
+
+                          <h4>
+                            {
+                              achievement.title
+                            }
+                          </h4>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="danger"
+                          onClick={() =>
+                            void deleteAchievement(
+                              achievement
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+
+                      </div>
+
+                      {(achievement.issuer ||
+                        achievement.issued_at) && (
+                        <p className="profileAchievementMeta">
+                          {
+                            achievement.issuer
+                          }
+
+                          {achievement.issuer &&
+                          achievement.issued_at
+                            ? " · "
+                            : ""}
+
+                          {achievement.issued_at
+                            ? new Date(
+                                `${achievement.issued_at}T00:00:00`
+                              ).toLocaleDateString(
+                                "en-IN",
+                                {
+                                  day:
+                                    "2-digit",
+                                  month:
+                                    "short",
+                                  year:
+                                    "numeric",
+                                }
+                              )
+                            : ""}
+                        </p>
+                      )}
+
+                      {achievement.description && (
+                        <p className="profileAchievementDescription">
+                          {
+                            achievement.description
+                          }
+                        </p>
+                      )}
+
+                      {achievement.credential_url && (
+                        <a
+                          href={
+                            achievement.credential_url
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                          className="profileCredentialLink"
+                        >
+                          View credential ↗
+                        </a>
+                      )}
+
+
+                      {files.length > 0 && (
+                        <div className="profileAchievementFiles">
+
+                          {files.map(
+                            file =>
+                              file.mime_type.startsWith(
+                                "image/"
+                              ) ? (
+                                <button
+                                  type="button"
+                                  key={
+                                    file.id
+                                  }
+                                  className="profileAchievementImage"
+                                  onClick={() => {
+                                    if (
+                                      file.signed_url
+                                    ) {
+                                      window.open(
+                                        file.signed_url,
+                                        "_blank",
+                                        "noopener,noreferrer"
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <img
+                                    src={
+                                      file.signed_url
+                                    }
+                                    alt={
+                                      file.file_name
+                                    }
+                                  />
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  key={
+                                    file.id
+                                  }
+                                  className="profileAchievementFile"
+                                  onClick={() => {
+                                    if (
+                                      file.signed_url
+                                    ) {
+                                      window.open(
+                                        file.signed_url,
+                                        "_blank",
+                                        "noopener,noreferrer"
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <span>
+                                    📄
+                                  </span>
+
+                                  <p>
+                                    <b>
+                                      {
+                                        file.file_name
+                                      }
+                                    </b>
+
+                                    <small>
+                                      {formatBytes(
+                                        file.file_size
+                                      )}
+                                    </small>
+                                  </p>
+
+                                  <strong>
+                                    Open
+                                  </strong>
+                                </button>
+                              )
+                          )}
+
+                        </div>
+                      )}
+
+                    </div>
+
+                  </article>
+                );
+              }
+            )}
+
+
+            {!achievements.length && (
+              <div className="profileAchievementEmpty">
+                <span>
+                  ★
+                </span>
+
+                <h4>
+                  Build your professional record
+                </h4>
+
+                <p>
+                  Add certificates, awards, hackathon wins, academic achievements and professional milestones.
+                </p>
+              </div>
+            )}
+
+          </div>
+
+        </section>
 
 
         <aside className="profileSideColumn">
@@ -16534,6 +30470,8 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
         <StatusLine text={status}/>
       )}
 
+      <CampusWorkDelegation />
+
       {showCreateAccount && (
         <form
           className="adminCreateAccount card"
@@ -16891,7 +30829,7 @@ function AnalyticsModule({profile}: {profile: ModuleProfile}) {
   }, []);
 
   const bars = [{label: "Profile readiness", value: profile.role === "Student" ? 78 : 92}, {label: "Academic engagement", value: metrics.attendance}, {label: "Resource activity", value: Math.min(100, metrics.resources * 2)}, {label: "Community participation", value: Math.min(100, metrics.groups * 8)}];
-  return <div className="moduleStack"><ModuleHero eyebrow="Decision intelligence" title={profile.role === "Student" ? "Your progress analytics" : "Campus performance analytics"} copy="Turn academic, placement and community activity into clear action signals."/><section className="adminSummary"><MetricTile label="Announcements" value={String(metrics.announcements)} note="Visible verified updates"/><MetricTile label="Assignments" value={String(metrics.assignments)} note="Active tasks and coursework"/><MetricTile label="Applications" value={String(metrics.applications)} note="Recruitment pipeline records"/><MetricTile label="Learning assets" value={String(metrics.resources)} note="Videos and PYQ collections"/></section><section className="analyticsGrid"><div className="analyticsBars card"><header><span>ENGAGEMENT INDEX</span><h3>Workspace health</h3></header>{bars.map(bar => <div className="analyticsBar" key={bar.label}><p><span>{bar.label}</span><b>{bar.value}%</b></p><i><span style={{width: `${bar.value}%`}}/></i></div>)}</div><div className="analyticsInsight card"><span>PRIORITY SIGNAL</span><h3>{profile.role === "Student" ? "Finish the closest deadline first" : "Attendance intervention has the highest impact"}</h3><p>{profile.role === "Student" ? "Your placement readiness is strong. Completing the open assessment and one resume improvement gives the fastest gain." : "Students below 75% need early mentoring before internal assessments and placement eligibility checks."}</p><div><b>{metrics.attendance}%</b><small>attendance signal</small></div></div><div className="analyticsMix card"><header><span>PLATFORM MIX</span><h3>Connected activity</h3></header><div><i style={{"--value": `${Math.min(100, metrics.resources * 2)}%`} as CSSProperties}/><p><b>{metrics.groups}</b><small>communities</small></p><p><b>{metrics.resources}</b><small>resources</small></p></div></div></section></div>;
+  return <div className="moduleStack"><ModuleHero eyebrow="Decision intelligence" title={profile.role === "Student" ? "Your progress analytics" : "Campus performance analytics"} copy="Turn academic, placement and community activity into clear action signals."/><section className="adminSummary"><MetricTile label="Announcements" value={String(metrics.announcements)} note="Visible verified updates"/><MetricTile label="Assignments" value={String(metrics.assignments)} note="Active tasks and coursework"/><MetricTile label="Applications" value={String(metrics.applications)} note="Recruitment pipeline records"/><MetricTile label="Learning assets" value={String(metrics.resources)} note="Videos and PYQ collections"/></section><section className="analyticsGrid"><div className="analyticsBars card"><header><span>ENGAGEMENT INDEX</span><h3>Workspace health</h3></header>{bars.map(bar => <div className="analyticsBar" key={bar.label}><p><span>{bar.label}</span><b>{bar.value}%</b></p><i><span style={{width: `${bar.value}%`}}/></i></div>)}</div><div className="analyticsInsight card"><span>PRIORITY SIGNAL</span><h3>{profile.role === "Student" ? "Finish the closest deadline first" : "Attendance intervention has the highest impact"}</h3><p>{profile.role === "Student" ? "Your placement readiness is strong. Completing the open assessment and one resume improvement gives the fastest gain." : "Students below 85% need early mentoring before internal assessments and placement eligibility checks."}</p><div><b>{metrics.attendance}%</b><small>attendance signal</small></div></div><div className="analyticsMix card"><header><span>PLATFORM MIX</span><h3>Connected activity</h3></header><div><i style={{"--value": `${Math.min(100, metrics.resources * 2)}%`} as CSSProperties}/><p><b>{metrics.groups}</b><small>communities</small></p><p><b>{metrics.resources}</b><small>resources</small></p></div></div></section></div>;
 }
 
 function ModuleHero({eyebrow, title, copy, action}: {eyebrow: string; title: string; copy: string; action?: ReactNode}) {

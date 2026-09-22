@@ -95,7 +95,7 @@ export function StudentPlacements({
   toggleSaved,
   onOpenApplications,
 }: StudentPlacementsProps) {
-  const [filter, setFilter] = useState<PlacementFilter>("Recommended");
+  const [filter, setFilter] = useState<PlacementFilter>("All drives");
   const [query, setQuery] = useState("");
   const [selectedJob, setSelectedJob] = useState<PlacementJob | null>(null);
   const [assessmentOpen, setAssessmentOpen] = useState(false);
@@ -444,7 +444,7 @@ export function StudentPlacements({
 
       <div className="placementToolbar">
         <div className="placementFilters" aria-label="Filter placement drives">
-          {(["Recommended", "All drives", "Saved"] as PlacementFilter[]).map(item => <button
+          {(["All drives", "Recommended", "Saved"] as PlacementFilter[]).map(item => <button
             className={filter === item ? "selected" : ""}
             onClick={() => setFilter(item)}
             aria-pressed={filter === item}
