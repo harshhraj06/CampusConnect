@@ -242,7 +242,7 @@
 
 .collegeIdSuccess {
   background: #edf8f0;
-  color: #2b7141;
+  color: #6b0909;
 }
 
 .collegeIdResult {
@@ -324,7 +324,7 @@
   display: grid;
   place-items: center;
   border-radius: 13px;
-  background: #193e6a;
+  background: #20b270;
   color: #ffffff;
   font-size: 12px;
   font-weight: 900;
@@ -501,3 +501,468 @@
     width: 100%;
   }
 }
+
+/* CAMPUSCONNECT — ROLE AWARE COLLEGE ID V2 BEGIN */
+
+
+/* ==========================================================
+   STUDENT CARD — BLUE / INDIGO
+   ========================================================== */
+
+.digitalCollegeId.digitalCollegeIdStudentCard {
+  border-color:
+    #bcc9ef;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8faff 0%,
+      #f8faff 42%,
+      #3159b7 42%,
+      #234792 93%,
+      #f0d93b 93%,
+      #f0d93b 100%
+    );
+
+  box-shadow:
+    0 20px 45px
+    rgba(32, 66, 146, .18);
+}
+
+
+.digitalCollegeIdStudentCard
+.digitalCollegeIdSeal {
+  background:
+    #244ca2;
+}
+
+
+.digitalCollegeIdStudentCard
+.digitalCollegeIdStudent {
+  background:
+    #f2d83d;
+
+  color:
+    #172744;
+}
+
+
+.digitalCollegeIdStudentCard
+.digitalCollegeIdPhotoFallback {
+  background:
+    #e7edff;
+
+  color:
+    #3159b7;
+}
+
+
+.digitalCollegeIdStudentCard
+.digitalCollegeIdVerified > span {
+  color:
+    #3159b7;
+}
+
+
+.digitalCollegeIdStudentCard
+.digitalCollegeIdFooter {
+  background:
+    #f0d93b;
+
+  color:
+    #172744;
+}
+
+
+/* ==========================================================
+   FACULTY CARD — DEEP TEAL / EMERALD
+   ========================================================== */
+
+.digitalCollegeId.digitalCollegeIdFaculty {
+  border-color:
+    #9ac9c0;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f7fbfa 0%,
+      #f7fbfa 42%,
+      #087f6d 42%,
+      #055f54 93%,
+      #bce8d8 93%,
+      #bce8d8 100%
+    );
+
+  box-shadow:
+    0 20px 48px
+    rgba(5, 95, 84, .22);
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdSeal {
+  background:
+    #07695d;
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdStudent {
+  background:
+    #d5f2e7;
+
+  color:
+    #064f47;
+
+  padding:
+    8px 6px;
+
+  border:
+    1px solid
+    rgba(5,95,84,.14);
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdPhoto,
+.digitalCollegeIdFaculty
+.digitalCollegeIdPhotoFallback {
+  border-color:
+    #e8fff7;
+
+  box-shadow:
+    0 8px 24px
+    rgba(0, 54, 48, .26);
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdPhotoFallback {
+  background:
+    #dff4ed;
+
+  color:
+    #087f6d;
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdFacts > div {
+  background:
+    rgba(255,255,255,.14);
+
+  border:
+    1px solid
+    rgba(255,255,255,.08);
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdVerified {
+  background:
+    rgba(255,255,255,.16);
+
+  border:
+    1px solid
+    rgba(255,255,255,.08);
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdVerified > span {
+  color:
+    #087f6d;
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdFooter {
+  background:
+    #bce8d8;
+
+  color:
+    #064a42;
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdFooter strong::before {
+  content:
+    "FACULTY · ";
+}
+
+
+/* ==========================================================
+   PROFESSIONAL DETAILS
+   ========================================================== */
+
+.digitalCollegeIdFacts strong {
+  overflow-wrap:
+    anywhere;
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdIdentity > strong {
+  letter-spacing:
+    .06em;
+}
+
+
+.digitalCollegeIdFaculty
+.digitalCollegeIdIdentity h3 {
+  letter-spacing:
+    .045em;
+}
+
+
+/* CAMPUSCONNECT — ROLE AWARE COLLEGE ID V2 END */
+
+/* CAMPUSCONNECT ID ROLE COLORS FINAL START */
+
+
+/* ==========================================================
+   STUDENT ID CARD — GREEN
+   ========================================================== */
+
+.digitalCollegeId.digitalCollegeIdStudentCard {
+  background:
+    linear-gradient(
+      180deg,
+      #f7fbf8 0%,
+      #f7fbf8 42%,
+      #149267 42%,
+      #087654 93%,
+      #d9f3e6 93%,
+      #d9f3e6 100%
+    ) !important;
+
+  border-color:
+    #9fd3bd !important;
+
+  box-shadow:
+    0 20px 48px
+    rgba(8, 118, 84, .20) !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdSeal {
+  background:
+    #087654 !important;
+
+  color:
+    #ffffff !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdStudent {
+  background:
+    #d9f3e6 !important;
+
+  color:
+    #07563f !important;
+
+  border:
+    1px solid
+    #a7dbc5 !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdPhoto,
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdPhotoFallback {
+  border-color:
+    #effff7 !important;
+
+  box-shadow:
+    0 8px 25px
+    rgba(5, 80, 57, .24) !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdPhotoFallback {
+  background:
+    #dff5ea !important;
+
+  color:
+    #087654 !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdFacts > div {
+  background:
+    rgba(255,255,255,.15) !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.10) !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdVerified {
+  background:
+    rgba(255,255,255,.16) !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.10) !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdVerified > span {
+  color:
+    #087654 !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdFooter {
+  background:
+    #d9f3e6 !important;
+
+  color:
+    #07563f !important;
+}
+
+
+/* ==========================================================
+   FACULTY ID CARD — RED
+   ========================================================== */
+
+.digitalCollegeId.digitalCollegeIdFaculty {
+  background:
+    linear-gradient(
+      180deg,
+      #fff8f8 0%,
+      #fff8f8 42%,
+      #c62828 42%,
+      #991b1b 93%,
+      #ffdada 93%,
+      #ffdada 100%
+    ) !important;
+
+  border-color:
+    #efaaaa !important;
+
+  box-shadow:
+    0 20px 48px
+    rgba(153, 27, 27, .24) !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdSeal {
+  background:
+    #991b1b !important;
+
+  color:
+    #ffffff !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdStudent {
+  background:
+    #ffdada !important;
+
+  color:
+    #821717 !important;
+
+  border:
+    1px solid
+    #efaaaa !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdPhoto,
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdPhotoFallback {
+  border-color:
+    #fff0f0 !important;
+
+  box-shadow:
+    0 8px 25px
+    rgba(110, 20, 20, .28) !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdPhotoFallback {
+  background:
+    #ffe2e2 !important;
+
+  color:
+    #991b1b !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdFacts > div {
+  background:
+    rgba(255,255,255,.15) !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.10) !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdVerified {
+  background:
+    rgba(255,255,255,.16) !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.10) !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdVerified > span {
+  color:
+    #b91c1c !important;
+}
+
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdFooter {
+  background:
+    #ffdada !important;
+
+  color:
+    #821717 !important;
+}
+
+
+/* ==========================================================
+   KEEP TEXT CLEAR
+   ========================================================== */
+
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdIdentity,
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdFacts,
+.digitalCollegeId.digitalCollegeIdFaculty
+.digitalCollegeIdVerified,
+
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdIdentity,
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdFacts,
+.digitalCollegeId.digitalCollegeIdStudentCard
+.digitalCollegeIdVerified {
+  color:
+    #ffffff !important;
+}
+
+
+/* CAMPUSCONNECT ID ROLE COLORS FINAL END */

@@ -1,0 +1,291 @@
+@@ -113755,10 +113755,290 @@
+       translateY(
+         0
+       );
++  }
++}
++
++/* CAMPUSCONNECT — FACULTY EXECUTIVE DASHBOARD FINAL START */
++
++html body .facultyExecutiveDashboard {
++  width: 100%;
++  padding: 18px;
++  display: grid;
++  gap: 16px;
++  color: #17293a;
++  background:
++    linear-gradient(180deg, #f7f9fb 0%, #eef3f6 100%);
++  border: 1px solid #dfe8ee;
++  border-radius: 20px;
++  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .82);
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveHero {
++  position: relative;
++  display: grid;
++  grid-template-columns: minmax(0, 1fr) auto;
++  align-items: end;
++  gap: 28px;
++  min-height: 245px;
++  padding: 30px;
++  overflow: hidden;
++  border: 1px solid rgba(28, 57, 84, .28);
++  border-radius: 18px;
++  background:
++    linear-gradient(135deg, #17304a 0%, #25445f 54%, #315873 100%);
++  box-shadow: 0 18px 42px rgba(23, 48, 74, .18);
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveHero::before {
++  content: "";
++  position: absolute;
++  inset: 0;
++  background:
++    linear-gradient(90deg, rgba(255, 255, 255, .08), transparent 38%),
++    repeating-linear-gradient(
++      90deg,
++      rgba(255, 255, 255, .05) 0,
++      rgba(255, 255, 255, .05) 1px,
++      transparent 1px,
++      transparent 72px
++    );
++  pointer-events: none;
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveHero::after {
++  content: "";
++  position: absolute;
++  right: 30px;
++  bottom: 28px;
++  width: min(34%, 360px);
++  height: 5px;
++  border-radius: 999px;
++  background: linear-gradient(90deg, #8eb8d2, #b7c9a6);
++  opacity: .9;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalCommandMain,
++html body .facultyExecutiveDashboard .facultyExecutiveActions {
++  position: relative;
++  z-index: 1;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalCommandEyebrow {
++  margin: 0 0 13px;
++  color: #dce8ef;
++  font-size: 11px;
++  font-weight: 850;
++  letter-spacing: .14em;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalCommandEyebrow > i {
++  width: 24px;
++  height: 2px;
++  background: #b7c9a6;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalCommandEyebrow > b {
++  border-color: rgba(183, 201, 166, .46);
++  color: #eef6e7;
++  background: rgba(183, 201, 166, .16);
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveHero h2 {
++  max-width: 760px;
++  margin: 0;
++  color: #ffffff;
++  font-size: clamp(2rem, 3vw, 3.15rem);
++  font-weight: 780;
++  line-height: 1.03;
++  letter-spacing: 0;
++  text-shadow: none;
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveHero p {
++  max-width: 720px;
++  margin: 14px 0 0;
++  color: rgba(237, 244, 248, .88);
++  font-size: 14px;
++  line-height: 1.65;
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveActions {
++  min-width: 270px;
++  display: grid;
++  gap: 10px;
++  justify-items: stretch;
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveActions button {
++  min-height: 44px;
++  justify-content: center;
++  border: 1px solid rgba(226, 236, 242, .28);
++  border-radius: 10px;
++  color: #eef5f8;
++  background: rgba(255, 255, 255, .10);
++  box-shadow: none;
++  backdrop-filter: blur(10px);
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveActions .facultyMinimalPrimary {
++  border-color: #c8d7e1;
++  color: #17304a;
++  background: #ffffff;
++  box-shadow: 0 12px 24px rgba(10, 24, 38, .18);
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveActions button:hover {
++  transform: translateY(-1px);
++  border-color: #ffffff;
++  background: rgba(255, 255, 255, .18);
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveActions .facultyMinimalPrimary:hover {
++  color: #17304a;
++  background: #f3f7f9;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalMetrics {
++  display: grid;
++  grid-template-columns: repeat(4, minmax(0, 1fr));
++  gap: 12px;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalMetrics article {
++  padding: 18px;
++  border: 1px solid #dce6ec;
++  border-radius: 14px;
++  background: #ffffff;
++  box-shadow: 0 8px 22px rgba(24, 45, 62, .055);
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalMetrics article::before {
++  left: 18px;
++  width: 42px;
++  height: 3px;
++  background: #7195ad;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalMetrics span {
++  color: #607484;
++  font-size: 10px;
++  letter-spacing: .1em;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalMetrics strong {
++  color: #172f44;
++  font-size: 30px;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalMetrics small {
++  color: #718393;
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveBrief {
++  display: block;
++  padding: 20px 22px;
++  border: 1px solid #dce6ec;
++  border-left: 4px solid #829b6f;
++  border-radius: 14px;
++  background: #ffffff;
++  box-shadow: 0 8px 20px rgba(24, 45, 62, .045);
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveBrief > div > span {
++  color: #647f54;
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveBrief strong {
++  color: #172f44;
++}
++
++html body .facultyExecutiveDashboard .facultyExecutiveBrief p {
++  max-width: 980px;
++  color: #6b7e8d;
++}
++
++html body .facultyExecutiveDashboard .facultyMinimalIntelligence,
++html body .facultyExecutiveDashboard .facultyMinimalOperations {
++  min-width: 0;
++}
++
++html body .facultyExecutiveDashboard .roleActionCenter,
++html body .facultyExecutiveDashboard .staffOperationsBoard {
++  border: 1px solid #dce6ec !important;
++  border-radius: 16px !important;
++  background: #ffffff !important;
++  box-shadow: 0 10px 26px rgba(24, 45, 62, .06) !important;
++}
++
++html body .facultyExecutiveDashboard .roleActionCenter::before,
++html body .facultyExecutiveDashboard .staffOperationsBoard::before,
++html body .facultyExecutiveDashboard .roleActionCenter::after,
++html body .facultyExecutiveDashboard .staffOperationsBoard::after {
++  display: none !important;
++}
++
++html body .facultyExecutiveDashboard .roleActionOpen,
++html body .facultyExecutiveDashboard .staffOperationsCreate,
++html body .facultyExecutiveDashboard .staffOperationsBoard button.primary,
++html body .facultyExecutiveDashboard .staffOperationsBoard button[type="submit"] {
++  border-color: #244f73 !important;
++  color: #ffffff !important;
++  background: #244f73 !important;
++  box-shadow: 0 8px 18px rgba(36, 79, 115, .18) !important;
++}
++
++html body .facultyExecutiveDashboard .roleActionAi,
++html body .facultyExecutiveDashboard .roleActionDismiss,
++html body .facultyExecutiveDashboard .staffOperationsRefresh,
++html body .facultyExecutiveDashboard .staffOperationsBoard button:not(.primary):not([type="submit"]):not(.newTaskButton) {
++  border-color: #d3e0e8 !important;
++  color: #31566f !important;
++  background: #ffffff !important;
++  box-shadow: none !important;
++}
++
++@media (max-width: 980px) {
++  html body .facultyExecutiveDashboard .facultyExecutiveHero {
++    grid-template-columns: 1fr;
++    align-items: start;
+   }
++
++  html body .facultyExecutiveDashboard .facultyExecutiveActions {
++    min-width: 0;
++    width: 100%;
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++  }
++
++  html body .facultyExecutiveDashboard .facultyMinimalMetrics {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++  }
+ }
+ 
++@media (max-width: 640px) {
++  html body .facultyExecutiveDashboard {
++    padding: 10px;
++    border-radius: 16px;
++  }
+ 
++  html body .facultyExecutiveDashboard .facultyExecutiveHero {
++    min-height: auto;
++    padding: 22px 18px;
++    border-radius: 15px;
++  }
++
++  html body .facultyExecutiveDashboard .facultyExecutiveHero h2 {
++    font-size: 2rem;
++  }
++
++  html body .facultyExecutiveDashboard .facultyExecutiveActions,
++  html body .facultyExecutiveDashboard .facultyMinimalMetrics {
++    grid-template-columns: 1fr;
++  }
++}
++
++/* CAMPUSCONNECT — FACULTY EXECUTIVE DASHBOARD FINAL END */
++
++
+ @media (prefers-reduced-motion: reduce) {
+ 
+   html body

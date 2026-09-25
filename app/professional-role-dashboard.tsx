@@ -11,6 +11,7 @@ import {getSupabaseClient} from "../lib/supabase";
 
 import {RoleActionCenter} from "./role-action-center";
 import {StaffOperationsBoard} from "./staff-operations-board";
+import {FacultyDashboardPremium} from "./faculty-dashboard-premium";
 
 export type DashboardRole =
   | "Student"
@@ -1319,6 +1320,18 @@ export function ProfessionalRoleDashboard({
     };
   }, []);
 
+  if (role === "Faculty") {
+    return (
+      <FacultyDashboardPremium
+        department={profile.department?.trim() || ""}
+        counts={counts}
+        loading={loading}
+        go={go}
+        onOpenCalculator={onOpenCalculator}
+      />
+    );
+  }
+
   return (
     <div
       className={`proRoleDashboard proRoleDashboard-${role
@@ -2129,9 +2142,6 @@ export function ProfessionalRoleDashboard({
                   : role ===
                     "Placement Cell"
                   ? "Recruitment operations stay connected."
-                  : role ===
-                    "Faculty"
-                  ? "Academic intervention becomes actionable."
                   : role ===
                     "Main Admin"
                   ? "Governance without dashboard noise."

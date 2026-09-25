@@ -2426,11 +2426,19 @@ const expectedLength =
         caught
       ) {
 
-        setError(
-          caught instanceof
-            Error
+        const message =
+          caught instanceof Error
             ? caught.message
-            : "Unable to save this teaching session."
+            : (
+                typeof caught === "object" &&
+                caught !== null &&
+                "message" in caught
+              )
+              ? String(caught.message)
+              : "Unable to save this teaching session.";
+
+        setError(
+          message
         );
 
       } finally {

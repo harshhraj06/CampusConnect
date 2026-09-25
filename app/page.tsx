@@ -1,5 +1,7 @@
 "use client";
 
+import UserManual from "./user-manual";
+
 import FacultyWorkspace from "./faculty-workspace";
 import FacultyTodayClasses from "./faculty-today-classes";
 import FacultyTeachingSchedule from "./faculty-teaching-schedule";
@@ -375,8 +377,12 @@ type View =
   | "My Teaching Schedule"
   | "Faculty Diary"
   | "Syllabus Progress"
+  | "Faculty Workload"
+  | "Faculty Availability"
+  | "Faculty Coverage"
   | "Timetable Coordinator"
-  | "Timetable Assignment";
+  | "Timetable Assignment"
+  | "User Manual";
 type Role = "Student" | "Faculty" | "Placement Cell" | "Coordinator" | "Volunteer" | "Main Admin";
 type Screen = "welcome" | "auth" | "dashboard";
 type AuthMode = "login" | "register" | "forgot" | "reset";
@@ -398,8 +404,12 @@ const viewSlugs: Record<View, string> = {
   "My Teaching Schedule": "faculty-teaching-schedule",
   "Faculty Diary": "faculty-diary",
   "Syllabus Progress": "faculty-syllabus-progress",
+  "Faculty Workload": "faculty-workload",
+  "Faculty Availability": "faculty-availability",
+  "Faculty Coverage": "faculty-coverage",
   "Timetable Coordinator": "timetable-coordinator",
   "Timetable Assignment": "timetable-assignment",
+  "User Manual": "user-manual",
   "My Campus": "my-campus",
   "Campus Map": "campus-map",
   "Campus AI": "campus-ai",
@@ -510,26 +520,27 @@ const navByRole: Record<Role, [View, string][]> = {
   Faculty: [
     ["Dashboard", "⌂"],
     ["Faculty Workspace", "▦"],
-    ["Today's Classes", "◷"],
-    ["My Teaching Schedule", "▤"],
-    ["My Batches", "▤"],
-    ["Attendance", "◷"],
-    ["Faculty Diary", "✎"],
-    ["Syllabus Progress", "◫"],
-    ["Assignments", "✓"],
-    ["My Campus", "◇"],
-    ["Announcements", "▣"],
-    ["Learning", "▶"],
-    ["Groups", "◉"],
+
+
+
+
     ["Notes & Tasks", "✎"],
-    ["Academics", "▦"],
+
+    ["Announcements", "▣"],
+    ["Calendar", "▦"],
+    ["Groups", "◉"],
     ["Network", "◎"],
-    ["Analytics", "▥"],
+
+    ["My Campus", "◇"],
+    ["Campus Map", "⌖"],
     ["Campus", "◇"],
-    ["Faculty Directory", "♙"],
+    ["Alumni", "✦"],
+
     ["Activity Center", "✦"],
     ["Seva Kendra", "✉"],
+    ["Analytics", "▥"],
     ["College ID", "▥"],
+
     ["About CampusConnect", "≋"],
     ["Profile", "◌"],
   ],
@@ -611,6 +622,81 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Profile", "◌"],
   ],
 };
+
+
+/*
+ * USER MANUAL NAVIGATION
+ *
+ * The manual is inserted automatically for every CampusConnect role.
+ * It is placed immediately before Profile when Profile exists.
+ *
+ * The manual itself reads directly from navByRole, so every future
+ * feature added to a role navigation automatically appears as a guide.
+ */
+
+(
+  Object.keys(
+    navByRole
+  ) as Role[]
+).forEach(
+  roleName => {
+
+    const roleItems =
+      navByRole[
+        roleName
+      ];
+
+
+    if (
+      roleItems.some(
+        ([view]) =>
+          view ===
+            "User Manual"
+      )
+    ) {
+      return;
+    }
+
+
+    const profileIndex =
+      roleItems.findIndex(
+        ([view]) =>
+          view ===
+            "Profile"
+      );
+
+
+    const manualItem:
+      [View, string] =
+        [
+          "User Manual",
+          "?",
+        ];
+
+
+    if (
+      profileIndex >=
+        0
+    ) {
+
+      roleItems.splice(
+        profileIndex,
+        0,
+        manualItem
+      );
+
+      return;
+
+    }
+
+
+    roleItems.push(
+      manualItem
+    );
+
+  }
+);
+
 
 const sidebarStatus: Record<Role, {value: string; title: string; note: string}> = {
   Student: {
@@ -1918,13 +2004,16 @@ export default function Home() {
 
   const initials = getInitials(profile.name);
   const firstName = profile.name.split(" ")[0];
-  const roleNav: [View, string][] = [
-    navByRole[role][0],
-    ["Campus Map", "⌖"],
-    ["Calendar", "▦"],
-    ["Alumni", "✦"],
-    ...navByRole[role].slice(1),
-  ];
+  const roleNav: [View, string][] =
+    role === "Faculty"
+      ? navByRole[role]
+      : [
+          navByRole[role][0],
+          ["Campus Map", "⌖"],
+          ["Calendar", "▦"],
+          ["Alumni", "✦"],
+          ...navByRole[role].slice(1),
+        ];
   const status = sidebarStatus[role];
   const actions = headerActions[role];
   const roleNotifications:
@@ -1992,10 +2081,11 @@ export default function Home() {
   return (
     <>
 
-      
+
 
       <GradeCalculator />
 
+      {!(role === "Faculty" && v === "Dashboard") && (
       <button
         type="button"
         className="campusGradeLauncher"
@@ -2005,8 +2095,9 @@ export default function Home() {
         <i>∑</i>
         <span>SGPA / CGPA</span>
       </button>
+      )}
 
-      {v === "Dashboard" && (
+      {v === "Dashboard" && role !== "Faculty" && (
         <button
           type="button"
           className="campusAiLauncher"
@@ -2297,7 +2388,7 @@ export default function Home() {
               </div>
             </div>
 
-            {v === "Dashboard" && (
+            {v === "Dashboard" && role !== "Faculty" && (
               <div className="headingActions">
                 <button
                   className="dashboardHeaderSecondary"
@@ -2325,7 +2416,7 @@ export default function Home() {
                 }}
               />
 
-              
+
 
               {role === "Student" ? (
                 <Dashboard
@@ -2492,6 +2583,30 @@ export default function Home() {
               />
             )}
 
+          {v === "Faculty Workload" &&
+            role === "Faculty" && (
+              <FacultyWorkloadManager
+                profile={profile}
+              />
+            )}
+
+
+          {v === "Faculty Availability" &&
+            role === "Faculty" && (
+              <FacultyAvailabilityManager
+                profile={profile}
+              />
+            )}
+
+
+          {v === "Faculty Coverage" &&
+            role === "Faculty" && (
+              <FacultyCoverageManager
+                profile={profile}
+              />
+            )}
+
+
           {v === "Timetable Coordinator" &&
             role === "Coordinator" && (
               <>
@@ -2578,9 +2693,9 @@ export default function Home() {
                   );
                 });
             }}
-          />)} 
-          {v === "Network" && <Network profile={profile}/>} 
-          {v === "Resume" && <Resume profile={profile} score={score} improve={() => setScore(current => Math.min(100, current + 6))}/>} 
+          />)}
+          {v === "Network" && <Network profile={profile}/>}
+          {v === "Resume" && <Resume profile={profile} score={score} improve={() => setScore(current => Math.min(100, current + 6))}/>}
           {v === "Academics" && <Academics role={role} profile={profile}/>}
           {v === "Academic Control" && (
             <AcademicControl
@@ -2624,6 +2739,18 @@ export default function Home() {
               viewerRole={role}
             />
           )}
+          {v === "User Manual" && (
+            <UserManual
+              role={role}
+              navigation={navByRole}
+              onOpen={target =>
+                setV(
+                  target as View
+                )
+              }
+            />
+          )}
+
           {v === "Profile" && <ProfilePage profile={profile} onProfileChange={next => { setProfile(next); setRole(next.role); }} onSignOut={signOut}/>}
           {isCampusModuleView(v) && (
             <CampusModule
@@ -6940,7 +7067,7 @@ function PlacementManagement() {
 
   return <div className="moduleStack">
     <section className="moduleHero"><div><span>PLACEMENT OPERATIONS</span><h2>Recruitment drives</h2><p>Create and manage real company drives backed by your campus database. No seeded or sample opportunities are shown.</p></div><button className="primary" onClick={() => setShowForm(v => !v)}>{showForm ? "Close" : "+ New drive"}</button></section>
-    {status && <StatusLine text={status}/>} 
+    {status && <StatusLine text={status}/>}
     {showForm && <form className="moduleForm card" onSubmit={createDrive}><FormHeading title="Create a live placement drive" text="Only verified Placement Cell accounts can publish recruitment opportunities."/><div className="formGrid"><Field label="Company"><input value={form.company} onChange={e => setForm({...form,company:e.target.value})}/></Field><Field label="Role"><input value={form.role_title} onChange={e => setForm({...form,role_title:e.target.value})}/></Field><Field label="Compensation"><input value={form.compensation} onChange={e => setForm({...form,compensation:e.target.value})}/></Field><Field label="Deadline"><input type="datetime-local" value={form.deadline} onChange={e => setForm({...form,deadline:e.target.value})}/></Field><Field label="Location"><input value={form.location} onChange={e => setForm({...form,location:e.target.value})}/></Field><Field label="Minimum CGPA"><input type="number" step="0.1" min="0" max="10" value={form.minimum_cgpa} onChange={e => setForm({...form,minimum_cgpa:e.target.value})}/></Field></div><Field label="Eligible branches"><input value={form.branches} onChange={e => setForm({...form,branches:e.target.value})} placeholder="ECE, CSE, ISE"/></Field><Field label="Skills"><input value={form.skills} onChange={e => setForm({...form,skills:e.target.value})} placeholder="Java, DSA, SQL"/></Field><Field label="About role"><textarea value={form.about} onChange={e => setForm({...form,about:e.target.value})}/></Field><Field label="Selection rounds"><input value={form.rounds} onChange={e => setForm({...form,rounds:e.target.value})} placeholder="Online assessment, Technical interview, HR"/></Field><FormActions status="" label="Publish live drive"/></form>}
     {drives.length ? <div className="split roleManagement"><section className="card driveManager"><div className="managementToolbar"><div><span>LIVE DRIVES</span><h2>Company recruitment</h2></div><b>{drives.length} active</b></div><div className="driveList">{drives.map(drive => <button className={`driveRow ${selected?.c === drive.c ? "selected" : ""}`} onClick={() => setSelected(drive)} key={`${drive.c}-${drive.r}`}><Logo t={drive.l}/><p><b>{drive.c}</b><small>{drive.r} · Deadline {drive.d}</small></p><span><b>{drive.applications}</b><small>applications</small></span><i>→</i></button>)}</div></section>{selected && <section className="card driveDetail"><div className="driveDetailHead"><Logo t={selected.l}/><div><span>LIVE</span><h2>{selected.c}</h2><p>{selected.r}</p></div></div><div className="driveNumbers"><p><b>{selected.applications}</b><small>Applications</small></p><p><b>{selected.m}%</b><small>Match score</small></p><p><b>{selected.cgpa}+</b><small>Minimum CGPA</small></p></div><div className="eligibility"><h3>Eligibility criteria</h3><MetricRow title="Departments" meta={selected.branches.join(", ") || "Not specified"} value={`${selected.branches.length} branches`}/><MetricRow title="Skills" meta={selected.skills.join(", ") || "Not specified"} value="Verified"/></div><div className="driveActions"><button className="ghost" onClick={exportApplications}>↓ Export applications</button><button className="primary" onClick={() => setStatus("Use Announcements to publish a verified student-facing deadline notice.")}>Create notice</button></div></section>}</div> : <EmptyState title="No live placement drives" text="Create the first company drive from the button above."/>}
   </div>;
@@ -8743,6 +8870,112 @@ const emptyGuardianContact: GuardianContact = {
   email_enabled: true,
 };
 
+
+function FacultyDepartmentLabel({
+  fallback,
+}: {
+  fallback: string;
+}) {
+
+  const [
+    departments,
+    setDepartments,
+  ] = useState<string[]>([]);
+
+
+  useEffect(() => {
+
+    let active = true;
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return;
+    }
+
+
+    void client.auth
+      .getUser()
+      .then(async ({
+        data: auth,
+      }) => {
+
+        if (
+          !active ||
+          !auth.user
+        ) {
+          return;
+        }
+
+
+        const {
+          data,
+          error,
+        } = await client
+          .from(
+            "faculty_department_assignments"
+          )
+          .select(
+            "department"
+          )
+          .eq(
+            "faculty_id",
+            auth.user.id
+          )
+          .order(
+            "department",
+            {
+              ascending: true,
+            }
+          );
+
+
+        if (
+          !active ||
+          error
+        ) {
+          return;
+        }
+
+
+        setDepartments(
+          (
+            data || []
+          ).map(
+            row =>
+              String(
+                row.department
+              )
+          )
+        );
+
+      });
+
+
+    return () => {
+
+      active = false;
+
+    };
+
+  }, []);
+
+
+  return (
+    <>
+      {departments.length
+        ? departments.join(
+            " • "
+          )
+        : fallback ||
+          "Not assigned"}
+    </>
+  );
+
+}
+
+
 function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; onProfileChange: (profile: Profile) => void; onSignOut: () => Promise<void> | void}) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(profile);
@@ -9117,8 +9350,11 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
       const {data: auth} = await client.auth.getUser();
       if (!auth.user) throw new Error("Your session has expired. Please sign in again.");
       const {data, error: saveError} = await client.from("profiles").update({
-        full_name: form.name.trim(), department: form.department.trim(), graduation_year: form.year.trim(),
-        bio: form.bio.trim(), skills: form.skills.trim(), phone: form.phone.trim(), usn: form.usn.trim().toUpperCase(), updated_at: new Date().toISOString(),
+        full_name: form.name.trim(), department: profile.role === "Main Admin" ? form.department.trim() : profile.department.trim(), graduation_year:
+          profile.role === "Student"
+            ? form.year.trim()
+            : profile.year.trim(),
+        bio: form.bio.trim(), skills: form.skills.trim(), phone: form.phone.trim(),  updated_at: new Date().toISOString(),
       }).eq("id", auth.user.id).select("full_name, role, department, graduation_year, bio, skills, phone, usn, campus_uid, avatar_url").single();
       if (saveError) throw saveError;
       const next = {...profile, name: data.full_name, department: data.department, year: data.graduation_year, bio: data.bio || "", skills: data.skills || "", phone: data.phone || "", usn: data.usn || ""};
@@ -9246,7 +9482,21 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
 
   return <div className="profilePage">
     <section className="profileHero card">
-      <div className="profileIdentity"><Avatar t={getInitials(profile.name) || "U"} src={profile.avatar_url} alt={`${profile.name} profile`}/><div><span>YOUR CAMPUS IDENTITY</span><h2>{profile.name || "Campus user"}</h2><p>{profile.role} · {profile.department || "Department not set"} · {profile.year || "Year not set"}</p></div></div>
+      <div className="profileIdentity"><Avatar t={getInitials(profile.name) || "U"} src={profile.avatar_url} alt={`${profile.name} profile`}/><div><span>YOUR CAMPUS IDENTITY</span><h2>{profile.name || "Campus user"}</h2><p>
+          {profile.role}
+          {" · "}
+          {profile.role === "Faculty" ? (
+            <FacultyDepartmentLabel
+              fallback={profile.department}
+            />
+          ) : (
+            <>
+              {profile.department || "Department not set"}
+              {" · "}
+              {profile.year || "Year not set"}
+            </>
+          )}
+        </p></div></div>
       <div className="profileHeroActions"><button className="ghost" onClick={() => {setForm(profile); setEditing(true); setMessage(""); setError("");}}>Edit profile</button><button className="primary" onClick={() => void onSignOut()}>Log out</button></div>
     </section>
     {message && <StatusLine text={message}/>} {error && <p className="authError" role="alert">{error}</p>}
@@ -9255,13 +9505,86 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
         {editing ? <form className="profileForm" onSubmit={save}>
           <Field label="Full name"><input value={form.name} onChange={e => setForm({...form,name:e.target.value})} required /></Field>
           <Field label="College email"><input value={profile.email} disabled /></Field>
-          <div className="profileTwo"><Field label="Department"><input value={form.department} onChange={e => setForm({...form,department:e.target.value})}/></Field><Field label="Graduation year"><input value={form.year} onChange={e => setForm({...form,year:e.target.value})}/></Field></div>
-          <Field label="USN"><input value={form.usn} onChange={e => setForm({...form,usn:e.target.value.toUpperCase()})} placeholder="1RN..." /></Field>
+          <div className="profileTwo"><Field label="Department">
+            <input
+              value={form.department}
+              onChange={e =>
+                setForm({
+                  ...form,
+                  department:
+                    e.target.value,
+                })
+              }
+              disabled={
+                profile.role !==
+                  "Main Admin"
+              }
+              title={
+                profile.role === "Faculty"
+                  ? "Faculty departments are managed by Main Admin."
+                  : undefined
+              }
+            />
+          </Field>{profile.role === "Student" && (
+            <Field label="Graduation year"><input value={form.year} onChange={e => setForm({...form,year:e.target.value})}/></Field>
+          )}</div>
+          {profile.role === "Student" && (
+            <Field label="USN">
+
+              <input
+                value={profile.usn}
+                disabled
+                title="USN is managed by Main Admin."
+                placeholder="USN not assigned"
+              />
+
+              <small className="profileManagedFieldNote">
+                Managed by Main Admin
+              </small>
+
+            </Field>
+          )}
           <Field label="Phone"><input value={form.phone} onChange={e => setForm({...form,phone:e.target.value})} inputMode="tel" /></Field>
           <Field label="Bio"><textarea value={form.bio} onChange={e => setForm({...form,bio:e.target.value})} maxLength={500} placeholder="A short professional introduction" /></Field>
           <Field label="Skills"><input value={form.skills} onChange={e => setForm({...form,skills:e.target.value})} placeholder="Java, Python, Embedded Systems" /></Field>
           <div className="formActions"><button type="button" className="ghost" onClick={() => {setForm(profile);setEditing(false)}}>Cancel</button><button className="primary" disabled={saving}>{saving ? "Saving..." : "Save changes"}</button></div>
-        </form> : <div className="profileDetails"><div><small>Email</small><b>{profile.email}</b></div><div><small>Phone</small><b>{profile.phone || "Not added"}</b></div><div><small>USN</small><b>{profile.usn || "Not added"}</b></div><div><small>Department</small><b>{profile.department || "Not added"}</b></div><div><small>Graduation year</small><b>{profile.year || "Not added"}</b></div><div><small>Role</small><b>{profile.role}</b></div><div className="profileBio"><small>Bio</small><p>{profile.bio || "Add a short professional bio from Edit profile."}</p></div><div className="profileBio"><small>Skills</small><p>{profile.skills || "Add your skills to improve your profile and resume."}</p></div></div>}
+        </form> : <div className="profileDetails"><div><small>Email</small><b>{profile.email}</b></div><div><small>Phone</small><b>{profile.phone || "Not added"}</b></div>{profile.role === "Student" && (
+          <div>
+            <small>USN</small>
+            <b>
+              {profile.usn ||
+                "Not assigned"}
+            </b>
+          </div>
+        )}<div>
+          <small>
+            {profile.role === "Faculty"
+              ? "Departments"
+              : "Department"}
+          </small>
+
+          <b>
+            {profile.role === "Faculty" ? (
+              <FacultyDepartmentLabel
+                fallback={profile.department}
+              />
+            ) : (
+              profile.department ||
+              "Not added"
+            )}
+          </b>
+        </div>{profile.role === "Student" && (
+          <div>
+            <small>
+              Graduation year
+            </small>
+
+            <b>
+              {profile.year ||
+                "Not added"}
+            </b>
+          </div>
+        )}<div><small>Role</small><b>{profile.role}</b></div><div className="profileBio"><small>Bio</small><p>{profile.bio || "Add a short professional bio from Edit profile."}</p></div><div className="profileBio"><small>Skills</small><p>{profile.skills || "Add your skills to improve your profile and resume."}</p></div></div>}
       </section>
       {profile.role === "Student" && (
         <section className="card profileCard guardianContactCard">
@@ -9276,26 +9599,17 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
               </h3>
             </div>
 
-            {!guardianLoading &&
-              !guardianEditing && (
-                <button
-                  type="button"
-                  className="ghost"
-                  onClick={() => {
-                    setGuardianEditing(true);
-                    setGuardianMessage("");
-                    setGuardianError("");
-                  }}
-                >
-                  Edit
-                </button>
-              )}
+            {!guardianLoading && (
+              <span className="guardianAdminManagedBadge">
+                Admin managed
+              </span>
+            )}
           </header>
 
           <p className="guardianIntro">
             This private contact is used for
-            attendance alerts. It is not shown
-            on your public CampusConnect profile.
+            attendance alerts. Only Main Admin
+            can change Parent / Guardian details.
           </p>
 
           {guardianMessage && (
@@ -14020,6 +14334,83 @@ function Academics({role, profile}: {role: Role; profile: Profile}) {
   const [semester, setSemester] = useState("All");
   const [query, setQuery] = useState("");
 
+  /*
+   * Live academic clock.
+   *
+   * Today's Classes must update while the page remains open.
+   * Without state, new Date() only changes when React happens
+   * to render for another reason.
+   */
+  const [
+    academicNow,
+    setAcademicNow,
+  ] = useState(
+    () => new Date()
+  );
+
+
+  useEffect(() => {
+
+    const updateAcademicClock = () => {
+      setAcademicNow(
+        new Date()
+      );
+    };
+
+
+    updateAcademicClock();
+
+
+    const timer =
+      window.setInterval(
+        updateAcademicClock,
+        30_000
+      );
+
+
+    const handleVisibility = () => {
+
+      if (
+        document.visibilityState ===
+        "visible"
+      ) {
+        updateAcademicClock();
+      }
+
+    };
+
+
+    window.addEventListener(
+      "focus",
+      updateAcademicClock
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibility
+    );
+
+
+    return () => {
+
+      window.clearInterval(
+        timer
+      );
+
+      window.removeEventListener(
+        "focus",
+        updateAcademicClock
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibility
+      );
+
+    };
+
+  }, []);
+
   const normalizeAcademicSubject = (
     value: unknown
   ) =>
@@ -14499,13 +14890,9 @@ if (role !== "Student") {
             .eq("student_id", id)
             .order("subject_name"),
 
-          client
-            .from("attendance_records")
-            .select(
-              "id,student_id,subject,attended,total,updated_at"
-            )
-            .eq("student_id", id)
-            .order("subject"),
+          client.rpc(
+            "get_my_live_attendance_summary"
+          ),
 
           client
             .from("college_marks")
@@ -14590,44 +14977,159 @@ if (role !== "Student") {
 
         if (!active) return;
 
-        if (!attendanceResult.error) {
-          const officialAttendance =
-            attendanceResult.data || [];
-
-          if (officialAttendance.length) {
-            setAttendance(
-              officialAttendance
-            );
-          } else if (
-            !campusAttendanceResult.error
-          ) {
-            setAttendance(
-              (
+        /*
+         * CANONICAL STUDENT ATTENDANCE
+         *
+         * get_my_live_attendance_summary is the source of truth
+         * for live Faculty-recorded attendance.
+         *
+         * college_attendance remains a legacy/import fallback only
+         * when no live attendance summary exists.
+         */
+        const liveAttendance =
+          !campusAttendanceResult.error
+            ? (
                 campusAttendanceResult.data ||
                 []
-              ).map(item => ({
-                ...item,
-                subject_name:
-                  item.subject || "",
-                subject_code: "",
-              }))
-            );
-          }
-        } else if (
-          !campusAttendanceResult.error
+              )
+            : [];
+
+
+        const importedAttendance =
+          !attendanceResult.error
+            ? (
+                attendanceResult.data ||
+                []
+              )
+            : [];
+
+
+        if (
+          liveAttendance.length
         ) {
+
           setAttendance(
-            (
-              campusAttendanceResult.data ||
-              []
-            ).map(item => ({
-              ...item,
-              subject_name:
-                item.subject || "",
-              subject_code: "",
-            }))
+            liveAttendance.map(
+              (item: AcademicRow) => {
+
+                const attended =
+                  Number(
+                    item.attended_classes ??
+                    item.attended ??
+                    0
+                  );
+
+
+                const total =
+                  Number(
+                    item.counted_classes ??
+                    item.total ??
+                    0
+                  );
+
+
+                return {
+                  ...item,
+
+                  subject_name:
+                    String(
+                      item.subject_name ||
+                      item.subject ||
+                      ""
+                    ),
+
+                  subject_code:
+                    String(
+                      item.subject_code ||
+                      ""
+                    ),
+
+                  attended:
+                    Number.isFinite(
+                      attended
+                    )
+                      ? attended
+                      : 0,
+
+                  total:
+                    Number.isFinite(
+                      total
+                    )
+                      ? total
+                      : 0,
+
+                  attendance_percentage:
+                    total > 0
+                      ? (
+                          attended /
+                          total
+                        ) *
+                          100
+                      : 0,
+
+                  __attendance_source:
+                    "live",
+                };
+
+              }
+            )
           );
+
+        } else if (
+          importedAttendance.length
+        ) {
+
+          /*
+           * Keep imported college attendance only as fallback.
+           */
+          setAttendance(
+            importedAttendance.map(
+              item => {
+
+                const attended =
+                  Number(
+                    item.attended ||
+                    0
+                  );
+
+                const total =
+                  Number(
+                    item.total ||
+                    0
+                  );
+
+
+                return {
+                  ...item,
+
+                  attended:
+                    Number.isFinite(
+                      attended
+                    )
+                      ? attended
+                      : 0,
+
+                  total:
+                    Number.isFinite(
+                      total
+                    )
+                      ? total
+                      : 0,
+
+                  __attendance_source:
+                    "imported",
+                };
+
+              }
+            )
+          );
+
+        } else {
+
+          setAttendance([]);
+
         }
+
 
         if (!marksResult.error)
           setMarks(marksResult.data || []);
@@ -14794,7 +15296,7 @@ if (role !== "Student") {
               ? (
                   campusAttendanceResult.data ||
                   []
-                ).map(item => ({
+                ).map((item: AcademicRow) => ({
                   ...item,
                   subject_name:
                     item.subject || "",
@@ -15180,28 +15682,10 @@ if (role !== "Student") {
 
         {(role === "Faculty" ||
           role === "Main Admin") && (
-          <>
-            {role === "Faculty" && (
-              <>
-                <FacultyWorkloadManager
-                  profile={profile}
-                />
-
-                <FacultyAvailabilityManager
-                  profile={profile}
-                />
-
-                <FacultyCoverageManager
-                  profile={profile}
-                />
-              </>
-            )}
-
-<AcademicMarksManager
-              role={role}
-              profile={profile}
-            />
-          </>
+          <AcademicMarksManager
+            role={role}
+            profile={profile}
+          />
         )}
 
       </div>
@@ -15349,23 +15833,78 @@ if (role !== "Student") {
     );
 
 
-  const attendanceAverage =
-    visibleAttendance.length
-      ? Math.round(
-          visibleAttendance.reduce(
-            (total, item) => {
-              if (!item.total) {
-                return total;
-              }
+  /*
+   * Canonical overall attendance:
+   *
+   * total attended classes
+   * ---------------------- × 100
+   * total counted classes
+   *
+   * Do NOT average individual subject percentages because
+   * subjects may contain different numbers of classes.
+   */
+  const academicAttendanceTotals =
+    visibleAttendance.reduce(
+      (
+        totals,
+        item
+      ) => {
 
-              return total +
-                item.attended /
-                  item.total *
-                  100;
-            },
+        const attended =
+          Number(
+            item.attended ||
             0
-          ) /
-            visibleAttendance.length
+          );
+
+        const total =
+          Number(
+            item.total ||
+            0
+          );
+
+
+        if (
+          !Number.isFinite(
+            attended
+          ) ||
+          !Number.isFinite(
+            total
+          ) ||
+          total <= 0
+        ) {
+          return totals;
+        }
+
+
+        totals.attended +=
+          Math.max(
+            0,
+            attended
+          );
+
+        totals.total +=
+          total;
+
+
+        return totals;
+
+      },
+      {
+        attended: 0,
+        total: 0,
+      }
+    );
+
+
+  const attendanceAverage =
+    academicAttendanceTotals.total >
+      0
+      ? Math.round(
+          (
+            academicAttendanceTotals.attended /
+            academicAttendanceTotals.total
+          ) *
+            100
         )
       : 0;
 
@@ -15395,39 +15934,109 @@ if (role !== "Student") {
     );
 
 
-  const now = new Date();
+  const now =
+    academicNow;
+
+  /*
+   * Campus timetable clock
+   *
+   * Timetable times belong to the campus timezone rather than
+   * whichever timezone happens to be configured on the device.
+   */
+  const campusClockParts =
+    new Intl.DateTimeFormat(
+      "en-GB",
+      {
+        timeZone:
+          "Asia/Kolkata",
+
+        weekday:
+          "long",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        hourCycle:
+          "h23",
+      }
+    ).formatToParts(
+      now
+    );
+
+
+  const campusClockPart = (
+    type: Intl.DateTimeFormatPartTypes
+  ) =>
+    campusClockParts.find(
+      part =>
+        part.type ===
+        type
+    )?.value ||
+    "";
+
 
   const currentDay =
-    new Intl.DateTimeFormat(
-      "en-US",
-      {
-        weekday: "long",
-      }
-    ).format(now);
+    campusClockPart(
+      "weekday"
+    );
 
 
+  /*
+   * Convert a database timetable value to minutes after midnight.
+   *
+   * Deliberately uses split(":") instead of a regex so values
+   * such as 09:20:00 cannot fail because of escaping.
+   */
   const timetableMinutes = (
     value: unknown
   ) => {
-    const match = String(
-      value || ""
-    ).match(
-      /^(\\d{1,2}):(\\d{2})/
-    );
 
-    if (!match) {
+    const raw =
+      String(
+        value ??
+        ""
+      )
+        .trim();
+
+
+    if (!raw) {
       return null;
     }
 
-    const hours =
-      Number(match[1]);
 
-    const minutes =
-      Number(match[2]);
+    const parts =
+      raw.split(":");
+
 
     if (
-      !Number.isInteger(hours) ||
-      !Number.isInteger(minutes) ||
+      parts.length <
+        2
+    ) {
+      return null;
+    }
+
+
+    const hours =
+      Number(
+        parts[0]
+      );
+
+    const minutes =
+      Number(
+        parts[1]
+      );
+
+
+    if (
+      !Number.isInteger(
+        hours
+      ) ||
+      !Number.isInteger(
+        minutes
+      ) ||
       hours < 0 ||
       hours > 23 ||
       minutes < 0 ||
@@ -15436,32 +16045,73 @@ if (role !== "Student") {
       return null;
     }
 
-    return hours * 60 + minutes;
+
+    return (
+      hours *
+        60 +
+      minutes
+    );
+
   };
 
 
+  const currentHour =
+    Number(
+      campusClockPart(
+        "hour"
+      )
+    );
+
+
+  const currentMinute =
+    Number(
+      campusClockPart(
+        "minute"
+      )
+    );
+
+
   const currentMinutes =
-    now.getHours() * 60 +
-    now.getMinutes();
+    Number.isFinite(
+      currentHour
+    ) &&
+    Number.isFinite(
+      currentMinute
+    )
+      ? currentHour *
+          60 +
+        currentMinute
+      : 0;
+
 
 
   /*
-   * Temporary substitutions are keyed by the permanent
-   * timetable entry UUID returned by get_my_timetable().
+   * Temporary Faculty substitutions are keyed by the
+   * permanent timetable entry returned by get_my_timetable().
    *
-   * This map affects Today's Classes only. The recurring
-   * Full Timetable continues showing its permanent faculty.
+   * This overlay affects Today's Classes only.
    */
   const substitutionByTimetableEntry =
     new Map<string, AcademicRow>(
       timetableSubstitutions
         .filter(
-          substitution =>
-            substitution
-              .timetable_entry_id
+          (
+            substitution:
+              AcademicRow
+          ) =>
+            Boolean(
+              substitution
+                .timetable_entry_id
+            )
         )
         .map(
-          substitution => [
+          (
+            substitution:
+              AcademicRow
+          ): [
+            string,
+            AcademicRow,
+          ] => [
             String(
               substitution
                 .timetable_entry_id
@@ -23679,7 +24329,7 @@ function Campus({
   return (
     <div className="campusHub">
 
-      
+
 
 
       <section className="campusRecruiterShowcase">
@@ -25018,7 +25668,7 @@ function Campus({
         </>
       )}
 
-      
+
           {tab === "Festivals" && (
 
             <section className="campusFestivalSection">
@@ -25358,7 +26008,7 @@ function Campus({
         </section>
       )}
 
-  
+
 
       {/* ===================================================
           PUBLISHED ACHIEVEMENTS
@@ -26971,7 +27621,7 @@ function Event({d, title}: {d: string; title: string}) {
 }
 
 function subtitle(v: View, role: Role) {
-  if (v === "College ID") return "Verify an official physical college ID barcode and view the authenticated digital student identity.";
+  if (v === "College ID") return "Verify a Student USN, Faculty Employee ID, Campus UID or official college ID barcode.";
   if (v === "Seva Kendra") return "Submit and track official campus requests through a secure role-based service desk.";
   if (v === "About CampusConnect") return "Open the ancient Patra to discover the story, mission and developer behind CampusConnect.";
   if (isCampusModuleView(v)) return campusModuleSubtitle(v, role as CampusModuleRole);

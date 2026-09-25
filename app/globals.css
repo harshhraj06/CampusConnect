@@ -102740,3 +102740,12380 @@ small {
     border-radius: 14px;
   }
 }
+
+
+/* ==========================================================
+   CAMPUSCONNECT — PROFESSIONAL FACULTY COMMAND CENTER
+   ========================================================== */
+
+.facultyWorkspaceCommandCenter {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(30, 64, 175, 0.09);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.98),
+      rgba(248, 250, 252, 0.96)
+    );
+}
+
+.facultyWorkspaceCommandCenter::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background:
+    linear-gradient(
+      90deg,
+      #1e3a5f,
+      #356a9a,
+      #94a3b8
+    );
+}
+
+.facultyWorkspaceCommandHeader {
+  gap: 24px;
+}
+
+.facultyWorkspaceCommandStatus {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 190px;
+  padding: 11px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.facultyWorkspaceCommandStatus > i {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 999px;
+  background: #15803d;
+  box-shadow:
+    0 0 0 4px rgba(21, 128, 61, 0.1);
+}
+
+.facultyWorkspaceCommandStatus > span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.facultyWorkspaceCommandStatus strong {
+  color: #172033;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.facultyWorkspaceCommandStatus small {
+  color: #7b8799;
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.facultyWorkspaceToolGroups {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.facultyWorkspaceToolGroup {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #e6eaf0;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow:
+    0 12px 32px rgba(15, 23, 42, 0.045);
+}
+
+.facultyWorkspaceToolGroup.primary {
+  border-color: rgba(53, 106, 154, 0.22);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(239, 246, 255, 0.94),
+      #ffffff 65%
+    );
+}
+
+.facultyWorkspaceToolGroup > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 112px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.facultyWorkspaceGroupIndex {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #172033;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.facultyWorkspaceToolGroup > header > div:last-child {
+  min-width: 0;
+}
+
+.facultyWorkspaceToolGroup > header span {
+  display: block;
+  margin-bottom: 5px;
+  color: #55708d;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.facultyWorkspaceToolGroup > header h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.facultyWorkspaceToolGroup > header p {
+  margin: 7px 0 0;
+  color: #7c8798;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.facultyWorkspaceGroupActions {
+  display: grid;
+  gap: 8px;
+  padding-top: 13px;
+}
+
+.facultyWorkspaceGroupActions > button {
+  width: 100%;
+  display: grid;
+  grid-template-columns:
+    38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  padding: 11px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.facultyWorkspaceGroupActions > button:hover {
+  transform: translateY(-1px);
+  border-color: #e1e7ef;
+  background: #f8fafc;
+  box-shadow:
+    0 7px 18px rgba(15, 23, 42, 0.045);
+}
+
+.facultyWorkspaceGroupActions > button.featured {
+  border-color: rgba(53, 106, 154, 0.14);
+  background: rgba(239, 246, 255, 0.74);
+}
+
+.facultyWorkspaceGroupActions > button > i {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #edf3f8;
+  color: #274d70;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.facultyWorkspaceGroupActions > button.featured > i {
+  background: #1f4f78;
+  color: #ffffff;
+}
+
+.facultyWorkspaceGroupActions > button > span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.facultyWorkspaceGroupActions strong {
+  overflow: hidden;
+  color: #172033;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.facultyWorkspaceGroupActions small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #8993a3;
+  font-size: 0.69rem;
+  line-height: 1.42;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.facultyWorkspaceGroupActions > button > b {
+  color: #8b97a8;
+  font-size: 1rem;
+  font-weight: 600;
+  transition:
+    transform 160ms ease,
+    color 160ms ease;
+}
+
+.facultyWorkspaceGroupActions > button:hover > b {
+  transform: translateX(2px);
+  color: #274d70;
+}
+
+.facultyWorkspaceMetrics article {
+  position: relative;
+  overflow: hidden;
+}
+
+.facultyWorkspaceMetrics article::after {
+  content: "";
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #b7c4d2;
+}
+
+.facultyWorkspaceMetrics article:first-child::after {
+  background: #356a9a;
+}
+
+.facultyWorkspaceMetrics article:nth-child(2)::after {
+  background: #5d748d;
+}
+
+.facultyWorkspaceMetrics article:nth-child(3)::after {
+  background: #a57432;
+}
+
+.facultyWorkspaceMetrics article:nth-child(4)::after {
+  background: #627d67;
+}
+
+@media (max-width: 1180px) {
+  .facultyWorkspaceToolGroups {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .facultyWorkspaceToolGroup.primary {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .facultyWorkspaceCommandStatus {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .facultyWorkspaceToolGroups {
+    grid-template-columns: 1fr;
+  }
+
+  .facultyWorkspaceToolGroup.primary {
+    grid-column: auto;
+  }
+
+  .facultyWorkspaceToolGroup > header {
+    min-height: 0;
+  }
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — FACULTY OPERATIONS DASHBOARD
+   ========================================================== */
+
+.facultyWorkspaceOperations {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.99),
+      rgba(248, 250, 252, 0.96)
+    );
+}
+
+.facultyWorkspaceOperationsGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.facultyWorkspaceOperationsGrid > button {
+  min-width: 0;
+  display: grid;
+  grid-template-columns:
+    46px minmax(0, 1fr) auto;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 18px;
+  border: 1px solid #e4e9f0;
+  border-radius: 18px;
+  background: #ffffff;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow:
+    0 10px 28px rgba(15, 23, 42, 0.045);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.facultyWorkspaceOperationsGrid > button:hover {
+  transform: translateY(-2px);
+  border-color:
+    rgba(53, 106, 154, 0.26);
+  background: #fbfdff;
+  box-shadow:
+    0 15px 34px rgba(15, 23, 42, 0.075);
+}
+
+.facultyWorkspaceOperationIcon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      145deg,
+      #1f4f78,
+      #356a9a
+    );
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow:
+    0 7px 18px rgba(31, 79, 120, 0.18);
+}
+
+.facultyWorkspaceOperationsGrid > button > div:nth-child(2) {
+  min-width: 0;
+}
+
+.facultyWorkspaceOperationsGrid span {
+  display: block;
+  margin-bottom: 5px;
+  color: #6d8298;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.facultyWorkspaceOperationsGrid strong {
+  display: block;
+  color: #172033;
+  font-size: 0.86rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.facultyWorkspaceOperationsGrid p {
+  margin: 6px 0 0;
+  color: #7f8b9b;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.facultyWorkspaceOperationsGrid > button > b {
+  margin-top: 11px;
+  color: #9aa5b4;
+  font-size: 1rem;
+  transition:
+    transform 160ms ease,
+    color 160ms ease;
+}
+
+.facultyWorkspaceOperationsGrid > button:hover > b {
+  transform: translateX(3px);
+  color: #1f4f78;
+}
+
+@media (max-width: 1080px) {
+  .facultyWorkspaceOperationsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .facultyWorkspaceOperationsGrid > button {
+    grid-template-columns:
+      42px minmax(0, 1fr) auto;
+    padding: 15px;
+  }
+
+  .facultyWorkspaceOperationIcon {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — FACULTY EXECUTIVE DASHBOARD
+   Professional Faculty-only dashboard
+   ========================================================== */
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard {
+  --faculty-ink: #142b3b;
+  --faculty-muted: #687987;
+  --faculty-line: #dce5ec;
+  --faculty-soft: #f4f8fb;
+  --faculty-soft-blue: #edf5fa;
+  --faculty-accent: #285f87;
+  --faculty-accent-dark: #194766;
+
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 26px !important;
+
+  color: var(--faculty-ink) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f7f9fc 0%,
+      #f3f6fa 100%
+    ) !important;
+
+  font-family:
+    inherit !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard *,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard h1,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard h2,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard h3,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard strong,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard button {
+  font-family:
+    inherit !important;
+}
+
+
+/* ----------------------------------------------------------
+   HEADER
+   ---------------------------------------------------------- */
+
+.facultyExecutiveHeader {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.55fr)
+    minmax(330px, .75fr);
+
+  gap: 18px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+}
+
+
+.facultyExecutiveHeaderMain {
+  position: relative;
+
+  overflow: hidden;
+
+  padding: 34px 36px;
+
+  border:
+    1px solid
+    #d8e3eb;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      140deg,
+      #ffffff 0%,
+      #f8fbfd 58%,
+      #edf5fa 100%
+    );
+
+  box-shadow:
+    0 14px 36px
+    rgba(23, 48, 67, .065);
+}
+
+
+.facultyExecutiveHeaderMain::after {
+  content: "";
+
+  position: absolute;
+
+  right: -75px;
+  top: -110px;
+
+  width: 270px;
+  height: 270px;
+
+  border-radius: 999px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(47, 111, 156, .10),
+      transparent 68%
+    );
+
+  pointer-events: none;
+}
+
+
+.facultyExecutiveEyebrow {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  margin-bottom: 16px;
+
+  color:
+    #47718d;
+
+  font-size:
+    11px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .14em;
+}
+
+
+.facultyExecutiveEyebrow > i {
+  width: 19px;
+  height: 2px;
+
+  border-radius: 999px;
+
+  background:
+    #356f98;
+}
+
+
+.facultyExecutiveHeaderMain h1 {
+  position: relative;
+  z-index: 1;
+
+  max-width: 760px;
+
+  margin:
+    0 0 12px;
+
+  color:
+    #142b3b !important;
+
+  font-size:
+    clamp(
+      30px,
+      4vw,
+      47px
+    );
+
+  font-weight:
+    650;
+
+  line-height:
+    1.08;
+
+  letter-spacing:
+    -.035em;
+}
+
+
+.facultyExecutiveHeaderMain h1 strong {
+  color:
+    #285f87 !important;
+
+  font-weight:
+    780;
+}
+
+
+.facultyExecutiveHeaderMain > p {
+  position: relative;
+  z-index: 1;
+
+  max-width:
+    700px;
+
+  margin: 0;
+
+  color:
+    #627582 !important;
+
+  font-size:
+    14px;
+
+  line-height:
+    1.7;
+}
+
+
+.facultyExecutiveIdentity {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top:
+    25px;
+}
+
+
+.facultyExecutiveIdentity > span {
+  min-width:
+    145px;
+
+  display: grid;
+
+  gap: 3px;
+
+  padding:
+    10px 13px;
+
+  border:
+    1px solid
+    #dce5ec;
+
+  border-radius:
+    12px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .82
+    );
+}
+
+
+.facultyExecutiveIdentity small {
+  color:
+    #83919c !important;
+
+  font-size:
+    9px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .12em;
+}
+
+
+.facultyExecutiveIdentity strong {
+  overflow: hidden;
+
+  color:
+    #203a4c !important;
+
+  font-size:
+    12px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.facultyExecutiveIdentity
+.facultyExecutiveLive {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+}
+
+
+.facultyExecutiveLive > i {
+  width: 8px;
+  height: 8px;
+
+  flex:
+    0 0 8px;
+
+  border-radius:
+    999px;
+
+  background:
+    #20a05a;
+
+  box-shadow:
+    0 0 0 5px
+    rgba(
+      32,
+      160,
+      90,
+      .10
+    );
+}
+
+
+.facultyExecutiveLive > span {
+  display: grid;
+
+  gap: 3px;
+}
+
+
+.facultyExecutiveHeaderActions {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+  margin-top:
+    23px;
+}
+
+
+.facultyExecutiveHeaderActions button {
+  min-height:
+    43px;
+
+  padding:
+    0 16px;
+
+  border:
+    1px solid
+    #d5e0e8;
+
+  border-radius:
+    11px;
+
+  background:
+    #ffffff;
+
+  color:
+    #375468;
+
+  font-size:
+    12px;
+
+  font-weight:
+    760;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform .16s ease,
+    box-shadow .16s ease,
+    border-color .16s ease;
+}
+
+
+.facultyExecutiveHeaderActions button:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #acc3d3;
+
+  box-shadow:
+    0 8px 20px
+    rgba(
+      24,
+      57,
+      78,
+      .075
+    );
+}
+
+
+.facultyExecutiveHeaderActions button.primary {
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  border-color:
+    #285f87;
+
+  background:
+    #285f87;
+
+  color:
+    #ffffff;
+}
+
+
+.facultyExecutiveHeaderActions
+button.primary b {
+  font-size:
+    15px;
+}
+
+
+/* ----------------------------------------------------------
+   TEACHING FOCUS
+   ---------------------------------------------------------- */
+
+.facultyExecutiveFocus {
+  display: flex;
+  flex-direction: column;
+
+  padding:
+    28px;
+
+  border:
+    1px solid
+    #183f5b;
+
+  border-radius:
+    24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #173b55 0%,
+      #214f70 58%,
+      #2e668b 100%
+    );
+
+  color:
+    #ffffff;
+
+  box-shadow:
+    0 17px 38px
+    rgba(
+      23,
+      59,
+      85,
+      .18
+    );
+}
+
+
+.facultyExecutiveFocusTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+
+.facultyExecutiveFocusTop > span {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .68
+    );
+
+  font-size:
+    10px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .14em;
+}
+
+
+.facultyExecutiveFocusTop > i {
+  padding:
+    5px 8px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .14
+    );
+
+  border-radius:
+    999px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .09
+    );
+
+  color:
+    #c9f3d8;
+
+  font-size:
+    8px;
+
+  font-style:
+    normal;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .1em;
+}
+
+
+.facultyExecutiveFocus h2 {
+  margin:
+    28px 0 10px;
+
+  color:
+    #ffffff !important;
+
+  font-size:
+    24px;
+
+  font-weight:
+    680;
+
+  line-height:
+    1.2;
+
+  letter-spacing:
+    -.025em;
+}
+
+
+.facultyExecutiveFocus > p {
+  margin: 0;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .69
+    ) !important;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.65;
+}
+
+
+.facultyExecutiveFocusActions {
+  display: grid;
+
+  gap: 9px;
+
+  margin-top:
+    auto;
+
+  padding-top:
+    24px;
+}
+
+
+.facultyExecutiveFocusActions button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding:
+    11px 12px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .12
+    );
+
+  border-radius:
+    12px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .075
+    );
+
+  color:
+    #ffffff;
+
+  text-align:
+    left;
+
+  cursor:
+    pointer;
+
+  transition:
+    background .16s ease,
+    transform .16s ease;
+}
+
+
+.facultyExecutiveFocusActions button:hover {
+  transform:
+    translateX(2px);
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .12
+    );
+}
+
+
+.facultyExecutiveFocusActions
+button > span {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+.facultyExecutiveFocusActions
+button > span > i {
+  width: 34px;
+  height: 34px;
+
+  display: grid;
+  place-items: center;
+
+  flex:
+    0 0 34px;
+
+  border-radius:
+    10px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .10
+    );
+
+  color:
+    #ffffff;
+
+  font-size:
+    9px;
+
+  font-style:
+    normal;
+
+  font-weight:
+    900;
+}
+
+
+.facultyExecutiveFocusActions
+button > span > span {
+  display: grid;
+
+  gap: 2px;
+}
+
+
+.facultyExecutiveFocusActions strong {
+  color:
+    #ffffff !important;
+
+  font-size:
+    11px;
+}
+
+
+.facultyExecutiveFocusActions small {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .61
+    ) !important;
+
+  font-size:
+    9px;
+}
+
+
+.facultyExecutiveFocusActions
+button > b {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .72
+    );
+}
+
+
+/* ----------------------------------------------------------
+   LIVE METRICS
+   ---------------------------------------------------------- */
+
+.facultyExecutiveMetrics {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    12px;
+
+  margin-top:
+    18px;
+}
+
+
+.facultyExecutiveMetrics > button {
+  position: relative;
+
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  gap:
+    7px 10px;
+
+  padding:
+    18px;
+
+  border:
+    1px solid
+    #dce5ec;
+
+  border-radius:
+    16px;
+
+  background:
+    #ffffff;
+
+  color:
+    #142b3b;
+
+  text-align:
+    left;
+
+  box-shadow:
+    0 8px 22px
+    rgba(
+      28,
+      52,
+      70,
+      .045
+    );
+
+  cursor:
+    pointer;
+
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease;
+}
+
+
+.facultyExecutiveMetrics
+> button:not(:disabled):hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    #aec5d5;
+
+  box-shadow:
+    0 12px 26px
+    rgba(
+      28,
+      52,
+      70,
+      .075
+    );
+}
+
+
+.facultyExecutiveMetrics
+> button:disabled {
+  cursor:
+    default;
+}
+
+
+.facultyExecutiveMetrics
+> button > div {
+  display: grid;
+
+  gap: 5px;
+}
+
+
+.facultyExecutiveMetrics small {
+  color:
+    #738592 !important;
+
+  font-size:
+    9px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .11em;
+}
+
+
+.facultyExecutiveMetrics strong {
+  color:
+    #17384d !important;
+
+  font-size:
+    28px;
+
+  font-weight:
+    780;
+}
+
+
+.facultyExecutiveMetrics
+> button > span {
+  grid-column:
+    1 / -1;
+
+  overflow: hidden;
+
+  color:
+    #7b8994;
+
+  font-size:
+    10px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.facultyExecutiveMetrics
+> button > b {
+  align-self:
+    start;
+
+  color:
+    #7891a2;
+
+  font-size:
+    13px;
+}
+
+
+/* ----------------------------------------------------------
+   MAIN WORKSPACE
+   ---------------------------------------------------------- */
+
+.facultyExecutiveWorkspaceGrid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(
+      0,
+      1.6fr
+    )
+    minmax(
+      300px,
+      .8fr
+    );
+
+  gap:
+    16px;
+
+  margin-top:
+    18px;
+}
+
+
+.facultyExecutivePanel,
+.facultyExecutiveSection {
+  border:
+    1px solid
+    #dbe4eb;
+
+  border-radius:
+    20px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 10px 28px
+    rgba(
+      29,
+      52,
+      69,
+      .05
+    );
+}
+
+
+.facultyExecutivePanel {
+  padding:
+    22px;
+}
+
+
+.facultyExecutivePanel > header,
+.facultyExecutiveSectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 18px;
+}
+
+
+.facultyExecutivePanel > header span,
+.facultyExecutiveSectionHeader span {
+  display: block;
+
+  margin-bottom:
+    5px;
+
+  color:
+    #547792;
+
+  font-size:
+    9px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    .12em;
+}
+
+
+.facultyExecutivePanel > header h2,
+.facultyExecutiveSectionHeader h2 {
+  margin: 0;
+
+  color:
+    #173247 !important;
+
+  font-size:
+    18px;
+
+  font-weight:
+    730;
+
+  letter-spacing:
+    -.015em;
+}
+
+
+.facultyExecutivePanel > header p,
+.facultyExecutiveSectionHeader p {
+  max-width:
+    620px;
+
+  margin:
+    6px 0 0;
+
+  color:
+    #788994 !important;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.55;
+}
+
+
+.facultyExecutivePanel
+> header
+> button {
+  flex:
+    0 0 auto;
+
+  padding:
+    9px 11px;
+
+  border:
+    1px solid
+    #d9e3ea;
+
+  border-radius:
+    10px;
+
+  background:
+    #f8fafc;
+
+  color:
+    #41657e;
+
+  font-size:
+    10px;
+
+  font-weight:
+    750;
+
+  cursor:
+    pointer;
+}
+
+
+.facultyExecutivePanel
+> header
+> button b {
+  margin-left:
+    6px;
+}
+
+
+/* ----------------------------------------------------------
+   TEACHING TOOL CARDS
+   ---------------------------------------------------------- */
+
+.facultyExecutiveToolGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    10px;
+
+  margin-top:
+    18px;
+}
+
+
+.facultyExecutiveToolGrid
+> button {
+  min-width:
+    0;
+
+  display: grid;
+
+  grid-template-columns:
+    42px
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items:
+    start;
+
+  gap:
+    11px;
+
+  padding:
+    15px;
+
+  border:
+    1px solid
+    #e1e8ee;
+
+  border-radius:
+    14px;
+
+  background:
+    #fbfcfd;
+
+  color:
+    inherit;
+
+  text-align:
+    left;
+
+  cursor:
+    pointer;
+
+  transition:
+    background .16s ease,
+    border-color .16s ease,
+    transform .16s ease;
+}
+
+
+.facultyExecutiveToolGrid
+> button:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #b9cddc;
+
+  background:
+    #f5f9fc;
+}
+
+
+.facultyExecutiveToolGrid
+> button > i,
+.facultyExecutiveOperationsList
+> button > i {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius:
+    11px;
+
+  background:
+    #eaf3f8;
+
+  color:
+    #285f87;
+
+  font-size:
+    9px;
+
+  font-style:
+    normal;
+
+  font-weight:
+    900;
+}
+
+
+.facultyExecutiveToolGrid
+> button > span {
+  min-width: 0;
+}
+
+
+.facultyExecutiveToolGrid
+small {
+  display: block;
+
+  margin-bottom:
+    3px;
+
+  color:
+    #80909b !important;
+
+  font-size:
+    8px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .10em;
+}
+
+
+.facultyExecutiveToolGrid
+strong {
+  display: block;
+
+  color:
+    #1b3648 !important;
+
+  font-size:
+    11px;
+
+  font-weight:
+    800;
+}
+
+
+.facultyExecutiveToolGrid p {
+  display:
+    -webkit-box;
+
+  overflow:
+    hidden;
+
+  margin:
+    5px 0 0;
+
+  color:
+    #7d8c96 !important;
+
+  font-size:
+    9px;
+
+  line-height:
+    1.45;
+
+  -webkit-line-clamp:
+    2;
+
+  -webkit-box-orient:
+    vertical;
+}
+
+
+.facultyExecutiveToolGrid
+> button > b,
+.facultyExecutiveOperationsList
+> button > b {
+  margin-top:
+    11px;
+
+  color:
+    #8ea0ad;
+}
+
+
+/* ----------------------------------------------------------
+   OPERATIONS
+   ---------------------------------------------------------- */
+
+.facultyExecutiveOperationsList {
+  display: grid;
+
+  gap: 8px;
+
+  margin-top:
+    18px;
+}
+
+
+.facultyExecutiveOperationsList
+> button {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    38px
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items: center;
+
+  gap:
+    10px;
+
+  padding:
+    11px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    12px;
+
+  background:
+    #f8fafc;
+
+  color:
+    inherit;
+
+  text-align:
+    left;
+
+  cursor:
+    pointer;
+
+  transition:
+    border-color .16s ease,
+    background .16s ease,
+    transform .16s ease;
+}
+
+
+.facultyExecutiveOperationsList
+> button:hover {
+  transform:
+    translateX(2px);
+
+  border-color:
+    #d6e2e9;
+
+  background:
+    #f2f7fa;
+}
+
+
+.facultyExecutiveOperationsList
+> button > i {
+  width: 38px;
+  height: 38px;
+}
+
+
+.facultyExecutiveOperationsList
+> button > span {
+  min-width: 0;
+
+  display: grid;
+
+  gap: 2px;
+}
+
+
+.facultyExecutiveOperationsList
+strong {
+  color:
+    #1d384a !important;
+
+  font-size:
+    10px;
+}
+
+
+.facultyExecutiveOperationsList
+small {
+  overflow:
+    hidden;
+
+  color:
+    #7c8c97 !important;
+
+  font-size:
+    9px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+/* ----------------------------------------------------------
+   LOWER SECTIONS
+   ---------------------------------------------------------- */
+
+.facultyExecutiveSection {
+  margin-top:
+    18px;
+
+  padding:
+    22px;
+}
+
+
+.facultyExecutiveSectionHeader {
+  margin-bottom:
+    16px;
+
+  padding-bottom:
+    15px;
+
+  border-bottom:
+    1px solid
+    #e5ebf0;
+}
+
+
+.facultyExecutiveAcademicGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    9px;
+}
+
+
+.facultyExecutiveAcademicGrid
+> button {
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    34px
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items: center;
+
+  gap:
+    9px;
+
+  padding:
+    11px;
+
+  border:
+    1px solid
+    #e1e8ed;
+
+  border-radius:
+    12px;
+
+  background:
+    #f9fbfc;
+
+  color:
+    #213d4f;
+
+  text-align:
+    left;
+
+  cursor:
+    pointer;
+}
+
+
+.facultyExecutiveAcademicGrid
+> button:hover {
+  border-color:
+    #b9cedb;
+
+  background:
+    #f1f6f9;
+}
+
+
+.facultyExecutiveAcademicGrid
+> button > i {
+  width: 34px;
+  height: 34px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius:
+    9px;
+
+  background:
+    #eaf2f7;
+
+  color:
+    #32698f;
+
+  font-size:
+    8px;
+
+  font-style:
+    normal;
+
+  font-weight:
+    900;
+}
+
+
+.facultyExecutiveAcademicGrid
+strong {
+  overflow: hidden;
+
+  color:
+    #294557 !important;
+
+  font-size:
+    9px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.facultyExecutiveAcademicGrid
+> button > b {
+  color:
+    #92a2ad;
+}
+
+
+/* ----------------------------------------------------------
+   REMOVE OLD PARCHMENT / BEIGE APPEARANCE FOR FACULTY ONLY
+   ---------------------------------------------------------- */
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenter,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsBoard {
+  margin-top:
+    0 !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    14px !important;
+
+  background:
+    transparent !important;
+
+  color:
+    #223b4b !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenter::before,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsBoard::before {
+  display:
+    none !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenterHeader,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsHeader {
+  border-color:
+    #dde6ec !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenter h2,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenter h3,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsBoard h2,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsBoard h3 {
+  color:
+    #19364a !important;
+
+  font-family:
+    inherit !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenter p,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenter small,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsBoard p,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsBoard small,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenterDate,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenterFootnote {
+  color:
+    #71828e !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionCenterSummary > *,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsMetrics > * {
+  border:
+    1px solid
+    #dce5eb !important;
+
+  color:
+    #294658 !important;
+
+  background:
+    #f7fafc !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionGrid > *,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsGrid > * {
+  border:
+    1px solid
+    #dde6ec !important;
+
+  border-radius:
+    13px !important;
+
+  color:
+    #263f50 !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 6px 18px
+    rgba(
+      31,
+      53,
+      69,
+      .045
+    ) !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionIcon {
+  color:
+    #285f87 !important;
+
+  background:
+    #e9f2f7 !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionOpen,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionAi,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsCreate,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationAi,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationClaim {
+  border-color:
+    #285f87 !important;
+
+  color:
+    #ffffff !important;
+
+  background:
+    #285f87 !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationsRefresh,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.staffOperationTimelineButton,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+.roleActionDismiss {
+  border-color:
+    #d3dfe7 !important;
+
+  color:
+    #426175 !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+input,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+textarea,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+select {
+  border:
+    1px solid
+    #d5e0e8 !important;
+
+  color:
+    #203b4d !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+input:focus,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+textarea:focus,
+html body
+.proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard
+select:focus {
+  border-color:
+    #78a4bf !important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      40,
+      95,
+      135,
+      .10
+    ) !important;
+}
+
+
+/* ----------------------------------------------------------
+   RESPONSIVE
+   ---------------------------------------------------------- */
+
+@media (
+  max-width:
+  1150px
+) {
+  .facultyExecutiveHeader,
+  .facultyExecutiveWorkspaceGrid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .facultyExecutiveFocusActions {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  .facultyExecutiveMetrics {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  .facultyExecutiveAcademicGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+}
+
+
+@media (
+  max-width:
+  720px
+) {
+  html body
+  .proRoleDashboard.proRoleDashboard-faculty.facultyExecutiveDashboard {
+    padding:
+      14px !important;
+  }
+
+
+  .facultyExecutiveHeaderMain,
+  .facultyExecutiveFocus {
+    padding:
+      22px;
+  }
+
+
+  .facultyExecutiveHeaderMain h1 {
+    font-size:
+      30px;
+  }
+
+
+  .facultyExecutiveIdentity {
+    display:
+      grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .facultyExecutiveIdentity > span {
+    min-width:
+      0;
+  }
+
+
+  .facultyExecutiveHeaderActions {
+    display:
+      grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .facultyExecutiveHeaderActions
+  button {
+    width:
+      100%;
+  }
+
+
+  .facultyExecutiveFocusActions {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .facultyExecutiveMetrics {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+
+  .facultyExecutiveToolGrid,
+  .facultyExecutiveAcademicGrid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .facultyExecutivePanel,
+  .facultyExecutiveSection {
+    padding:
+      17px;
+  }
+
+
+  .facultyExecutivePanel > header {
+    display:
+      grid;
+  }
+}
+
+
+@media (
+  max-width:
+  460px
+) {
+  .facultyExecutiveMetrics {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .facultyExecutiveHeaderMain,
+  .facultyExecutiveFocus {
+    border-radius:
+      18px;
+  }
+}
+
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .facultyExecutiveDashboard *,
+  .facultyExecutiveDashboard *::before,
+  .facultyExecutiveDashboard *::after {
+    scroll-behavior:
+      auto !important;
+
+    transition:
+      none !important;
+
+    animation:
+      none !important;
+  }
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — ATTENDANCE POPUP VIEWPORT FIX
+   Sidebar-aware + viewport-safe
+   ========================================================== */
+
+/*
+ * .content uses a transform-based entrance animation.
+ * A transformed ancestor becomes the containing block for
+ * position: fixed descendants.
+ *
+ * While Attendance is open, remove that transform so the
+ * modal is fixed against the actual browser viewport.
+ */
+.shell:has(.attendanceSessionScrim) .content {
+  animation:
+    none !important;
+
+  transform:
+    none !important;
+}
+
+
+/*
+ * True viewport overlay.
+ *
+ * Do not use width:100vw here. The desktop sidebar has its
+ * own reserved region, so left/right edges define the usable
+ * viewport much more reliably.
+ */
+.attendanceModalScrim.attendanceSessionScrim,
+.attendanceSessionScrim {
+  position:
+    fixed !important;
+
+  top:
+    0 !important;
+
+  right:
+    0 !important;
+
+  bottom:
+    0 !important;
+
+  left:
+    0 !important;
+
+  width:
+    auto !important;
+
+  max-width:
+    none !important;
+
+  height:
+    100dvh !important;
+
+  min-height:
+    100dvh !important;
+
+  margin:
+    0 !important;
+
+  padding:
+    20px !important;
+
+  display:
+    flex !important;
+
+  align-items:
+    flex-start !important;
+
+  justify-content:
+    center !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  overscroll-behavior:
+    contain !important;
+
+  box-sizing:
+    border-box !important;
+
+  z-index:
+    10000 !important;
+}
+
+
+/*
+ * Desktop — sidebar OPEN.
+ *
+ * CampusConnect desktop sidebar width is 245px.
+ * Center Attendance inside the remaining workspace instead
+ * of underneath the sidebar.
+ */
+@media (min-width: 741px) {
+
+  .shell:not(.sidebarCollapsed)
+  .attendanceModalScrim.attendanceSessionScrim,
+  .shell:not(.sidebarCollapsed)
+  .attendanceSessionScrim {
+    left:
+      245px !important;
+
+    right:
+      0 !important;
+
+    width:
+      auto !important;
+  }
+
+
+  /*
+   * Desktop — sidebar COLLAPSED.
+   */
+  .shell.sidebarCollapsed
+  .attendanceModalScrim.attendanceSessionScrim,
+  .shell.sidebarCollapsed
+  .attendanceSessionScrim {
+    left:
+      0 !important;
+
+    right:
+      0 !important;
+
+    width:
+      auto !important;
+  }
+
+}
+
+
+/*
+ * Dialog dimensions.
+ *
+ * The dialog never exceeds the currently available workspace
+ * width or browser height.
+ */
+.attendanceSessionScrim
+> .attendanceSessionModal {
+  position:
+    relative !important;
+
+  flex:
+    0 1 auto !important;
+
+  width:
+    min(
+      1180px,
+      100%
+    ) !important;
+
+  max-width:
+    100% !important;
+
+  height:
+    min(
+      800px,
+      calc(
+        100dvh - 40px
+      )
+    ) !important;
+
+  min-width:
+    0 !important;
+
+  min-height:
+    0 !important;
+
+  max-height:
+    calc(
+      100dvh - 40px
+    ) !important;
+
+  margin:
+    0 auto !important;
+
+  overflow:
+    hidden !important;
+
+  box-sizing:
+    border-box !important;
+}
+
+
+/*
+ * Keep the modal's existing three-row structure:
+ *
+ * header
+ * scrollable content
+ * footer
+ */
+.attendanceSessionScrim
+> .attendanceSessionModal {
+  display:
+    grid !important;
+
+  grid-template-rows:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto !important;
+}
+
+
+/*
+ * Only the body scrolls.
+ */
+.attendanceSessionScrim
+> .attendanceSessionModal
+> .attendanceSessionContent {
+  min-width:
+    0 !important;
+
+  min-height:
+    0 !important;
+
+  overflow-x:
+    hidden !important;
+
+  overflow-y:
+    auto !important;
+
+  overscroll-behavior:
+    contain !important;
+
+  scrollbar-gutter:
+    stable;
+}
+
+
+/*
+ * Header always remains reachable.
+ */
+.attendanceSessionScrim
+> .attendanceSessionModal
+> .attendanceSessionModalHeader {
+  position:
+    relative !important;
+
+  top:
+    auto !important;
+
+  flex:
+    0 0 auto !important;
+
+  z-index:
+    20 !important;
+}
+
+
+/*
+ * Footer never floats over the student list.
+ */
+.attendanceSessionScrim
+> .attendanceSessionModal
+> .attendanceSessionFooter {
+  position:
+    relative !important;
+
+  bottom:
+    auto !important;
+
+  flex:
+    0 0 auto !important;
+
+  z-index:
+    20 !important;
+}
+
+
+/*
+ * Short laptop screens.
+ */
+@media (
+  min-width: 741px
+)
+and (
+  max-height: 760px
+) {
+
+  .attendanceModalScrim.attendanceSessionScrim,
+  .attendanceSessionScrim {
+    padding:
+      12px !important;
+  }
+
+
+  .attendanceSessionScrim
+  > .attendanceSessionModal {
+    height:
+      calc(
+        100dvh - 24px
+      ) !important;
+
+    max-height:
+      calc(
+        100dvh - 24px
+      ) !important;
+  }
+
+}
+
+
+/*
+ * Tablet / mobile.
+ * Sidebar disappears, so the modal gets the entire viewport.
+ */
+@media (max-width: 740px) {
+
+  .attendanceModalScrim.attendanceSessionScrim,
+  .attendanceSessionScrim,
+  .shell:not(.sidebarCollapsed)
+  .attendanceSessionScrim,
+  .shell.sidebarCollapsed
+  .attendanceSessionScrim {
+    left:
+      0 !important;
+
+    right:
+      0 !important;
+
+    width:
+      auto !important;
+
+    padding:
+      8px !important;
+  }
+
+
+  .attendanceSessionScrim
+  > .attendanceSessionModal {
+    width:
+      100% !important;
+
+    max-width:
+      100% !important;
+
+    height:
+      calc(
+        100dvh - 16px
+      ) !important;
+
+    max-height:
+      calc(
+        100dvh - 16px
+      ) !important;
+
+    border-radius:
+      15px !important;
+  }
+
+
+  .attendanceSessionScrim
+  > .attendanceSessionModal
+  > .attendanceSessionFooter {
+    flex-direction:
+      column !important;
+
+    align-items:
+      stretch !important;
+  }
+
+
+  .attendanceSessionScrim
+  .attendanceSessionFooter
+  > div:last-child {
+    width:
+      100% !important;
+  }
+
+
+  .attendanceSessionScrim
+  .attendanceSessionFooter
+  > div:last-child
+  > button {
+    flex:
+      1 !important;
+  }
+
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — ROLE-AWARE USER MANUAL
+   ========================================================== */
+
+.ccManual {
+  --manualText:
+    #152238;
+
+  --manualMuted:
+    #718096;
+
+  --manualBorder:
+    rgba(148, 163, 184, .22);
+
+  --manualBorderStrong:
+    rgba(148, 163, 184, .34);
+
+  --manualBlue:
+    #3568e8;
+
+  --manualBlueDark:
+    #2858cf;
+
+  --manualBlueSoft:
+    #edf3ff;
+
+  --manualGreen:
+    #15945d;
+
+  --manualGreenSoft:
+    #ecf9f3;
+
+  display:
+    grid;
+
+  gap:
+    18px;
+
+  color:
+    var(--manualText);
+}
+
+
+/* ==========================================================
+   HERO
+   ========================================================== */
+
+.ccManualHero {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  min-height:
+    180px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    30px;
+
+  padding:
+    30px;
+
+  border:
+    1px solid
+    var(--manualBorder);
+
+  border-radius:
+    20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f9fbff 58%,
+      #f0f5ff 100%
+    );
+
+  box-shadow:
+    0 15px 45px
+    rgba(
+      26,
+      39,
+      72,
+      .06
+    );
+}
+
+
+.ccManualHeroGlow {
+  position:
+    absolute;
+
+  border-radius:
+    50%;
+
+  pointer-events:
+    none;
+
+  filter:
+    blur(4px);
+}
+
+
+.ccManualHeroGlow.one {
+  width:
+    230px;
+
+  height:
+    230px;
+
+  top:
+    -130px;
+
+  right:
+    180px;
+
+  background:
+    rgba(
+      84,
+      116,
+      255,
+      .09
+    );
+}
+
+
+.ccManualHeroGlow.two {
+  width:
+    170px;
+
+  height:
+    170px;
+
+  right:
+    -55px;
+
+  bottom:
+    -90px;
+
+  background:
+    rgba(
+      52,
+      211,
+      153,
+      .08
+    );
+}
+
+
+.ccManualHeroMain {
+  position:
+    relative;
+
+  z-index:
+    1;
+
+  min-width:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    18px;
+}
+
+
+.ccManualRoleIcon {
+  width:
+    64px;
+
+  height:
+    64px;
+
+  flex:
+    0 0 auto;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border:
+    1px solid
+    rgba(
+      53,
+      104,
+      232,
+      .12
+    );
+
+  border-radius:
+    18px;
+
+  color:
+    var(--manualBlue);
+
+  background:
+    var(--manualBlueSoft);
+
+  font-size:
+    17px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    -.02em;
+}
+
+
+.ccManualEyebrow {
+  display:
+    block;
+
+  margin-bottom:
+    5px;
+
+  color:
+    var(--manualBlue);
+
+  font-size:
+    9px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .16em;
+}
+
+
+.ccManualHero h1 {
+  margin:
+    0;
+
+  color:
+    var(--manualText);
+
+  font-size:
+    clamp(
+      25px,
+      3vw,
+      36px
+    );
+
+  line-height:
+    1.1;
+
+  letter-spacing:
+    -.035em;
+}
+
+
+.ccManualHero p {
+  max-width:
+    680px;
+
+  margin:
+    9px 0 0;
+
+  color:
+    var(--manualMuted);
+
+  font-size:
+    13px;
+
+  line-height:
+    1.6;
+}
+
+
+.ccManualHeroMeta {
+  position:
+    relative;
+
+  z-index:
+    1;
+
+  display:
+    flex;
+
+  align-items:
+    stretch;
+
+  gap:
+    9px;
+}
+
+
+.ccManualHeroMeta > div {
+  min-width:
+    100px;
+
+  padding:
+    14px 16px;
+
+  border:
+    1px solid
+    rgba(
+      148,
+      163,
+      184,
+      .2
+    );
+
+  border-radius:
+    13px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .74
+    );
+
+  backdrop-filter:
+    blur(
+      10px
+    );
+}
+
+
+.ccManualHeroMeta strong {
+  display:
+    block;
+
+  color:
+    var(--manualText);
+
+  font-size:
+    21px;
+}
+
+
+.ccManualHeroMeta span {
+  display:
+    block;
+
+  margin-top:
+    2px;
+
+  color:
+    var(--manualMuted);
+
+  font-size:
+    9px;
+
+  font-weight:
+    700;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .07em;
+}
+
+
+/* ==========================================================
+   AUTO SYNC BANNER
+   ========================================================== */
+
+.ccManualSync {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    1fr
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    12px;
+
+  padding:
+    13px 15px;
+
+  border:
+    1px solid
+    rgba(
+      21,
+      148,
+      93,
+      .2
+    );
+
+  border-radius:
+    13px;
+
+  background:
+    var(--manualGreenSoft);
+}
+
+
+.ccManualSyncIcon {
+  width:
+    34px;
+
+  height:
+    34px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    10px;
+
+  color:
+    #ffffff;
+
+  background:
+    var(--manualGreen);
+
+  font-size:
+    18px;
+
+  font-weight:
+    800;
+}
+
+
+.ccManualSync > div:nth-child(2) {
+  min-width:
+    0;
+
+  display:
+    grid;
+
+  gap:
+    2px;
+}
+
+
+.ccManualSync strong {
+  color:
+    #176e4a;
+
+  font-size:
+    12px;
+}
+
+
+.ccManualSync span {
+  color:
+    #54806c;
+
+  font-size:
+    10px;
+
+  line-height:
+    1.45;
+}
+
+
+.ccManualLiveBadge {
+  padding:
+    6px 9px;
+
+  border:
+    1px solid
+    rgba(
+      21,
+      148,
+      93,
+      .2
+    );
+
+  border-radius:
+    999px;
+
+  color:
+    #14784b !important;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .55
+    );
+
+  font-size:
+    8px !important;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .12em;
+}
+
+
+/* ==========================================================
+   TOOLBAR
+   ========================================================== */
+
+.ccManualToolbar {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    12px;
+}
+
+
+.ccManualSearch {
+  width:
+    min(
+      620px,
+      100%
+    );
+
+  min-height:
+    48px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  padding:
+    0 15px;
+
+  border:
+    1px solid
+    var(--manualBorderStrong);
+
+  border-radius:
+    12px;
+
+  color:
+    #6b7890;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 5px 18px
+    rgba(
+      30,
+      41,
+      59,
+      .035
+    );
+}
+
+
+.ccManualSearch:focus-within {
+  border-color:
+    rgba(
+      53,
+      104,
+      232,
+      .5
+    );
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      53,
+      104,
+      232,
+      .08
+    );
+}
+
+
+.ccManualSearch input {
+  width:
+    100%;
+
+  min-width:
+    0;
+
+  padding:
+    0;
+
+  border:
+    0 !important;
+
+  outline:
+    0 !important;
+
+  box-shadow:
+    none !important;
+
+  background:
+    transparent !important;
+
+  color:
+    var(--manualText);
+
+  font:
+    inherit;
+
+  font-size:
+    12px;
+}
+
+
+.ccManualRolePreview {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    9px;
+
+  color:
+    var(--manualMuted);
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+}
+
+
+.ccManualRolePreview select {
+  min-height:
+    43px;
+
+  padding:
+    0 34px
+    0 12px;
+
+  border:
+    1px solid
+    var(--manualBorderStrong);
+
+  border-radius:
+    10px;
+
+  background:
+    #ffffff;
+
+  color:
+    var(--manualText);
+
+  font:
+    inherit;
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+}
+
+
+/* ==========================================================
+   WORKSPACE
+   ========================================================== */
+
+.ccManualWorkspace {
+  min-height:
+    650px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(
+      230px,
+      290px
+    )
+    minmax(
+      0,
+      1fr
+    );
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--manualBorder);
+
+  border-radius:
+    18px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 12px 40px
+    rgba(
+      30,
+      41,
+      59,
+      .045
+    );
+}
+
+
+/* ==========================================================
+   FEATURE NAVIGATION
+   ========================================================== */
+
+.ccManualFeatureNav {
+  min-width:
+    0;
+
+  border-right:
+    1px solid
+    var(--manualBorder);
+
+  background:
+    #fafbfd;
+}
+
+
+.ccManualFeatureNavHead {
+  min-height:
+    52px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    10px;
+
+  padding:
+    0 16px;
+
+  border-bottom:
+    1px solid
+    var(--manualBorder);
+}
+
+
+.ccManualFeatureNavHead span {
+  color:
+    #7b8799;
+
+  font-size:
+    9px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .14em;
+}
+
+
+.ccManualFeatureNavHead b {
+  min-width:
+    24px;
+
+  height:
+    24px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  padding:
+    0 6px;
+
+  border-radius:
+    8px;
+
+  color:
+    var(--manualBlue);
+
+  background:
+    var(--manualBlueSoft);
+
+  font-size:
+    10px;
+}
+
+
+.ccManualFeatureList {
+  max-height:
+    720px;
+
+  overflow-y:
+    auto;
+
+  padding:
+    8px;
+}
+
+
+.ccManualFeatureList > button {
+  width:
+    100%;
+
+  min-height:
+    56px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  padding:
+    8px 10px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:
+    10px;
+
+  color:
+    #536075;
+
+  background:
+    transparent;
+
+  cursor:
+    pointer;
+
+  text-align:
+    left;
+
+  transition:
+    border-color .15s ease,
+    background .15s ease,
+    color .15s ease;
+}
+
+
+.ccManualFeatureList > button:hover {
+  background:
+    #f3f6fc;
+}
+
+
+.ccManualFeatureList > button.active {
+  color:
+    #285acb;
+
+  border-color:
+    rgba(
+      53,
+      104,
+      232,
+      .13
+    );
+
+  background:
+    var(--manualBlueSoft);
+}
+
+
+.ccManualFeatureList > button > i {
+  width:
+    34px;
+
+  height:
+    34px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    9px;
+
+  color:
+    var(--manualBlue);
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(
+      53,
+      104,
+      232,
+      .09
+    );
+
+  font-style:
+    normal;
+
+  font-size:
+    14px;
+}
+
+
+.ccManualFeatureList button > span {
+  min-width:
+    0;
+
+  display:
+    grid;
+
+  gap:
+    2px;
+}
+
+
+.ccManualFeatureList button strong {
+  overflow:
+    hidden;
+
+  color:
+    inherit;
+
+  font-size:
+    11px;
+
+  font-weight:
+    760;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.ccManualFeatureList button small {
+  overflow:
+    hidden;
+
+  color:
+    #94a0b1;
+
+  font-size:
+    8px;
+
+  font-weight:
+    650;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.ccManualFeatureList button em {
+  padding:
+    3px 5px;
+
+  border-radius:
+    5px;
+
+  color:
+    #a46b22;
+
+  background:
+    #fff5e5;
+
+  font-size:
+    7px;
+
+  font-style:
+    normal;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .06em;
+}
+
+
+.ccManualFeatureList button > b {
+  color:
+    #a4afbf;
+
+  font-size:
+    17px;
+
+  font-weight:
+    500;
+}
+
+
+.ccManualFeatureList button.active > b {
+  color:
+    var(--manualBlue);
+}
+
+
+.ccManualNoResults {
+  min-height:
+    180px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    5px;
+
+  padding:
+    20px;
+
+  color:
+    var(--manualMuted);
+
+  text-align:
+    center;
+}
+
+
+.ccManualNoResults i {
+  width:
+    42px;
+
+  height:
+    42px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  margin-bottom:
+    5px;
+
+  border-radius:
+    50%;
+
+  color:
+    var(--manualBlue);
+
+  background:
+    var(--manualBlueSoft);
+
+  font-style:
+    normal;
+}
+
+
+.ccManualNoResults strong {
+  font-size:
+    11px;
+}
+
+
+.ccManualNoResults span {
+  font-size:
+    9px;
+}
+
+
+/* ==========================================================
+   GUIDE
+   ========================================================== */
+
+.ccManualGuide {
+  min-width:
+    0;
+
+  padding:
+    26px;
+}
+
+
+.ccManualGuideHeader {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    20px;
+
+  padding-bottom:
+    22px;
+
+  border-bottom:
+    1px solid
+    var(--manualBorder);
+}
+
+
+.ccManualGuideHeader > div {
+  min-width:
+    0;
+}
+
+
+.ccManualGuideHeader > div > span {
+  display:
+    block;
+
+  margin-bottom:
+    5px;
+
+  color:
+    var(--manualBlue);
+
+  font-size:
+    9px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .13em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.ccManualGuideHeader h2 {
+  margin:
+    0;
+
+  color:
+    var(--manualText);
+
+  font-size:
+    clamp(
+      23px,
+      3vw,
+      32px
+    );
+
+  letter-spacing:
+    -.035em;
+}
+
+
+.ccManualGuideHeader p {
+  max-width:
+    700px;
+
+  margin:
+    7px 0 0;
+
+  color:
+    var(--manualMuted);
+
+  font-size:
+    12px;
+
+  line-height:
+    1.6;
+}
+
+
+.ccManualOpenFeature {
+  flex:
+    0 0 auto;
+
+  min-height:
+    40px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  padding:
+    0 14px;
+
+  border:
+    1px solid
+    var(--manualBlue);
+
+  border-radius:
+    10px;
+
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--manualBlue),
+      var(--manualBlueDark)
+    );
+
+  box-shadow:
+    0 8px 20px
+    rgba(
+      53,
+      104,
+      232,
+      .17
+    );
+
+  cursor:
+    pointer;
+
+  font-size:
+    10px;
+
+  font-weight:
+    750;
+}
+
+
+.ccManualPreviewOnly {
+  flex:
+    0 0 auto;
+
+  padding:
+    7px 10px;
+
+  border:
+    1px solid
+    var(--manualBorder);
+
+  border-radius:
+    999px;
+
+  color:
+    #7d8899;
+
+  background:
+    #fafbfd;
+
+  font-size:
+    8px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .08em;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* ==========================================================
+   SECTIONS
+   ========================================================== */
+
+.ccManualSteps,
+.ccManualDiagram {
+  padding-top:
+    25px;
+}
+
+
+.ccManualSectionHeading span {
+  display:
+    block;
+
+  margin-bottom:
+    4px;
+
+  color:
+    #8793a4;
+
+  font-size:
+    8px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .14em;
+}
+
+
+.ccManualSectionHeading h3 {
+  margin:
+    0;
+
+  color:
+    var(--manualText);
+
+  font-size:
+    16px;
+
+  letter-spacing:
+    -.015em;
+}
+
+
+.ccManualStepList {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    9px;
+
+  margin-top:
+    14px;
+}
+
+
+.ccManualStep {
+  min-height:
+    88px;
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  gap:
+    11px;
+
+  padding:
+    13px;
+
+  border:
+    1px solid
+    var(--manualBorder);
+
+  border-radius:
+    12px;
+
+  background:
+    #ffffff;
+}
+
+
+.ccManualStepNumber {
+  width:
+    34px;
+
+  height:
+    34px;
+
+  flex:
+    0 0 auto;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    9px;
+
+  color:
+    var(--manualBlue);
+
+  background:
+    var(--manualBlueSoft);
+
+  font-size:
+    10px;
+
+  font-weight:
+    850;
+}
+
+
+.ccManualStep > div:last-child {
+  display:
+    grid;
+
+  gap:
+    4px;
+}
+
+
+.ccManualStep small {
+  color:
+    #98a3b4;
+
+  font-size:
+    7px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .11em;
+}
+
+
+.ccManualStep p {
+  margin:
+    0;
+
+  color:
+    #536176;
+
+  font-size:
+    10px;
+
+  line-height:
+    1.5;
+}
+
+
+/* ==========================================================
+   VISUAL FLOW DIAGRAM
+   ========================================================== */
+
+.ccManualFlow {
+  max-width:
+    720px;
+
+  display:
+    grid;
+
+  gap:
+    0;
+
+  margin-top:
+    15px;
+
+  padding:
+    18px;
+
+  border:
+    1px solid
+    var(--manualBorder);
+
+  border-radius:
+    14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fafcff,
+      #ffffff
+    );
+}
+
+
+.ccManualFlowUnit {
+  display:
+    grid;
+
+  justify-items:
+    center;
+}
+
+
+.ccManualFlowNode {
+  width:
+    min(
+      100%,
+      520px
+    );
+
+  min-height:
+    54px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    1fr;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  padding:
+    10px 13px;
+
+  border:
+    1px solid
+    rgba(
+      53,
+      104,
+      232,
+      .15
+    );
+
+  border-radius:
+    11px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 5px 16px
+    rgba(
+      30,
+      41,
+      59,
+      .035
+    );
+}
+
+
+.ccManualFlowNode > span {
+  width:
+    28px;
+
+  height:
+    28px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    50%;
+
+  color:
+    #ffffff;
+
+  background:
+    var(--manualBlue);
+
+  font-size:
+    9px;
+
+  font-weight:
+    850;
+}
+
+
+.ccManualFlowNode strong {
+  color:
+    #45546a;
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+
+  line-height:
+    1.45;
+}
+
+
+.ccManualFlowArrow {
+  height:
+    24px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  color:
+    #8ca1ce;
+
+  font-size:
+    15px;
+}
+
+
+/* ==========================================================
+   TIPS
+   ========================================================== */
+
+.ccManualTip {
+  display:
+    grid;
+
+  grid-template-columns:
+    auto
+    1fr;
+
+  gap:
+    11px;
+
+  margin-top:
+    22px;
+
+  padding:
+    13px;
+
+  border:
+    1px solid
+    rgba(
+      53,
+      104,
+      232,
+      .15
+    );
+
+  border-radius:
+    12px;
+
+  background:
+    #f7f9ff;
+}
+
+
+.ccManualTip > div {
+  width:
+    30px;
+
+  height:
+    30px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    9px;
+
+  color:
+    var(--manualBlue);
+
+  background:
+    var(--manualBlueSoft);
+
+  font-size:
+    12px;
+
+  font-weight:
+    850;
+}
+
+
+.ccManualTip p {
+  display:
+    grid;
+
+  gap:
+    2px;
+
+  margin:
+    0;
+}
+
+
+.ccManualTip strong {
+  color:
+    #40526d;
+
+  font-size:
+    10px;
+}
+
+
+.ccManualTip span {
+  color:
+    #718096;
+
+  font-size:
+    9px;
+
+  line-height:
+    1.5;
+}
+
+
+.ccManualAutoGuide {
+  margin-top:
+    13px;
+
+  padding:
+    12px;
+
+  border:
+    1px dashed
+    rgba(
+      213,
+      145,
+      54,
+      .3
+    );
+
+  border-radius:
+    11px;
+
+  background:
+    #fffaf1;
+}
+
+
+.ccManualAutoGuide > span {
+  color:
+    #a66c21;
+
+  font-size:
+    7px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .11em;
+}
+
+
+.ccManualAutoGuide p {
+  margin:
+    5px 0 0;
+
+  color:
+    #806746;
+
+  font-size:
+    9px;
+
+  line-height:
+    1.5;
+}
+
+
+/* ==========================================================
+   EMPTY
+   ========================================================== */
+
+.ccManualEmpty {
+  min-height:
+    500px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  color:
+    var(--manualMuted);
+
+  text-align:
+    center;
+}
+
+
+.ccManualEmpty i {
+  width:
+    54px;
+
+  height:
+    54px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    50%;
+
+  color:
+    var(--manualBlue);
+
+  background:
+    var(--manualBlueSoft);
+
+  font-style:
+    normal;
+
+  font-size:
+    20px;
+
+  font-weight:
+    800;
+}
+
+
+.ccManualEmpty h3 {
+  margin:
+    12px 0 4px;
+
+  color:
+    var(--manualText);
+}
+
+
+.ccManualEmpty p {
+  margin:
+    0;
+
+  font-size:
+    11px;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (
+  max-width:
+    980px
+) {
+
+  .ccManualHero {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+
+  .ccManualWorkspace {
+    grid-template-columns:
+      220px
+      minmax(
+        0,
+        1fr
+      );
+  }
+
+
+  .ccManualStepList {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+
+
+@media (
+  max-width:
+    760px
+) {
+
+  .ccManual {
+    gap:
+      13px;
+  }
+
+
+  .ccManualHero {
+    padding:
+      21px;
+  }
+
+
+  .ccManualHeroMain {
+    align-items:
+      flex-start;
+  }
+
+
+  .ccManualRoleIcon {
+    width:
+      48px;
+
+    height:
+      48px;
+
+    border-radius:
+      13px;
+
+    font-size:
+      13px;
+  }
+
+
+  .ccManualHeroMeta {
+    width:
+      100%;
+  }
+
+
+  .ccManualHeroMeta > div {
+    flex:
+      1;
+  }
+
+
+  .ccManualSync {
+    grid-template-columns:
+      auto
+      1fr;
+  }
+
+
+  .ccManualLiveBadge {
+    display:
+      none;
+  }
+
+
+  .ccManualToolbar {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+
+  .ccManualSearch {
+    width:
+      100%;
+  }
+
+
+  .ccManualRolePreview {
+    justify-content:
+      space-between;
+  }
+
+
+  .ccManualWorkspace {
+    display:
+      block;
+
+    min-height:
+      0;
+  }
+
+
+  .ccManualFeatureNav {
+    border-right:
+      0;
+
+    border-bottom:
+      1px solid
+      var(--manualBorder);
+  }
+
+
+  .ccManualFeatureList {
+    max-height:
+      270px;
+  }
+
+
+  .ccManualGuide {
+    padding:
+      19px;
+  }
+
+
+  .ccManualGuideHeader {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+
+  .ccManualOpenFeature {
+    align-self:
+      flex-start;
+  }
+
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — TODAY CLASS STATUS COLORS
+   ========================================================== */
+
+/* COMPLETED — GREEN */
+.academicClassStatus.completed {
+  color: #168253 !important;
+
+  background:
+    #ecf9f2 !important;
+
+  border:
+    1px solid
+    #c6ecd8 !important;
+
+  box-shadow:
+    0 3px 10px
+    rgba(22, 130, 83, .06);
+}
+
+
+/* UPCOMING — BLUE */
+.academicClassStatus.upcoming {
+  color: #315fd3 !important;
+
+  background:
+    #eef4ff !important;
+
+  border:
+    1px solid
+    #d4e0ff !important;
+
+  box-shadow:
+    0 3px 10px
+    rgba(49, 95, 211, .06);
+}
+
+
+/* ONGOING / LIVE NOW — ORANGE */
+.academicClassStatus.live {
+  color: #b45d12 !important;
+
+  background:
+    #fff4e8 !important;
+
+  border:
+    1px solid
+    #ffd8b5 !important;
+
+  box-shadow:
+    0 3px 12px
+    rgba(180, 93, 18, .09);
+
+  animation:
+    campusClassLivePulse
+    2.2s ease-in-out
+    infinite;
+}
+
+
+/* NEXT CLASS — PURPLE */
+.academicClassStatus.next {
+  color: #7149c6 !important;
+
+  background:
+    #f4efff !important;
+
+  border:
+    1px solid
+    #dfd2ff !important;
+
+  box-shadow:
+    0 3px 10px
+    rgba(113, 73, 198, .06);
+}
+
+
+/* subtle live animation */
+@keyframes campusClassLivePulse {
+
+  0%,
+  100% {
+    box-shadow:
+      0 3px 12px
+      rgba(180, 93, 18, .08);
+  }
+
+  50% {
+    box-shadow:
+      0 4px 18px
+      rgba(180, 93, 18, .18);
+  }
+
+}
+
+
+/* Optional subtle left signal on the complete row */
+
+.academicTodayClass.completed {
+  border-left:
+    3px solid
+    rgba(22, 130, 83, .55) !important;
+}
+
+
+.academicTodayClass.live {
+  border-left:
+    3px solid
+    rgba(180, 93, 18, .65) !important;
+}
+
+
+.academicTodayClass.next {
+  border-left:
+    3px solid
+    rgba(113, 73, 198, .55) !important;
+}
+
+
+.academicTodayClass.upcoming {
+  border-left:
+    3px solid
+    transparent !important;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .academicClassStatus.live {
+    animation:
+      none !important;
+  }
+
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT MESSENGER — MULTILINE COMPOSER
+   ========================================================== */
+
+.messageComposerBar {
+  align-items: flex-end;
+}
+
+
+.messageComposerBar
+.messageComposerInput {
+  flex: 1;
+
+  width: 100%;
+  min-width: 0;
+
+  min-height: 42px;
+  max-height: 132px;
+
+  padding: 10px 14px;
+
+  border: 1px solid #dbe1eb;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: inherit;
+
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+
+  resize: none;
+  overflow-y: auto;
+
+  outline: none;
+
+  transition:
+    border-color .16s ease,
+    box-shadow .16s ease;
+}
+
+
+.messageComposerBar
+.messageComposerInput:focus {
+  border-color: #9bb3ef;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(49, 95, 215, .08);
+}
+
+
+.messageComposerBar
+.messageComposerInput::placeholder {
+  color: #98a3b3;
+}
+
+
+/*
+ * Preserve Shift+Enter line breaks
+ * when the message is displayed.
+ */
+.chatMessageBody {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+
+.messageComposerBar
+.messageComposerInput::-webkit-scrollbar {
+  width: 5px;
+}
+
+
+.messageComposerBar
+.messageComposerInput::-webkit-scrollbar-thumb {
+  background:
+    rgba(82, 96, 120, .22);
+
+  border-radius: 999px;
+}
+/* CAMPUSCONNECT — WHATSAPP MESSENGER V2 BEGIN */
+
+/* ==========================================================
+   LOCAL THEME TOKENS
+   ========================================================== */
+
+.whatsappMessenger {
+  --msg-accent: #00a884;
+  --msg-accent-strong: #008069;
+
+  --msg-shell: #ffffff;
+  --msg-panel: #ffffff;
+
+  --msg-header: #f0f2f5;
+  --msg-sidebar-header: #f0f2f5;
+
+  --msg-chat:
+    #efeae2;
+
+  --msg-line:
+    #e6e9ec;
+
+  --msg-text:
+    #111b21;
+
+  --msg-muted:
+    #667781;
+
+  --msg-soft:
+    #f0f2f5;
+
+  --msg-search:
+    #f0f2f5;
+
+  --msg-hover:
+    #f5f6f6;
+
+  --msg-active:
+    #f0f2f5;
+
+  --msg-incoming:
+    #ffffff;
+
+  --msg-outgoing:
+    #d9fdd3;
+
+  --msg-input:
+    #ffffff;
+
+  --msg-shadow:
+    0 10px 35px
+    rgba(17, 27, 33, .08);
+
+
+  position:
+    relative;
+
+  display:
+    grid !important;
+
+  grid-template-columns:
+    minmax(320px, 390px)
+    minmax(0, 1fr) !important;
+
+  width:
+    100%;
+
+  min-height:
+    680px;
+
+  height:
+    calc(100vh - 235px);
+
+  max-height:
+    840px;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    rgba(17, 27, 33, .10) !important;
+
+  border-radius:
+    18px !important;
+
+  background:
+    var(--msg-shell) !important;
+
+  color:
+    var(--msg-text);
+
+  box-shadow:
+    var(--msg-shadow) !important;
+
+  isolation:
+    isolate;
+}
+
+
+/* ==========================================================
+   DARK MODE — MESSENGER ONLY
+   ========================================================== */
+
+.whatsappMessenger.messengerTheme-dark {
+  --msg-shell: #111b21;
+  --msg-panel: #111b21;
+
+  --msg-header: #202c33;
+  --msg-sidebar-header: #202c33;
+
+  --msg-chat: #0b141a;
+
+  --msg-line:
+    rgba(255,255,255,.075);
+
+  --msg-text:
+    #e9edef;
+
+  --msg-muted:
+    #8696a0;
+
+  --msg-soft:
+    #202c33;
+
+  --msg-search:
+    #202c33;
+
+  --msg-hover:
+    #202c33;
+
+  --msg-active:
+    #2a3942;
+
+  --msg-incoming:
+    #202c33;
+
+  --msg-outgoing:
+    #005c4b;
+
+  --msg-input:
+    #2a3942;
+
+  --msg-shadow:
+    0 18px 50px
+    rgba(0, 0, 0, .28);
+}
+
+
+/* ==========================================================
+   THEME BUTTON
+   ========================================================== */
+
+.whatsappMessenger
+.messengerThemeToggle {
+  position:
+    absolute;
+
+  z-index:
+    25;
+
+  top:
+    14px;
+
+  right:
+    58px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    38px;
+
+  height:
+    38px;
+
+  padding:
+    0 !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    50% !important;
+
+  background:
+    transparent !important;
+
+  color:
+    var(--msg-muted) !important;
+
+  box-shadow:
+    none !important;
+
+  cursor:
+    pointer;
+
+  transition:
+    background .16s ease,
+    color .16s ease,
+    transform .16s ease;
+}
+
+
+.whatsappMessenger
+.messengerThemeToggle:hover {
+  background:
+    rgba(128, 128, 128, .12) !important;
+
+  color:
+    var(--msg-text) !important;
+
+  transform:
+    translateY(-1px);
+}
+
+
+.whatsappMessenger
+.messengerThemeToggle span {
+  font-size:
+    19px;
+}
+
+
+/* ==========================================================
+   SIDEBAR
+   ========================================================== */
+
+.whatsappMessenger
+.messengerSidebar {
+  min-width:
+    0;
+
+  height:
+    100%;
+
+  overflow:
+    hidden;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  border-right:
+    1px solid
+    var(--msg-line) !important;
+
+  background:
+    var(--msg-panel) !important;
+}
+
+
+.whatsappMessenger
+.messengerIdentity {
+  min-height:
+    68px;
+
+  padding:
+    10px 14px !important;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  border-bottom:
+    1px solid
+    var(--msg-line) !important;
+
+  background:
+    var(--msg-sidebar-header) !important;
+}
+
+
+.whatsappMessenger
+.messengerIdentity > div:not(
+  .messengerUserAvatar
+) {
+  min-width:
+    0;
+
+  flex:
+    1;
+}
+
+
+.whatsappMessenger
+.messengerIdentity b {
+  color:
+    var(--msg-text) !important;
+
+  font-size:
+    14px !important;
+
+  font-weight:
+    650 !important;
+}
+
+
+.whatsappMessenger
+.messengerIdentity span,
+.whatsappMessenger
+.messengerIdentity small {
+  color:
+    var(--msg-muted) !important;
+}
+
+
+.whatsappMessenger
+.messengerAvatar,
+.whatsappMessenger
+.messengerUserAvatar {
+  overflow:
+    hidden;
+
+  border-radius:
+    50% !important;
+
+  background:
+    #dfe7f5;
+}
+
+
+.whatsappMessenger
+.messengerAvatar img,
+.whatsappMessenger
+.messengerUserAvatar img,
+.whatsappMessenger
+.conversationAvatar img,
+.whatsappMessenger
+.groupInfoAvatar img {
+  display:
+    block;
+
+  width:
+    100% !important;
+
+  height:
+    100% !important;
+
+  border-radius:
+    inherit;
+
+  object-fit:
+    cover !important;
+
+  object-position:
+    center;
+}
+
+
+/* ==========================================================
+   QUICK ACTIONS
+   ========================================================== */
+
+.whatsappMessenger
+.messengerQuickActions {
+  display:
+    grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:
+    8px;
+
+  padding:
+    11px 12px 8px;
+
+  background:
+    var(--msg-panel);
+}
+
+
+.whatsappMessenger
+.messengerQuickActions button {
+  min-height:
+    38px;
+
+  border:
+    1px solid
+    var(--msg-line) !important;
+
+  border-radius:
+    10px !important;
+
+  background:
+    var(--msg-panel) !important;
+
+  color:
+    var(--msg-text) !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    650 !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.whatsappMessenger
+.messengerQuickActions button:hover {
+  background:
+    var(--msg-hover) !important;
+
+  border-color:
+    rgba(0, 168, 132, .36) !important;
+}
+
+
+/* ==========================================================
+   SEARCH
+   ========================================================== */
+
+.whatsappMessenger
+.messengerSearch {
+  margin:
+    4px 12px 10px !important;
+
+  min-height:
+    42px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  border:
+    0 !important;
+
+  border-radius:
+    9px !important;
+
+  background:
+    var(--msg-search) !important;
+
+  color:
+    var(--msg-muted);
+}
+
+
+.whatsappMessenger
+.messengerSearch span {
+  margin-left:
+    13px;
+
+  color:
+    var(--msg-muted) !important;
+}
+
+
+.whatsappMessenger
+.messengerSearch input {
+  width:
+    100%;
+
+  height:
+    42px;
+
+  padding:
+    0 12px !important;
+
+  border:
+    0 !important;
+
+  outline:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  color:
+    var(--msg-text) !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.whatsappMessenger
+.messengerSearch input::placeholder {
+  color:
+    var(--msg-muted);
+}
+
+
+/* ==========================================================
+   PEOPLE / FRIENDS
+   ========================================================== */
+
+.whatsappMessenger
+.friendDirectory,
+.whatsappMessenger
+.connectionRequestsBox,
+.whatsappMessenger
+[class*="people"] {
+  background:
+    var(--msg-panel);
+}
+
+
+.whatsappMessenger
+.friendRow {
+  border-bottom:
+    1px solid
+    var(--msg-line) !important;
+
+  background:
+    var(--msg-panel) !important;
+
+  color:
+    var(--msg-text) !important;
+}
+
+
+.whatsappMessenger
+.friendRow:hover {
+  background:
+    var(--msg-hover) !important;
+}
+
+
+/* ==========================================================
+   CONVERSATION LIST
+   ========================================================== */
+
+.whatsappMessenger
+.conversationList {
+  min-height:
+    0;
+
+  flex:
+    1;
+
+  overflow-y:
+    auto;
+
+  background:
+    var(--msg-panel) !important;
+
+  scrollbar-width:
+    thin;
+}
+
+
+.whatsappMessenger
+.conversationList > button {
+  position:
+    relative;
+
+  width:
+    100%;
+
+  min-height:
+    72px;
+
+  padding:
+    9px 12px !important;
+
+  display:
+    grid !important;
+
+  grid-template-columns:
+    48px
+    minmax(0, 1fr)
+    auto !important;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  border:
+    0 !important;
+
+  border-bottom:
+    1px solid
+    var(--msg-line) !important;
+
+  border-radius:
+    0 !important;
+
+  background:
+    var(--msg-panel) !important;
+
+  color:
+    var(--msg-text) !important;
+
+  box-shadow:
+    none !important;
+
+  text-align:
+    left;
+
+  transition:
+    background .14s ease;
+}
+
+
+.whatsappMessenger
+.conversationList > button:hover {
+  background:
+    var(--msg-hover) !important;
+}
+
+
+.whatsappMessenger
+.conversationList > button.active {
+  background:
+    var(--msg-active) !important;
+}
+
+
+.whatsappMessenger
+.conversationAvatar {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    46px !important;
+
+  height:
+    46px !important;
+
+  min-width:
+    46px;
+
+  overflow:
+    hidden;
+
+  border-radius:
+    50% !important;
+
+  background:
+    #dfe7f5 !important;
+
+  color:
+    #335aa8 !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    750 !important;
+}
+
+
+.whatsappMessenger
+.conversationList > button > span {
+  min-width:
+    0;
+}
+
+
+.whatsappMessenger
+.conversationList > button > span b {
+  display:
+    block;
+
+  overflow:
+    hidden;
+
+  color:
+    var(--msg-text) !important;
+
+  font-size:
+    14px !important;
+
+  font-weight:
+    600 !important;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.whatsappMessenger
+.conversationList > button > span small {
+  display:
+    block;
+
+  margin-top:
+    4px;
+
+  overflow:
+    hidden;
+
+  color:
+    var(--msg-muted) !important;
+
+  font-size:
+    12px !important;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.whatsappMessenger
+.conversationMeta {
+  align-self:
+    stretch;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    flex-end;
+
+  justify-content:
+    center;
+
+  gap:
+    6px;
+}
+
+
+.whatsappMessenger
+.conversationMeta time {
+  color:
+    var(--msg-muted) !important;
+
+  font-size:
+    10px !important;
+}
+
+
+.whatsappMessenger
+.chatUnreadBadge {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  min-width:
+    20px;
+
+  height:
+    20px;
+
+  padding:
+    0 6px;
+
+  border-radius:
+    999px;
+
+  background:
+    #25d366 !important;
+
+  color:
+    #ffffff !important;
+
+  font-size:
+    10px !important;
+}
+
+
+/* ==========================================================
+   MAIN CONVERSATION
+   ========================================================== */
+
+.whatsappMessenger
+.messengerConversation {
+  position:
+    relative;
+
+  min-width:
+    0;
+
+  height:
+    100%;
+
+  overflow:
+    hidden;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  background:
+    var(--msg-chat) !important;
+}
+
+
+.whatsappMessenger
+.messengerConversationHeader {
+  position:
+    relative;
+
+  z-index:
+    8;
+
+  min-height:
+    68px;
+
+  padding:
+    8px 14px !important;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  border-bottom:
+    1px solid
+    var(--msg-line) !important;
+
+  background:
+    var(--msg-header) !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.whatsappMessenger
+.messengerConversationHeader
+.conversationAvatar.large {
+  width:
+    44px !important;
+
+  height:
+    44px !important;
+
+  min-width:
+    44px;
+
+  cursor:
+    pointer;
+}
+
+
+.whatsappMessenger
+.messengerConversationHeader
+> div:nth-of-type(2) {
+  min-width:
+    0;
+
+  flex:
+    1;
+}
+
+
+.whatsappMessenger
+.messengerConversationHeader h3 {
+  margin:
+    0 !important;
+
+  overflow:
+    hidden;
+
+  color:
+    var(--msg-text) !important;
+
+  font-size:
+    15px !important;
+
+  font-weight:
+    650 !important;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.whatsappMessenger
+.messengerConversationHeader span {
+  display:
+    block;
+
+  margin-top:
+    2px;
+
+  color:
+    var(--msg-muted) !important;
+
+  font-size:
+    11px !important;
+}
+
+
+.whatsappMessenger
+.messengerConversationHeader button {
+  color:
+    var(--msg-muted) !important;
+}
+
+
+/* ==========================================================
+   CHAT WALLPAPER
+   ========================================================== */
+
+.whatsappMessenger
+.messageArea {
+  position:
+    relative;
+
+  flex:
+    1;
+
+  min-height:
+    0;
+
+  overflow-y:
+    auto;
+
+  padding:
+    20px
+    clamp(18px, 4vw, 62px)
+    24px !important;
+
+  background-color:
+    var(--msg-chat) !important;
+
+  background-image:
+    radial-gradient(
+      circle at 12px 12px,
+      rgba(84, 101, 111, .055)
+      1px,
+      transparent 1.4px
+    ),
+    radial-gradient(
+      circle at 38px 30px,
+      rgba(84, 101, 111, .038)
+      1px,
+      transparent 1.4px
+    );
+
+  background-size:
+    48px 48px;
+
+  scrollbar-width:
+    thin;
+}
+
+
+.whatsappMessenger.messengerTheme-dark
+.messageArea {
+  background-image:
+    radial-gradient(
+      circle at 12px 12px,
+      rgba(255,255,255,.035)
+      1px,
+      transparent 1.4px
+    ),
+    radial-gradient(
+      circle at 38px 30px,
+      rgba(255,255,255,.025)
+      1px,
+      transparent 1.4px
+    );
+}
+
+
+/* ==========================================================
+   MESSAGE BUBBLES
+   ========================================================== */
+
+.whatsappMessenger
+.chatMessageRow {
+  width:
+    100%;
+
+  display:
+    flex;
+
+  justify-content:
+    flex-start;
+
+  margin:
+    3px 0;
+}
+
+
+.whatsappMessenger
+.chatMessageRow.mine {
+  justify-content:
+    flex-end;
+}
+
+
+.whatsappMessenger
+.chatBubble {
+  position:
+    relative;
+
+  width:
+    fit-content;
+
+  max-width:
+    min(68%, 720px);
+
+  padding:
+    7px 9px 6px !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    8px !important;
+
+  background:
+    var(--msg-incoming) !important;
+
+  color:
+    var(--msg-text) !important;
+
+  box-shadow:
+    0 1px 1px
+    rgba(11, 20, 26, .12) !important;
+}
+
+
+.whatsappMessenger
+.chatMessageRow.mine
+.chatBubble {
+  background:
+    var(--msg-outgoing) !important;
+}
+
+
+.whatsappMessenger
+.chatBubble > strong {
+  display:
+    block;
+
+  margin-bottom:
+    4px;
+
+  color:
+    var(--msg-accent-strong) !important;
+
+  font-size:
+    11px !important;
+
+  font-weight:
+    700 !important;
+}
+
+
+.whatsappMessenger
+.chatMessageBody,
+.whatsappMessenger
+.chatBubble > p {
+  margin:
+    0 !important;
+
+  color:
+    var(--msg-text) !important;
+
+  font-size:
+    13px !important;
+
+  line-height:
+    1.42 !important;
+
+  white-space:
+    pre-wrap;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.whatsappMessenger
+.chatBubble time {
+  color:
+    var(--msg-muted) !important;
+
+  font-size:
+    9px !important;
+}
+
+
+.whatsappMessenger
+.deletedMessage {
+  color:
+    var(--msg-muted) !important;
+
+  font-style:
+    italic;
+}
+
+
+.whatsappMessenger
+.chatReplyQuote {
+  margin-bottom:
+    6px;
+
+  padding:
+    6px 8px;
+
+  border-left:
+    3px solid
+    var(--msg-accent);
+
+  border-radius:
+    6px;
+
+  background:
+    rgba(0, 0, 0, .055);
+}
+
+
+.whatsappMessenger.messengerTheme-dark
+.chatReplyQuote {
+  background:
+    rgba(255,255,255,.055);
+}
+
+
+.whatsappMessenger
+.chatMessageReply,
+.whatsappMessenger
+.chatMessageDelete {
+  opacity:
+    .42;
+
+  border:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  color:
+    var(--msg-muted) !important;
+
+  box-shadow:
+    none !important;
+
+  transition:
+    opacity .15s ease;
+}
+
+
+.whatsappMessenger
+.chatBubble:hover
+.chatMessageReply,
+.whatsappMessenger
+.chatBubble:hover
+.chatMessageDelete {
+  opacity:
+    1;
+}
+
+
+/* ==========================================================
+   COMPOSER
+   ========================================================== */
+
+.whatsappMessenger
+.messageComposerBar {
+  min-height:
+    62px;
+
+  padding:
+    9px 12px !important;
+
+  display:
+    flex;
+
+  align-items:
+    flex-end;
+
+  gap:
+    9px;
+
+  border-top:
+    1px solid
+    var(--msg-line) !important;
+
+  background:
+    var(--msg-header) !important;
+}
+
+
+.whatsappMessenger
+.chatAttachButton {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    42px;
+
+  height:
+    42px;
+
+  flex:
+    0 0 42px;
+
+  border:
+    0 !important;
+
+  border-radius:
+    50% !important;
+
+  background:
+    transparent !important;
+
+  color:
+    var(--msg-muted) !important;
+
+  font-size:
+    24px !important;
+
+  cursor:
+    pointer;
+}
+
+
+.whatsappMessenger
+.chatAttachButton:hover {
+  background:
+    rgba(128,128,128,.11) !important;
+}
+
+
+.whatsappMessenger
+.messageComposerInput {
+  min-height:
+    42px !important;
+
+  max-height:
+    128px !important;
+
+  padding:
+    10px 14px !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    10px !important;
+
+  background:
+    var(--msg-input) !important;
+
+  color:
+    var(--msg-text) !important;
+
+  box-shadow:
+    none !important;
+
+  font-size:
+    13px !important;
+}
+
+
+.whatsappMessenger
+.messageComposerInput::placeholder {
+  color:
+    var(--msg-muted) !important;
+}
+
+
+.whatsappMessenger
+.messageComposerInput:focus {
+  box-shadow:
+    none !important;
+}
+
+
+.whatsappMessenger
+.messageComposerBar
+button[type="submit"] {
+  min-width:
+    74px;
+
+  height:
+    42px;
+
+  padding:
+    0 18px !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    999px !important;
+
+  background:
+    var(--msg-accent) !important;
+
+  color:
+    #ffffff !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    700 !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.whatsappMessenger
+.messageComposerBar
+button[type="submit"]:hover {
+  background:
+    var(--msg-accent-strong) !important;
+}
+
+
+/* ==========================================================
+   STATUS / FILE / REPLY PREVIEWS
+   ========================================================== */
+
+.whatsappMessenger
+.chatFilePreview,
+.whatsappMessenger
+.composerReplyPreview {
+  margin:
+    0 !important;
+
+  padding:
+    8px 14px !important;
+
+  border-top:
+    1px solid
+    var(--msg-line);
+
+  background:
+    var(--msg-header) !important;
+
+  color:
+    var(--msg-text);
+}
+
+
+/* ==========================================================
+   GROUP INFO / MODALS
+   ========================================================== */
+
+.whatsappMessenger
+.messengerModal,
+.whatsappMessenger
+.groupInfoModal {
+  border:
+    1px solid
+    var(--msg-line) !important;
+
+  background:
+    var(--msg-panel) !important;
+
+  color:
+    var(--msg-text) !important;
+
+  box-shadow:
+    0 24px 80px
+    rgba(0,0,0,.24) !important;
+}
+
+
+.whatsappMessenger
+.groupInfoModal input,
+.whatsappMessenger
+.groupInfoModal textarea {
+  border:
+    1px solid
+    var(--msg-line) !important;
+
+  background:
+    var(--msg-input) !important;
+
+  color:
+    var(--msg-text) !important;
+}
+
+
+.whatsappMessenger
+.groupInfoPerson {
+  border-color:
+    var(--msg-line) !important;
+
+  background:
+    var(--msg-panel) !important;
+}
+
+
+.whatsappMessenger
+.groupInfoPerson:hover,
+.whatsappMessenger
+.groupInfoPerson.selected {
+  background:
+    var(--msg-hover) !important;
+}
+
+
+/* ==========================================================
+   EMPTY STATE
+   ========================================================== */
+
+.whatsappMessenger
+.messengerWelcome,
+.whatsappMessenger
+.messengerEmpty {
+  color:
+    var(--msg-muted) !important;
+}
+
+
+.whatsappMessenger
+.messengerWelcome {
+  background:
+    var(--msg-chat) !important;
+}
+
+
+.whatsappMessenger
+.messengerWelcome h2,
+.whatsappMessenger
+.messengerEmpty b {
+  color:
+    var(--msg-text) !important;
+}
+
+
+/* ==========================================================
+   SCROLLBARS
+   ========================================================== */
+
+.whatsappMessenger
+*::-webkit-scrollbar {
+  width:
+    6px;
+
+  height:
+    6px;
+}
+
+
+.whatsappMessenger
+*::-webkit-scrollbar-thumb {
+  border-radius:
+    999px;
+
+  background:
+    rgba(102,119,129,.28);
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 1050px) {
+
+  .whatsappMessenger {
+    grid-template-columns:
+      330px minmax(0, 1fr) !important;
+  }
+
+
+  .whatsappMessenger
+  .chatBubble {
+    max-width:
+      78%;
+  }
+
+}
+
+
+@media (max-width: 760px) {
+
+  .whatsappMessenger {
+    min-height:
+      650px;
+
+    grid-template-columns:
+      280px minmax(0, 1fr) !important;
+
+    border-radius:
+      14px !important;
+  }
+
+
+  .whatsappMessenger
+  .messengerIdentity {
+    padding:
+      9px !important;
+  }
+
+
+  .whatsappMessenger
+  .messageArea {
+    padding:
+      16px 12px 20px !important;
+  }
+
+
+  .whatsappMessenger
+  .chatBubble {
+    max-width:
+      88%;
+  }
+
+
+  .whatsappMessenger
+  .messengerThemeToggle {
+    right:
+      52px;
+  }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .whatsappMessenger *,
+  .whatsappMessenger *::before,
+  .whatsappMessenger *::after {
+    transition:
+      none !important;
+  }
+
+}
+
+/* CAMPUSCONNECT — WHATSAPP MESSENGER V2 END */
+
+/* CAMPUSCONNECT — COLLAPSIBLE MESSENGER CONTACTS */
+
+.whatsappMessenger
+.messengerPeople {
+  flex:
+    0 0 auto;
+
+  margin:
+    0 12px 8px;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--msg-line) !important;
+
+  border-radius:
+    12px !important;
+
+  background:
+    var(--msg-panel) !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.whatsappMessenger
+.messengerPeople.collapsed {
+  max-height:
+    54px;
+}
+
+
+.whatsappMessenger
+.messengerPeople.expanded {
+  max-height:
+    min(330px, 42vh);
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+}
+
+
+.whatsappMessenger
+.messengerPeopleToggle {
+  width:
+    100%;
+
+  min-height:
+    52px;
+
+  flex:
+    0 0 52px;
+
+  display:
+    grid !important;
+
+  grid-template-columns:
+    30px minmax(0, 1fr) 24px;
+
+  align-items:
+    center;
+
+  gap:
+    9px;
+
+  padding:
+    7px 11px !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    0 !important;
+
+  background:
+    var(--msg-panel) !important;
+
+  color:
+    var(--msg-text) !important;
+
+  text-align:
+    left;
+
+  box-shadow:
+    none !important;
+
+  cursor:
+    pointer;
+
+  transition:
+    background .15s ease;
+}
+
+
+.whatsappMessenger
+.messengerPeopleToggle:hover {
+  background:
+    var(--msg-hover) !important;
+}
+
+
+.whatsappMessenger
+.messengerPeopleToggleIcon {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    30px;
+
+  height:
+    30px;
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(0, 168, 132, .12);
+
+  color:
+    var(--msg-accent);
+
+  font-size:
+    12px;
+}
+
+
+.whatsappMessenger
+.messengerPeopleToggleCopy {
+  min-width:
+    0;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    2px;
+}
+
+
+.whatsappMessenger
+.messengerPeopleToggleCopy b {
+  overflow:
+    hidden;
+
+  color:
+    var(--msg-text) !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    650 !important;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.whatsappMessenger
+.messengerPeopleToggleCopy small {
+  overflow:
+    hidden;
+
+  color:
+    var(--msg-muted) !important;
+
+  font-size:
+    10px !important;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.whatsappMessenger
+.messengerPeopleToggleChevron {
+  color:
+    var(--msg-muted);
+
+  font-size:
+    15px;
+
+  text-align:
+    center;
+}
+
+
+.whatsappMessenger
+.messengerPeopleContent {
+  min-height:
+    0;
+
+  overflow-y:
+    auto;
+
+  border-top:
+    1px solid
+    var(--msg-line);
+}
+
+
+/*
+ * Compact the tabs when contacts are expanded.
+ */
+.whatsappMessenger
+.messengerPeopleTabs {
+  position:
+    sticky;
+
+  top:
+    0;
+
+  z-index:
+    3;
+
+  min-height:
+    42px;
+
+  padding:
+    5px !important;
+
+  display:
+    flex;
+
+  gap:
+    3px;
+
+  background:
+    var(--msg-panel) !important;
+}
+
+
+.whatsappMessenger
+.messengerPeopleTabs button {
+  min-height:
+    32px !important;
+
+  padding:
+    0 8px !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    8px !important;
+
+  background:
+    transparent !important;
+
+  color:
+    var(--msg-muted) !important;
+
+  font-size:
+    10px !important;
+
+  font-weight:
+    650 !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.whatsappMessenger
+.messengerPeopleTabs button.active {
+  background:
+    var(--msg-active) !important;
+
+  color:
+    var(--msg-accent) !important;
+}
+
+
+/*
+ * Do not let the friend list grow forever.
+ */
+.whatsappMessenger
+.friendDirectory {
+  max-height:
+    220px;
+
+  overflow-y:
+    auto;
+}
+
+
+/*
+ * The chat-account list is now the main scrolling area.
+ */
+.whatsappMessenger
+.conversationList {
+  flex:
+    1 1 auto !important;
+
+  min-height:
+    130px !important;
+
+  overflow-y:
+    auto !important;
+}
+
+
+@media (max-width: 760px) {
+
+  .whatsappMessenger
+  .messengerPeople {
+    margin:
+      0 8px 7px;
+  }
+
+
+  .whatsappMessenger
+  .messengerPeople.expanded {
+    max-height:
+      280px;
+  }
+
+}
+
+/* CAMPUSCONNECT — GROUP INFO HIGH CONTRAST BEGIN */
+
+/* ==========================================================
+   GROUP INFO — PROFESSIONAL DARK MODAL
+   ========================================================== */
+
+.messengerModalScrim
+.groupInfoModal {
+  --group-modal-bg: #111b21;
+  --group-modal-panel: #18252d;
+  --group-modal-input: #202f38;
+
+  --group-modal-text: #f0f2f5;
+  --group-modal-muted: #aebac1;
+  --group-modal-faint: #8696a0;
+
+  --group-modal-border:
+    rgba(255, 255, 255, .11);
+
+  --group-modal-hover:
+    rgba(255, 255, 255, .06);
+
+  --group-modal-accent: #4f72eb;
+  --group-modal-danger: #ef635f;
+
+
+  background:
+    var(--group-modal-bg) !important;
+
+  color:
+    var(--group-modal-text) !important;
+
+  border:
+    1px solid
+    var(--group-modal-border) !important;
+
+  box-shadow:
+    0 28px 90px
+    rgba(0, 0, 0, .42) !important;
+}
+
+
+/* ==========================================================
+   HEADER
+   ========================================================== */
+
+.messengerModalScrim
+.groupInfoModal > header {
+  position:
+    sticky;
+
+  top:
+    0;
+
+  z-index:
+    12;
+
+  background:
+    rgba(17, 27, 33, .98) !important;
+
+  border-bottom:
+    1px solid
+    var(--group-modal-border) !important;
+
+  backdrop-filter:
+    blur(12px);
+}
+
+
+.messengerModalScrim
+.groupInfoModal > header span {
+  color:
+    #80a4ff !important;
+
+  font-weight:
+    750 !important;
+
+  letter-spacing:
+    .12em;
+}
+
+
+.messengerModalScrim
+.groupInfoModal > header h3 {
+  color:
+    var(--group-modal-text) !important;
+
+  font-weight:
+    700 !important;
+}
+
+
+.messengerModalScrim
+.groupInfoModal > header button {
+  color:
+    var(--group-modal-text) !important;
+
+  background:
+    rgba(255,255,255,.06) !important;
+
+  border:
+    1px solid
+    var(--group-modal-border) !important;
+}
+
+
+/* ==========================================================
+   GROUP IDENTITY
+   ========================================================== */
+
+.messengerModalScrim
+.groupInfoIdentity {
+  color:
+    var(--group-modal-text) !important;
+}
+
+
+.messengerModalScrim
+.groupInfoIdentity b {
+  color:
+    var(--group-modal-text) !important;
+
+  font-weight:
+    700 !important;
+}
+
+
+.messengerModalScrim
+.groupInfoIdentity span {
+  color:
+    var(--group-modal-muted) !important;
+}
+
+
+.messengerModalScrim
+.groupInfoAvatar {
+  color:
+    #315fd7 !important;
+
+  background:
+    #dce7ff !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.12) !important;
+}
+
+
+/* ==========================================================
+   GROUP PHOTO
+   ========================================================== */
+
+.messengerModalScrim
+.groupAvatarControls {
+  border-color:
+    var(--group-modal-border) !important;
+}
+
+
+.messengerModalScrim
+.groupAvatarControls label,
+.messengerModalScrim
+.groupAvatarControls label span {
+  color:
+    var(--group-modal-text) !important;
+
+  font-weight:
+    650 !important;
+}
+
+
+.messengerModalScrim
+.groupAvatarControls input[type="file"] {
+  color:
+    var(--group-modal-text) !important;
+
+  background:
+    var(--group-modal-input) !important;
+
+  border:
+    1px solid
+    var(--group-modal-border) !important;
+
+  border-radius:
+    8px !important;
+}
+
+
+.messengerModalScrim
+.groupAvatarControls
+button {
+  color:
+    #ffffff !important;
+
+  background:
+    var(--group-modal-accent) !important;
+
+  border:
+    0 !important;
+
+  opacity:
+    1 !important;
+}
+
+
+/* ==========================================================
+   GROUP NAME / DESCRIPTION
+   ========================================================== */
+
+.messengerModalScrim
+.groupInfoEdit {
+  color:
+    var(--group-modal-text) !important;
+}
+
+
+.messengerModalScrim
+.groupInfoEdit label {
+  color:
+    var(--group-modal-muted) !important;
+
+  font-weight:
+    650 !important;
+}
+
+
+.messengerModalScrim
+.groupInfoEdit input,
+.messengerModalScrim
+.groupInfoEdit textarea {
+  color:
+    var(--group-modal-text) !important;
+
+  background:
+    var(--group-modal-input) !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.12) !important;
+
+  caret-color:
+    #ffffff;
+}
+
+
+.messengerModalScrim
+.groupInfoEdit input::placeholder,
+.messengerModalScrim
+.groupInfoEdit textarea::placeholder {
+  color:
+    #83919a !important;
+
+  opacity:
+    1;
+}
+
+
+.messengerModalScrim
+.groupInfoEdit input:focus,
+.messengerModalScrim
+.groupInfoEdit textarea:focus {
+  border-color:
+    #6f8df5 !important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(79, 114, 235, .16) !important;
+
+  outline:
+    none;
+}
+
+
+.messengerModalScrim
+.groupInfoEdit
+button.primary {
+  color:
+    #ffffff !important;
+
+  background:
+    var(--group-modal-accent) !important;
+
+  opacity:
+    1 !important;
+}
+
+
+/* ==========================================================
+   ADD MEMBERS
+   ========================================================== */
+
+.messengerModalScrim
+.groupAddMember {
+  border-top:
+    1px solid
+    var(--group-modal-border) !important;
+
+  border-bottom:
+    1px solid
+    var(--group-modal-border) !important;
+}
+
+
+.messengerModalScrim
+.groupSelectionSummary {
+  background:
+    #f5f7fb !important;
+
+  border:
+    0 !important;
+
+  color:
+    #334155 !important;
+}
+
+
+.messengerModalScrim
+.groupSelectionSummary > span {
+  color:
+    #64748b !important;
+
+  font-weight:
+    750 !important;
+}
+
+
+.messengerModalScrim
+.groupSelectionSummary > b {
+  color:
+    #ffffff !important;
+
+  background:
+    var(--group-modal-accent) !important;
+}
+
+
+.messengerModalScrim
+.groupAddMember > span {
+  color:
+    var(--group-modal-muted) !important;
+
+  font-weight:
+    750 !important;
+}
+
+
+.messengerModalScrim
+.groupAddMember input {
+  color:
+    var(--group-modal-text) !important;
+
+  background:
+    var(--group-modal-input) !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.12) !important;
+
+  caret-color:
+    #ffffff;
+}
+
+
+.messengerModalScrim
+.groupAddMember input::placeholder {
+  color:
+    #8b9aa3 !important;
+
+  opacity:
+    1;
+}
+
+
+.messengerModalScrim
+.groupAddMember input:focus {
+  border-color:
+    #6f8df5 !important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(79, 114, 235, .16) !important;
+
+  outline:
+    none;
+}
+
+
+/* Batch Add Members button */
+.messengerModalScrim
+.groupAddMember
+.createGroupButton,
+.messengerModalScrim
+.groupAddMember
+button.primary {
+  color:
+    #ffffff !important;
+
+  background:
+    var(--group-modal-accent) !important;
+
+  border:
+    0 !important;
+
+  opacity:
+    1 !important;
+}
+
+
+.messengerModalScrim
+.groupAddMember
+button:disabled {
+  color:
+    rgba(255,255,255,.62) !important;
+
+  background:
+    #314889 !important;
+
+  opacity:
+    1 !important;
+}
+
+
+/* ==========================================================
+   MEMBER SEARCH RESULTS
+   ========================================================== */
+
+.messengerModalScrim
+.groupInfoSearchResults {
+  border:
+    1px solid
+    var(--group-modal-border) !important;
+
+  background:
+    var(--group-modal-panel) !important;
+}
+
+
+.messengerModalScrim
+.groupInfoPerson {
+  color:
+    var(--group-modal-text) !important;
+
+  background:
+    var(--group-modal-panel) !important;
+
+  border-bottom:
+    1px solid
+    var(--group-modal-border) !important;
+}
+
+
+.messengerModalScrim
+.groupInfoPerson:hover,
+.messengerModalScrim
+.groupInfoPerson.selected {
+  background:
+    #24343e !important;
+}
+
+
+.messengerModalScrim
+.groupInfoPerson b {
+  color:
+    var(--group-modal-text) !important;
+
+  font-weight:
+    650 !important;
+}
+
+
+.messengerModalScrim
+.groupInfoPerson small {
+  color:
+    var(--group-modal-muted) !important;
+}
+
+
+.messengerModalScrim
+.groupInfoPerson button {
+  color:
+    #8eacff !important;
+
+  background:
+    rgba(79, 114, 235, .12) !important;
+
+  border:
+    1px solid
+    rgba(111, 141, 245, .28) !important;
+}
+
+
+/* ==========================================================
+   SELECTED MEMBERS
+   ========================================================== */
+
+.messengerModalScrim
+.selectedGroupUserList {
+  background:
+    transparent !important;
+}
+
+
+.messengerModalScrim
+.selectedGroupUser {
+  color:
+    var(--group-modal-text) !important;
+
+  background:
+    var(--group-modal-panel) !important;
+
+  border:
+    1px solid
+    var(--group-modal-border) !important;
+}
+
+
+.messengerModalScrim
+.selectedGroupUser b {
+  color:
+    var(--group-modal-text) !important;
+}
+
+
+.messengerModalScrim
+.selectedGroupUser small {
+  color:
+    var(--group-modal-muted) !important;
+}
+
+
+.messengerModalScrim
+.selectedGroupUser button {
+  color:
+    #ffffff !important;
+}
+
+
+/* ==========================================================
+   TABS
+   ========================================================== */
+
+.messengerModalScrim
+.groupInfoTabs {
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--group-modal-border) !important;
+
+  border-radius:
+    12px !important;
+
+  background:
+    #eef1f6 !important;
+}
+
+
+.messengerModalScrim
+.groupInfoTabs button {
+  min-height:
+    42px;
+
+  color:
+    #5f6b7d !important;
+
+  background:
+    transparent !important;
+
+  border:
+    0 !important;
+
+  font-weight:
+    650 !important;
+
+  opacity:
+    1 !important;
+}
+
+
+.messengerModalScrim
+.groupInfoTabs button.active {
+  color:
+    #315fd7 !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 2px 8px
+    rgba(21, 38, 68, .08) !important;
+}
+
+
+/* ==========================================================
+   MEMBER LIST
+   ========================================================== */
+
+.messengerModalScrim
+.groupMemberSection {
+  color:
+    var(--group-modal-text) !important;
+}
+
+
+.messengerModalScrim
+.groupMemberHeading {
+  color:
+    var(--group-modal-muted) !important;
+}
+
+
+.messengerModalScrim
+.groupMemberHeading span,
+.messengerModalScrim
+.groupMemberHeading b {
+  color:
+    var(--group-modal-muted) !important;
+
+  font-weight:
+    750 !important;
+}
+
+
+.messengerModalScrim
+.groupMemberList {
+  background:
+    transparent !important;
+}
+
+
+.messengerModalScrim
+.groupMemberRow {
+  min-height:
+    66px;
+
+  color:
+    var(--group-modal-text) !important;
+
+  border-bottom:
+    1px solid
+    var(--group-modal-border) !important;
+
+  background:
+    transparent !important;
+}
+
+
+.messengerModalScrim
+.groupMemberRow:hover {
+  background:
+    var(--group-modal-hover) !important;
+}
+
+
+.messengerModalScrim
+.groupMemberRow > span {
+  min-width:
+    0;
+}
+
+
+.messengerModalScrim
+.groupMemberRow > span > b {
+  color:
+    var(--group-modal-text) !important;
+
+  font-weight:
+    650 !important;
+}
+
+
+.messengerModalScrim
+.groupMemberRow > span > small {
+  color:
+    var(--group-modal-muted) !important;
+}
+
+
+/* initials avatar */
+.messengerModalScrim
+.groupMemberRow > i {
+  color:
+    #315fd7 !important;
+
+  background:
+    #dbe6ff !important;
+
+  font-style:
+    normal !important;
+
+  font-weight:
+    750 !important;
+}
+
+
+/* real avatar image support */
+.messengerModalScrim
+.groupMemberRow
+.messengerUserAvatar {
+  border:
+    1px solid
+    var(--group-modal-border);
+}
+
+
+/* ==========================================================
+   MEMBER ACTION BUTTONS
+   ========================================================== */
+
+.messengerModalScrim
+.groupMemberRow button {
+  color:
+    #d8e2ff !important;
+
+  background:
+    #24313a !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.14) !important;
+
+  opacity:
+    1 !important;
+
+  font-weight:
+    650 !important;
+}
+
+
+.messengerModalScrim
+.groupMemberRow button:hover {
+  color:
+    #ffffff !important;
+
+  background:
+    #30414c !important;
+}
+
+
+.messengerModalScrim
+.groupMemberRow
+button[class*="danger" i],
+.messengerModalScrim
+.groupMemberRow
+button:last-child:not(:only-child) {
+  color:
+    #ffb4b0 !important;
+}
+
+
+/* ==========================================================
+   ROLE / ADMIN BADGES
+   ========================================================== */
+
+.messengerModalScrim
+.groupMemberRow em,
+.messengerModalScrim
+.groupMemberRow strong {
+  color:
+    #9ab4ff !important;
+
+  background:
+    rgba(79, 114, 235, .12);
+
+  border-radius:
+    999px;
+}
+
+
+/* ==========================================================
+   MEDIA / DOCS / LINKS
+   ========================================================== */
+
+.messengerModalScrim
+.groupMediaGrid,
+.messengerModalScrim
+.groupDocsList,
+.messengerModalScrim
+.groupLinksList {
+  color:
+    var(--group-modal-text) !important;
+}
+
+
+.messengerModalScrim
+.groupMediaGrid *,
+.messengerModalScrim
+.groupDocsList *,
+.messengerModalScrim
+.groupLinksList * {
+  color:
+    inherit;
+}
+
+
+/* ==========================================================
+   SCROLLBAR
+   ========================================================== */
+
+.messengerModalScrim
+.groupInfoModal {
+  scrollbar-width:
+    thin;
+
+  scrollbar-color:
+    #40515d transparent;
+}
+
+
+.messengerModalScrim
+.groupInfoModal::-webkit-scrollbar {
+  width:
+    6px;
+}
+
+
+.messengerModalScrim
+.groupInfoModal::-webkit-scrollbar-thumb {
+  border-radius:
+    999px;
+
+  background:
+    #40515d;
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 700px) {
+
+  .messengerModalScrim
+  .groupInfoModal {
+    width:
+      calc(100vw - 20px) !important;
+
+    max-height:
+      calc(100vh - 20px) !important;
+
+    border-radius:
+      16px !important;
+  }
+
+
+  .messengerModalScrim
+  .groupMemberRow {
+    align-items:
+      center;
+  }
+
+}
+
+/* CAMPUSCONNECT — GROUP INFO HIGH CONTRAST END */
+
+
+/* COLLEGE ID RED THEME OVERRIDE */
+.collegeIdCard,
+.facultyCollegeIdCard,
+.studentCollegeIdCard,
+.collegeIdentityCard {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 32%, #b91c1c 68%, #dc2626 100%) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  box-shadow: 0 20px 60px rgba(127, 29, 29, 0.30) !important;
+}
+
+.collegeIdCard *,
+.facultyCollegeIdCard *,
+.studentCollegeIdCard *,
+.collegeIdentityCard * {
+  color: inherit;
+}
+
+.collegeIdCard .muted,
+.facultyCollegeIdCard .muted,
+.studentCollegeIdCard .muted,
+.collegeIdentityCard .muted {
+  color: rgba(255,255,255,0.76) !important;
+}
+
+.collegeIdCard .chip,
+.facultyCollegeIdCard .chip,
+.studentCollegeIdCard .chip,
+.collegeIdentityCard .chip {
+  background: rgba(255,255,255,0.12) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+}
+
+.collegeIdMetaItem span,
+.collegeIdInfoLabel {
+  color: rgba(255,255,255,0.72) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.collegeIdMetaItem strong,
+.collegeIdInfoValue {
+  color: #fff !important;
+}
+
+.collegeIdAvatar,
+.collegeIdPhoto {
+  border: 3px solid rgba(255,255,255,0.18) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
+}
+
+/* CAMPUSCONNECT — USABILITY PHASE 1 START */
+
+/*
+ * Accessibility/readability repair based on the live
+ * CampusConnect dashboard usability audit.
+ *
+ * Scope:
+ *   - tiny body/support text
+ *   - task search prominence
+ *   - action-center footer readability
+ *
+ * No navigation, Supabase, Faculty Workspace or
+ * business logic is changed here.
+ */
+
+
+/* ==========================================================
+   SEARCH PLACEHOLDER / HEADER SUPPORT TEXT
+   Audit issue #5
+   ========================================================== */
+
+body > main > section > header > button > span {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+
+  line-height:
+    1.4 !important;
+}
+
+
+/* ==========================================================
+   NOTICE / RESULT SUPPORT COPY
+   Audit issue #6
+   ========================================================== */
+
+section
+> div
+> div
+> article:nth-of-type(1)
+> span:nth-of-type(2)
+> p {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+
+  line-height:
+    1.45 !important;
+}
+
+
+/* ==========================================================
+   DATE TEXT
+   Audit issue #8
+   ========================================================== */
+
+div:nth-of-type(1)
+> div:nth-of-type(1)
+> div
+> div
+> div:nth-of-type(2)
+> span:nth-of-type(1) {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+
+  line-height:
+    1.35 !important;
+}
+
+
+/* ==========================================================
+   FACULTY PANEL SUPPORT COPY
+   Audit issue #10
+   ========================================================== */
+
+div:nth-of-type(2)
+> section:nth-of-type(3)
+> article:nth-of-type(1)
+> header
+> div
+> p {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+
+  line-height:
+    1.5 !important;
+}
+
+
+/* ==========================================================
+   FACULTY ACTION DESCRIPTION
+   Audit issue #11
+   ========================================================== */
+
+section:nth-of-type(3)
+> article:nth-of-type(1)
+> div
+> button:nth-of-type(1)
+> span
+> p {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+
+  line-height:
+    1.45 !important;
+}
+
+
+/* ==========================================================
+   ACTION CENTER SECURITY LABEL
+   Audit issue #12
+   ========================================================== */
+
+div
+> div:nth-of-type(2)
+> section:nth-of-type(4)
+> section
+> footer
+> span {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+
+  line-height:
+    1.4 !important;
+}
+
+
+/* ==========================================================
+   ACTION CENTER EXPLANATORY COPY
+   Audit issue #13
+   ========================================================== */
+
+div
+> div:nth-of-type(2)
+> section:nth-of-type(4)
+> section
+> footer
+> p {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+
+  line-height:
+    1.5 !important;
+
+  max-width:
+    72ch;
+}
+
+
+/* ==========================================================
+   STAFF OPERATIONS EMPTY STATE
+   Audit issue #14
+   ========================================================== */
+
+#staff-operations-board
+> div:nth-of-type(3)
+> div
+> p {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+
+  line-height:
+    1.5 !important;
+}
+
+
+/* ==========================================================
+   OPERATIONAL TASK SEARCH
+   Audit issue #21
+   ========================================================== */
+
+#staff-operations-board
+> div:nth-of-type(2)
+> label {
+  position:
+    relative;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  width:
+    min(
+      100%,
+      440px
+    );
+}
+
+
+#staff-operations-board
+> div:nth-of-type(2)
+> label
+> input {
+  width:
+    100% !important;
+
+  min-width:
+    280px;
+
+  min-height:
+    44px;
+
+  padding:
+    10px 14px !important;
+
+  border-radius:
+    12px !important;
+
+  font-size:
+    14px !important;
+
+  line-height:
+    1.4 !important;
+}
+
+
+#staff-operations-board
+> div:nth-of-type(2)
+> label
+> input::placeholder {
+  font-size:
+    13px;
+
+  opacity:
+    0.72;
+}
+
+
+#staff-operations-board
+> div:nth-of-type(2)
+> label
+> input:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      49,
+      89,
+      183,
+      0.22
+    );
+
+  outline-offset:
+    2px;
+}
+
+
+/* ==========================================================
+   ROLE ACTION CENTER GENERAL READABILITY SAFETY
+   ========================================================== */
+
+.roleActionCenter p,
+.roleActionCenter small,
+.roleActionCenter span {
+  line-height:
+    1.45;
+}
+
+
+.roleActionCenter
+.roleActionCenterFootnote,
+.roleActionCenter
+.roleActionCenterFootnote p,
+.roleActionCenter
+.roleActionCenterFootnote span {
+  font-size:
+    max(
+      12px,
+      0.75rem
+    ) !important;
+}
+
+
+/* Prevent intentionally small decorative labels from
+ * becoming unreadable while keeping visual hierarchy.
+ */
+
+#staff-operations-board p,
+#staff-operations-board input,
+.roleActionCenter p {
+  text-rendering:
+    optimizeLegibility;
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 700px) {
+
+  #staff-operations-board
+  > div:nth-of-type(2)
+  > label {
+    width:
+      100%;
+  }
+
+
+  #staff-operations-board
+  > div:nth-of-type(2)
+  > label
+  > input {
+    min-width:
+      0;
+
+    width:
+      100% !important;
+  }
+}
+
+
+/* CAMPUSCONNECT — USABILITY PHASE 1 END */
+
+/* CAMPUSCONNECT — USABILITY PHASE 2 START */
+
+
+/* Faculty Teaching Today is supporting content,
+   so keep it visually below the main greeting. */
+
+.facultyExecutiveDashboard
+.facultyExecutiveFocus {
+  background:
+    linear-gradient(
+      145deg,
+      #f8fafc 0%,
+      #ffffff 58%,
+      #f2f7fa 100%
+    ) !important;
+
+  color:
+    #183247 !important;
+
+  border:
+    1px solid #dce6ed !important;
+
+  box-shadow:
+    0 12px 28px
+    rgba(15, 23, 42, 0.065) !important;
+}
+
+
+.facultyExecutiveDashboard
+.facultyExecutiveFocusTop > span {
+  color:
+    #60798b !important;
+}
+
+
+.facultyExecutiveDashboard
+.facultyExecutiveFocusTop > i {
+  color:
+    #167344 !important;
+
+  background:
+    #e8f6ee !important;
+
+  border:
+    1px solid #cde8d8 !important;
+}
+
+
+.facultyExecutiveDashboard
+.facultyExecutiveFocus h2 {
+  color:
+    #183247 !important;
+}
+
+
+.facultyExecutiveDashboard
+.facultyExecutiveFocus > p {
+  color:
+    #687c8b !important;
+
+  font-size:
+    max(
+      12px,
+      0.78rem
+    ) !important;
+
+  line-height:
+    1.55 !important;
+}
+
+
+/* Keep one obvious primary Today's Classes action. */
+
+.facultyExecutiveDashboard
+.facultyExecutiveFocusActions
+> button:first-child {
+  background:
+    #285f87 !important;
+
+  color:
+    #ffffff !important;
+
+  border:
+    1px solid #285f87 !important;
+
+  box-shadow:
+    0 8px 18px
+    rgba(40, 95, 135, 0.16) !important;
+}
+
+
+/* Secondary Teaching Today actions stay quieter. */
+
+.facultyExecutiveDashboard
+.facultyExecutiveFocusActions
+> button:not(:first-child) {
+  background:
+    #ffffff !important;
+
+  color:
+    #28485f !important;
+
+  border:
+    1px solid #d8e3eb !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+@media (max-width: 700px) {
+
+  .facultyExecutiveDashboard
+  .facultyExecutiveFocus {
+    padding:
+      20px !important;
+  }
+
+}
+
+
+/* CAMPUSCONNECT — USABILITY PHASE 2 END */
+
+/* CAMPUSCONNECT — ACTION CENTER DISMISS V3 START */
+
+
+/*
+ * Clear secondary dismissal action.
+ * Logic remains in role-action-center.tsx.
+ */
+
+.proRoleDashboard
+.roleActionDismiss {
+  display:
+    inline-flex !important;
+
+  align-items:
+    center !important;
+
+  justify-content:
+    center !important;
+
+  gap:
+    6px !important;
+
+  width:
+    auto !important;
+
+  min-width:
+    82px !important;
+
+  min-height:
+    36px !important;
+
+  padding:
+    0 11px !important;
+
+  border-radius:
+    9px !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    700 !important;
+
+  line-height:
+    1 !important;
+
+  white-space:
+    nowrap !important;
+}
+
+
+.proRoleDashboard
+.roleActionDismissIcon {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  width:
+    16px;
+
+  height:
+    16px;
+
+  font-size:
+    16px;
+
+  font-weight:
+    500;
+
+  line-height:
+    1;
+}
+
+
+.proRoleDashboard
+.roleActionDismissLabel {
+  font-size:
+    12px !important;
+
+  line-height:
+    1 !important;
+}
+
+
+.proRoleDashboard
+.roleActionDismiss:hover {
+  border-color:
+    #bdccd7 !important;
+
+  background:
+    #f6f9fb !important;
+}
+
+
+.proRoleDashboard
+.roleActionDismiss:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      49,
+      89,
+      183,
+      0.18
+    );
+
+  outline-offset:
+    2px;
+}
+
+
+/* CAMPUSCONNECT — ACTION CENTER DISMISS V3 END */
+
+/* CAMPUSCONNECT — FACULTY MINIMAL V3 START */
+
+
+/* ==========================================================
+   FACULTY DASHBOARD — MINIMAL PROFESSIONAL SYSTEM
+   ========================================================== */
+
+html body
+.facultyMinimalDashboard {
+  display:
+    grid;
+
+  gap:
+    18px;
+
+  width:
+    100%;
+
+  padding:
+    16px 16px 28px;
+
+  color:
+    #172f40;
+}
+
+
+/* ==========================================================
+   COMMAND CARD
+   ========================================================== */
+
+html body
+.facultyMinimalCommand {
+  position:
+    relative;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    28px;
+
+  overflow:
+    hidden;
+
+  padding:
+    26px 28px;
+
+  border:
+    1px solid #d9e5ec;
+
+  border-radius:
+    22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f7fbfd 50%,
+      #edf6fb 100%
+    );
+
+  box-shadow:
+    0 14px 38px
+    rgba(
+      24,
+      57,
+      78,
+      .075
+    );
+}
+
+
+html body
+.facultyMinimalCommand::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    -90px;
+
+  right:
+    -75px;
+
+  width:
+    240px;
+
+  height:
+    240px;
+
+  border-radius:
+    50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(
+        58,
+        128,
+        169,
+        .10
+      ),
+      transparent 70%
+    );
+
+  pointer-events:
+    none;
+}
+
+
+.facultyMinimalCommandMain {
+  position:
+    relative;
+
+  z-index:
+    1;
+
+  min-width:
+    0;
+}
+
+
+.facultyMinimalCommandEyebrow {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    9px;
+
+  margin-bottom:
+    11px;
+
+  color:
+    #49738d;
+
+  font-size:
+    11px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .14em;
+}
+
+
+.facultyMinimalCommandEyebrow > i {
+  width:
+    22px;
+
+  height:
+    2px;
+
+  border-radius:
+    999px;
+
+  background:
+    #2d739b;
+}
+
+
+.facultyMinimalCommandEyebrow > b {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  min-height:
+    23px;
+
+  margin-left:
+    4px;
+
+  padding:
+    0 8px;
+
+  border:
+    1px solid #cce8d8;
+
+  border-radius:
+    999px;
+
+  color:
+    #177244;
+
+  background:
+    #edf9f2;
+
+  font-size:
+    9px;
+
+  letter-spacing:
+    .09em;
+}
+
+
+.facultyMinimalCommand h2 {
+  margin:
+    0;
+
+  max-width:
+    650px;
+
+  color:
+    #142f42;
+
+  font-size:
+    clamp(
+      1.65rem,
+      2.6vw,
+      2.35rem
+    );
+
+  font-weight:
+    760;
+
+  line-height:
+    1.08;
+
+  letter-spacing:
+    -.035em;
+}
+
+
+.facultyMinimalCommand p {
+  max-width:
+    720px;
+
+  margin:
+    11px 0 0;
+
+  color:
+    #687f8f;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.55;
+}
+
+
+.facultyMinimalCommandActions {
+  position:
+    relative;
+
+  z-index:
+    1;
+
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    9px;
+
+  min-width:
+    330px;
+}
+
+
+.facultyMinimalCommandActions
+button {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    8px;
+
+  min-height:
+    42px;
+
+  padding:
+    0 15px;
+
+  border:
+    1px solid #d2e0e9;
+
+  border-radius:
+    11px;
+
+  color:
+    #315369;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .90
+    );
+
+  font-size:
+    12px;
+
+  font-weight:
+    720;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease,
+    background .16s ease;
+}
+
+
+.facultyMinimalCommandActions
+button:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #a9c5d6;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 8px 20px
+    rgba(
+      30,
+      74,
+      101,
+      .08
+    );
+}
+
+
+.facultyMinimalCommandActions
+.facultyMinimalPrimary {
+  border-color:
+    #285f87;
+
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2b6f99,
+      #245b80
+    );
+
+  box-shadow:
+    0 9px 20px
+    rgba(
+      36,
+      91,
+      128,
+      .16
+    );
+}
+
+
+.facultyMinimalCommandActions
+.facultyMinimalPrimary:hover {
+  border-color:
+    #214f70;
+
+  color:
+    #ffffff;
+
+  background:
+    #245b80;
+}
+
+
+/* ==========================================================
+   LIVE METRICS
+   ========================================================== */
+
+.facultyMinimalMetrics {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    12px;
+}
+
+
+.facultyMinimalMetrics
+article {
+  position:
+    relative;
+
+  min-width:
+    0;
+
+  padding:
+    18px 19px;
+
+  border:
+    1px solid #dce6ec;
+
+  border-radius:
+    16px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 7px 22px
+    rgba(
+      28,
+      52,
+      68,
+      .045
+    );
+}
+
+
+.facultyMinimalMetrics
+article::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    18px;
+
+  width:
+    34px;
+
+  height:
+    2px;
+
+  border-radius:
+    0 0 999px 999px;
+
+  background:
+    #5d97b8;
+}
+
+
+.facultyMinimalMetrics
+span {
+  display:
+    block;
+
+  color:
+    #6d8290;
+
+  font-size:
+    10px;
+
+  font-weight:
+    820;
+
+  letter-spacing:
+    .11em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.facultyMinimalMetrics
+strong {
+  display:
+    block;
+
+  margin-top:
+    8px;
+
+  color:
+    #17364a;
+
+  font-size:
+    28px;
+
+  font-weight:
+    760;
+
+  line-height:
+    1;
+}
+
+
+.facultyMinimalMetrics
+small {
+  display:
+    block;
+
+  margin-top:
+    8px;
+
+  color:
+    #80919d;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.35;
+}
+
+
+/* ==========================================================
+   SINGLE WORKSPACE MESSAGE
+   ========================================================== */
+
+.facultyMinimalWorkspaceNote {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    24px;
+
+  padding:
+    19px 21px;
+
+  border:
+    1px solid #dbe6ec;
+
+  border-radius:
+    16px;
+
+  background:
+    #f8fbfd;
+}
+
+
+.facultyMinimalWorkspaceNote
+> div {
+  min-width:
+    0;
+}
+
+
+.facultyMinimalWorkspaceNote
+> div > span {
+  display:
+    block;
+
+  color:
+    #527b92;
+
+  font-size:
+    9px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .13em;
+}
+
+
+.facultyMinimalWorkspaceNote
+strong {
+  display:
+    block;
+
+  margin-top:
+    5px;
+
+  color:
+    #1d3b4e;
+
+  font-size:
+    15px;
+}
+
+
+.facultyMinimalWorkspaceNote
+p {
+  max-width:
+    820px;
+
+  margin:
+    5px 0 0;
+
+  color:
+    #748793;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.5;
+}
+
+
+.facultyMinimalWorkspaceNote
+> button {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  flex:
+    0 0 auto;
+
+  min-height:
+    40px;
+
+  padding:
+    0 14px;
+
+  border:
+    1px solid #cddce5;
+
+  border-radius:
+    10px;
+
+  color:
+    #31566d;
+
+  background:
+    #ffffff;
+
+  font-size:
+    12px;
+
+  font-weight:
+    750;
+
+  cursor:
+    pointer;
+}
+
+
+/* ==========================================================
+   EXISTING FUNCTIONAL MODULES
+   ========================================================== */
+
+.facultyMinimalIntelligence,
+.facultyMinimalOperations {
+  min-width:
+    0;
+}
+
+
+.facultyMinimalDashboard
+.roleActionCenter,
+.facultyMinimalDashboard
+.staffOperationsBoard {
+  margin:
+    0 !important;
+
+  border:
+    1px solid #dce6ec !important;
+
+  border-radius:
+    18px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 8px 25px
+    rgba(
+      25,
+      49,
+      65,
+      .05
+    ) !important;
+}
+
+
+/*
+ * The previous Faculty dashboard had extra outer titles around
+ * these components. The component itself now owns its heading.
+ */
+
+.facultyMinimalDashboard
+.roleActionCenter::before,
+.facultyMinimalDashboard
+.staffOperationsBoard::before {
+  display:
+    none !important;
+}
+
+
+/* Keep action cards calm and professional. */
+
+.facultyMinimalDashboard
+.roleActionGrid
+> article {
+  border-radius:
+    14px !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+> * {
+  border-radius:
+    13px !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 1050px) {
+
+  .facultyMinimalCommand {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+
+  .facultyMinimalCommandActions {
+    justify-content:
+      flex-start;
+
+    min-width:
+      0;
+
+    width:
+      100%;
+  }
+
+
+  .facultyMinimalMetrics {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+}
+
+
+@media (max-width: 680px) {
+
+  html body
+  .facultyMinimalDashboard {
+    gap:
+      13px;
+
+    padding:
+      10px 8px 22px;
+  }
+
+
+  html body
+  .facultyMinimalCommand {
+    gap:
+      18px;
+
+    padding:
+      20px 18px;
+
+    border-radius:
+      17px;
+  }
+
+
+  .facultyMinimalCommand h2 {
+    font-size:
+      1.65rem;
+  }
+
+
+  .facultyMinimalCommandActions
+  button {
+    flex:
+      1 1 auto;
+  }
+
+
+  .facultyMinimalCommandActions
+  .facultyMinimalPrimary {
+    flex-basis:
+      100%;
+  }
+
+
+  .facultyMinimalMetrics {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    gap:
+      9px;
+  }
+
+
+  .facultyMinimalMetrics
+  article {
+    padding:
+      16px;
+  }
+
+
+  .facultyMinimalWorkspaceNote {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
+    padding:
+      17px;
+  }
+
+
+  .facultyMinimalWorkspaceNote
+  > button {
+    width:
+      100%;
+
+    justify-content:
+      center;
+  }
+
+}
+
+
+/* CAMPUSCONNECT — FACULTY MINIMAL V3 END */
+
+/* CAMPUSCONNECT — FACULTY PREMIUM V6 START */
+
+
+/* ==========================================================
+   DESIGN TOKENS
+   ========================================================== */
+
+.facultyMinimalDashboard {
+  --fd-bg:
+    #f5f7fa;
+
+  --fd-surface:
+    #ffffff;
+
+  --fd-surface-subtle:
+    #f8fafc;
+
+  --fd-border:
+    #dce4eb;
+
+  --fd-border-strong:
+    #cbd8e2;
+
+  --fd-text:
+    #142a3a;
+
+  --fd-text-secondary:
+    #617586;
+
+  --fd-text-muted:
+    #8a9aa7;
+
+  --fd-primary:
+    #27679c;
+
+  --fd-primary-hover:
+    #205985;
+
+  --fd-navy:
+    #122b40;
+
+  --fd-success:
+    #19704a;
+
+  --fd-danger:
+    #b44747;
+
+  --fd-warning:
+    #a16d22;
+
+  --fd-radius-sm:
+    8px;
+
+  --fd-radius-md:
+    12px;
+
+  --fd-radius-lg:
+    18px;
+
+  --fd-shadow-sm:
+    0 3px 12px
+    rgba(
+      22,
+      44,
+      62,
+      .045
+    );
+
+  --fd-shadow-md:
+    0 10px 28px
+    rgba(
+      22,
+      44,
+      62,
+      .065
+    );
+
+  position:
+    relative;
+
+  display:
+    grid;
+
+  gap:
+    18px;
+
+  padding:
+    18px;
+
+  border:
+    1px solid
+    rgba(
+      203,
+      216,
+      226,
+      .75
+    );
+
+  border-radius:
+    22px;
+
+  background:
+    var(
+      --fd-bg
+    );
+}
+
+
+/* ==========================================================
+   MAIN OVERVIEW
+   ========================================================== */
+
+.facultyMinimalDashboard
+.facultyMinimalCommand {
+  position:
+    relative;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    32px;
+
+  min-height:
+    154px;
+
+  padding:
+    28px 30px;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .09
+    );
+
+  border-radius:
+    var(
+      --fd-radius-lg
+    );
+
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      120deg,
+      #122b40 0%,
+      #173a55 100%
+    );
+
+  box-shadow:
+    0 12px 30px
+    rgba(
+      18,
+      43,
+      64,
+      .14
+    );
+
+  animation:
+    fdReveal
+    .42s
+    cubic-bezier(
+      .2,
+      .7,
+      .2,
+      1
+    )
+    both;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommand::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    -88px;
+
+  right:
+    -50px;
+
+  width:
+    220px;
+
+  height:
+    220px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .07
+    );
+
+  border-radius:
+    50%;
+
+  pointer-events:
+    none;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandMain,
+.facultyMinimalDashboard
+.facultyMinimalCommandActions {
+  position:
+    relative;
+
+  z-index:
+    1;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandEyebrow {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    9px;
+
+  margin-bottom:
+    12px;
+
+  color:
+    #b9cddd;
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .13em;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandEyebrow
+> i {
+  width:
+    22px;
+
+  height:
+    2px;
+
+  border-radius:
+    999px;
+
+  background:
+    #70b4e8;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandEyebrow
+> b {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  min-height:
+    23px;
+
+  padding:
+    0 8px;
+
+  border:
+    1px solid
+    rgba(
+      105,
+      219,
+      157,
+      .22
+    );
+
+  border-radius:
+    999px;
+
+  color:
+    #aee6c6;
+
+  background:
+    rgba(
+      66,
+      170,
+      115,
+      .10
+    );
+
+  font-size:
+    9px;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommand
+h2 {
+  max-width:
+    720px;
+
+  margin:
+    0;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      1.8rem,
+      2.9vw,
+      2.55rem
+    );
+
+  font-weight:
+    720;
+
+  line-height:
+    1.06;
+
+  letter-spacing:
+    -.035em;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommand
+p {
+  max-width:
+    760px;
+
+  margin:
+    11px 0 0;
+
+  color:
+    #bdcedb;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.55;
+}
+
+
+/* ==========================================================
+   TOP ACTIONS — ONLY UNIQUE GLOBAL ACTIONS
+   ========================================================== */
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    8px;
+
+  max-width:
+    430px;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    8px;
+
+  min-height:
+    42px;
+
+  padding:
+    0 14px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .13
+    );
+
+  border-radius:
+    10px;
+
+  color:
+    #eaf3f8;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .065
+    );
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform
+    150ms
+    ease-out,
+    border-color
+    150ms
+    ease-out,
+    background
+    150ms
+    ease-out;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button:hover {
+  transform:
+    translateY(
+      -1px
+    );
+
+  border-color:
+    rgba(
+      255,
+      255,
+      255,
+      .23
+    );
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .11
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button:active {
+  transform:
+    translateY(
+      0
+    )
+    scale(
+      .985
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      112,
+      180,
+      232,
+      .35
+    );
+
+  outline-offset:
+    2px;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+.facultyMinimalPrimary {
+  border-color:
+    #4c92c7;
+
+  color:
+    #ffffff;
+
+  background:
+    #2b75ab;
+
+  box-shadow:
+    0 8px 18px
+    rgba(
+      18,
+      77,
+      119,
+      .25
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+.facultyMinimalPrimary:hover {
+  border-color:
+    #5ba2d7;
+
+  background:
+    #337fb6;
+}
+
+
+/* ==========================================================
+   METRICS
+   ========================================================== */
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    12px;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article {
+  position:
+    relative;
+
+  min-width:
+    0;
+
+  padding:
+    18px 19px;
+
+  border:
+    1px solid
+    var(
+      --fd-border
+    );
+
+  border-radius:
+    var(
+      --fd-radius-md
+    );
+
+  background:
+    var(
+      --fd-surface
+    );
+
+  box-shadow:
+    var(
+      --fd-shadow-sm
+    );
+
+  transition:
+    transform
+    160ms
+    ease-out,
+    border-color
+    160ms
+    ease-out,
+    box-shadow
+    160ms
+    ease-out;
+
+  animation:
+    fdReveal
+    .38s
+    ease-out
+    both;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:nth-child(2) {
+  animation-delay:
+    40ms;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:nth-child(3) {
+  animation-delay:
+    80ms;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:nth-child(4) {
+  animation-delay:
+    120ms;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:hover {
+  transform:
+    translateY(
+      -2px
+    );
+
+  border-color:
+    #c2d4e1;
+
+  box-shadow:
+    var(
+      --fd-shadow-md
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    18px;
+
+  width:
+    32px;
+
+  height:
+    2px;
+
+  border-radius:
+    0 0 999px 999px;
+
+  background:
+    #4c8bbb;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+span {
+  color:
+    var(
+      --fd-text-secondary
+    );
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .105em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+strong {
+  display:
+    block;
+
+  margin-top:
+    9px;
+
+  color:
+    var(
+      --fd-text
+    );
+
+  font-size:
+    29px;
+
+  font-weight:
+    720;
+
+  line-height:
+    1;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+small {
+  display:
+    block;
+
+  margin-top:
+    8px;
+
+  color:
+    var(
+      --fd-text-muted
+    );
+
+  font-size:
+    11px;
+
+  line-height:
+    1.4;
+}
+
+
+/* ==========================================================
+   ACTION CENTER
+   ========================================================== */
+
+html body
+.facultyMinimalDashboard
+.roleActionCenter {
+  position:
+    relative;
+
+  margin:
+    0 !important;
+
+  padding:
+    25px !important;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    var(
+      --fd-radius-lg
+    ) !important;
+
+  color:
+    var(
+      --fd-text
+    ) !important;
+
+  background:
+    var(
+      --fd-surface
+    ) !important;
+
+  box-shadow:
+    var(
+      --fd-shadow-sm
+    ) !important;
+
+  animation:
+    fdReveal
+    .42s
+    ease-out
+    both;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCenter::before {
+  background:
+    #377db0 !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCenterHeader {
+  padding-bottom:
+    18px;
+
+  border-bottom:
+    1px solid
+    var(
+      --fd-border
+    );
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCenterHeader
+span {
+  color:
+    #47708e !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCenterHeader
+h3 {
+  margin-top:
+    7px;
+
+  color:
+    var(
+      --fd-text
+    ) !important;
+
+  font-family:
+    inherit !important;
+
+  font-size:
+    clamp(
+      1.55rem,
+      2.1vw,
+      1.95rem
+    ) !important;
+
+  font-weight:
+    720 !important;
+
+  letter-spacing:
+    -.03em;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCenterHeader
+p {
+  color:
+    var(
+      --fd-text-secondary
+    ) !important;
+
+  font-size:
+    12px !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCenterSummary {
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    12px !important;
+
+  background:
+    var(
+      --fd-surface-subtle
+    ) !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCenterSummary
+> div {
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  background:
+    #ffffff !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionGrid {
+  gap:
+    12px !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCard {
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    13px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    none !important;
+
+  transition:
+    transform
+    160ms
+    ease-out,
+    border-color
+    160ms
+    ease-out,
+    box-shadow
+    160ms
+    ease-out;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCard:hover {
+  transform:
+    translateY(
+      -2px
+    );
+
+  border-color:
+    var(
+      --fd-border-strong
+    ) !important;
+
+  box-shadow:
+    var(
+      --fd-shadow-sm
+    ) !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCard
+h4 {
+  color:
+    var(
+      --fd-text
+    ) !important;
+
+  font-size:
+    15px !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionCard
+p {
+  color:
+    var(
+      --fd-text-secondary
+    ) !important;
+
+  font-size:
+    12px !important;
+
+  line-height:
+    1.5 !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionOpen {
+  min-height:
+    38px;
+
+  padding:
+    0 12px !important;
+
+  border:
+    1px solid
+    #2b6e9f !important;
+
+  border-radius:
+    9px !important;
+
+  color:
+    #ffffff !important;
+
+  background:
+    var(
+      --fd-primary
+    ) !important;
+
+  box-shadow:
+    none !important;
+
+  font-size:
+    11px !important;
+
+  font-weight:
+    700 !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionOpen:hover {
+  background:
+    var(
+      --fd-primary-hover
+    ) !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.roleActionDismiss {
+  min-width:
+    78px !important;
+
+  min-height:
+    38px !important;
+
+  margin-left:
+    auto;
+
+  padding:
+    0 11px !important;
+
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    9px !important;
+
+  color:
+    #647b8c !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* ==========================================================
+   STAFF OPERATIONS
+   ========================================================== */
+
+html body
+.facultyMinimalDashboard
+.staffOperationsBoard {
+  margin:
+    0 !important;
+
+  padding:
+    25px !important;
+
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    var(
+      --fd-radius-lg
+    ) !important;
+
+  color:
+    var(
+      --fd-text
+    ) !important;
+
+  background:
+    var(
+      --fd-surface
+    ) !important;
+
+  box-shadow:
+    var(
+      --fd-shadow-sm
+    ) !important;
+
+  animation:
+    fdReveal
+    .46s
+    ease-out
+    both;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsHeader {
+  padding-bottom:
+    18px;
+
+  border-bottom:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsHeader
+h3 {
+  color:
+    var(
+      --fd-text
+    ) !important;
+
+  font-family:
+    inherit !important;
+
+  font-size:
+    clamp(
+      1.55rem,
+      2.1vw,
+      1.95rem
+    ) !important;
+
+  font-weight:
+    720 !important;
+
+  letter-spacing:
+    -.03em;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsHeader
+p {
+  color:
+    var(
+      --fd-text-secondary
+    ) !important;
+
+  font-size:
+    12px !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsCreate {
+  border:
+    1px solid
+    #27679c !important;
+
+  border-radius:
+    9px !important;
+
+  color:
+    #ffffff !important;
+
+  background:
+    var(
+      --fd-primary
+    ) !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsRefresh {
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    9px !important;
+
+  color:
+    #526d80 !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsMetrics {
+  gap:
+    10px !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button {
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    12px !important;
+
+  color:
+    var(
+      --fd-text
+    ) !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    none !important;
+
+  transition:
+    transform
+    150ms
+    ease-out,
+    border-color
+    150ms
+    ease-out;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button:hover {
+  transform:
+    translateY(
+      -1px
+    );
+
+  border-color:
+    var(
+      --fd-border-strong
+    ) !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsToolbar {
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    12px !important;
+
+  background:
+    var(
+      --fd-surface-subtle
+    ) !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsToolbar
+input {
+  min-height:
+    44px;
+
+  border:
+    1px solid
+    var(
+      --fd-border
+    ) !important;
+
+  border-radius:
+    9px !important;
+
+  color:
+    var(
+      --fd-text
+    ) !important;
+
+  background:
+    #ffffff !important;
+
+  font-size:
+    13px !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsToolbar
+input:focus-visible {
+  border-color:
+    #74a7cf !important;
+
+  outline:
+    3px solid
+    rgba(
+      39,
+      103,
+      156,
+      .12
+    );
+
+  outline-offset:
+    1px;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsFilters
+button {
+  min-height:
+    36px;
+
+  border:
+    1px solid
+    transparent !important;
+
+  border-radius:
+    8px !important;
+
+  color:
+    #6a7f90 !important;
+
+  background:
+    transparent !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsFilters
+button.active {
+  border-color:
+    var(
+      --fd-border
+    ) !important;
+
+  color:
+    var(
+      --fd-primary
+    ) !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    var(
+      --fd-shadow-sm
+    ) !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsEmpty {
+  border:
+    1px dashed
+    #c9d8e3 !important;
+
+  border-radius:
+    12px !important;
+
+  background:
+    #f9fbfc !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsEmpty
+strong {
+  color:
+    var(
+      --fd-text
+    ) !important;
+}
+
+
+html body
+.facultyMinimalDashboard
+.staffOperationsEmpty
+p {
+  color:
+    var(
+      --fd-text-secondary
+    ) !important;
+}
+
+
+/* ==========================================================
+   ACCESSIBILITY
+   ========================================================== */
+
+.facultyMinimalDashboard
+button:focus-visible,
+.facultyMinimalDashboard
+a:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      39,
+      103,
+      156,
+      .20
+    );
+
+  outline-offset:
+    2px;
+}
+
+
+/* ==========================================================
+   MOTION
+   ========================================================== */
+
+@keyframes fdReveal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        7px
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      );
+  }
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (
+  max-width:
+  980px
+) {
+
+  .facultyMinimalDashboard
+  .facultyMinimalCommand {
+    grid-template-columns:
+      1fr;
+
+    gap:
+      20px;
+  }
+
+
+  .facultyMinimalDashboard
+  .facultyMinimalCommandActions {
+    justify-content:
+      flex-start;
+
+    max-width:
+      none;
+  }
+
+
+  .facultyMinimalDashboard
+  .facultyMinimalMetrics {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+}
+
+
+@media (
+  max-width:
+  620px
+) {
+
+  .facultyMinimalDashboard {
+    gap:
+      12px;
+
+    padding:
+      10px;
+
+    border-radius:
+      16px;
+  }
+
+
+  .facultyMinimalDashboard
+  .facultyMinimalCommand {
+    min-height:
+      auto;
+
+    padding:
+      21px 18px;
+
+    border-radius:
+      14px;
+  }
+
+
+  .facultyMinimalDashboard
+  .facultyMinimalCommand
+  h2 {
+    font-size:
+      1.7rem;
+  }
+
+
+  .facultyMinimalDashboard
+  .facultyMinimalCommandActions {
+    display:
+      grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .facultyMinimalDashboard
+  .facultyMinimalCommandActions
+  button {
+    width:
+      100%;
+  }
+
+
+  .facultyMinimalDashboard
+  .facultyMinimalMetrics {
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap:
+      8px;
+  }
+
+
+  html body
+  .facultyMinimalDashboard
+  .roleActionCenter,
+
+  html body
+  .facultyMinimalDashboard
+  .staffOperationsBoard {
+    padding:
+      18px !important;
+
+    border-radius:
+      14px !important;
+  }
+
+
+  .facultyMinimalDashboard
+  .roleActionGrid {
+    grid-template-columns:
+      1fr !important;
+  }
+
+
+  .facultyMinimalDashboard
+  .roleActionCard
+  footer {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+
+  .facultyMinimalDashboard
+  .roleActionDismiss {
+    width:
+      100% !important;
+
+    margin-left:
+      0 !important;
+  }
+
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .facultyMinimalDashboard *,
+  .facultyMinimalDashboard *::before,
+  .facultyMinimalDashboard *::after {
+    scroll-behavior:
+      auto !important;
+
+    animation-duration:
+      .01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+
+
+/* CAMPUSCONNECT — FACULTY PREMIUM V6 END */
+
+/* CAMPUSCONNECT — FACULTY ACTION DEDUP FIX START */
+
+/*
+ * Campus AI already exists once in the Faculty dashboard
+ * command area.
+ *
+ * Keep RoleActionCenter AI functionality for every other role,
+ * but do not repeat the same Campus AI action on every
+ * Faculty signal card.
+ */
+
+.facultyMinimalDashboard
+.roleActionCard
+.roleActionAi {
+  display:
+    none !important;
+}
+
+
+/*
+ * Keep card footer balanced after removing the repeated AI
+ * action.
+ */
+
+.facultyMinimalDashboard
+.roleActionCard
+> footer {
+  align-items:
+    center;
+
+  gap:
+    8px;
+}
+
+
+/*
+ * Preserve the contextual workspace action and dismissal.
+ */
+
+.facultyMinimalDashboard
+.roleActionOpen {
+  flex:
+    0 0 auto;
+}
+
+
+.facultyMinimalDashboard
+.roleActionDismiss {
+  margin-left:
+    auto !important;
+}
+
+
+/* CAMPUSCONNECT — FACULTY ACTION DEDUP FIX END */
+
+/* CAMPUSCONNECT — FACULTY MOTION V7 START */
+
+
+/* ==========================================================
+   MOTION TOKENS
+   ========================================================== */
+
+.facultyMinimalDashboard {
+  --fd-ease:
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    );
+
+  --fd-ease-spring:
+    cubic-bezier(
+      .16,
+      1,
+      .3,
+      1
+    );
+
+  --fd-motion-fast:
+    150ms;
+
+  --fd-motion:
+    260ms;
+
+  --fd-motion-slow:
+    480ms;
+}
+
+
+/* ==========================================================
+   DASHBOARD ENTRY
+   ========================================================== */
+
+.facultyMinimalDashboard
+> * {
+  animation:
+    fdSectionReveal
+    var(--fd-motion-slow)
+    var(--fd-ease-spring)
+    both;
+}
+
+
+.facultyMinimalDashboard
+> *:nth-child(1) {
+  animation-delay:
+    0ms;
+}
+
+
+.facultyMinimalDashboard
+> *:nth-child(2) {
+  animation-delay:
+    55ms;
+}
+
+
+.facultyMinimalDashboard
+> *:nth-child(3) {
+  animation-delay:
+    110ms;
+}
+
+
+.facultyMinimalDashboard
+> *:nth-child(4) {
+  animation-delay:
+    165ms;
+}
+
+
+.facultyMinimalDashboard
+> *:nth-child(5) {
+  animation-delay:
+    220ms;
+}
+
+
+/* ==========================================================
+   COMMAND AREA — SUBTLE LIVING SURFACE
+   ========================================================== */
+
+.facultyMinimalDashboard
+.facultyMinimalCommand {
+  isolation:
+    isolate;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommand::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    -35%;
+
+  width:
+    32%;
+
+  height:
+    1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(
+        134,
+        205,
+        255,
+        .9
+      ),
+      transparent
+    );
+
+  opacity:
+    .65;
+
+  animation:
+    fdCommandSweep
+    8s
+    ease-in-out
+    infinite;
+
+  pointer-events:
+    none;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandEyebrow
+> b {
+  position:
+    relative;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandEyebrow
+> b::before {
+  content:
+    "";
+
+  width:
+    6px;
+
+  height:
+    6px;
+
+  margin-right:
+    6px;
+
+  border-radius:
+    999px;
+
+  background:
+    #61c88b;
+
+  box-shadow:
+    0 0 0 0
+    rgba(
+      97,
+      200,
+      139,
+      .28
+    );
+
+  animation:
+    fdLivePulse
+    2.4s
+    ease-out
+    infinite;
+}
+
+
+/* ==========================================================
+   COMMAND BUTTON MICRO-INTERACTION
+   ========================================================== */
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  transition:
+    transform
+    var(--fd-motion-fast)
+    var(--fd-ease),
+    border-color
+    var(--fd-motion-fast)
+    ease,
+    background
+    var(--fd-motion-fast)
+    ease,
+    box-shadow
+    var(--fd-motion-fast)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  background:
+    linear-gradient(
+      110deg,
+      transparent 25%,
+      rgba(
+        255,
+        255,
+        255,
+        .11
+      ) 48%,
+      transparent 72%
+    );
+
+  transform:
+    translateX(
+      -120%
+    );
+
+  transition:
+    transform
+    500ms
+    var(--fd-ease);
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button:hover::after {
+  transform:
+    translateX(
+      120%
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button:hover {
+  transform:
+    translateY(
+      -2px
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalCommandActions
+button:active {
+  transform:
+    translateY(
+      0
+    )
+    scale(
+      .975
+    );
+}
+
+
+/* arrow movement */
+
+.facultyMinimalDashboard
+.facultyMinimalPrimary
+b {
+  display:
+    inline-block;
+
+  transition:
+    transform
+    var(--fd-motion-fast)
+    var(--fd-ease);
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalPrimary:hover
+b {
+  transform:
+    translateX(
+      3px
+    );
+}
+
+
+/* ==========================================================
+   METRIC CARDS — DIFFERENTIATED, NOT DECORATIVE
+   ========================================================== */
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article {
+  overflow:
+    hidden;
+
+  transition:
+    transform
+    var(--fd-motion)
+    var(--fd-ease-spring),
+    border-color
+    var(--fd-motion)
+    ease,
+    box-shadow
+    var(--fd-motion)
+    ease,
+    background
+    var(--fd-motion)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:nth-child(1) {
+  --metric-accent:
+    #3478c8;
+
+  --metric-soft:
+    rgba(
+      52,
+      120,
+      200,
+      .07
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:nth-child(2) {
+  --metric-accent:
+    #16856c;
+
+  --metric-soft:
+    rgba(
+      22,
+      133,
+      108,
+      .07
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:nth-child(3) {
+  --metric-accent:
+    #7161b3;
+
+  --metric-soft:
+    rgba(
+      113,
+      97,
+      179,
+      .07
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:nth-child(4) {
+  --metric-accent:
+    #b2762d;
+
+  --metric-soft:
+    rgba(
+      178,
+      118,
+      45,
+      .07
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article::before {
+  width:
+    34px;
+
+  background:
+    var(
+      --metric-accent,
+      #4c8bbb
+    );
+
+  transition:
+    width
+    var(--fd-motion)
+    var(--fd-ease-spring);
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  right:
+    -34px;
+
+  bottom:
+    -34px;
+
+  width:
+    90px;
+
+  height:
+    90px;
+
+  border-radius:
+    50%;
+
+  background:
+    var(
+      --metric-soft,
+      rgba(
+        52,
+        120,
+        200,
+        .06
+      )
+    );
+
+  transform:
+    scale(
+      .75
+    );
+
+  transition:
+    transform
+    var(--fd-motion-slow)
+    var(--fd-ease-spring);
+
+  pointer-events:
+    none;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:hover {
+  transform:
+    translateY(
+      -4px
+    );
+
+  box-shadow:
+    0 14px 28px
+    rgba(
+      22,
+      44,
+      62,
+      .085
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:hover::before {
+  width:
+    62px;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:hover::after {
+  transform:
+    scale(
+      1.15
+    );
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+strong {
+  transition:
+    transform
+    var(--fd-motion)
+    var(--fd-ease-spring),
+    color
+    var(--fd-motion-fast)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.facultyMinimalMetrics
+article:hover
+strong {
+  transform:
+    translateY(
+      -2px
+    );
+
+  color:
+    var(
+      --metric-accent,
+      #27679c
+    );
+}
+
+
+/* ==========================================================
+   ROLE ACTION CENTER
+   ========================================================== */
+
+.facultyMinimalDashboard
+.roleActionCenter {
+  transition:
+    border-color
+    var(--fd-motion)
+    ease,
+    box-shadow
+    var(--fd-motion)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.roleActionCenter:hover {
+  border-color:
+    #ccdbe6 !important;
+
+  box-shadow:
+    0 12px 30px
+    rgba(
+      22,
+      44,
+      62,
+      .065
+    ) !important;
+}
+
+
+/* stagger signal cards */
+
+.facultyMinimalDashboard
+.roleActionGrid
+.roleActionCard {
+  animation:
+    fdCardReveal
+    400ms
+    var(--fd-ease-spring)
+    both;
+}
+
+
+.facultyMinimalDashboard
+.roleActionGrid
+.roleActionCard:nth-child(1) {
+  animation-delay:
+    60ms;
+}
+
+
+.facultyMinimalDashboard
+.roleActionGrid
+.roleActionCard:nth-child(2) {
+  animation-delay:
+    110ms;
+}
+
+
+.facultyMinimalDashboard
+.roleActionGrid
+.roleActionCard:nth-child(3) {
+  animation-delay:
+    160ms;
+}
+
+
+.facultyMinimalDashboard
+.roleActionGrid
+.roleActionCard:nth-child(4) {
+  animation-delay:
+    210ms;
+}
+
+
+.facultyMinimalDashboard
+.roleActionCard {
+  transition:
+    transform
+    var(--fd-motion)
+    var(--fd-ease-spring),
+    border-color
+    var(--fd-motion)
+    ease,
+    box-shadow
+    var(--fd-motion)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.roleActionCard:hover {
+  transform:
+    translateY(
+      -3px
+    );
+}
+
+
+/* contextual severity accent */
+
+.facultyMinimalDashboard
+.roleActionCard.information::before {
+  background:
+    #3f83c4 !important;
+}
+
+
+.facultyMinimalDashboard
+.roleActionCard.attention::before {
+  background:
+    #c28531 !important;
+}
+
+
+.facultyMinimalDashboard
+.roleActionCard.urgent::before {
+  background:
+    #be5252 !important;
+}
+
+
+/* ==========================================================
+   SIGNAL BUTTONS
+   ========================================================== */
+
+.facultyMinimalDashboard
+.roleActionOpen,
+.facultyMinimalDashboard
+.roleActionDismiss {
+  transition:
+    transform
+    var(--fd-motion-fast)
+    var(--fd-ease),
+    background
+    var(--fd-motion-fast)
+    ease,
+    border-color
+    var(--fd-motion-fast)
+    ease,
+    box-shadow
+    var(--fd-motion-fast)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.roleActionOpen:hover,
+.facultyMinimalDashboard
+.roleActionDismiss:hover {
+  transform:
+    translateY(
+      -1px
+    );
+}
+
+
+.facultyMinimalDashboard
+.roleActionOpen:active,
+.facultyMinimalDashboard
+.roleActionDismiss:active {
+  transform:
+    scale(
+      .975
+    );
+}
+
+
+.facultyMinimalDashboard
+.roleActionOpen
+span {
+  display:
+    inline-block;
+
+  transition:
+    transform
+    var(--fd-motion-fast)
+    var(--fd-ease);
+}
+
+
+.facultyMinimalDashboard
+.roleActionOpen:hover
+span {
+  transform:
+    translateX(
+      3px
+    );
+}
+
+
+/* ==========================================================
+   ACTION CENTER LOADING SKELETON
+   ========================================================== */
+
+.facultyMinimalDashboard
+.roleActionCenterLoading
+span {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  background:
+    #edf2f6 !important;
+}
+
+
+.facultyMinimalDashboard
+.roleActionCenterLoading
+span::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(
+        255,
+        255,
+        255,
+        .85
+      ),
+      transparent
+    );
+
+  transform:
+    translateX(
+      -100%
+    );
+
+  animation:
+    fdSkeleton
+    1.5s
+    ease-in-out
+    infinite;
+}
+
+
+/* ==========================================================
+   STAFF OPERATIONS
+   ========================================================== */
+
+.facultyMinimalDashboard
+.staffOperationsBoard {
+  transition:
+    border-color
+    var(--fd-motion)
+    ease,
+    box-shadow
+    var(--fd-motion)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsBoard:hover {
+  border-color:
+    #ccdbe6 !important;
+
+  box-shadow:
+    0 12px 30px
+    rgba(
+      22,
+      44,
+      62,
+      .065
+    ) !important;
+}
+
+
+/* operational metric identity */
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button:nth-child(1) {
+  --staff-accent:
+    #367cc4;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button:nth-child(2) {
+  --staff-accent:
+    #617d99;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button:nth-child(3) {
+  --staff-accent:
+    #be5353;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button:nth-child(4) {
+  --staff-accent:
+    #23845d;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  transition:
+    transform
+    var(--fd-motion)
+    var(--fd-ease-spring),
+    border-color
+    var(--fd-motion)
+    ease,
+    background
+    var(--fd-motion)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    0;
+
+  width:
+    0;
+
+  height:
+    2px;
+
+  background:
+    var(
+      --staff-accent,
+      #367cc4
+    );
+
+  transition:
+    width
+    var(--fd-motion)
+    var(--fd-ease-spring);
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button:hover {
+  transform:
+    translateY(
+      -2px
+    );
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button:hover::before,
+.facultyMinimalDashboard
+.staffOperationsMetrics
+button.active::before {
+  width:
+    100%;
+}
+
+
+/* ==========================================================
+   FILTER TAB TRANSITION
+   ========================================================== */
+
+.facultyMinimalDashboard
+.staffOperationsFilters
+button {
+  transition:
+    color
+    var(--fd-motion-fast)
+    ease,
+    background
+    var(--fd-motion-fast)
+    ease,
+    border-color
+    var(--fd-motion-fast)
+    ease,
+    transform
+    var(--fd-motion-fast)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsFilters
+button:hover {
+  transform:
+    translateY(
+      -1px
+    );
+
+  color:
+    #315f82 !important;
+}
+
+
+/* ==========================================================
+   SEARCH INTERACTION
+   ========================================================== */
+
+.facultyMinimalDashboard
+.staffOperationsToolbar
+input {
+  transition:
+    border-color
+    var(--fd-motion-fast)
+    ease,
+    box-shadow
+    var(--fd-motion-fast)
+    ease,
+    background
+    var(--fd-motion-fast)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsToolbar
+input:hover {
+  border-color:
+    #c0d2df !important;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsToolbar
+input:focus {
+  background:
+    #ffffff !important;
+}
+
+
+/* ==========================================================
+   EMPTY STATE
+   ========================================================== */
+
+.facultyMinimalDashboard
+.staffOperationsEmpty {
+  transition:
+    border-color
+    var(--fd-motion)
+    ease,
+    background
+    var(--fd-motion)
+    ease;
+}
+
+
+.facultyMinimalDashboard
+.staffOperationsEmpty
+> span {
+  animation:
+    fdSuccessPop
+    420ms
+    var(--fd-ease-spring)
+    both;
+}
+
+
+/* ==========================================================
+   STATUS / UPDATE INDICATOR
+   ========================================================== */
+
+.facultyMinimalDashboard
+.roleActionCenterSummary
+p
+i {
+  animation:
+    fdStatusPulse
+    2.2s
+    ease-out
+    infinite;
+}
+
+
+/* ==========================================================
+   KEYFRAMES
+   ========================================================== */
+
+@keyframes fdSectionReveal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        10px
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      );
+  }
+
+}
+
+
+@keyframes fdCardReveal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        8px
+      )
+      scale(
+        .99
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      )
+      scale(
+        1
+      );
+  }
+
+}
+
+
+@keyframes fdCommandSweep {
+
+  0%,
+  72% {
+    transform:
+      translateX(
+        0
+      );
+  }
+
+  100% {
+    transform:
+      translateX(
+        450%
+      );
+  }
+
+}
+
+
+@keyframes fdLivePulse {
+
+  0% {
+    box-shadow:
+      0 0 0 0
+      rgba(
+        97,
+        200,
+        139,
+        .26
+      );
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 7px
+      rgba(
+        97,
+        200,
+        139,
+        0
+      );
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0
+      rgba(
+        97,
+        200,
+        139,
+        0
+      );
+  }
+
+}
+
+
+@keyframes fdStatusPulse {
+
+  0% {
+    box-shadow:
+      0 0 0 0
+      rgba(
+        45,
+        173,
+        102,
+        .25
+      );
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 5px
+      rgba(
+        45,
+        173,
+        102,
+        0
+      );
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0
+      rgba(
+        45,
+        173,
+        102,
+        0
+      );
+  }
+
+}
+
+
+@keyframes fdSkeleton {
+
+  from {
+    transform:
+      translateX(
+        -100%
+      );
+  }
+
+  to {
+    transform:
+      translateX(
+        100%
+      );
+  }
+
+}
+
+
+@keyframes fdSuccessPop {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(
+        .75
+      );
+  }
+
+  70% {
+    transform:
+      scale(
+        1.06
+      );
+  }
+
+  100% {
+    opacity:
+      1;
+
+    transform:
+      scale(
+        1
+      );
+  }
+
+}
+
+
+/* ==========================================================
+   TOUCH DEVICES
+   ========================================================== */
+
+@media (
+  hover:
+  none
+) {
+
+  .facultyMinimalDashboard
+  .facultyMinimalMetrics
+  article:hover,
+
+  .facultyMinimalDashboard
+  .roleActionCard:hover,
+
+  .facultyMinimalDashboard
+  .staffOperationsMetrics
+  button:hover {
+    transform:
+      none;
+  }
+
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .facultyMinimalDashboard *,
+  .facultyMinimalDashboard *::before,
+  .facultyMinimalDashboard *::after {
+    animation:
+      none !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+
+
+/* CAMPUSCONNECT — FACULTY MOTION V7 END */

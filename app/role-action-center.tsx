@@ -537,6 +537,7 @@ export function RoleActionCenter({
   role,
   go,
 }: Props) {
+  const [selectedAiSource, setSelectedAiSource] = useState("");
 
   const [
     items,
@@ -1129,6 +1130,34 @@ export function RoleActionCenter({
             {formatCurrentDate()}
           </span>
 
+          {role === "Faculty" && visibleItems.length > 0 && (
+            <div className="roleActionAiPicker">
+              <label htmlFor="faculty-ai-signal">Ask AI about</label>
+              <select
+                id="faculty-ai-signal"
+                value={visibleItems.some(item => item.key === selectedAiSource) ? selectedAiSource : ""}
+                onChange={event => setSelectedAiSource(event.target.value)}
+              >
+                <option value="">Choose a signal</option>
+                {visibleItems.map(item => (
+                  <option key={item.key} value={item.key}>{item.label}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                disabled={!visibleItems.some(item => item.key === selectedAiSource)}
+                onClick={() => {
+                  const item = visibleItems.find(signal => signal.key === selectedAiSource);
+                  if (item) askCampusAi(item);
+                }}
+              >Ask Campus AI</button>
+            </div>
+          )}
+
+          {role === "Faculty" && !loading && visibleItems.length === 0 && (
+            <button type="button" onClick={() => go("My Campus")}>Campus AI</button>
+          )}
+
           <button
             type="button"
             onClick={() =>
@@ -1146,7 +1175,7 @@ export function RoleActionCenter({
 
             {refreshing
               ? "Refreshing"
-              : "Refresh"}
+              : role === "Faculty" ? "Refresh signals" : "Refresh"}
           </button>
         </div>
       </header>
@@ -1269,12 +1298,13 @@ export function RoleActionCenter({
                         )
                       }
                     >
-                      Open workspace
+                      {role === "Faculty" ? `Review ${item.label.toLowerCase()}` : "Open workspace"}
                       <span>
                         →
                       </span>
                     </button>
 
+                    {role !== "Faculty" && (
                     <button
                       type="button"
                       className="roleActionAi"
@@ -1289,6 +1319,7 @@ export function RoleActionCenter({
                       </span>
                       Ask Campus AI
                     </button>
+                    )}
 
                     <button
                       type="button"
@@ -1311,7 +1342,8 @@ export function RoleActionCenter({
                       }
                       title="Dismiss for today"
                     >
-                      ×
+                      <span className="roleActionDismissIcon" aria-hidden="true">×</span>
+                      <span className="roleActionDismissLabel">Dismiss</span>
                     </button>
                   </footer>
                 </article>

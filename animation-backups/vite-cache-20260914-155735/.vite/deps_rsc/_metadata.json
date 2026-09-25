@@ -1,0 +1,66 @@
+{
+  "hash": "0e1ca36c",
+  "configHash": "eded9442",
+  "lockfileHash": "79ba79f6",
+  "browserHash": "fc791e34",
+  "optimized": {
+    "@supabase/supabase-js": {
+      "src": "../../@supabase/supabase-js/dist/index.mjs",
+      "file": "@supabase_supabase-js.js",
+      "fileHash": "aa5ef4f5",
+      "needsInterop": false
+    },
+    "react-dom": {
+      "src": "../../react-dom/react-dom.react-server.js",
+      "file": "react-dom.js",
+      "fileHash": "e839b150",
+      "needsInterop": true
+    },
+    "react-server-dom-webpack/client.edge": {
+      "src": "../../react-server-dom-webpack/client.edge.js",
+      "file": "react-server-dom-webpack_client__edge.js",
+      "fileHash": "26d26d21",
+      "needsInterop": true
+    },
+    "react-server-dom-webpack/server.edge": {
+      "src": "../../react-server-dom-webpack/server.edge.js",
+      "file": "react-server-dom-webpack_server__edge.js",
+      "fileHash": "9ce4c19a",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../react/react.react-server.js",
+      "file": "react.js",
+      "fileHash": "8b70e6b7",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../react/jsx-dev-runtime.react-server.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "754d79f7",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../react/jsx-runtime.react-server.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "e1b479c2",
+      "needsInterop": true
+    },
+    "unpdf": {
+      "src": "../../unpdf/dist/index.mjs",
+      "file": "unpdf.js",
+      "fileHash": "01a27f8a",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "pdfjs-DiT7jK-y": {
+      "file": "pdfjs-DiT7jK-y.js",
+      "isDynamicEntry": true
+    },
+    "react.react-server-B0Qp6gYL": {
+      "file": "react.react-server-B0Qp6gYL.js",
+      "isDynamicEntry": false
+    }
+  }
+}

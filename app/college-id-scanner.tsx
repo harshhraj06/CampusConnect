@@ -319,7 +319,7 @@ export default function CollegeIdScanner() {
           </span>
 
           <h2>
-            Scan physical RNSIT ID
+            Scan RNSIT ID
           </h2>
 
           <p>
@@ -484,11 +484,17 @@ export default function CollegeIdScanner() {
               </strong>
 
               <p>
-                Scan a physical RNSIT student ID barcode to display the verified digital identity.
+                Scan an official RNSIT ID barcode or enter a Student USN / Faculty Employee ID to display the verified digital identity.
               </p>
             </div>
           ) : (
-            <article className="digitalCollegeId">
+            <article className={
+                  `digitalCollegeId ${
+                    student.role === "Faculty"
+                      ? "digitalCollegeIdFaculty"
+                      : "digitalCollegeIdStudentCard"
+                  }`
+                }>
               <div className="digitalCollegeIdTop">
                 <div className="digitalCollegeIdBrand">
                   <div className="digitalCollegeIdSeal">
@@ -511,7 +517,11 @@ export default function CollegeIdScanner() {
                 </div>
 
                 <span className="digitalCollegeIdStudent">
-                  Student
+                  {
+                    student.role === "Faculty"
+                      ? "FACULTY"
+                      : "STUDENT"
+                  }
                 </span>
               </div>
 
@@ -548,62 +558,137 @@ export default function CollegeIdScanner() {
                 </h3>
 
                 <strong>
-                  USN:{" "}
-                  {student.usn ||
-                    "Not available"}
+                  {
+                    student.role === "Faculty"
+                      ? (
+                          student.usn ||
+                          "Employee ID not assigned"
+                        )
+                      : (
+                          student.usn ||
+                          student.campus_uid ||
+                          "Student ID"
+                        )
+                  }
                 </strong>
               </div>
 
               <div className="digitalCollegeIdFacts">
-                <div>
-                  <span>
-                    DEPARTMENT
-                  </span>
 
-                  <strong>
-                    {student.department ||
-                      "Not set"}
-                  </strong>
+                  {student.role === "Faculty" ? (
+                    <>
+                      <div>
+                        <span>
+                          EMPLOYEE ID
+                        </span>
+
+                        <strong>
+                          {
+                            student.usn ||
+                            "—"
+                          }
+                        </strong>
+                      </div>
+
+
+                      <div>
+                        <span>
+                          DEPARTMENT
+                        </span>
+
+                        <strong>
+                          {
+                            student.department ||
+                            "—"
+                          }
+                        </strong>
+                      </div>
+
+
+                      <div>
+                        <span>
+                          STAFF STATUS
+                        </span>
+
+                        <strong>
+                          VERIFIED FACULTY
+                        </strong>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <span>
+                          USN
+                        </span>
+
+                        <strong>
+                          {
+                            student.usn ||
+                            "—"
+                          }
+                        </strong>
+                      </div>
+
+
+                      <div>
+                        <span>
+                          DEPARTMENT
+                        </span>
+
+                        <strong>
+                          {
+                            student.department ||
+                            "—"
+                          }
+                        </strong>
+                      </div>
+
+
+                      <div>
+                        <span>
+                          GRADUATION
+                        </span>
+
+                        <strong>
+                          {
+                            student.graduation_year ||
+                            "—"
+                          }
+                        </strong>
+                      </div>
+                    </>
+                  )}
+
                 </div>
-
-                <div>
-                  <span>
-                    GRADUATION YEAR
-                  </span>
-
-                  <strong>
-                    {student.graduation_year ||
-                      "Not set"}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>
-                    CAMPUS UID
-                  </span>
-
-                  <strong>
-                    {student.campus_uid ||
-                      "Not assigned"}
-                  </strong>
-                </div>
-              </div>
 
               <div className="digitalCollegeIdVerified">
-                <span>
-                  ✓
-                </span>
 
-                <div>
-                  <strong>
-                    VERIFIED STUDENT
-                  </strong>
+                  <span>
+                    ✓
+                  </span>
 
-                  <small>
-                    CampusConnect authenticated college record
-                  </small>
+                  <div>
+
+                    <strong>
+                      {
+                        student.role === "Faculty"
+                          ? "VERIFIED FACULTY"
+                          : "VERIFIED STUDENT"
+                      }
+                    </strong>
+
+                    <small>
+                      {
+                        student.role === "Faculty"
+                          ? "Institution-managed staff identity"
+                          : "Institution-verified student identity"
+                      }
+                    </small>
+
+                  </div>
+
                 </div>
-              </div>
 
               <footer className="digitalCollegeIdFooter">
                 <strong>

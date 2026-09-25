@@ -92,6 +92,498 @@ async function getRequestUserRole(request: Request) {
   };
 }
 
+
+export async function GET(request: Request) {
+
+  try {
+
+    const {
+      admin,
+    } =
+      await getRequestUserRole(
+        request
+      );
+
+
+    const [
+      profileResult,
+      guardianResult,
+    ] =
+      await Promise.all([
+
+        admin
+          .from("profiles")
+          .select(
+            "id,full_name,email,role,department,graduation_year,usn,created_at"
+          )
+          .order(
+            "created_at",
+            {
+              ascending: false,
+            }
+          )
+          .limit(300),
+
+        admin
+          .from(
+            "student_guardian_contacts"
+          )
+          .select(
+            "student_id,guardian_name,relationship,email,phone,sms_enabled,email_enabled"
+          ),
+
+      ]);
+
+
+    if (
+      profileResult.error
+    ) {
+
+      return Response.json(
+        {
+          error:
+            profileResult
+              .error.message,
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    if (
+      guardianResult.error
+    ) {
+
+      return Response.json(
+        {
+          error:
+            guardianResult
+              .error.message,
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    return Response.json(
+      {
+        users:
+          profileResult.data ||
+          [],
+
+        guardianContacts:
+          guardianResult.data ||
+          [],
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "no-store",
+        },
+      }
+    );
+
+  } catch (error) {
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unable to load campus accounts.";
+
+
+    const status =
+      message.includes(
+        "Main Admin permission"
+      )
+        ? 403
+        : 401;
+
+
+    return Response.json(
+      {
+        error:
+          message,
+      },
+      {
+        status,
+      }
+    );
+
+  }
+
+}
+
+
+export async function PATCH(request: Request) {
+
+  try {
+
+    const {
+      admin,
+    } =
+      await getRequestUserRole(
+        request
+      );
+
+
+    const body =
+      (
+        await request.json()
+      ) as {
+        student_id?: string;
+
+        usn?: string;
+
+        guardian?: {
+          guardian_name?: string;
+          relationship?: string;
+          email?: string;
+          phone?: string;
+          sms_enabled?: boolean;
+          email_enabled?: boolean;
+        };
+      };
+
+
+    const studentId =
+      String(
+        body.student_id ||
+        ""
+      ).trim();
+
+
+    if (!studentId) {
+
+      return Response.json(
+        {
+          error:
+            "Student account is required.",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    const {
+      data: student,
+      error: studentError,
+    } =
+      await admin
+        .from("profiles")
+        .select(
+          "id,role"
+        )
+        .eq(
+          "id",
+          studentId
+        )
+        .single();
+
+
+    if (
+      studentError ||
+      !student
+    ) {
+
+      return Response.json(
+        {
+          error:
+            studentError
+              ?.message ||
+            "Student account was not found.",
+        },
+        {
+          status: 404,
+        }
+      );
+
+    }
+
+
+    if (
+      student.role !==
+      "Student"
+    ) {
+
+      return Response.json(
+        {
+          error:
+            "Only Student identity records can be managed here.",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    const usn =
+      String(
+        body.usn ||
+        ""
+      )
+        .trim()
+        .toUpperCase();
+
+
+    if (
+      usn.length > 80
+    ) {
+
+      return Response.json(
+        {
+          error:
+            "USN is too long.",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    const guardian =
+      body.guardian ||
+      {};
+
+
+    const guardianName =
+      String(
+        guardian.guardian_name ||
+        ""
+      ).trim();
+
+
+    const relationship =
+      String(
+        guardian.relationship ||
+        "Parent"
+      ).trim() ||
+      "Parent";
+
+
+    const email =
+      String(
+        guardian.email ||
+        ""
+      )
+        .trim()
+        .toLowerCase();
+
+
+    const phone =
+      String(
+        guardian.phone ||
+        ""
+      )
+        .trim()
+        .replace(
+          /[\s()-]/g,
+          ""
+        );
+
+
+    if (
+      email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        email
+      )
+    ) {
+
+      return Response.json(
+        {
+          error:
+            "Enter a valid guardian email address.",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    if (
+      phone &&
+      !/^\+?[0-9]{8,15}$/.test(
+        phone
+      )
+    ) {
+
+      return Response.json(
+        {
+          error:
+            "Enter a valid guardian mobile number.",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    const {
+      error: profileError,
+    } =
+      await admin
+        .from("profiles")
+        .update({
+          usn,
+
+          updated_at:
+            new Date()
+              .toISOString(),
+        })
+        .eq(
+          "id",
+          studentId
+        );
+
+
+    if (
+      profileError
+    ) {
+
+      return Response.json(
+        {
+          error:
+            profileError.message,
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    const {
+      data: savedGuardian,
+      error: guardianError,
+    } =
+      await admin
+        .from(
+          "student_guardian_contacts"
+        )
+        .upsert(
+          {
+            student_id:
+              studentId,
+
+            guardian_name:
+              guardianName,
+
+            relationship,
+
+            email,
+
+            phone,
+
+            sms_enabled:
+              guardian.sms_enabled !==
+              false,
+
+            email_enabled:
+              guardian.email_enabled !==
+              false,
+
+            updated_at:
+              new Date()
+                .toISOString(),
+          },
+          {
+            onConflict:
+              "student_id",
+          }
+        )
+        .select(
+          "student_id,guardian_name,relationship,email,phone,sms_enabled,email_enabled"
+        )
+        .single();
+
+
+    if (
+      guardianError
+    ) {
+
+      return Response.json(
+        {
+          error:
+            guardianError.message,
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+
+    return Response.json(
+      {
+        ok: true,
+
+        student: {
+          id:
+            studentId,
+
+          usn,
+        },
+
+        guardian:
+          savedGuardian,
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "no-store",
+        },
+      }
+    );
+
+  } catch (error) {
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unable to update Student identity.";
+
+
+    const status =
+      message.includes(
+        "Main Admin permission"
+      )
+        ? 403
+        : 401;
+
+
+    return Response.json(
+      {
+        error:
+          message,
+      },
+      {
+        status,
+      }
+    );
+
+  }
+
+}
+
+
 export async function POST(request: Request) {
   try {
     const {admin} = await getRequestUserRole(request);
@@ -169,7 +661,7 @@ export async function POST(request: Request) {
           full_name: fullName,
           department,
           graduation_year:
-            graduationYear || "2027",
+            (role === "Student" ? graduationYear : ""),
         },
       });
 
@@ -194,7 +686,7 @@ export async function POST(request: Request) {
         role,
         department,
         graduation_year:
-          graduationYear || "2027",
+          (role === "Student" ? graduationYear : ""),
         employee_id: employeeId || null,
         account_status: "Active",
         updated_at: new Date().toISOString(),
@@ -220,7 +712,7 @@ export async function POST(request: Request) {
         role,
         department,
         graduation_year:
-          graduationYear || "2027",
+          (role === "Student" ? graduationYear : ""),
         account_status: "Active",
       },
     });

@@ -20945,3 +20945,3258 @@ b[data-state="unavailable"] {
   border-color: #aebdcb;
   background: #ffffff;
 }
+
+
+/* ==========================================================
+   CAMPUSCONNECT — LEARNING RESOURCE DEPARTMENT LOCK
+   ========================================================== */
+
+.learningDepartmentLock {
+  min-height:
+    46px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    12px;
+
+  padding:
+    10px 12px;
+
+  border:
+    1px solid
+    #dce5eb;
+
+  border-radius:
+    10px;
+
+  background:
+    #f7fafc;
+}
+
+
+.learningDepartmentLock > span {
+  min-width:
+    0;
+
+  display:
+    grid;
+
+  gap:
+    3px;
+}
+
+
+.learningDepartmentLock small {
+  color:
+    #7b8b97;
+
+  font-size:
+    7px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .1em;
+}
+
+
+.learningDepartmentLock strong {
+  overflow:
+    hidden;
+
+  color:
+    #213b4d;
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.learningDepartmentLock > i {
+  flex:
+    0 0 auto;
+
+  padding:
+    5px 7px;
+
+  border:
+    1px solid
+    #cfdee8;
+
+  border-radius:
+    999px;
+
+  background:
+    #edf5f9;
+
+  color:
+    #35657f;
+
+  font-size:
+    7px;
+
+  font-style:
+    normal;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    .08em;
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — MINIMAL FACULTY DEPARTMENT MANAGEMENT
+   ========================================================== */
+
+.facultyDepartmentAdmin {
+  display: grid;
+  gap: 14px;
+}
+
+.facultyDepartmentAdmin > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.facultyDepartmentAdmin > header h3 {
+  margin: 4px 0;
+}
+
+.facultyDepartmentAdmin > header p {
+  margin: 0;
+}
+
+.facultyDepartmentSearch {
+  min-width: 210px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.facultyDepartmentSearch input {
+  width: 100%;
+}
+
+.facultyDepartmentList {
+  display: grid;
+}
+
+.facultyDepartmentRow {
+  min-height: 62px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 1fr)
+    minmax(220px, 2fr)
+    auto;
+
+  align-items: center;
+  gap: 14px;
+
+  padding: 11px 0;
+
+  border-top:
+    1px solid
+    rgba(120, 140, 155, .18);
+}
+
+.facultyDepartmentIdentity {
+  min-width: 0;
+
+  display: grid;
+  gap: 3px;
+}
+
+.facultyDepartmentIdentity small {
+  overflow: hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+.facultyDepartmentChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.facultyDepartmentChips span {
+  padding: 5px 8px;
+
+  border:
+    1px solid
+    rgba(110, 135, 150, .22);
+
+  border-radius:
+    999px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+}
+
+.facultyDepartmentChips .empty {
+  opacity: .6;
+}
+
+.facultyDepartmentModalBackdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1500;
+
+  display: grid;
+  place-items: center;
+
+  padding: 20px;
+
+  background:
+    rgba(12, 20, 28, .46);
+}
+
+.facultyDepartmentModal {
+  width: min(520px, 100%);
+
+  max-height:
+    min(640px, 88vh);
+
+  overflow: auto;
+
+  display: grid;
+  gap: 18px;
+
+  padding: 20px;
+
+  border:
+    1px solid
+    rgba(120, 140, 155, .22);
+
+  border-radius:
+    16px;
+
+  background:
+    var(--card, #fff);
+
+  box-shadow:
+    0 24px 70px
+    rgba(0, 0, 0, .22);
+}
+
+.facultyDepartmentModal > header,
+.facultyDepartmentModal > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.facultyDepartmentModal > header h3 {
+  margin: 4px 0 0;
+}
+
+.facultyDepartmentModal > footer {
+  justify-content: flex-end;
+}
+
+.facultyDepartmentOptions {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 8px;
+}
+
+.facultyDepartmentOptions label {
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px;
+
+  border:
+    1px solid
+    rgba(120, 140, 155, .2);
+
+  border-radius:
+    10px;
+}
+
+.facultyDepartmentOptions label.selected {
+  border-color:
+    currentColor;
+}
+
+.facultyDepartmentOptions label span {
+  min-width: 0;
+
+  display: grid;
+  gap: 2px;
+}
+
+.facultyDepartmentOptions label small {
+  overflow: hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+@media (max-width: 760px) {
+
+  .facultyDepartmentAdmin > header {
+    flex-direction: column;
+  }
+
+  .facultyDepartmentSearch {
+    width: 100%;
+  }
+
+  .facultyDepartmentRow {
+    grid-template-columns: 1fr;
+  }
+
+  .facultyDepartmentRow > button {
+    justify-self: start;
+  }
+
+  .facultyDepartmentOptions {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — FACULTY DEPARTMENT PROFESSIONAL REDESIGN
+   ========================================================== */
+
+.facultyDepartmentAdminPro {
+  --fd-border:
+    rgba(148, 163, 184, 0.22);
+
+  --fd-border-strong:
+    rgba(148, 163, 184, 0.34);
+
+  --fd-text:
+    #142033;
+
+  --fd-muted:
+    #738096;
+
+  --fd-blue:
+    #3568e8;
+
+  --fd-blue-soft:
+    #edf3ff;
+
+  --fd-green:
+    #16935b;
+
+  --fd-green-soft:
+    #edf9f3;
+
+  padding: 0 !important;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--fd-border) !important;
+
+  border-radius:
+    18px !important;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 14px 38px
+    rgba(30, 41, 59, 0.055);
+}
+
+
+/* HEADER */
+
+.facultyDepartmentProHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 28px;
+
+  padding:
+    26px 28px 24px;
+}
+
+
+.facultyDepartmentHeading {
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 16px;
+}
+
+
+.facultyDepartmentHeadingIcon {
+  width: 52px;
+  height: 52px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 15px;
+
+  color:
+    var(--fd-blue);
+
+  background:
+    linear-gradient(
+      145deg,
+      #edf3ff,
+      #f7f9ff
+    );
+
+  border:
+    1px solid
+    rgba(53, 104, 232, .08);
+}
+
+
+.facultyDepartmentHeadingText {
+  display: grid;
+
+  gap: 3px;
+}
+
+
+.facultyDepartmentHeadingText h2 {
+  margin: 0;
+
+  color:
+    var(--fd-text);
+
+  font-size:
+    clamp(
+      20px,
+      2vw,
+      26px
+    );
+
+  line-height:
+    1.2;
+
+  font-weight:
+    750;
+
+  letter-spacing:
+    -0.025em;
+}
+
+
+.facultyDepartmentHeadingText > span {
+  color:
+    #58677d;
+
+  font-size:
+    13px;
+
+  font-weight:
+    650;
+}
+
+
+.facultyDepartmentHeadingText p {
+  margin:
+    2px 0 0;
+
+  color:
+    var(--fd-muted);
+
+  font-size:
+    13px;
+
+  line-height:
+    1.5;
+}
+
+
+/* SEARCH */
+
+.facultyDepartmentProSearch {
+  width:
+    min(
+      330px,
+      36vw
+    );
+
+  min-height:
+    46px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding:
+    0 15px;
+
+  border:
+    1px solid
+    var(--fd-border-strong);
+
+  border-radius:
+    12px;
+
+  color:
+    #64748b;
+
+  background:
+    #fbfcfe;
+
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease;
+}
+
+
+.facultyDepartmentProSearch:focus-within {
+  background:
+    #ffffff;
+
+  border-color:
+    rgba(
+      53,
+      104,
+      232,
+      .55
+    );
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      53,
+      104,
+      232,
+      .09
+    );
+}
+
+
+.facultyDepartmentProSearch input {
+  width: 100%;
+
+  min-width: 0;
+
+  padding: 0;
+
+  border: 0 !important;
+
+  outline: 0 !important;
+
+  box-shadow:
+    none !important;
+
+  color:
+    var(--fd-text);
+
+  background:
+    transparent !important;
+
+  font:
+    inherit;
+
+  font-size:
+    13px;
+}
+
+
+.facultyDepartmentProSearch input::placeholder {
+  color:
+    #96a0b2;
+}
+
+
+/* STATUS NOTICE */
+
+.facultyDepartmentNotice {
+  margin:
+    0 28px 20px;
+
+  min-height:
+    52px;
+
+  display: grid;
+
+  grid-template-columns:
+    auto 1fr auto;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding:
+    10px 13px;
+
+  border-radius:
+    11px;
+
+  font-size:
+    13px;
+
+  font-weight:
+    650;
+}
+
+
+.facultyDepartmentNotice.success {
+  color:
+    #14794c;
+
+  border:
+    1px solid
+    rgba(
+      22,
+      147,
+      91,
+      .24
+    );
+
+  background:
+    var(--fd-green-soft);
+}
+
+
+.facultyDepartmentNotice.error {
+  color:
+    #b33b35;
+
+  border:
+    1px solid
+    rgba(
+      190,
+      60,
+      53,
+      .22
+    );
+
+  background:
+    #fff4f3;
+}
+
+
+.facultyDepartmentNoticeIcon {
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius:
+    999px;
+
+  color:
+    #ffffff;
+
+  background:
+    var(--fd-green);
+
+  font-size:
+    14px;
+
+  font-weight:
+    800;
+}
+
+
+.facultyDepartmentNotice.error
+.facultyDepartmentNoticeIcon {
+  background:
+    #c75048;
+}
+
+
+.facultyDepartmentNotice > button {
+  width: 30px;
+  height: 30px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius:
+    8px;
+
+  color:
+    currentColor;
+
+  background:
+    transparent;
+
+  cursor:
+    pointer;
+
+  font-size:
+    19px;
+
+  opacity:
+    .72;
+}
+
+
+.facultyDepartmentNotice > button:hover {
+  background:
+    rgba(
+      15,
+      23,
+      42,
+      .05
+    );
+
+  opacity:
+    1;
+}
+
+
+/* TABLE */
+
+.facultyDepartmentTable {
+  margin:
+    0 28px 24px;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--fd-border);
+
+  border-radius:
+    13px;
+
+  background:
+    #ffffff;
+}
+
+
+.facultyDepartmentTableHead {
+  display: grid;
+
+  grid-template-columns:
+    minmax(
+      220px,
+      1.15fr
+    )
+    minmax(
+      260px,
+      1.5fr
+    )
+    110px;
+
+  align-items: center;
+
+  gap: 18px;
+
+  min-height:
+    44px;
+
+  padding:
+    0 20px;
+
+  border-bottom:
+    1px solid
+    var(--fd-border);
+
+  background:
+    #fafbfd;
+}
+
+
+.facultyDepartmentTableHead span {
+  color:
+    #718096;
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .11em;
+}
+
+
+.facultyDepartmentTableHead span:last-child {
+  text-align:
+    right;
+}
+
+
+/* ROW */
+
+.facultyDepartmentList {
+  display: block;
+}
+
+
+.facultyDepartmentRow {
+  min-height:
+    76px !important;
+
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(
+      220px,
+      1.15fr
+    )
+    minmax(
+      260px,
+      1.5fr
+    )
+    110px !important;
+
+  align-items: center;
+
+  gap: 18px !important;
+
+  padding:
+    12px 20px !important;
+
+  border-top:
+    0 !important;
+
+  border-bottom:
+    1px solid
+    var(--fd-border) !important;
+
+  transition:
+    background .16s ease;
+}
+
+
+.facultyDepartmentRow:last-child {
+  border-bottom:
+    0 !important;
+}
+
+
+.facultyDepartmentRow:hover {
+  background:
+    #fbfcff;
+}
+
+
+.facultyDepartmentPerson {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+}
+
+
+.facultyDepartmentAvatar {
+  width: 43px;
+  height: 43px;
+
+  flex:
+    0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  border-radius:
+    50%;
+
+  font-size:
+    13px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .01em;
+}
+
+
+.facultyDepartmentAvatar.avatarTone1 {
+  color:
+    #315fd2;
+
+  background:
+    #edf3ff;
+}
+
+
+.facultyDepartmentAvatar.avatarTone2 {
+  color:
+    #168152;
+
+  background:
+    #eaf8f1;
+}
+
+
+.facultyDepartmentAvatar.avatarTone3 {
+  color:
+    #7447cb;
+
+  background:
+    #f2edff;
+}
+
+
+.facultyDepartmentAvatar.avatarTone4 {
+  color:
+    #be681f;
+
+  background:
+    #fff3e5;
+}
+
+
+.facultyDepartmentIdentity {
+  min-width: 0;
+
+  display: grid;
+
+  gap: 4px !important;
+}
+
+
+.facultyDepartmentIdentity strong {
+  overflow: hidden;
+
+  color:
+    var(--fd-text);
+
+  font-size:
+    13px;
+
+  font-weight:
+    750;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.facultyDepartmentIdentity small {
+  overflow: hidden;
+
+  color:
+    var(--fd-muted);
+
+  font-size:
+    11px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+/* DEPARTMENT CHIPS */
+
+.facultyDepartmentChips {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+
+  gap: 7px !important;
+}
+
+
+.facultyDepartmentChip {
+  min-height:
+    30px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding:
+    5px 10px !important;
+
+  border:
+    1px solid
+    rgba(
+      53,
+      104,
+      232,
+      .11
+    ) !important;
+
+  border-radius:
+    999px !important;
+
+  color:
+    #315fc9;
+
+  background:
+    var(--fd-blue-soft);
+
+  font-size:
+    10px !important;
+
+  font-weight:
+    800 !important;
+
+  letter-spacing:
+    .025em;
+}
+
+
+.facultyDepartmentNotAssigned {
+  display:
+    inline-flex;
+
+  padding:
+    5px 9px;
+
+  border:
+    1px dashed
+    rgba(
+      148,
+      163,
+      184,
+      .45
+    );
+
+  border-radius:
+    999px;
+
+  color:
+    #8792a5;
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+}
+
+
+/* ACTION */
+
+.facultyDepartmentActions {
+  display: flex;
+
+  justify-content:
+    flex-end;
+}
+
+
+.facultyDepartmentEditButton {
+  min-height:
+    36px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    7px;
+
+  padding:
+    0 12px;
+
+  border:
+    1px solid
+    var(--fd-border-strong);
+
+  border-radius:
+    9px;
+
+  color:
+    #334155;
+
+  background:
+    #ffffff;
+
+  cursor:
+    pointer;
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease,
+    color .16s ease;
+}
+
+
+.facultyDepartmentEditButton:hover {
+  color:
+    var(--fd-blue);
+
+  border-color:
+    rgba(
+      53,
+      104,
+      232,
+      .35
+    );
+
+  box-shadow:
+    0 5px 14px
+    rgba(
+      53,
+      104,
+      232,
+      .08
+    );
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* EMPTY */
+
+.facultyDepartmentEmpty {
+  min-height:
+    190px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    8px;
+
+  color:
+    var(--fd-muted);
+
+  text-align:
+    center;
+}
+
+
+.facultyDepartmentEmptyIcon {
+  width: 50px;
+  height: 50px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  margin-bottom:
+    4px;
+
+  border-radius:
+    50%;
+
+  color:
+    var(--fd-blue);
+
+  background:
+    var(--fd-blue-soft);
+}
+
+
+.facultyDepartmentEmpty strong {
+  color:
+    #3c4a60;
+
+  font-size:
+    13px;
+}
+
+
+.facultyDepartmentEmpty span {
+  font-size:
+    11px;
+}
+
+
+/* ==========================================================
+   MODAL
+   ========================================================== */
+
+.facultyDepartmentModalBackdrop {
+  z-index:
+    1700 !important;
+
+  padding:
+    20px;
+
+  background:
+    rgba(
+      15,
+      23,
+      42,
+      .42
+    ) !important;
+
+  backdrop-filter:
+    blur(4px);
+}
+
+
+.facultyDepartmentModalPro {
+  width:
+    min(
+      580px,
+      calc(
+        100vw -
+        32px
+      )
+    ) !important;
+
+  max-height:
+    min(
+      720px,
+      88vh
+    ) !important;
+
+  padding:
+    0 !important;
+
+  gap:
+    0 !important;
+
+  overflow:
+    hidden !important;
+
+  border:
+    1px solid
+    rgba(
+      148,
+      163,
+      184,
+      .22
+    ) !important;
+
+  border-radius:
+    17px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 28px 90px
+    rgba(
+      15,
+      23,
+      42,
+      .24
+    ) !important;
+}
+
+
+.facultyDepartmentModalHeader {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    18px;
+
+  padding:
+    22px 22px 18px;
+
+  border-bottom:
+    1px solid
+    var(--fd-border);
+}
+
+
+.facultyDepartmentModalTitle {
+  min-width:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    13px;
+}
+
+
+.facultyDepartmentModalAvatar {
+  width:
+    46px;
+
+  height:
+    46px;
+
+  flex:
+    0 0 auto;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  border-radius:
+    13px;
+
+  color:
+    var(--fd-blue);
+
+  background:
+    var(--fd-blue-soft);
+
+  font-size:
+    13px;
+
+  font-weight:
+    800;
+}
+
+
+.facultyDepartmentModalTitle > div:last-child {
+  display:
+    grid;
+
+  gap:
+    3px;
+}
+
+
+.facultyDepartmentModalTitle span {
+  color:
+    var(--fd-blue);
+
+  font-size:
+    9px;
+
+  font-weight:
+    800;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .12em;
+}
+
+
+.facultyDepartmentModalTitle h3 {
+  margin:
+    0 !important;
+
+  color:
+    var(--fd-text);
+
+  font-size:
+    18px;
+
+  font-weight:
+    750;
+
+  letter-spacing:
+    -.015em;
+}
+
+
+.facultyDepartmentModalTitle p {
+  margin:
+    0;
+
+  color:
+    var(--fd-muted);
+
+  font-size:
+    11px;
+
+  line-height:
+    1.5;
+}
+
+
+.facultyDepartmentModalClose {
+  width:
+    34px;
+
+  height:
+    34px;
+
+  flex:
+    0 0 auto;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  padding:
+    0;
+
+  border:
+    1px solid
+    var(--fd-border);
+
+  border-radius:
+    9px;
+
+  color:
+    #64748b;
+
+  background:
+    #ffffff;
+
+  cursor:
+    pointer;
+
+  font-size:
+    20px;
+}
+
+
+.facultyDepartmentModalMeta {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    12px;
+
+  padding:
+    13px 22px;
+
+  border-bottom:
+    1px solid
+    var(--fd-border);
+
+  background:
+    #fafbfd;
+}
+
+
+.facultyDepartmentModalMeta span {
+  color:
+    #64748b;
+
+  font-size:
+    11px;
+
+  font-weight:
+    650;
+}
+
+
+.facultyDepartmentModalMeta button {
+  padding:
+    0;
+
+  border:
+    0;
+
+  color:
+    var(--fd-blue);
+
+  background:
+    transparent;
+
+  cursor:
+    pointer;
+
+  font-size:
+    10px;
+
+  font-weight:
+    750;
+}
+
+
+/* MODAL OPTIONS */
+
+.facultyDepartmentModalPro
+.facultyDepartmentOptions {
+  display:
+    grid !important;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    ) !important;
+
+  gap:
+    9px !important;
+
+  max-height:
+    390px;
+
+  overflow-y:
+    auto;
+
+  padding:
+    18px 22px !important;
+}
+
+
+.facultyDepartmentModalPro
+.facultyDepartmentOptions label {
+  position:
+    relative;
+
+  min-height:
+    62px;
+
+  display:
+    flex !important;
+
+  align-items:
+    center;
+
+  gap:
+    11px !important;
+
+  padding:
+    10px 12px !important;
+
+  border:
+    1px solid
+    var(--fd-border) !important;
+
+  border-radius:
+    11px !important;
+
+  background:
+    #ffffff;
+
+  cursor:
+    pointer;
+
+  transition:
+    border-color .16s ease,
+    background .16s ease,
+    box-shadow .16s ease;
+}
+
+
+.facultyDepartmentModalPro
+.facultyDepartmentOptions
+label:hover {
+  border-color:
+    rgba(
+      53,
+      104,
+      232,
+      .32
+    ) !important;
+
+  background:
+    #fbfcff;
+}
+
+
+.facultyDepartmentModalPro
+.facultyDepartmentOptions
+label.selected {
+  border-color:
+    rgba(
+      53,
+      104,
+      232,
+      .42
+    ) !important;
+
+  background:
+    var(--fd-blue-soft);
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(
+      53,
+      104,
+      232,
+      .04
+    );
+}
+
+
+.facultyDepartmentModalPro
+.facultyDepartmentOptions
+input {
+  width:
+    16px;
+
+  height:
+    16px;
+
+  flex:
+    0 0 auto;
+
+  accent-color:
+    var(--fd-blue);
+}
+
+
+.facultyDepartmentOptionText {
+  min-width:
+    0;
+
+  display:
+    grid !important;
+
+  gap:
+    3px !important;
+}
+
+
+.facultyDepartmentOptionText strong {
+  color:
+    #334155;
+
+  font-size:
+    11px;
+
+  font-weight:
+    800;
+}
+
+
+.facultyDepartmentOptionText small {
+  overflow:
+    hidden;
+
+  color:
+    var(--fd-muted);
+
+  font-size:
+    10px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.facultyDepartmentOptionCheck {
+  width:
+    22px;
+
+  height:
+    22px;
+
+  margin-left:
+    auto;
+
+  display:
+    grid !important;
+
+  place-items:
+    center;
+
+  border-radius:
+    50%;
+
+  color:
+    #ffffff;
+
+  background:
+    var(--fd-blue);
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  opacity:
+    0;
+
+  transform:
+    scale(.75);
+
+  transition:
+    opacity .16s ease,
+    transform .16s ease;
+}
+
+
+.facultyDepartmentOptions
+label.selected
+.facultyDepartmentOptionCheck {
+  opacity:
+    1;
+
+  transform:
+    scale(1);
+}
+
+
+/* MODAL FOOTER */
+
+.facultyDepartmentModalFooter {
+  display:
+    flex !important;
+
+  justify-content:
+    flex-end !important;
+
+  gap:
+    9px !important;
+
+  padding:
+    15px 22px 18px;
+
+  border-top:
+    1px solid
+    var(--fd-border);
+
+  background:
+    #ffffff;
+}
+
+
+.facultyDepartmentCancelButton,
+.facultyDepartmentSaveButton {
+  min-height:
+    39px;
+
+  padding:
+    0 15px;
+
+  border-radius:
+    9px;
+
+  cursor:
+    pointer;
+
+  font-size:
+    11px;
+
+  font-weight:
+    750;
+}
+
+
+.facultyDepartmentCancelButton {
+  border:
+    1px solid
+    var(--fd-border-strong);
+
+  color:
+    #475569;
+
+  background:
+    #ffffff;
+}
+
+
+.facultyDepartmentSaveButton {
+  border:
+    1px solid
+    var(--fd-blue);
+
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #3568e8,
+      #2857cf
+    );
+
+  box-shadow:
+    0 7px 18px
+    rgba(
+      53,
+      104,
+      232,
+      .18
+    );
+}
+
+
+.facultyDepartmentCancelButton:disabled,
+.facultyDepartmentSaveButton:disabled {
+  cursor:
+    not-allowed;
+
+  opacity:
+    .6;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (
+  max-width:
+    900px
+) {
+
+  .facultyDepartmentProHeader {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+
+  .facultyDepartmentProSearch {
+    width:
+      100%;
+  }
+
+
+  .facultyDepartmentTableHead {
+    display:
+      none;
+  }
+
+
+  .facultyDepartmentRow {
+    grid-template-columns:
+      1fr
+      auto !important;
+
+    gap:
+      12px !important;
+  }
+
+
+  .facultyDepartmentChips {
+    grid-column:
+      1 / -1;
+  }
+
+
+  .facultyDepartmentActions {
+    grid-column:
+      2;
+
+    grid-row:
+      1;
+  }
+
+}
+
+
+@media (
+  max-width:
+    620px
+) {
+
+  .facultyDepartmentProHeader {
+    padding:
+      20px 18px;
+  }
+
+
+  .facultyDepartmentHeadingIcon {
+    width:
+      44px;
+
+    height:
+      44px;
+  }
+
+
+  .facultyDepartmentNotice {
+    margin:
+      0 18px 16px;
+  }
+
+
+  .facultyDepartmentTable {
+    margin:
+      0 18px 18px;
+  }
+
+
+  .facultyDepartmentRow {
+    padding:
+      13px 14px !important;
+  }
+
+
+  .facultyDepartmentModalPro
+  .facultyDepartmentOptions {
+    grid-template-columns:
+      1fr !important;
+  }
+
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — ADMIN DIRECTORY COLLAPSE TOGGLE
+   ========================================================== */
+
+.adminDirectoryHeaderActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+
+/* TOGGLE */
+
+.adminDirectoryToggle {
+  min-height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 13px;
+
+  border:
+    1px solid
+    rgba(148, 163, 184, .30);
+
+  border-radius: 10px;
+
+  color: #334155;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  font-size: 11px;
+  font-weight: 750;
+
+  white-space: nowrap;
+
+  transition:
+    border-color .16s ease,
+    background .16s ease,
+    color .16s ease,
+    box-shadow .16s ease,
+    transform .16s ease;
+}
+
+
+.adminDirectoryToggle:hover {
+  color: #3568e8;
+
+  border-color:
+    rgba(53, 104, 232, .32);
+
+  background: #f9fbff;
+
+  box-shadow:
+    0 5px 14px
+    rgba(53, 104, 232, .07);
+
+  transform:
+    translateY(-1px);
+}
+
+
+.adminDirectoryToggleIcon {
+  width: 22px;
+  height: 22px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 7px;
+
+  color: #3568e8;
+
+  background: #edf3ff;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+
+/* COLLAPSED DEFAULT STATE */
+
+.adminUsersCollapsed {
+  overflow: hidden;
+}
+
+
+.adminUsersCollapsed .adminDirectorySearch,
+.adminUsersCollapsed .adminTable {
+  display: none !important;
+}
+
+
+.adminUsersCollapsed > header {
+  margin-bottom: 0 !important;
+
+  border-bottom: 0 !important;
+}
+
+
+/* EXPANDED */
+
+.adminUsersExpanded .adminDirectorySearch {
+  display: flex;
+}
+
+
+.adminUsersExpanded .adminTable {
+  display: block;
+}
+
+
+/* MAKE COLLAPSED CARD COMPACT */
+
+.adminUsersCollapsed {
+  min-height: 0 !important;
+}
+
+
+.adminUsersCollapsed > header {
+  padding-bottom: 22px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 760px) {
+
+  .adminDirectoryHeaderActions {
+    width: 100%;
+
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+
+  .adminDirectoryToggle {
+    width: 100%;
+  }
+
+
+  .adminUsersExpanded
+  .adminDirectorySearch {
+    width: 100%;
+  }
+
+}
+
+
+/* ==========================================================
+   CAMPUSCONNECT — ADMIN MANAGED STUDENT IDENTITY
+   ========================================================== */
+
+.studentIdentityAdmin {
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+
+.studentIdentityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+
+.studentIdentityHeader > div {
+  display: grid;
+  gap: 3px;
+}
+
+
+.studentIdentityHeader span {
+  color: #5571c8;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .13em;
+}
+
+
+.studentIdentityHeader h3 {
+  margin: 0;
+  color: #17233a;
+  font-size: 18px;
+}
+
+
+.studentIdentityHeader p {
+  margin: 2px 0 0;
+  color: #7a8699;
+  font-size: 10px;
+}
+
+
+.studentIdentityToggle,
+.studentIdentityEdit {
+  border: 1px solid #d9e2f1;
+  border-radius: 9px;
+  background: #fff;
+  color: #315fd2;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+
+.studentIdentityToggle {
+  min-height: 38px;
+  padding: 0 13px;
+}
+
+
+.studentIdentitySearch {
+  margin-top: 17px;
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 13px;
+  border: 1px solid #dfe5ee;
+  border-radius: 10px;
+  background: #fbfcfe;
+}
+
+
+.studentIdentitySearch span {
+  color: #8994a6;
+}
+
+
+.studentIdentitySearch input {
+  width: 100%;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 11px;
+}
+
+
+.studentIdentityList {
+  margin-top: 13px;
+  overflow: hidden;
+  border: 1px solid #e4e9f0;
+  border-radius: 11px;
+}
+
+
+.studentIdentityRow {
+  min-height: 70px;
+  display: grid;
+  grid-template-columns:
+    minmax(190px, 1.3fr)
+    minmax(120px, .7fr)
+    minmax(170px, 1fr)
+    70px;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 15px;
+  border-bottom: 1px solid #edf0f4;
+}
+
+
+.studentIdentityRow:last-child {
+  border-bottom: 0;
+}
+
+
+.studentIdentityPerson {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.studentIdentityPerson > i {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #315fd2;
+  background: #edf3ff;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+
+.studentIdentityPerson > div,
+.studentIdentityValue {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+
+.studentIdentityPerson strong,
+.studentIdentityValue strong {
+  overflow: hidden;
+  color: #27364e;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.studentIdentityPerson small,
+.studentIdentityValue small,
+.studentIdentityValue span {
+  overflow: hidden;
+  color: #8a95a6;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.studentIdentityEdit {
+  min-height: 34px;
+}
+
+
+.studentIdentityStatus {
+  margin: 13px 0 0;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #fff5f3;
+  color: #a94c42;
+  font-size: 10px;
+}
+
+
+.studentIdentityStatus.success {
+  background: #eef9f3;
+  color: #187a4e;
+}
+
+
+.studentIdentityEmpty {
+  padding: 30px;
+  color: #8792a3;
+  text-align: center;
+  font-size: 10px;
+}
+
+
+.studentIdentityModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, .48);
+  backdrop-filter: blur(5px);
+}
+
+
+.studentIdentityModal {
+  width: min(590px, calc(100vw - 32px));
+  max-height: 88vh;
+  overflow-y: auto;
+  border: 1px solid #e1e6ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 28px 90px rgba(15, 23, 42, .24);
+}
+
+
+.studentIdentityModal > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 21px;
+  border-bottom: 1px solid #e8ecf2;
+}
+
+
+.studentIdentityModal > header span {
+  color: #3568e8;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .12em;
+}
+
+
+.studentIdentityModal > header h3 {
+  margin: 4px 0;
+  color: #17233a;
+}
+
+
+.studentIdentityModal > header p {
+  margin: 0;
+  color: #7c8799;
+  font-size: 9px;
+}
+
+
+.studentIdentityModal > header > button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e1e6ee;
+  border-radius: 9px;
+  background: #fff;
+  cursor: pointer;
+  color: #68758a;
+  font-size: 18px;
+}
+
+
+.studentIdentityForm {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  padding: 20px;
+}
+
+
+.studentIdentityForm > label {
+  display: grid;
+  gap: 6px;
+}
+
+
+.studentIdentityForm > label > span {
+  color: #68758a;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+
+.studentIdentityForm input,
+.studentIdentityForm select {
+  min-height: 41px;
+  padding: 0 11px;
+  border: 1px solid #dce3ed;
+  border-radius: 9px;
+  background: #fff;
+  color: #293750;
+  font: inherit;
+  font-size: 10px;
+}
+
+
+.studentIdentityChecks {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 20px;
+  padding-top: 4px;
+}
+
+
+.studentIdentityChecks label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #5c687b;
+  font-size: 9px;
+}
+
+
+.studentIdentityModal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 15px 20px;
+  border-top: 1px solid #e8ecf2;
+}
+
+
+.guardianAdminManagedBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 29px;
+  padding: 0 10px;
+  border: 1px solid #dbe4f6;
+  border-radius: 999px;
+  color: #4564b7;
+  background: #f2f6ff;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+
+.profileManagedFieldNote {
+  display: block;
+  margin-top: 5px;
+  color: #7b8799;
+  font-size: 8px;
+}
+
+
+@media (max-width: 760px) {
+
+  .studentIdentityHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+
+  .studentIdentityRow {
+    grid-template-columns:
+      1fr
+      auto;
+  }
+
+
+  .studentIdentityValue {
+    grid-column: 1 / -1;
+  }
+
+
+  .studentIdentityEdit {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+
+  .studentIdentityForm {
+    grid-template-columns: 1fr;
+  }
+
+
+  .studentIdentityChecks {
+    grid-column: 1;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+}
+
+
+/* ============================================================
+   CAMPUSCONNECT — STUDENT IDENTITY ADMIN CONSOLE
+   USN + GUARDIAN CONTACT
+   ============================================================ */
+
+.studentIdentityAdminPro {
+  position: relative;
+
+  overflow: hidden;
+
+  padding: 0 !important;
+
+  border:
+    1px solid
+    rgba(37, 69, 126, 0.13) !important;
+
+  border-radius:
+    22px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fbfcff 100%
+    ) !important;
+
+  box-shadow:
+    0 16px 44px
+    rgba(31, 48, 76, 0.065) !important;
+}
+
+
+/* subtle premium top accent */
+.studentIdentityAdminPro::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 28px;
+  right: 28px;
+
+  height: 3px;
+
+  border-radius:
+    0 0 999px 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #315fd7,
+      #7395ee 55%,
+      transparent
+    );
+
+  opacity: .9;
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.studentIdentityAdminPro > header {
+  position: relative;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 24px;
+
+  padding:
+    28px 28px
+    22px !important;
+
+  border-bottom:
+    1px solid
+    rgba(39, 61, 93, 0.08);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(245, 248, 255, .92),
+      rgba(255, 255, 255, .98)
+    );
+}
+
+
+.studentIdentityAdminPro > header > div:first-child {
+  min-width: 0;
+}
+
+
+.studentIdentityAdminPro > header span {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 8px;
+
+  color:
+    #315fd7 !important;
+
+  font-size:
+    10px !important;
+
+  font-weight:
+    850 !important;
+
+  letter-spacing:
+    .16em !important;
+
+  text-transform:
+    uppercase;
+}
+
+
+.studentIdentityAdminPro > header span::before {
+  content: "";
+
+  width: 7px;
+  height: 7px;
+
+  border-radius:
+    999px;
+
+  background:
+    #315fd7;
+
+  box-shadow:
+    0 0 0 5px
+    rgba(49, 95, 215, .09);
+}
+
+
+.studentIdentityAdminPro > header h2,
+.studentIdentityAdminPro > header h3 {
+  margin:
+    0 0 7px !important;
+
+  color:
+    #18243b !important;
+
+  font-size:
+    clamp(
+      21px,
+      2vw,
+      27px
+    ) !important;
+
+  font-weight:
+    760 !important;
+
+  letter-spacing:
+    -.035em !important;
+
+  line-height:
+    1.15 !important;
+}
+
+
+.studentIdentityAdminPro > header p {
+  max-width:
+    640px;
+
+  margin:
+    0 !important;
+
+  color:
+    #78869a !important;
+
+  font-size:
+    12px !important;
+
+  line-height:
+    1.65 !important;
+}
+
+
+/* ============================================================
+   HEADER SHOW / HIDE BUTTON
+   ============================================================ */
+
+.studentIdentityAdminPro > header button {
+  min-width:
+    76px;
+
+  min-height:
+    40px;
+
+  padding:
+    0 17px !important;
+
+  border:
+    1px solid
+    #d8e1f3 !important;
+
+  border-radius:
+    12px !important;
+
+  background:
+    #ffffff !important;
+
+  color:
+    #315fd7 !important;
+
+  box-shadow:
+    0 5px 16px
+    rgba(32, 63, 116, .05);
+
+  font-size:
+    11px !important;
+
+  font-weight:
+    760 !important;
+
+  cursor:
+    pointer;
+
+  transition:
+    border-color .18s ease,
+    background .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+
+.studentIdentityAdminPro > header button:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #b8caf4 !important;
+
+  background:
+    #f7f9ff !important;
+
+  box-shadow:
+    0 9px 20px
+    rgba(32, 63, 116, .08);
+}
+
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+.studentIdentityAdminPro
+input[placeholder="Search student, USN or guardian"] {
+  width:
+    calc(100% - 56px) !important;
+
+  min-height:
+    48px !important;
+
+  margin:
+    20px 28px 14px !important;
+
+  padding:
+    0 18px 0 43px !important;
+
+  border:
+    1px solid
+    #dfe6f2 !important;
+
+  border-radius:
+    14px !important;
+
+  outline:
+    none !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fbfcff,
+      #f8faff
+    ) !important;
+
+  color:
+    #24324a !important;
+
+  font-size:
+    12px !important;
+
+  font-weight:
+    520 !important;
+
+  box-shadow:
+    inset 0 1px 2px
+    rgba(31, 48, 76, .02);
+
+  transition:
+    border-color .18s ease,
+    background .18s ease,
+    box-shadow .18s ease;
+}
+
+
+.studentIdentityAdminPro
+input[placeholder="Search student, USN or guardian"]::placeholder {
+  color:
+    #9aa8ba !important;
+}
+
+
+.studentIdentityAdminPro
+input[placeholder="Search student, USN or guardian"]:focus {
+  border-color:
+    #9db5f1 !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(49, 95, 215, .075) !important;
+}
+
+
+/* ============================================================
+   STUDENT LIST
+   ============================================================ */
+
+.studentIdentityAdminPro
+:is(article, li) {
+  transition:
+    background .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+
+.studentIdentityAdminPro
+:is(article, li):hover {
+  background:
+    #fbfcff;
+}
+
+
+/*
+ * Current identity rows are div based.
+ * This styles row-like children without changing their structure.
+ */
+
+.studentIdentityAdminPro
+> div
+> div:has(> button) {
+  position:
+    relative;
+
+  min-height:
+    76px;
+
+  padding:
+    14px 18px !important;
+
+  border-bottom:
+    1px solid
+    rgba(49, 67, 96, .075);
+
+  background:
+    rgba(255, 255, 255, .92);
+
+  transition:
+    background .16s ease,
+    transform .16s ease,
+    box-shadow .16s ease;
+}
+
+
+.studentIdentityAdminPro
+> div
+> div:has(> button):hover {
+  z-index:
+    1;
+
+  background:
+    linear-gradient(
+      90deg,
+      #fbfcff,
+      #f7f9ff
+    );
+
+  box-shadow:
+    inset 3px 0 0
+    #7798ec;
+}
+
+
+/* ============================================================
+   AVATAR-LIKE ELEMENTS
+   ============================================================ */
+
+.studentIdentityAdminPro
+[class*="avatar" i],
+.studentIdentityAdminPro
+[class*="Avatar"] {
+  display:
+    grid !important;
+
+  place-items:
+    center !important;
+
+  width:
+    42px !important;
+
+  height:
+    42px !important;
+
+  min-width:
+    42px !important;
+
+  border:
+    1px solid
+    rgba(49, 95, 215, .08);
+
+  border-radius:
+    14px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #edf3ff,
+      #f8faff
+    ) !important;
+
+  color:
+    #315fd7 !important;
+
+  font-size:
+    11px !important;
+
+  font-weight:
+    820 !important;
+}
+
+
+/* ============================================================
+   TEXT HIERARCHY
+   ============================================================ */
+
+.studentIdentityAdminPro strong {
+  color:
+    #263550;
+
+  font-weight:
+    720;
+}
+
+
+.studentIdentityAdminPro small {
+  color:
+    #94a0b1;
+}
+
+
+/* ============================================================
+   EDIT BUTTONS
+   ============================================================ */
+
+.studentIdentityAdminPro button:not(
+  header button
+) {
+  min-height:
+    38px;
+
+  padding:
+    0 17px !important;
+
+  border:
+    1px solid
+    #dbe4f4 !important;
+
+  border-radius:
+    11px !important;
+
+  background:
+    #ffffff !important;
+
+  color:
+    #315fd7 !important;
+
+  font-size:
+    11px !important;
+
+  font-weight:
+    760 !important;
+
+  box-shadow:
+    0 3px 10px
+    rgba(31, 48, 76, .035);
+
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease,
+    background .16s ease;
+}
+
+
+.studentIdentityAdminPro button:not(
+  header button
+):hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #afc2f0 !important;
+
+  background:
+    #f7f9ff !important;
+
+  box-shadow:
+    0 7px 16px
+    rgba(49, 95, 215, .08);
+}
+
+
+/* ============================================================
+   STATUS / EMPTY VALUES
+   ============================================================ */
+
+.studentIdentityAdminPro
+[class*="status" i],
+.studentIdentityAdminPro
+[class*="badge" i],
+.studentIdentityAdminPro
+[class*="chip" i] {
+  border-radius:
+    999px !important;
+
+  font-weight:
+    700 !important;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .studentIdentityAdminPro {
+    border-radius:
+      18px !important;
+  }
+
+
+  .studentIdentityAdminPro > header {
+    padding:
+      23px 20px
+      18px !important;
+  }
+
+
+  .studentIdentityAdminPro
+  input[placeholder="Search student, USN or guardian"] {
+    width:
+      calc(100% - 40px) !important;
+
+    margin:
+      16px 20px 12px !important;
+  }
+
+}
+
+
+@media (max-width: 640px) {
+
+  .studentIdentityAdminPro > header {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+
+    gap:
+      14px;
+  }
+
+
+  .studentIdentityAdminPro > header button {
+    width:
+      100%;
+  }
+
+
+  .studentIdentityAdminPro
+  input[placeholder="Search student, USN or guardian"] {
+    min-height:
+      46px !important;
+  }
+
+
+  .studentIdentityAdminPro
+  button:not(header button) {
+    min-height:
+      40px;
+  }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .studentIdentityAdminPro *,
+  .studentIdentityAdminPro *::before,
+  .studentIdentityAdminPro *::after {
+    transition:
+      none !important;
+  }
+
+}
+
+
+/* ==========================================================
+   ADMIN ROLE + EMPLOYEE ID CONTROL
+   ========================================================== */
+
+.adminRoleIdentityControls {
+  display:
+    flex !important;
+
+  align-items:
+    center !important;
+
+  gap:
+    7px !important;
+
+  min-width:
+    0;
+}
+
+
+.adminRoleIdentityControls > select {
+  flex:
+    1 1 112px;
+
+  min-width:
+    105px;
+
+  height:
+    34px;
+
+  padding:
+    0 8px;
+
+  border:
+    1px solid
+    #dce2eb;
+
+  border-radius:
+    8px;
+
+  background:
+    #ffffff;
+
+  color:
+    #344157;
+
+  font-size:
+    8px;
+}
+
+
+.adminEmployeeIdButton {
+  min-height:
+    34px;
+
+  padding:
+    0 11px;
+
+  border:
+    1px solid
+    #cbd8fb;
+
+  border-radius:
+    8px;
+
+  background:
+    #f4f7ff;
+
+  color:
+    #315fd7;
+
+  font-size:
+    7px;
+
+  font-weight:
+    800;
+
+  white-space:
+    nowrap;
+
+  cursor:
+    pointer;
+
+  transition:
+    background .15s ease,
+    border-color .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+
+.adminEmployeeIdButton:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #9db4f1;
+
+  background:
+    #eaf0ff;
+
+  box-shadow:
+    0 4px 12px
+    rgba(49,95,215,.08);
+}
+
+
+@media (max-width: 920px) {
+
+  .adminRoleIdentityControls {
+    min-width:
+      230px;
+  }
+
+}

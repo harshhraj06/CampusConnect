@@ -1593,7 +1593,7 @@ export function StaffOperationsBoard({
           >
             {refreshing
               ? "Refreshing…"
-              : "↻ Refresh"}
+              : role === "Faculty" ? "↻ Refresh tasks" : "↻ Refresh"}
           </button>
 
           <button
@@ -2050,6 +2050,11 @@ export function StaffOperationsBoard({
                 }
               >
                 {item}
+                {role === "Faculty" && item !== "All" && (
+                  <span className="staffFilterCount">
+                    {counts[item === "Active" ? "active" : item === "Mine" ? "mine" : item === "Overdue" ? "overdue" : "completed"]}
+                  </span>
+                )}
               </button>
             )
           )}

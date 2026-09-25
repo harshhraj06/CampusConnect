@@ -652,6 +652,28 @@ export default function FacultyWorkspace({
     );
 
 
+  const openFacultyView =
+    (target: string) => {
+
+      if (
+        typeof window ===
+        "undefined"
+      ) {
+        return;
+      }
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "campus-navigate",
+          {
+            detail:
+              target,
+          }
+        )
+      );
+    };
+
+
   if (
     profile.role !==
     "Faculty"
@@ -694,7 +716,7 @@ export default function FacultyWorkspace({
           <p>
             {mode === "batches"
               ? "Only batches assigned to your faculty account are shown here."
-              : "Your assigned academic work, teaching tools and faculty actions in one place."}
+              : "Manage today's teaching, students, academic progress and faculty responsibilities from one focused workspace."}
           </p>
 
         </div>
@@ -833,206 +855,570 @@ export default function FacultyWorkspace({
           </section>
 
 
-          <section className="facultyWorkspaceSection">
+          <section className="facultyWorkspaceSection facultyWorkspaceCommandCenter">
 
-            <header>
+            <header className="facultyWorkspaceCommandHeader">
+
               <div>
+
                 <span>
-                  QUICK ACCESS
+                  FACULTY COMMAND CENTER
                 </span>
 
                 <h2>
-                  Faculty tools
+                  Your academic work, organized.
                 </h2>
 
                 <p>
-                  Each tool opens in its own dedicated CampusConnect page.
+                  Start with today's teaching, continue with student and academic work, then open supporting faculty tools when needed.
                 </p>
+
               </div>
+
+
+              <div className="facultyWorkspaceCommandStatus">
+
+                <i />
+
+                <span>
+
+                  <strong>
+                    Live workspace
+                  </strong>
+
+                  <small>
+                    Based on your current Faculty access
+                  </small>
+
+                </span>
+
+              </div>
+
             </header>
 
 
-            <div className="facultyWorkspaceActions">
+            <div className="facultyWorkspaceToolGroups">
+
+              <article className="facultyWorkspaceToolGroup primary">
+
+                <header>
+
+                  <div className="facultyWorkspaceGroupIndex">
+                    01
+                  </div>
+
+                  <div>
+
+                    <span>
+                      TEACHING
+                    </span>
+
+                    <h3>
+                      Today &amp; schedule
+                    </h3>
+
+                    <p>
+                      Prepare for classes and manage your published teaching schedule.
+                    </p>
+
+                  </div>
+
+                </header>
+
+
+                <div className="facultyWorkspaceGroupActions">
+
+                  <button
+                    type="button"
+                    className="featured"
+                    onClick={
+                      onOpenTodayClasses
+                    }
+                  >
+
+                    <i>
+                      TC
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Today's Classes
+                      </strong>
+
+                      <small>
+                        See today's classes from the published timetable.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openFacultyView(
+                        "My Teaching Schedule"
+                      )
+                    }
+                  >
+
+                    <i>
+                      TS
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Teaching Schedule
+                      </strong>
+
+                      <small>
+                        Open your complete published teaching timetable.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    onClick={
+                      onOpenMyBatches
+                    }
+                  >
+
+                    <i>
+                      MB
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        My Batches
+                      </strong>
+
+                      <small>
+                        View batches and subjects assigned to you.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+                </div>
+
+              </article>
+
+
+              <article className="facultyWorkspaceToolGroup">
+
+                <header>
+
+                  <div className="facultyWorkspaceGroupIndex">
+                    02
+                  </div>
+
+                  <div>
+
+                    <span>
+                      ACADEMIC WORK
+                    </span>
+
+                    <h3>
+                      Students &amp; delivery
+                    </h3>
+
+                    <p>
+                      Keep attendance, coursework and teaching progress current.
+                    </p>
+
+                  </div>
+
+                </header>
+
+
+                <div className="facultyWorkspaceGroupActions">
+
+                  <button
+                    type="button"
+                    onClick={
+                      onOpenAttendance
+                    }
+                  >
+
+                    <i>
+                      AT
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Attendance
+                      </strong>
+
+                      <small>
+                        Record and review attendance for your classes.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    onClick={
+                      onOpenSyllabusProgress
+                    }
+                  >
+
+                    <i>
+                      SP
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Syllabus Progress
+                      </strong>
+
+                      <small>
+                        Track unit and topic completion.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    onClick={
+                      onOpenAssignments
+                    }
+                  >
+
+                    <i>
+                      AS
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Assignments
+                      </strong>
+
+                      <small>
+                        Create coursework and review completion.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openFacultyView(
+                        "Faculty Diary"
+                      )
+                    }
+                  >
+
+                    <i>
+                      DY
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Faculty Diary
+                      </strong>
+
+                      <small>
+                        Maintain your teaching and academic activity record.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+                </div>
+
+              </article>
+
+
+              <article className="facultyWorkspaceToolGroup">
+
+                <header>
+
+                  <div className="facultyWorkspaceGroupIndex">
+                    03
+                  </div>
+
+                  <div>
+
+                    <span>
+                      RESOURCES
+                    </span>
+
+                    <h3>
+                      Academic support
+                    </h3>
+
+                    <p>
+                      Reach learning material, academic tools and Faculty contacts.
+                    </p>
+
+                  </div>
+
+                </header>
+
+
+                <div className="facultyWorkspaceGroupActions">
+
+                  <button
+                    type="button"
+                    onClick={
+                      onOpenLearning
+                    }
+                  >
+
+                    <i>
+                      LR
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Learning Resources
+                      </strong>
+
+                      <small>
+                        Manage verified teaching and learning material.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    onClick={
+                      onOpenAcademics
+                    }
+                  >
+
+                    <i>
+                      AC
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Academic Tools
+                      </strong>
+
+                      <small>
+                        Open Faculty-facing academic management tools.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openFacultyView(
+                        "Faculty Directory"
+                      )
+                    }
+                  >
+
+                    <i>
+                      DR
+                    </i>
+
+                    <span>
+
+                      <strong>
+                        Faculty Directory
+                      </strong>
+
+                      <small>
+                        Find verified Faculty members across campus.
+                      </small>
+
+                    </span>
+
+                    <b>→</b>
+
+                  </button>
+
+                </div>
+
+              </article>
+
+            </div>
+
+          </section>
+
+
+          <section className="facultyWorkspaceSection facultyWorkspaceOperations">
+
+            <header>
+
+              <div>
+
+                <span>
+                  FACULTY OPERATIONS
+                </span>
+
+                <h2>
+                  Manage your teaching operations.
+                </h2>
+
+                <p>
+                  Workload, availability and class coverage now have dedicated workspaces instead of being mixed into Academics.
+                </p>
+
+              </div>
+
+            </header>
+
+
+            <div className="facultyWorkspaceOperationsGrid">
 
               <button
                 type="button"
-                onClick={
-                  onOpenTodayClasses
+                onClick={() =>
+                  openFacultyView(
+                    "Faculty Workload"
+                  )
                 }
               >
-                <i>
-                  TC
-                </i>
 
-                <span>
+                <div className="facultyWorkspaceOperationIcon">
+                  WL
+                </div>
+
+                <div>
+
+                  <span>
+                    TEACHING LOAD
+                  </span>
+
                   <strong>
-                    Today&apos;s Classes
+                    Workload &amp; Allocations
                   </strong>
 
-                  <small>
-                    View your live classes from the currently published timetable.
-                  </small>
-                </span>
+                  <p>
+                    Review subjects, weekly hours, labs, tutorials, projects and mentoring allocations.
+                  </p>
+
+                </div>
 
                 <b>
                   →
                 </b>
+
               </button>
 
 
               <button
                 type="button"
-                onClick={
-                  onOpenMyBatches
+                onClick={() =>
+                  openFacultyView(
+                    "Faculty Availability"
+                  )
                 }
               >
-                <i>
-                  MB
-                </i>
 
-                <span>
+                <div className="facultyWorkspaceOperationIcon">
+                  AV
+                </div>
+
+                <div>
+
+                  <span>
+                    AVAILABILITY
+                  </span>
+
                   <strong>
-                    My Batches
+                    Availability &amp; Exceptions
                   </strong>
 
-                  <small>
-                    Open only the batches and subjects assigned to you.
-                  </small>
-                </span>
+                  <p>
+                    Manage available periods and record date-specific unavailability safely.
+                  </p>
+
+                </div>
 
                 <b>
                   →
                 </b>
+
               </button>
 
 
               <button
                 type="button"
-                onClick={
-                  onOpenAttendance
+                onClick={() =>
+                  openFacultyView(
+                    "Faculty Coverage"
+                  )
                 }
               >
-                <i>
-                  AT
-                </i>
 
-                <span>
+                <div className="facultyWorkspaceOperationIcon">
+                  CV
+                </div>
+
+                <div>
+
+                  <span>
+                    CLASS CONTINUITY
+                  </span>
+
                   <strong>
-                    Attendance
+                    Coverage &amp; Substitution
                   </strong>
 
-                  <small>
-                    Record attendance and review class attendance history.
-                  </small>
-                </span>
+                  <p>
+                    Request class coverage, review offers and manage substitute Faculty assignments.
+                  </p>
+
+                </div>
 
                 <b>
                   →
                 </b>
-              </button>
 
-
-              <button
-                type="button"
-                onClick={
-                  onOpenSyllabusProgress
-                }
-              >
-                <i>
-                  SP
-                </i>
-
-                <span>
-                  <strong>
-                    Syllabus Progress
-                  </strong>
-
-                  <small>
-                    Track unit and topic coverage automatically from completed classes.
-                  </small>
-                </span>
-
-                <b>
-                  →
-                </b>
-              </button>
-
-
-              <button
-                type="button"
-                onClick={
-                  onOpenAssignments
-                }
-              >
-                <i>
-                  AS
-                </i>
-
-                <span>
-                  <strong>
-                    Assignments
-                  </strong>
-
-                  <small>
-                    Create coursework and review student completion.
-                  </small>
-                </span>
-
-                <b>
-                  →
-                </b>
-              </button>
-
-
-              <button
-                type="button"
-                onClick={
-                  onOpenLearning
-                }
-              >
-                <i>
-                  LR
-                </i>
-
-                <span>
-                  <strong>
-                    Learning Resources
-                  </strong>
-
-                  <small>
-                    Manage verified academic learning material.
-                  </small>
-                </span>
-
-                <b>
-                  →
-                </b>
-              </button>
-
-
-              <button
-                type="button"
-                onClick={
-                  onOpenAcademics
-                }
-              >
-                <i>
-                  AC
-                </i>
-
-                <span>
-                  <strong>
-                    Academics
-                  </strong>
-
-                  <small>
-                    Open academic records and faculty-facing academic tools.
-                  </small>
-                </span>
-
-                <b>
-                  →
-                </b>
               </button>
 
             </div>

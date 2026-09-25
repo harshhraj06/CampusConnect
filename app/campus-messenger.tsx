@@ -162,6 +162,104 @@ export default function CampusMessenger({
   const [composer, setComposer] =
     useState("");
 
+
+  /*
+   * Messenger has its own visual theme.
+   * This intentionally does not change the rest
+   * of the CampusConnect dashboard.
+   */
+  const [
+    messengerTheme,
+    setMessengerTheme,
+  ] =
+    useState<"light" | "dark">(
+      "light"
+    );
+
+
+  useEffect(() => {
+
+    try {
+
+      const saved =
+        window.localStorage.getItem(
+          "campusconnect-messenger-theme"
+        );
+
+
+      if (
+        saved === "dark" ||
+        saved === "light"
+      ) {
+
+        setMessengerTheme(
+          saved
+        );
+
+        return;
+
+      }
+
+
+      if (
+        window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches
+      ) {
+
+        setMessengerTheme(
+          "dark"
+        );
+
+      }
+
+    } catch {
+
+      /*
+       * Storage/privacy restrictions must never
+       * break Messenger.
+       */
+
+    }
+
+  }, []);
+
+
+  const toggleMessengerTheme =
+    () => {
+
+      setMessengerTheme(
+        current => {
+
+          const next =
+            current === "dark"
+              ? "light"
+              : "dark";
+
+
+          try {
+
+            window.localStorage.setItem(
+              "campusconnect-messenger-theme",
+              next
+            );
+
+          } catch {
+
+            /*
+             * Theme still changes for this session.
+             */
+
+          }
+
+
+          return next;
+
+        }
+      );
+
+    };
+
   const [query, setQuery] =
     useState("");
 
@@ -195,7 +293,19 @@ export default function CampusMessenger({
     >("Friends");
 
 
-  useEffect(() => {
+  
+
+  /*
+   * Keep contacts compact so the actual chat list
+   * receives most of the Messenger sidebar.
+   */
+  const [
+    peoplePanelOpen,
+    setPeoplePanelOpen,
+  ] =
+    useState(false);
+
+useEffect(() => {
     const applyRequestedTab = (
       requestedTab?: string | null
     ) => {
@@ -207,6 +317,10 @@ export default function CampusMessenger({
       ) {
         setPeopleTab(
           requestedTab
+        );
+
+        setPeoplePanelOpen(
+          true
         );
       }
     };
@@ -279,6 +393,26 @@ export default function CampusMessenger({
     useState<"Members" | "Media" | "Docs" | "Links">("Members");
 
   const [groupInfoCandidates, setGroupInfoCandidates] =
+    useState<CampusUser[]>([]);
+
+
+  /*
+   * Members selected while editing an existing group.
+   *
+   * This is deliberately separate from selectedMemberIds,
+   * which belongs to the Create Group modal.
+   */
+  const [
+    groupInfoSelectedMemberIds,
+    setGroupInfoSelectedMemberIds,
+  ] =
+    useState<string[]>([]);
+
+
+  const [
+    groupInfoSelectedUsers,
+    setGroupInfoSelectedUsers,
+  ] =
     useState<CampusUser[]>([]);
 
   const [groupMemberProfiles, setGroupMemberProfiles] =
@@ -2220,6 +2354,14 @@ export default function CampusMessenger({
 
       setGroupInfoSearch("");
       setGroupInfoCandidates([]);
+
+      setGroupInfoSelectedMemberIds(
+        []
+      );
+
+      setGroupInfoSelectedUsers(
+        []
+      );
       setShowGroupInfo(true);
 
       await loadGroupMemberProfiles(
@@ -2320,19 +2462,20 @@ export default function CampusMessenger({
         const avatarUrl =
           signedData.signedUrl;
 
-        const {error: updateError} =
-          await client
-            .from("chat_conversations")
-            .update({
-              avatar_url:
+        const {
+          error:
+            updateError,
+        } =
+          await client.rpc(
+            "update_chat_group_avatar",
+            {
+              target_conversation:
+                activeConversation.id,
+
+              next_avatar_url:
                 avatarUrl,
-              updated_at:
-                new Date().toISOString(),
-            })
-            .eq(
-              "id",
-              activeConversation.id
-            );
+            }
+          );
 
         if (updateError) {
           throw updateError;
@@ -2441,65 +2584,197 @@ export default function CampusMessenger({
     async (
       value: string
     ) => {
-      setGroupInfoSearch(value);
+
+      setGroupInfoSearch(
+        value
+      );
+
 
       const search =
         value.trim();
+
 
       if (
         search.length < 2 ||
         !activeConversation
       ) {
-        setGroupInfoCandidates([]);
+
+        setGroupInfoCandidates(
+          []
+        );
+
         return;
+
       }
+
 
       const client =
         getSupabaseClient();
 
-      if (!client) return;
 
-      const {data, error} =
-        await client
-          .from("profiles")
-          .select(
-            "id,full_name,email,role,department,graduation_year,campus_uid,avatar_url"
-          )
-          .or(
-            `full_name.ilike.%${search}%,campus_uid.ilike.%${search}%`
-          )
-          .limit(15);
-
-      if (error) {
-        return setStatus(
-          error.message
-        );
+      if (!client) {
+        return;
       }
 
-      const existingIds =
-        new Set(
-          activeGroupMembers.map(
-            member =>
-              member.user_id
-          )
+
+      try {
+
+        const excludedIds =
+          Array.from(
+            new Set(
+              [
+                currentUserId,
+
+                ...activeGroupMembers.map(
+                  member =>
+                    member.user_id
+                ),
+              ]
+                .filter(
+                  (
+                    id
+                  ): id is string =>
+                    Boolean(
+                      id
+                    )
+                )
+            )
+          );
+
+
+        const {
+          data,
+          error,
+        } =
+          await client.rpc(
+            "search_chat_group_users",
+            {
+              search_term:
+                search,
+
+              excluded_ids:
+                excludedIds,
+            }
+          );
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        setGroupInfoCandidates(
+          (
+            data ||
+            []
+          ) as CampusUser[]
         );
 
-      setGroupInfoCandidates(
-        ((data || []) as CampusUser[])
-          .filter(
-            user =>
-              !existingIds.has(
-                user.id
-              )
-          )
-      );
+
+      } catch (error) {
+
+        console.error(
+          "Group member search failed:",
+          error
+        );
+
+
+        setGroupInfoCandidates(
+          []
+        );
+
+
+        setStatus(
+          error instanceof Error
+            ? error.message
+            : "Unable to search for members."
+        );
+
+      }
+
     };
 
 
-  const addExistingGroupMember =
-    async (
-      user: CampusUser
-    ) => {
+  const toggleExistingGroupMemberSelection = (
+    user: CampusUser
+  ) => {
+
+    if (
+      !user.id ||
+      user.id === currentUserId
+    ) {
+      return;
+    }
+
+
+    const alreadySelected =
+      groupInfoSelectedMemberIds.includes(
+        user.id
+      );
+
+
+    if (alreadySelected) {
+
+      setGroupInfoSelectedMemberIds(
+        current =>
+          current.filter(
+            id =>
+              id !== user.id
+          )
+      );
+
+
+      setGroupInfoSelectedUsers(
+        current =>
+          current.filter(
+            item =>
+              item.id !== user.id
+          )
+      );
+
+
+      return;
+    }
+
+
+    setGroupInfoSelectedMemberIds(
+      current =>
+        Array.from(
+          new Set([
+            ...current,
+            user.id,
+          ])
+        )
+    );
+
+
+    setGroupInfoSelectedUsers(
+      current => {
+
+        if (
+          current.some(
+            item =>
+              item.id === user.id
+          )
+        ) {
+          return current;
+        }
+
+
+        return [
+          ...current,
+          user,
+        ];
+
+      }
+    );
+
+  };
+
+
+  const addSelectedExistingGroupMembers =
+    async () => {
+
       if (
         !activeConversation ||
         !isCurrentGroupAdmin
@@ -2507,59 +2782,169 @@ export default function CampusMessenger({
         return;
       }
 
+
+      const targetUsers =
+        Array.from(
+          new Set(
+            groupInfoSelectedMemberIds
+              .filter(
+                id =>
+                  Boolean(id) &&
+                  id !== currentUserId
+              )
+          )
+        );
+
+
+      if (!targetUsers.length) {
+
+        setStatus(
+          "Select at least one member."
+        );
+
+        return;
+
+      }
+
+
       const client =
         getSupabaseClient();
 
-      if (!client) return;
 
-      setGroupActionBusy(true);
+      if (!client) {
+
+        setStatus(
+          "CampusConnect is not connected to Supabase."
+        );
+
+        return;
+
+      }
+
+
+      const conversationId =
+        activeConversation.id;
+
+
+      const selectedUsersSnapshot =
+        [...groupInfoSelectedUsers];
+
+
+      setGroupActionBusy(
+        true
+      );
+
+      setStatus(
+        ""
+      );
+
 
       try {
-        const {error} =
+
+        const {
+          data,
+          error,
+        } =
           await client.rpc(
-            "add_chat_group_member",
+            "add_chat_group_members",
             {
               target_conversation:
-                activeConversation.id,
+                conversationId,
 
-              target_user:
-                user.id,
+              target_users:
+                targetUsers,
             }
           );
 
-        if (error) throw error;
 
-        await loadBaseData();
+        if (error) {
+          throw error;
+        }
 
+
+        const addedCount =
+          Number(
+            data ?? 0
+          );
+
+
+        /*
+         * Update profile cache immediately so newly-added
+         * members render without requiring the modal to close.
+         */
         setGroupMemberProfiles(
-          current => ({
-            ...current,
-            [user.id]: user,
-          })
+          current => {
+
+            const next = {
+              ...current,
+            };
+
+
+            for (
+              const user
+              of selectedUsersSnapshot
+            ) {
+              next[user.id] =
+                user;
+            }
+
+
+            return next;
+
+          }
+        );
+
+
+        setGroupInfoSelectedMemberIds(
+          []
+        );
+
+        setGroupInfoSelectedUsers(
+          []
+        );
+
+        setGroupInfoSearch(
+          ""
         );
 
         setGroupInfoCandidates(
-          current =>
-            current.filter(
-              item =>
-                item.id !==
-                user.id
-            )
+          []
         );
+
+
+        await loadBaseData();
+
 
         setStatus(
-          `${user.full_name} added to the group.`
+          addedCount === 1
+            ? "1 member added to the group."
+            : `${addedCount} members added to the group.`
         );
 
+
       } catch (error) {
+
+        console.error(
+          "Add group members failed:",
+          error
+        );
+
+
         setStatus(
           error instanceof Error
             ? error.message
-            : "Unable to add member."
+            : "Unable to add selected members."
         );
+
+
       } finally {
-        setGroupActionBusy(false);
+
+        setGroupActionBusy(
+          false
+        );
+
       }
+
     };
 
 
@@ -2892,132 +3277,115 @@ export default function CampusMessenger({
     async (
       value: string
     ) => {
-      setGroupSearch(value);
+
+      setGroupSearch(
+        value
+      );
+
 
       const search =
         value.trim();
 
-      if (search.length < 2) {
-        setGroupCandidates([]);
+
+      if (
+        search.length < 2
+      ) {
+
+        setGroupCandidates(
+          []
+        );
+
         return;
+
       }
+
 
       const client =
         getSupabaseClient();
 
+
       if (!client) {
-        setStatus(
-          "CampusConnect is not connected to Supabase."
-        );
         return;
       }
 
-      setStatus("");
 
       try {
-        /*
-         * UID SEARCH
-         *
-         * Use the same RPC that already works
-         * in the New Chat window.
-         */
-        if (
-          search
-            .toUpperCase()
-            .startsWith("CC-")
-        ) {
-          const {
-            data,
-            error,
-          } = await client.rpc(
-            "find_campus_user_by_uid",
-            {
-              lookup_uid:
-                search.toUpperCase(),
-            }
+
+        const excludedIds =
+          Array.from(
+            new Set(
+              [
+                currentUserId,
+
+                ...selectedMemberIds,
+              ]
+                .filter(
+                  (
+                    id
+                  ): id is string =>
+                    Boolean(
+                      id
+                    )
+                )
+            )
           );
 
-          if (error) {
-            throw error;
-          }
 
-          const found =
-            Array.isArray(data)
-              ? data[0]
-              : data;
-
-          if (!found) {
-            setGroupCandidates([]);
-            setStatus(
-              "No user found with this CampusConnect UID."
-            );
-            return;
-          }
-
-          const user =
-            found as CampusUser;
-
-          if (
-            user.id ===
-            currentUserId
-          ) {
-            setGroupCandidates([]);
-            setStatus(
-              "You are already included as the group admin."
-            );
-            return;
-          }
-
-          setGroupCandidates([
-            user,
-          ]);
-
-          return;
-        }
-
-        /*
-         * NAME SEARCH
-         */
         const {
           data,
           error,
-        } = await client
-          .from("profiles")
-          .select(
-            "id,full_name,email,role,department,graduation_year,campus_uid,avatar_url"
-          )
-          .neq(
-            "id",
-            currentUserId
-          )
-          .ilike(
-            "full_name",
-            `%${search}%`
-          )
-          .limit(100);
+        } =
+          await client.rpc(
+            "search_chat_group_users",
+            {
+              search_term:
+                search,
+
+              excluded_ids:
+                excludedIds,
+            }
+          );
+
 
         if (error) {
           throw error;
         }
 
+
         setGroupCandidates(
-          (data || []) as CampusUser[]
+          (
+            data ||
+            []
+          ) as CampusUser[]
         );
 
+
+        setStatus(
+          ""
+        );
+
+
       } catch (error) {
+
         console.error(
           "Group member search failed:",
           error
         );
 
-        setGroupCandidates([]);
+
+        setGroupCandidates(
+          []
+        );
+
 
         setStatus(
           error instanceof Error
             ? error.message
             : "Unable to search for members."
         );
+
       }
+
     };
 
 
@@ -4807,7 +5175,37 @@ export default function CampusMessenger({
 
 
   return (
-    <div className="campusMessenger">
+    <div
+      className={
+        `campusMessenger whatsappMessenger messengerTheme-${messengerTheme}`
+      }
+    >
+
+      <button
+        type="button"
+        className="messengerThemeToggle"
+        onClick={
+          toggleMessengerTheme
+        }
+        title={
+          messengerTheme === "dark"
+            ? "Use light mode"
+            : "Use dark mode"
+        }
+        aria-label={
+          messengerTheme === "dark"
+            ? "Use light Messenger theme"
+            : "Use dark Messenger theme"
+        }
+      >
+        <span aria-hidden="true">
+          {
+            messengerTheme === "dark"
+              ? "☀"
+              : "☾"
+          }
+        </span>
+      </button>
 
       <aside className="messengerSidebar">
 
@@ -4879,7 +5277,68 @@ export default function CampusMessenger({
           />
         </div>
 
-        <section className="messengerPeople">
+        <section
+          className={
+            `messengerPeople ${
+              peoplePanelOpen
+                ? "expanded"
+                : "collapsed"
+            }`
+          }
+        >
+
+          <button
+            type="button"
+            className="messengerPeopleToggle"
+            onClick={() =>
+              setPeoplePanelOpen(
+                current =>
+                  !current
+              )
+            }
+            aria-expanded={
+              peoplePanelOpen
+            }
+          >
+
+            <span className="messengerPeopleToggleIcon">
+              ◉
+            </span>
+
+            <span className="messengerPeopleToggleCopy">
+
+              <b>
+                Contacts & requests
+              </b>
+
+              <small>
+                {acceptedConnections.length} friends
+                {incomingRequests.length > 0
+                  ? ` · ${incomingRequests.length} request${
+                      incomingRequests.length === 1
+                        ? ""
+                        : "s"
+                    }`
+                  : ""}
+              </small>
+
+            </span>
+
+            <span className="messengerPeopleToggleChevron">
+              {
+                peoplePanelOpen
+                  ? "⌃"
+                  : "⌄"
+              }
+            </span>
+
+          </button>
+
+
+          {peoplePanelOpen && (
+
+            <div className="messengerPeopleContent">
+
 
           <div className="messengerPeopleTabs">
 
@@ -5157,6 +5616,11 @@ export default function CampusMessenger({
               )}
 
             </div>
+          )}
+
+        
+            </div>
+
           )}
 
         </section>
@@ -5744,7 +6208,7 @@ export default function CampusMessenger({
                           This message was deleted
                         </p>
                       ) : message.body ? (
-                        <p>
+                        <p className="chatMessageBody">
                           {message.body}
                         </p>
                       ) : null}
@@ -6001,7 +6465,9 @@ export default function CampusMessenger({
                 />
               </label>
 
-              <input
+              <textarea
+                className="messageComposerInput"
+                rows={1}
                 value={composer}
                 onChange={event => {
                   setComposer(
@@ -6010,7 +6476,38 @@ export default function CampusMessenger({
 
                   sendTypingSignal();
                 }}
+                onKeyDown={event => {
+
+                  /*
+                   * Messenger keyboard behaviour:
+                   *
+                   * Enter       = send
+                   * Shift+Enter = insert new line
+                   */
+                  if (
+                    event.key === "Enter" &&
+                    !event.shiftKey &&
+                    !event.nativeEvent.isComposing
+                  ) {
+
+                    event.preventDefault();
+
+                    if (
+                      !busy &&
+                      (
+                        composer.trim() ||
+                        attachment
+                      )
+                    ) {
+                      event.currentTarget.form
+                        ?.requestSubmit();
+                    }
+
+                  }
+
+                }}
                 placeholder="Type a message"
+                aria-label="Type a message"
               />
 
               <button
@@ -6354,7 +6851,20 @@ export default function CampusMessenger({
             {isCurrentGroupAdmin && (
               <section className="groupAddMember">
 
-                <span>ADD MEMBERS</span>
+                <div className="groupSelectionSummary">
+
+                  <span>
+                    ADD MEMBERS
+                  </span>
+
+                  <b>
+                    {
+                      groupInfoSelectedMemberIds.length
+                    } selected
+                  </b>
+
+                </div>
+
 
                 <input
                   value={
@@ -6368,55 +6878,180 @@ export default function CampusMessenger({
                   placeholder="Search name or Campus UID"
                 />
 
-                {groupInfoCandidates.length >
-                  0 && (
-                  <div className="groupInfoSearchResults">
 
-                    {groupInfoCandidates.map(
-                      user => (
-                        <div
-                          key={user.id}
-                          className="groupInfoPerson"
-                        >
+                {
+                  groupInfoSelectedUsers.length >
+                    0 && (
 
-                          <MessengerUserAvatar
-                            name={user.full_name}
-                            src={user.avatar_url}
-                            className="groupPersonAvatar"
-                          />
+                  <div className="selectedGroupUserList">
 
-                          <span>
-                            <b>
-                              {user.full_name}
-                            </b>
+                    {
+                      groupInfoSelectedUsers.map(
+                        user => (
 
-                            <small>
-                              {user.role}
-                              {" · "}
-                              {user.campus_uid}
-                            </small>
-                          </span>
-
-                          <button
-                            type="button"
-                            disabled={
-                              groupActionBusy
-                            }
-                            onClick={() =>
-                              void addExistingGroupMember(
-                                user
-                              )
-                            }
+                          <div
+                            className="selectedGroupUser"
+                            key={user.id}
                           >
-                            Add
-                          </button>
 
-                        </div>
+                            <MessengerUserAvatar
+                              name={user.full_name}
+                              src={user.avatar_url}
+                              className="groupCandidateAvatar"
+                            />
+
+
+                            <div>
+
+                              <b>
+                                {user.full_name}
+                              </b>
+
+                              <small>
+                                {user.role}
+                                {" · "}
+                                {user.campus_uid}
+                              </small>
+
+                            </div>
+
+
+                            <button
+                              type="button"
+                              title="Remove from selection"
+                              disabled={
+                                groupActionBusy
+                              }
+                              onClick={() =>
+                                toggleExistingGroupMemberSelection(
+                                  user
+                                )
+                              }
+                            >
+                              ×
+                            </button>
+
+                          </div>
+
+                        )
                       )
-                    )}
+                    }
 
                   </div>
+
                 )}
+
+
+                {
+                  groupInfoCandidates.length >
+                    0 && (
+
+                  <div className="groupInfoSearchResults">
+
+                    {
+                      groupInfoCandidates.map(
+                        user => {
+
+                          const selected =
+                            groupInfoSelectedMemberIds.includes(
+                              user.id
+                            );
+
+
+                          return (
+
+                            <div
+                              key={user.id}
+                              className={
+                                `groupInfoPerson ${
+                                  selected
+                                    ? "selected"
+                                    : ""
+                                }`
+                              }
+                            >
+
+                              <MessengerUserAvatar
+                                name={user.full_name}
+                                src={user.avatar_url}
+                                className="groupCandidateAvatar"
+                              />
+
+
+                              <span>
+
+                                <b>
+                                  {user.full_name}
+                                </b>
+
+                                <small>
+                                  {user.role}
+                                  {" · "}
+                                  {user.campus_uid}
+                                </small>
+
+                              </span>
+
+
+                              <button
+                                type="button"
+                                disabled={
+                                  groupActionBusy
+                                }
+                                onClick={() =>
+                                  toggleExistingGroupMemberSelection(
+                                    user
+                                  )
+                                }
+                              >
+                                {
+                                  selected
+                                    ? "✓ Selected"
+                                    : "+ Select"
+                                }
+                              </button>
+
+                            </div>
+
+                          );
+
+                        }
+                      )
+                    }
+
+                  </div>
+
+                )}
+
+
+                <button
+                  type="button"
+                  className="primary createGroupButton"
+                  disabled={
+                    groupActionBusy ||
+                    groupInfoSelectedMemberIds.length ===
+                      0
+                  }
+                  onClick={() =>
+                    void addSelectedExistingGroupMembers()
+                  }
+                >
+                  {
+                    groupActionBusy
+                      ? "Adding members..."
+                      : groupInfoSelectedMemberIds.length ===
+                          0
+                      ? "Select members"
+                      : `Add ${
+                          groupInfoSelectedMemberIds.length
+                        } ${
+                          groupInfoSelectedMemberIds.length ===
+                            1
+                            ? "member"
+                            : "members"
+                        }`
+                  }
+                </button>
 
               </section>
             )}

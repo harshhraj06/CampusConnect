@@ -4536,7 +4536,7 @@ const registrationClosed =
             </div>
           )}
 
-          
+
           {canPublishFestival && (
             <section className="festivalPublishControls">
 
@@ -24802,6 +24802,126 @@ type LearningResourceType =
   | "Assignment Material"
   | "External Link";
 
+const normalizeLearningDepartment =
+  (
+    value: string | null | undefined
+  ) => {
+
+    const raw =
+      String(
+        value || ""
+      ).trim();
+
+    const compact =
+      raw
+        .toUpperCase()
+        .replace(
+          /[^A-Z0-9]+/g,
+          ""
+        );
+
+
+    if (
+      [
+        "ECE",
+        "ELECTRONICSANDCOMMUNICATION",
+        "ELECTRONICSANDCOMMUNICATIONENGINEERING",
+        "ELECTRONICSCOMMUNICATIONENGINEERING",
+      ].includes(
+        compact
+      )
+    ) {
+      return "ECE";
+    }
+
+
+    if (
+      [
+        "CSE",
+        "COMPUTERSCIENCE",
+        "COMPUTERSCIENCEANDENGINEERING",
+        "COMPUTERSCIENCEENGINEERING",
+      ].includes(
+        compact
+      )
+    ) {
+      return "CSE";
+    }
+
+
+    if (
+      [
+        "AIML",
+        "AIANDML",
+        "AIMACHINELEARNING",
+        "ARTIFICIALINTELLIGENCEANDML",
+        "ARTIFICIALINTELLIGENCEML",
+        "ARTIFICIALINTELLIGENCEANDMACHINELEARNING",
+        "ARTIFICIALINTELLIGENCEMACHINELEARNING",
+      ].includes(
+        compact
+      )
+    ) {
+      return "AIML";
+    }
+
+
+    if (
+      compact === "ISE" ||
+      compact ===
+        "INFORMATIONSCIENCE" ||
+      compact ===
+        "INFORMATIONSCIENCEANDENGINEERING"
+    ) {
+      return "ISE";
+    }
+
+
+    if (
+      compact === "EEE" ||
+      compact ===
+        "ELECTRICALANDELECTRONICS" ||
+      compact ===
+        "ELECTRICALANDELECTRONICSENGINEERING"
+    ) {
+      return "EEE";
+    }
+
+
+    if (
+      compact === "ME" ||
+      compact === "MECH" ||
+      compact === "MECHANICAL" ||
+      compact ===
+        "MECHANICALENGINEERING"
+    ) {
+      return "ME";
+    }
+
+
+    if (
+      compact === "CIVIL" ||
+      compact ===
+        "CIVILENGINEERING"
+    ) {
+      return "CIVIL";
+    }
+
+
+    if (
+      compact === "ALL" ||
+      compact === "ANY" ||
+      compact ===
+        "ALLDEPARTMENTS"
+    ) {
+      return "All";
+    }
+
+
+    return raw.toUpperCase();
+  };
+
+
 type LearningResource = {
   id: string;
   added_by?: string;
@@ -24859,6 +24979,11 @@ type CampusBranch = {
 };
 
 function LearningModule({profile}: {profile: ModuleProfile}) {
+
+  const canPublishLearningResources =
+    profile.role === "Faculty" ||
+    profile.role === "Main Admin";
+
   const [selectedBranch, setSelectedBranch] =
     useState("");
 
@@ -24870,6 +24995,11 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
 
   const [branches, setBranches] =
     useState<CampusBranch[]>([]);
+
+  const [
+    facultyDepartments,
+    setFacultyDepartments,
+  ] = useState<string[]>([]);
 
   const [branchesLoading, setBranchesLoading] =
     useState(true);
@@ -24894,9 +25024,92 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
   const canDeleteBranch =
     profile.role === "Main Admin";
 
+
+  const departmentToken = (
+    value: string | null | undefined
+  ) =>
+    String(
+      value || ""
+    )
+      .trim()
+      .toUpperCase()
+      .replace(
+        /[^A-Z0-9]+/g,
+        ""
+      );
+
+
+  const branchMatchesDepartment = (
+    branch: CampusBranch,
+    department: string
+  ) => {
+
+    const target =
+      departmentToken(
+        department
+      );
+
+
+    return (
+      target !== "" &&
+      (
+        target ===
+          departmentToken(
+            branch.name
+          )
+
+        ||
+
+        target ===
+          departmentToken(
+            branch.code
+          )
+      )
+    );
+
+  };
+
+
+  const accessibleLearningBranches =
+    branches.filter(branch => {
+
+      if (
+        profile.role ===
+          "Main Admin"
+      ) {
+        return true;
+      }
+
+
+      if (
+        profile.role ===
+          "Faculty"
+      ) {
+
+        return facultyDepartments.some(
+          department =>
+            branchMatchesDepartment(
+              branch,
+              department
+            )
+        );
+
+      }
+
+
+      return branchMatchesDepartment(
+        branch,
+        profile.department
+      );
+
+    });
+
+
   const selectedBranchData =
-    branches.find(branch =>
-      branch.name === selectedBranch
+    accessibleLearningBranches.find(
+      branch =>
+        branch.name ===
+          selectedBranch
     );
 
   const semesters = Array.from(
@@ -24953,6 +25166,88 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
     form.resource_type === "Video" ||
     form.resource_type === "PYQ" ||
     form.resource_type === "External Link";
+
+  const loadFacultyDepartments =
+    async () => {
+
+      if (
+        profile.role !==
+          "Faculty"
+      ) {
+
+        setFacultyDepartments(
+          []
+        );
+
+        return;
+      }
+
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+        return;
+      }
+
+
+      const {
+        data: auth,
+      } =
+        await client.auth.getUser();
+
+
+      if (!auth.user) {
+        return;
+      }
+
+
+      const {
+        data,
+        error,
+      } =
+        await client
+          .from(
+            "faculty_department_assignments"
+          )
+          .select(
+            "department"
+          )
+          .eq(
+            "faculty_id",
+            auth.user.id
+          )
+          .order(
+            "department",
+            {
+              ascending: true,
+            }
+          );
+
+
+      if (error) {
+
+        setStatus(
+          error.message
+        );
+
+        return;
+      }
+
+
+      setFacultyDepartments(
+        (
+          data || []
+        ).map(
+          row =>
+            String(
+              row.department
+            )
+        )
+      );
+
+    };
+
 
   const loadBranches = async () => {
     const client = getSupabaseClient();
@@ -25160,12 +25455,31 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
     const client = getSupabaseClient();
     if (!client) return;
 
-    const {data, error} = await client
-      .from("learning_resources")
-      .select("*")
-      .order("is_verified", {ascending: false})
-      .order("created_at", {ascending: false})
-      .limit(150);
+    let resourceQuery =
+      client
+        .from("learning_resources")
+        .select("*");
+
+
+    const {data, error} =
+      await resourceQuery
+        .order(
+          "is_verified",
+          {
+            ascending:
+              false,
+          }
+        )
+        .order(
+          "created_at",
+          {
+            ascending:
+              false,
+          }
+        )
+        .limit(
+          150
+        );
 
     if (!error) {
       setItems((data || []) as LearningResource[]);
@@ -25222,12 +25536,144 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
 
   useEffect(() => {
     void loadBranches();
+    void loadFacultyDepartments();
     void loadResources();
     void loadAiDocuments();
   }, []);
 
+
+  useEffect(() => {
+
+    if (
+      !accessibleLearningBranches.length
+    ) {
+
+      setSelectedBranch(
+        ""
+      );
+
+      if (
+        profile.role ===
+          "Faculty"
+      ) {
+
+        setForm(current => ({
+          ...current,
+          department: "",
+        }));
+
+      }
+
+      return;
+    }
+
+
+    if (
+      !accessibleLearningBranches.some(
+        branch =>
+          branch.name ===
+            selectedBranch
+      )
+    ) {
+
+      setSelectedBranch(
+        accessibleLearningBranches[0].name
+      );
+
+    }
+
+
+    if (
+      (
+        profile.role ===
+          "Faculty"
+
+        ||
+
+        profile.role ===
+          "Main Admin"
+      )
+
+      &&
+
+      !accessibleLearningBranches.some(
+        branch =>
+          branch.name ===
+            form.department
+      )
+    ) {
+
+      setForm(current => ({
+        ...current,
+        department:
+          accessibleLearningBranches[0].name,
+      }));
+
+    }
+
+  }, [
+    branches,
+    facultyDepartments,
+    profile.department,
+    profile.role,
+  ]);
+
   const addResource = async (event: FormEvent) => {
     event.preventDefault();
+
+
+    if (
+      !canPublishLearningResources
+    ) {
+
+      setStatus(
+        "Only Faculty can publish learning resources."
+      );
+
+      return;
+    }
+
+
+    if (
+      profile.role ===
+        "Faculty" &&
+      (
+        !form.department ||
+        !accessibleLearningBranches.some(
+          branch =>
+            branch.name ===
+              form.department
+        )
+      )
+    ) {
+
+      setStatus(
+        "Select one of your assigned departments."
+      );
+
+      return;
+    }
+
+
+    if (
+      profile.role ===
+        "Main Admin" &&
+      (
+        !form.department ||
+        !accessibleLearningBranches.some(
+          branch =>
+            branch.name ===
+              form.department
+        )
+      )
+    ) {
+
+      setStatus(
+        "Select a valid department."
+      );
+
+      return;
+    }
 
     if (!form.subject.trim() || !form.title.trim()) {
       return setStatus(
@@ -25302,8 +25748,19 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
             "-"
           );
 
+        const departmentFolder =
+          departmentToken(
+            form.department
+          );
+
+        if (!departmentFolder) {
+          throw new Error(
+            "Select a valid department before uploading."
+          );
+        }
+
         uploadedPath =
-          `${auth.user.id}/${Date.now()}-${safeName}`;
+          `${auth.user.id}/${departmentFolder}/${Date.now()}-${safeName}`;
 
         const {error: uploadError} =
           await client.storage
@@ -25336,7 +25793,7 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
         academic_year:
           form.academic_year.trim(),
         department:
-          form.department || "All",
+          form.department,
         semester:
           form.semester || "All",
         file_path:
@@ -25721,21 +26178,27 @@ const visible = items.filter(item => {
         title="Campus learning resources"
         copy="Access verified videos, PDFs, notes, PYQs, lab manuals and subject material shared across CampusConnect."
         action={
-          <button
-            className="primary"
-            onClick={() =>
-              setShowForm(value => !value)
-            }
-          >
-            {showForm
-              ? "Close form"
-              : "+ Add resource"}
-          </button>
+          canPublishLearningResources
+            ? (
+                <button
+                  className="primary"
+                  onClick={() =>
+                    setShowForm(
+                      value => !value
+                    )
+                  }
+                >
+                  {showForm
+                    ? "Close form"
+                    : "+ Add resource"}
+                </button>
+              )
+            : undefined
         }
       />
 
-      {showForm && (
-        <form
+      {showForm && canPublishLearningResources && (
+          <form
           className="moduleForm card"
           onSubmit={addResource}
         >
@@ -25807,8 +26270,11 @@ const visible = items.filter(item => {
           <div className="formGrid">
 
             <Field label="Department">
+
               <select
-                value={form.department}
+                value={
+                  form.department
+                }
                 onChange={event =>
                   setForm({
                     ...form,
@@ -25816,18 +26282,34 @@ const visible = items.filter(item => {
                       event.target.value,
                   })
                 }
+                required
               >
-                <option value="All">All</option>
 
-                {branches.map(branch => (
-                  <option
-                    key={branch.id}
-                    value={branch.name}
-                  >
-                    {branch.name}
-                  </option>
-                ))}
+                <option value="">
+                  Select department
+                </option>
+
+                {accessibleLearningBranches.map(
+                  branch => (
+
+                    <option
+                      key={
+                        branch.id
+                      }
+                      value={
+                        branch.name
+                      }
+                    >
+                      {branch.code}
+                      {" · "}
+                      {branch.name}
+                    </option>
+
+                  )
+                )}
+
               </select>
+
             </Field>
 
             <Field label="Semester">
@@ -25933,9 +26415,9 @@ const visible = items.filter(item => {
             disabled={uploading}
           />
         </form>
-      )}
+        )}
 
-      
+
     {canCreateBranch && (
       <section className="branchManagement card">
         <div className="branchManagementHeader">
@@ -26080,7 +26562,7 @@ const visible = items.filter(item => {
           <div className="branchLoading">
             Loading branches...
           </div>
-        ) : branches.length === 0 ? (
+        ) : accessibleLearningBranches.length === 0 ? (
           <div className="branchEmpty">
             <strong>No branches available</strong>
             <span>
@@ -26089,7 +26571,7 @@ const visible = items.filter(item => {
             </span>
           </div>
         ) : (
-          branches.map(branch => {
+          accessibleLearningBranches.map(branch => {
 
             const count = items.filter(item =>
               item.department === branch.name ||
@@ -27217,8 +27699,17 @@ function ProfileModule({
           bio: details.bio.trim(),
           skills: details.skills.trim(),
           phone: details.phone.trim(),
-          usn: details.usn.trim(),
-
+          ...(
+            profile.role !== "Student" &&
+            profile.role !== "Faculty"
+              ? {
+                  usn:
+                    details.usn
+                      .trim()
+                      .toUpperCase(),
+                }
+              : {}
+          ),
           headline:
             details.headline.trim(),
 
@@ -28664,6 +29155,18 @@ function ProfileModule({
                   label={identityLabel}
                 >
                   <input
+                    className="profileIdentityProtectedField"
+                    disabled={
+                      profile.role === "Student" ||
+                      profile.role === "Faculty"
+                    }
+                    title={
+                      profile.role === "Student"
+                        ? "USN is managed by Main Admin."
+                        : profile.role === "Faculty"
+                        ? "Employee ID is managed by Main Admin."
+                        : undefined
+                    }
                     value={
                       details.usn
                     }
@@ -30147,6 +30650,2029 @@ function ProfileModule({
 }
 
 
+
+type FacultyDepartmentAdminPerson = {
+  id: string;
+  full_name: string;
+  email: string;
+  department: string;
+};
+
+type FacultyDepartmentAdminBranch = {
+  name: string;
+  code: string;
+};
+
+type FacultyDepartmentAdminAssignment = {
+  faculty_id: string;
+  department: string;
+};
+
+
+function FacultyDepartmentManagement() {
+
+  const [faculty, setFaculty] =
+    useState<FacultyDepartmentAdminPerson[]>([]);
+
+  const [branches, setBranches] =
+    useState<FacultyDepartmentAdminBranch[]>([]);
+
+  const [assignments, setAssignments] =
+    useState<FacultyDepartmentAdminAssignment[]>([]);
+
+  const [query, setQuery] =
+    useState("");
+
+  const [editing, setEditing] =
+    useState<FacultyDepartmentAdminPerson | null>(null);
+
+  const [selected, setSelected] =
+    useState<string[]>([]);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [status, setStatus] =
+    useState("");
+
+
+  const load = async () => {
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+
+      setStatus(
+        "CampusConnect is not connected to Supabase."
+      );
+
+      return;
+    }
+
+
+    try {
+
+      const {
+        data: {
+          session,
+        },
+      } =
+        await client.auth.getSession();
+
+
+      if (
+        !session?.access_token
+      ) {
+
+        setStatus(
+          "Your administrator session has expired. Sign in again."
+        );
+
+        return;
+      }
+
+
+      const [
+        facultyResponse,
+        branchResult,
+        assignmentResult,
+      ] =
+        await Promise.all([
+
+          fetch(
+            "/api/admin/users",
+            {
+              method:
+                "GET",
+
+              headers: {
+                Authorization:
+                  `Bearer ${session.access_token}`,
+              },
+
+              cache:
+                "no-store",
+            }
+          ),
+
+          client
+            .from(
+              "campus_branches"
+            )
+            .select(
+              "name,code"
+            )
+            .eq(
+              "is_active",
+              true
+            )
+            .order(
+              "name",
+              {
+                ascending:
+                  true,
+              }
+            ),
+
+          client
+            .from(
+              "faculty_department_assignments"
+            )
+            .select(
+              "faculty_id,department"
+            ),
+
+        ]);
+
+
+      const facultyPayload =
+        (
+          await facultyResponse
+            .json()
+            .catch(
+              () => ({})
+            )
+        ) as {
+          users?: Array<
+            FacultyDepartmentAdminPerson & {
+              role: string;
+            }
+          >;
+
+          error?: string;
+        };
+
+
+      if (
+        !facultyResponse.ok
+      ) {
+
+        setStatus(
+          facultyPayload.error ||
+            "Unable to load Faculty accounts."
+        );
+
+        return;
+      }
+
+
+      const dataError =
+        branchResult.error ||
+        assignmentResult.error;
+
+
+      if (dataError) {
+
+        setStatus(
+          dataError.message
+        );
+
+        return;
+      }
+
+
+      setFaculty(
+        (
+          facultyPayload.users ||
+          []
+        )
+          .filter(
+            person =>
+              person.role ===
+                "Faculty"
+          )
+          .map(
+            person => ({
+              id:
+                person.id,
+
+              full_name:
+                person.full_name,
+
+              email:
+                person.email,
+
+              department:
+                person.department,
+            })
+          )
+      );
+
+
+      setBranches(
+        (
+          branchResult.data ||
+          []
+        ) as FacultyDepartmentAdminBranch[]
+      );
+
+
+      setAssignments(
+        (
+          assignmentResult.data ||
+          []
+        ) as FacultyDepartmentAdminAssignment[]
+      );
+
+
+      setStatus("");
+
+    } catch (error) {
+
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "Unable to load Faculty departments."
+      );
+
+    }
+
+  };
+
+  useEffect(() => {
+
+    void load();
+
+  }, []);
+
+
+  const assignedTo = (
+    facultyId: string
+  ) =>
+    assignments
+      .filter(
+        item =>
+          item.faculty_id ===
+            facultyId
+      )
+      .map(
+        item =>
+          item.department
+      );
+
+
+  const visible =
+    faculty.filter(person => {
+
+      const assigned =
+        assignedTo(
+          person.id
+        ).join(" ");
+
+
+      return (
+        `${person.full_name} ${person.email} ${assigned}`
+          .toLowerCase()
+          .includes(
+            query
+              .trim()
+              .toLowerCase()
+          )
+      );
+
+    });
+
+
+  const editFaculty = (
+    person: FacultyDepartmentAdminPerson
+  ) => {
+
+    setEditing(
+      person
+    );
+
+    setSelected(
+      assignedTo(
+        person.id
+      )
+    );
+
+    setStatus("");
+
+  };
+
+
+  const toggle = (
+    department: string
+  ) => {
+
+    setSelected(current =>
+      current.includes(
+        department
+      )
+        ? current.filter(
+            item =>
+              item !== department
+          )
+        : [
+            ...current,
+            department,
+          ]
+    );
+
+  };
+
+
+  const save =
+    async () => {
+
+      if (!editing) {
+        return;
+      }
+
+
+      const client =
+        getSupabaseClient();
+
+      if (!client) {
+
+        setStatus(
+          "CampusConnect is not connected to Supabase."
+        );
+
+        return;
+      }
+
+
+      setSaving(true);
+      setStatus("");
+
+
+      try {
+
+        const {
+          error,
+        } = await client.rpc(
+          "set_faculty_departments",
+          {
+            p_faculty_id:
+              editing.id,
+
+            p_departments:
+              selected,
+          }
+        );
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        const facultyName =
+          editing.full_name;
+
+
+        setEditing(
+          null
+        );
+
+
+        await load();
+
+
+        setStatus(
+          `${facultyName}'s departments were updated.`
+        );
+
+      } catch (error) {
+
+        setStatus(
+          error instanceof Error
+            ? error.message
+            : "Unable to update Faculty departments."
+        );
+
+      } finally {
+
+        setSaving(false);
+
+      }
+
+    };
+
+
+  return (
+
+    <section
+      className="
+        facultyDepartmentAdmin
+        facultyDepartmentAdminPro
+        card
+      "
+    >
+
+      {/* =====================================================
+          HEADER
+         ===================================================== */}
+
+      <header className="facultyDepartmentProHeader">
+
+        <div className="facultyDepartmentHeading">
+
+          <div
+            className="facultyDepartmentHeadingIcon"
+            aria-hidden="true"
+          >
+
+            <svg
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+
+          </div>
+
+
+          <div className="facultyDepartmentHeadingText">
+
+            <h2>
+              Faculty Departments
+            </h2>
+
+            <span>
+              Department access
+            </span>
+
+            <p>
+              Assign the departments each Faculty member works with.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <label className="facultyDepartmentProSearch">
+
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+            <path
+              d="m21 21-4.35-4.35"
+            />
+          </svg>
+
+          <input
+            value={query}
+            onChange={event =>
+              setQuery(
+                event.target.value
+              )
+            }
+            placeholder="Search faculty"
+            aria-label="Search faculty"
+          />
+
+        </label>
+
+      </header>
+
+
+      {/* =====================================================
+          STATUS
+         ===================================================== */}
+
+      {status && (
+
+        <div
+          className={
+            `facultyDepartmentNotice ${
+              status
+                .toLowerCase()
+                .includes(
+                  "updated"
+                )
+                ? "success"
+                : "error"
+            }`
+          }
+          role="status"
+        >
+
+          <div className="facultyDepartmentNoticeIcon">
+
+            {status
+              .toLowerCase()
+              .includes(
+                "updated"
+              )
+              ? "✓"
+              : "!"}
+
+          </div>
+
+
+          <span>
+            {status}
+          </span>
+
+
+          <button
+            type="button"
+            onClick={() =>
+              setStatus("")
+            }
+            aria-label="Dismiss message"
+          >
+            ×
+          </button>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================================
+          FACULTY TABLE
+         ===================================================== */}
+
+      <div className="facultyDepartmentTable">
+
+        <div className="facultyDepartmentTableHead">
+
+          <span>
+            Faculty member
+          </span>
+
+          <span>
+            Department(s)
+          </span>
+
+          <span>
+            Actions
+          </span>
+
+        </div>
+
+
+        <div className="facultyDepartmentList">
+
+          {visible.map(
+            (
+              person,
+              index
+            ) => {
+
+              const departments =
+                assignedTo(
+                  person.id
+                );
+
+
+              const initials =
+                person.full_name
+                  .split(
+                    /[\s_]+/
+                  )
+                  .filter(
+                    Boolean
+                  )
+                  .slice(
+                    0,
+                    2
+                  )
+                  .map(
+                    part =>
+                      part
+                        .charAt(0)
+                        .toUpperCase()
+                  )
+                  .join("") ||
+                "F";
+
+
+              return (
+
+                <div
+                  className="facultyDepartmentRow"
+                  key={person.id}
+                >
+
+                  <div className="facultyDepartmentPerson">
+
+                    <div
+                      className={
+                        `facultyDepartmentAvatar avatarTone${
+                          (
+                            index %
+                            4
+                          ) +
+                          1
+                        }`
+                      }
+                      aria-hidden="true"
+                    >
+                      {initials}
+                    </div>
+
+
+                    <div className="facultyDepartmentIdentity">
+
+                      <strong>
+                        {person.full_name}
+                      </strong>
+
+                      <small>
+                        {person.email ||
+                          "Faculty account"}
+                      </small>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="facultyDepartmentChips">
+
+                    {departments.length ? (
+
+                      departments.map(
+                        department => (
+
+                          <span
+                            key={
+                              department
+                            }
+                            className="facultyDepartmentChip"
+                          >
+
+                            <svg
+                              viewBox="0 0 24 24"
+                              width="14"
+                              height="14"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="m3 10 9-6 9 6" />
+                              <path d="M5 10v8" />
+                              <path d="M9 10v8" />
+                              <path d="M15 10v8" />
+                              <path d="M19 10v8" />
+                              <path d="M3 21h18" />
+                            </svg>
+
+                            {department}
+
+                          </span>
+
+                        )
+                      )
+
+                    ) : (
+
+                      <span className="facultyDepartmentNotAssigned">
+                        Not assigned
+                      </span>
+
+                    )}
+
+                  </div>
+
+
+                  <div className="facultyDepartmentActions">
+
+                    <button
+                      type="button"
+                      className="facultyDepartmentEditButton"
+                      onClick={() =>
+                        editFaculty(
+                          person
+                        )
+                      }
+                    >
+
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="15"
+                        height="15"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                      </svg>
+
+                      <span>
+                        Edit
+                      </span>
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+              );
+
+            }
+          )}
+
+
+          {!visible.length && (
+
+            <div className="facultyDepartmentEmpty">
+
+              <div
+                className="facultyDepartmentEmptyIcon"
+                aria-hidden="true"
+              >
+
+                <svg
+                  viewBox="0 0 24 24"
+                  width="26"
+                  height="26"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="m17 11 4 4" />
+                  <path d="m21 11-4 4" />
+                </svg>
+
+              </div>
+
+              <strong>
+                No Faculty found
+              </strong>
+
+              <span>
+                Try another faculty name.
+              </span>
+
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
+
+      {/* =====================================================
+          EDIT MODAL
+         ===================================================== */}
+
+      {editing && (
+
+        <div
+          className="facultyDepartmentModalBackdrop"
+          role="presentation"
+          onMouseDown={event => {
+
+            if (
+              event.target ===
+                event.currentTarget
+            ) {
+
+              setEditing(
+                null
+              );
+
+            }
+
+          }}
+        >
+
+          <section
+            className="facultyDepartmentModal facultyDepartmentModalPro"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Edit Faculty departments"
+          >
+
+            <header className="facultyDepartmentModalHeader">
+
+              <div className="facultyDepartmentModalTitle">
+
+                <div
+                  className="facultyDepartmentModalAvatar"
+                  aria-hidden="true"
+                >
+                  {editing.full_name
+                    .split(
+                      /[\s_]+/
+                    )
+                    .filter(
+                      Boolean
+                    )
+                    .slice(
+                      0,
+                      2
+                    )
+                    .map(
+                      part =>
+                        part
+                          .charAt(0)
+                          .toUpperCase()
+                    )
+                    .join("") ||
+                    "F"}
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Assigned departments
+                  </span>
+
+                  <h3>
+                    {editing.full_name}
+                  </h3>
+
+                  <p>
+                    Choose all departments this Faculty member works with.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <button
+                type="button"
+                className="facultyDepartmentModalClose"
+                onClick={() =>
+                  setEditing(
+                    null
+                  )
+                }
+                aria-label="Close"
+              >
+                ×
+              </button>
+
+            </header>
+
+
+            <div className="facultyDepartmentModalMeta">
+
+              <span>
+                {selected.length}
+                {" "}
+                {selected.length === 1
+                  ? "department"
+                  : "departments"}
+                {" "}
+                selected
+              </span>
+
+              {selected.length > 0 && (
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelected([])
+                  }
+                >
+                  Clear all
+                </button>
+
+              )}
+
+            </div>
+
+
+            <div className="facultyDepartmentOptions">
+
+              {branches.map(
+                branch => {
+
+                  const checked =
+                    selected.includes(
+                      branch.name
+                    );
+
+
+                  return (
+
+                    <label
+                      key={
+                        branch.name
+                      }
+                      className={
+                        checked
+                          ? "selected"
+                          : ""
+                      }
+                    >
+
+                      <input
+                        type="checkbox"
+                        checked={
+                          checked
+                        }
+                        onChange={() =>
+                          toggle(
+                            branch.name
+                          )
+                        }
+                      />
+
+
+                      <span className="facultyDepartmentOptionText">
+
+                        <strong>
+                          {branch.code}
+                        </strong>
+
+                        <small>
+                          {branch.name}
+                        </small>
+
+                      </span>
+
+
+                      <span
+                        className="facultyDepartmentOptionCheck"
+                        aria-hidden="true"
+                      >
+                        ✓
+                      </span>
+
+                    </label>
+
+                  );
+
+                }
+              )}
+
+            </div>
+
+
+            <footer className="facultyDepartmentModalFooter">
+
+              <button
+                type="button"
+                className="facultyDepartmentCancelButton"
+                disabled={
+                  saving
+                }
+                onClick={() =>
+                  setEditing(
+                    null
+                  )
+                }
+              >
+                Cancel
+              </button>
+
+
+              <button
+                type="button"
+                className="facultyDepartmentSaveButton"
+                disabled={
+                  saving
+                }
+                onClick={() =>
+                  void save()
+                }
+              >
+
+                {saving
+                  ? "Saving..."
+                  : "Save departments"}
+
+              </button>
+
+            </footer>
+
+          </section>
+
+        </div>
+
+      )}
+
+    </section>
+
+  );
+
+}
+
+type AdminStudentIdentityPerson = {
+  id: string;
+  full_name: string;
+  email: string;
+  role: Role;
+  department: string;
+  graduation_year: string;
+  usn?: string | null;
+};
+
+
+type AdminStudentGuardian = {
+  student_id: string;
+  guardian_name: string;
+  relationship: string;
+  email: string;
+  phone: string;
+  sms_enabled: boolean;
+  email_enabled: boolean;
+};
+
+
+function StudentIdentityManagement() {
+
+  const [
+    students,
+    setStudents,
+  ] =
+    useState<
+      AdminStudentIdentityPerson[]
+    >([]);
+
+
+  const [
+    guardians,
+    setGuardians,
+  ] =
+    useState<
+      AdminStudentGuardian[]
+    >([]);
+
+
+  const [
+    query,
+    setQuery,
+  ] =
+    useState("");
+
+
+  const [
+    expanded,
+    setExpanded,
+  ] =
+    useState(false);
+
+
+  const [
+    editing,
+    setEditing,
+  ] =
+    useState<
+      AdminStudentIdentityPerson |
+      null
+    >(null);
+
+
+  const [
+    status,
+    setStatus,
+  ] =
+    useState("");
+
+
+  const [
+    saving,
+    setSaving,
+  ] =
+    useState(false);
+
+
+  const [
+    form,
+    setForm,
+  ] =
+    useState({
+      usn: "",
+      guardian_name: "",
+      relationship: "Parent",
+      email: "",
+      phone: "",
+      sms_enabled: true,
+      email_enabled: true,
+    });
+
+
+  const load =
+    async () => {
+
+      const client =
+        getSupabaseClient();
+
+
+      if (!client) {
+        setStatus(
+          "CampusConnect is not connected to Supabase."
+        );
+
+        return;
+      }
+
+
+      const {
+        data: {
+          session,
+        },
+      } =
+        await client.auth
+          .getSession();
+
+
+      if (
+        !session?.access_token
+      ) {
+
+        setStatus(
+          "Your administrator session has expired."
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/admin/users",
+            {
+              method:
+                "GET",
+
+              headers: {
+                Authorization:
+                  `Bearer ${session.access_token}`,
+              },
+
+              cache:
+                "no-store",
+            }
+          );
+
+
+        const payload =
+          (
+            await response
+              .json()
+              .catch(
+                () => ({})
+              )
+          ) as {
+            users?: AdminStudentIdentityPerson[];
+
+            guardianContacts?:
+              AdminStudentGuardian[];
+
+            error?: string;
+          };
+
+
+        if (!response.ok) {
+
+          setStatus(
+            payload.error ||
+              "Unable to load Student records."
+          );
+
+          return;
+        }
+
+
+        setStudents(
+          (
+            payload.users ||
+            []
+          ).filter(
+            user =>
+              user.role ===
+                "Student"
+          )
+        );
+
+
+        setGuardians(
+          payload.guardianContacts ||
+          []
+        );
+
+
+        setStatus("");
+
+      } catch (error) {
+
+        setStatus(
+          error instanceof Error
+            ? error.message
+            : "Unable to load Student records."
+        );
+
+      }
+
+    };
+
+
+  useEffect(
+    () => {
+      void load();
+    },
+    []
+  );
+
+
+  const guardianFor =
+    (
+      studentId:
+        string
+    ) =>
+      guardians.find(
+        item =>
+          item.student_id ===
+            studentId
+      );
+
+
+  const visible =
+    students.filter(
+      student => {
+
+        const needle =
+          query
+            .trim()
+            .toLowerCase();
+
+
+        if (!needle) {
+          return true;
+        }
+
+
+        const guardian =
+          guardianFor(
+            student.id
+          );
+
+
+        return [
+          student.full_name,
+          student.email,
+          student.department,
+          student.usn,
+          guardian?.guardian_name,
+          guardian?.phone,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(
+            needle
+          );
+
+      }
+    );
+
+
+  const openEditor =
+    (
+      student:
+        AdminStudentIdentityPerson
+    ) => {
+
+      const guardian =
+        guardianFor(
+          student.id
+        );
+
+
+      setEditing(
+        student
+      );
+
+
+      setForm({
+        usn:
+          student.usn ||
+          "",
+
+        guardian_name:
+          guardian
+            ?.guardian_name ||
+          "",
+
+        relationship:
+          guardian
+            ?.relationship ||
+          "Parent",
+
+        email:
+          guardian
+            ?.email ||
+          "",
+
+        phone:
+          guardian
+            ?.phone ||
+          "",
+
+        sms_enabled:
+          guardian
+            ?.sms_enabled !==
+          false,
+
+        email_enabled:
+          guardian
+            ?.email_enabled !==
+          false,
+      });
+
+
+      setStatus("");
+
+    };
+
+
+  const save =
+    async () => {
+
+      if (!editing) {
+        return;
+      }
+
+
+      const client =
+        getSupabaseClient();
+
+
+      if (!client) {
+        setStatus(
+          "CampusConnect is not connected to Supabase."
+        );
+
+        return;
+      }
+
+
+      const {
+        data: {
+          session,
+        },
+      } =
+        await client.auth
+          .getSession();
+
+
+      if (
+        !session?.access_token
+      ) {
+
+        setStatus(
+          "Your administrator session has expired."
+        );
+
+        return;
+      }
+
+
+      setSaving(true);
+      setStatus("");
+
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/admin/users",
+            {
+              method:
+                "PATCH",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+
+                Authorization:
+                  `Bearer ${session.access_token}`,
+              },
+
+              body:
+                JSON.stringify({
+                  student_id:
+                    editing.id,
+
+                  usn:
+                    form.usn,
+
+                  guardian: {
+                    guardian_name:
+                      form.guardian_name,
+
+                    relationship:
+                      form.relationship,
+
+                    email:
+                      form.email,
+
+                    phone:
+                      form.phone,
+
+                    sms_enabled:
+                      form.sms_enabled,
+
+                    email_enabled:
+                      form.email_enabled,
+                  },
+                }),
+            }
+          );
+
+
+        const payload =
+          (
+            await response
+              .json()
+              .catch(
+                () => ({})
+              )
+          ) as {
+            error?: string;
+          };
+
+
+        if (!response.ok) {
+
+          setStatus(
+            payload.error ||
+              "Unable to update Student identity."
+          );
+
+          return;
+        }
+
+
+        setEditing(
+          null
+        );
+
+
+        setStatus(
+          "Student USN and guardian contact updated."
+        );
+
+
+        await load();
+
+      } catch (error) {
+
+        setStatus(
+          error instanceof Error
+            ? error.message
+            : "Unable to update Student identity."
+        );
+
+      } finally {
+
+        setSaving(false);
+
+      }
+
+    };
+
+
+  return (
+
+    <section className="studentIdentityAdmin card studentIdentityAdminPro">
+
+      <header className="studentIdentityHeader">
+
+        <div>
+
+          <span>
+            STUDENT IDENTITY
+          </span>
+
+          <h3>
+            USN & Guardian Contact
+          </h3>
+
+          <p>
+            Only Main Admin can change these protected Student records.
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          className="studentIdentityToggle"
+          onClick={() =>
+            setExpanded(
+              current =>
+                !current
+            )
+          }
+        >
+          {expanded
+            ? "Hide"
+            : "Manage students"}
+        </button>
+
+      </header>
+
+
+      {status && (
+        <p
+          className={
+            status.includes(
+              "updated"
+            )
+              ? "studentIdentityStatus success"
+              : "studentIdentityStatus"
+          }
+        >
+          {status}
+        </p>
+      )}
+
+
+      {expanded && (
+
+        <>
+
+          <label className="studentIdentitySearch">
+
+            <span>
+              ⌕
+            </span>
+
+            <input
+              value={query}
+              onChange={
+                event =>
+                  setQuery(
+                    event.target.value
+                  )
+              }
+              placeholder="Search student, USN or guardian"
+            />
+
+          </label>
+
+
+          <div className="studentIdentityList">
+
+            {visible.map(
+              student => {
+
+                const guardian =
+                  guardianFor(
+                    student.id
+                  );
+
+
+                return (
+
+                  <article
+                    key={
+                      student.id
+                    }
+                    className="studentIdentityRow"
+                  >
+
+                    <div className="studentIdentityPerson">
+
+                      <i>
+                        {student.full_name
+                          .split(/\s+/)
+                          .filter(Boolean)
+                          .slice(0, 2)
+                          .map(
+                            value =>
+                              value[0]
+                                ?.toUpperCase()
+                          )
+                          .join("") ||
+                          "ST"}
+                      </i>
+
+
+                      <div>
+
+                        <strong>
+                          {student.full_name}
+                        </strong>
+
+                        <small>
+                          {student.email}
+                        </small>
+
+                      </div>
+
+                    </div>
+
+
+                    <div className="studentIdentityValue">
+
+                      <small>
+                        USN
+                      </small>
+
+                      <strong>
+                        {student.usn ||
+                          "Not assigned"}
+                      </strong>
+
+                    </div>
+
+
+                    <div className="studentIdentityValue">
+
+                      <small>
+                        Guardian
+                      </small>
+
+                      <strong>
+                        {guardian
+                          ?.guardian_name ||
+                          "Not added"}
+                      </strong>
+
+                      <span>
+                        {guardian
+                          ?.phone ||
+                          ""}
+                      </span>
+
+                    </div>
+
+
+                    <button
+                      type="button"
+                      className="studentIdentityEdit"
+                      onClick={() =>
+                        openEditor(
+                          student
+                        )
+                      }
+                    >
+                      Edit
+                    </button>
+
+                  </article>
+
+                );
+
+              }
+            )}
+
+
+            {!visible.length && (
+
+              <div className="studentIdentityEmpty">
+                No Student found.
+              </div>
+
+            )}
+
+          </div>
+
+        </>
+
+      )}
+
+
+      {editing && (
+
+        <div
+          className="studentIdentityModalBackdrop"
+          onMouseDown={
+            event => {
+
+              if (
+                event.target ===
+                  event.currentTarget
+              ) {
+                setEditing(
+                  null
+                );
+              }
+
+            }
+          }
+        >
+
+          <section
+            className="studentIdentityModal"
+            role="dialog"
+            aria-modal="true"
+          >
+
+            <header>
+
+              <div>
+
+                <span>
+                  PROTECTED STUDENT RECORD
+                </span>
+
+                <h3>
+                  {editing.full_name}
+                </h3>
+
+                <p>
+                  USN and guardian details are controlled by Main Admin.
+                </p>
+
+              </div>
+
+
+              <button
+                type="button"
+                onClick={() =>
+                  setEditing(
+                    null
+                  )
+                }
+              >
+                ×
+              </button>
+
+            </header>
+
+
+            <div className="studentIdentityForm">
+
+              <label>
+
+                <span>
+                  Student USN
+                </span>
+
+                <input
+                  value={
+                    form.usn
+                  }
+                  onChange={
+                    event =>
+                      setForm({
+                        ...form,
+                        usn:
+                          event
+                            .target
+                            .value
+                            .toUpperCase(),
+                      })
+                  }
+                  placeholder="1RN..."
+                />
+
+              </label>
+
+
+              <label>
+
+                <span>
+                  Parent / Guardian name
+                </span>
+
+                <input
+                  value={
+                    form.guardian_name
+                  }
+                  onChange={
+                    event =>
+                      setForm({
+                        ...form,
+                        guardian_name:
+                          event
+                            .target
+                            .value,
+                      })
+                  }
+                />
+
+              </label>
+
+
+              <label>
+
+                <span>
+                  Relationship
+                </span>
+
+                <select
+                  value={
+                    form.relationship
+                  }
+                  onChange={
+                    event =>
+                      setForm({
+                        ...form,
+                        relationship:
+                          event
+                            .target
+                            .value,
+                      })
+                  }
+                >
+                  <option>
+                    Parent
+                  </option>
+
+                  <option>
+                    Mother
+                  </option>
+
+                  <option>
+                    Father
+                  </option>
+
+                  <option>
+                    Guardian
+                  </option>
+                </select>
+
+              </label>
+
+
+              <label>
+
+                <span>
+                  Guardian email
+                </span>
+
+                <input
+                  type="email"
+                  value={
+                    form.email
+                  }
+                  onChange={
+                    event =>
+                      setForm({
+                        ...form,
+                        email:
+                          event
+                            .target
+                            .value,
+                      })
+                  }
+                />
+
+              </label>
+
+
+              <label>
+
+                <span>
+                  Guardian phone
+                </span>
+
+                <input
+                  value={
+                    form.phone
+                  }
+                  onChange={
+                    event =>
+                      setForm({
+                        ...form,
+                        phone:
+                          event
+                            .target
+                            .value,
+                      })
+                  }
+                  inputMode="tel"
+                />
+
+              </label>
+
+
+              <div className="studentIdentityChecks">
+
+                <label>
+
+                  <input
+                    type="checkbox"
+                    checked={
+                      form.email_enabled
+                    }
+                    onChange={
+                      event =>
+                        setForm({
+                          ...form,
+                          email_enabled:
+                            event
+                              .target
+                              .checked,
+                        })
+                    }
+                  />
+
+                  Email alerts
+
+                </label>
+
+
+                <label>
+
+                  <input
+                    type="checkbox"
+                    checked={
+                      form.sms_enabled
+                    }
+                    onChange={
+                      event =>
+                        setForm({
+                          ...form,
+                          sms_enabled:
+                            event
+                              .target
+                              .checked,
+                        })
+                    }
+                  />
+
+                  SMS alerts
+
+                </label>
+
+              </div>
+
+            </div>
+
+
+            <footer>
+
+              <button
+                type="button"
+                className="ghost"
+                disabled={
+                  saving
+                }
+                onClick={() =>
+                  setEditing(
+                    null
+                  )
+                }
+              >
+                Cancel
+              </button>
+
+
+              <button
+                type="button"
+                className="primary"
+                disabled={
+                  saving
+                }
+                onClick={() =>
+                  void save()
+                }
+              >
+                {saving
+                  ? "Saving..."
+                  : "Save protected record"}
+              </button>
+
+            </footer>
+
+          </section>
+
+        </div>
+
+      )}
+
+    </section>
+
+  );
+
+}
+
+
 type AdminProfile = {id: string; full_name: string; email: string; role: Role; department: string; graduation_year: string; created_at: string};
 const emptyAdminProfiles: AdminProfile[]  = [];
 
@@ -30156,6 +32682,11 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("");
+
+  const [
+    showAccountDirectory,
+    setShowAccountDirectory,
+  ] = useState(false);
 
   const [showCreateAccount, setShowCreateAccount] =
     useState(false);
@@ -30177,33 +32708,108 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
     canManageUsersRole(profile.role);
 
   const loadUsers = async () => {
-    if (!canManage) return;
 
-    const client = getSupabaseClient();
+    if (!canManage) {
+      return;
+    }
+
+
+    const client =
+      getSupabaseClient();
+
 
     if (!client) {
+
       setStatus(
         "CampusConnect is not connected to Supabase."
       );
+
       return;
     }
 
-    const {data, error} = await client
-      .from("profiles")
-      .select(
-        "id,full_name,email,role,department,graduation_year,created_at"
-      )
-      .order("created_at", {
-        ascending: false,
-      })
-      .limit(300);
 
-    if (error) {
-      setStatus(error.message);
-      return;
+    try {
+
+      const {
+        data: {
+          session,
+        },
+      } =
+        await client.auth.getSession();
+
+
+      if (
+        !session?.access_token
+      ) {
+
+        setStatus(
+          "Your administrator session has expired. Sign in again."
+        );
+
+        return;
+      }
+
+
+      const response =
+        await fetch(
+          "/api/admin/users",
+          {
+            method:
+              "GET",
+
+            headers: {
+              Authorization:
+                `Bearer ${session.access_token}`,
+            },
+
+            cache:
+              "no-store",
+          }
+        );
+
+
+      const payload =
+        (
+          await response
+            .json()
+            .catch(
+              () => ({})
+            )
+        ) as {
+          users?: AdminProfile[];
+          error?: string;
+        };
+
+
+      if (!response.ok) {
+
+        setStatus(
+          payload.error ||
+            "Unable to load campus accounts."
+        );
+
+        return;
+      }
+
+
+      setUsers(
+        payload.users ||
+          []
+      );
+
+
+      setStatus("");
+
+    } catch (error) {
+
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "Unable to load campus accounts."
+      );
+
     }
 
-    setUsers((data || []) as AdminProfile[]);
   };
 
   useEffect(() => {
@@ -30426,6 +33032,160 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
       `${user.full_name} is now assigned to ${role}.`
     );
   };
+
+  const changeEmployeeId = async (
+    user: AdminProfile
+  ) => {
+
+    if (!canManage) {
+      return;
+    }
+
+
+    if (
+      user.role !== "Faculty"
+    ) {
+
+      setStatus(
+        "Employee ID can only be changed for Faculty accounts."
+      );
+
+      return;
+
+    }
+
+
+    const value =
+      window.prompt(
+        `Enter new Employee ID for ${user.full_name}`
+      );
+
+
+    if (value === null) {
+      return;
+    }
+
+
+    const employeeId =
+      value
+        .trim()
+        .toUpperCase();
+
+
+    if (!employeeId) {
+
+      setStatus(
+        "Employee ID is required."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      employeeId.length > 80
+    ) {
+
+      setStatus(
+        "Employee ID must be 80 characters or fewer."
+      );
+
+      return;
+
+    }
+
+
+    const client =
+      getSupabaseClient();
+
+
+    if (!client) {
+
+      setStatus(
+        "CampusConnect is not connected to Supabase."
+      );
+
+      return;
+
+    }
+
+
+    setStatus(
+      `Updating Employee ID for ${user.full_name}...`
+    );
+
+
+    try {
+
+      const {
+        error,
+      } =
+        await client.rpc(
+          "admin_update_campus_account",
+          {
+            p_user_id:
+              user.id,
+
+            p_role:
+              user.role,
+
+            p_account_status:
+              "Active",
+
+            p_employee_id:
+              employeeId,
+
+            p_coordinator_scope:
+              null,
+
+            p_volunteer_scope:
+              null,
+          }
+        );
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      setStatus(
+        `${user.full_name}'s Employee ID was updated to ${employeeId}.`
+      );
+
+
+      await loadUsers();
+
+
+    } catch (error) {
+
+      console.error(
+        "Employee ID update failed:",
+        error
+      );
+
+
+      const errorMessage =
+        error &&
+        typeof error === "object" &&
+        "message" in error
+          ? String(
+              error.message
+            )
+          : error instanceof Error
+          ? error.message
+          : "Unknown database error.";
+
+
+      setStatus(
+        `Unable to update Employee ID: ${errorMessage}`
+      );
+
+    }
+
+  };
+
 
   const visible = users.filter(user =>
     `${user.full_name} ${user.email} ${user.department} ${user.role}`
@@ -30710,7 +33470,19 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
         />
       </section>
 
-      <section className="adminUsers card">
+      <FacultyDepartmentManagement />
+
+      <StudentIdentityManagement />
+
+      <section
+        className={
+          `adminUsers card ${
+            showAccountDirectory
+              ? "adminUsersExpanded"
+              : "adminUsersCollapsed"
+          }`
+        }
+      >
         <header>
           <div>
             <span>CAMPUS DIRECTORY</span>
@@ -30722,16 +33494,55 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
             </p>
           </div>
 
-          <div className="adminDirectorySearch">
-            <span>⌕</span>
+          <div className="adminDirectoryHeaderActions">
 
-            <input
-              value={query}
-              onChange={event =>
-                setQuery(event.target.value)
+            <button
+              type="button"
+              className="adminDirectoryToggle"
+              aria-expanded={
+                showAccountDirectory
               }
-              placeholder="Search name, email, role or department"
-            />
+              onClick={() =>
+                setShowAccountDirectory(
+                  current =>
+                    !current
+                )
+              }
+            >
+
+              <span className="adminDirectoryToggleIcon">
+                {showAccountDirectory
+                  ? "−"
+                  : "+"}
+              </span>
+
+              <span>
+                {showAccountDirectory
+                  ? "Hide directory"
+                  : "Show directory"}
+              </span>
+
+            </button>
+
+
+            <div className="adminDirectorySearch">
+
+              <span>
+                ⌕
+              </span>
+
+              <input
+                value={query}
+                onChange={event =>
+                  setQuery(
+                    event.target.value
+                  )
+                }
+                placeholder="Search name, email, role or department"
+              />
+
+            </div>
+
           </div>
         </header>
 
@@ -30740,7 +33551,7 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
             <span>User</span>
             <span>Department</span>
             <span>Year</span>
-            <span>Verified role</span>
+            <span>Role & identity</span>
           </div>
 
           {visible.map(user => (
@@ -30767,28 +33578,50 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
               </span>
 
               <span>
-                {user.graduation_year}
+                {user.role === "Student"
+                  ? user.graduation_year
+                  : "—"}
               </span>
 
-              <select
-                value={user.role}
-                onChange={event =>
-                  void changeRole(
-                    user,
-                    event.target.value as Role
-                  )
-                }
-                disabled={
-                  user.email === profile.email
-                }
-              >
-                <option>Student</option>
-                <option>Faculty</option>
-                <option>Coordinator</option>
-                <option>Volunteer</option>
-                <option>Placement Cell</option>
-                <option>Main Admin</option>
-              </select>
+              <div className="adminRoleIdentityControls">
+
+                <select
+                  value={user.role}
+                  onChange={event =>
+                    void changeRole(
+                      user,
+                      event.target.value as Role
+                    )
+                  }
+                  disabled={
+                    user.email === profile.email
+                  }
+                >
+                  <option>Student</option>
+                  <option>Faculty</option>
+                  <option>Coordinator</option>
+                  <option>Volunteer</option>
+                  <option>Placement Cell</option>
+                  <option>Main Admin</option>
+                </select>
+
+
+                {user.role === "Faculty" && (
+                  <button
+                    type="button"
+                    className="adminEmployeeIdButton"
+                    onClick={() =>
+                      void changeEmployeeId(
+                        user
+                      )
+                    }
+                    title={`Change Employee ID for ${user.full_name}`}
+                  >
+                    Edit Employee ID
+                  </button>
+                )}
+
+              </div>
             </div>
           ))}
 

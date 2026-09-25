@@ -1,0 +1,61 @@
+@@ -1363,7 +1363,7 @@
+               <i aria-hidden="true" />
+ 
+               <span>
+-                FACULTY COMMAND CENTER
++                FACULTY OPERATIONS
+               </span>
+ 
+               <b>
+@@ -1492,44 +1490,27 @@
+         </section>
+ 
+ 
+-        <section className="facultyMinimalWorkspaceNote">
++        <section className="facultyMinimalWorkspaceNote facultyExecutiveBrief">
+ 
+           <div>
+ 
+             <span>
+-              ONE WORKSPACE
++              ORGANIZED TOOLING
+             </span>
+ 
+             <strong>
+-              Teaching tools are grouped,
+-              not repeated.
++              One primary workspace keeps the dashboard clean.
+             </strong>
+ 
+             <p>
+-              Schedule, batches, attendance,
+-              syllabus progress, assignments,
+-              diary, learning resources,
+-              workload, availability, coverage
+-              and Faculty Directory remain
+-              available from Faculty Workspace.
++              Schedule, batches, attendance, syllabus progress,
++              assignments, diary, resources, workload, availability,
++              coverage and directory tools remain grouped in Faculty
++              Workspace so the dashboard stays professional.
+             </p>
+ 
+           </div>
+ 
+-
+-          <button
+-            type="button"
+-            onClick={() =>
+-              go(
+-                "Faculty Workspace"
+-              )
+-            }
+-          >
+-            Open workspace
+-            <b>
+-              →
+-            </b>
+-          </button>
+ 
+         </section>
+ 

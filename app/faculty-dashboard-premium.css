@@ -1,0 +1,4373 @@
+.facultyDashboardPremium {
+  --fdp-ink: #182e40;
+  --fdp-muted: #586b7b;
+  --fdp-line: #dce5ec;
+  --fdp-blue: #245b80;
+  --fdp-blue-hover: #194867;
+  --fdp-soft: #f3f7fa;
+  display: grid;
+  gap: 24px;
+  width: 100%;
+  max-width: 1480px;
+  margin: 20px auto 48px;
+  color: var(--fdp-ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.content:has(.facultyDashboardPremium) .dashboardTopBar {
+  min-height: 0 !important;
+  padding: 24px 28px !important;
+  border: 1px solid var(--fdp-line, #dce5ec) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 12px rgba(22, 49, 69, .035) !important;
+}
+
+.content:has(.facultyDashboardPremium) .dashboardProfessionalHeading .dashboardGreeting,
+.content:has(.facultyDashboardPremium) .dashboardProfessionalHeading .dashboardGreeting > strong,
+.content:has(.facultyDashboardPremium) .dashboardProfessionalHeading .dashboardGreeting > span:first-child {
+  color: #182e40 !important;
+}
+
+.content:has(.facultyDashboardPremium) .dashboardIdentityLine > span {
+  color: #245b80 !important;
+  font-size: 11px !important;
+}
+
+.content:has(.facultyDashboardPremium) .dashboardIdentityLine > small,
+.content:has(.facultyDashboardPremium) .dashboardProfessionalHeading .dashboardMetaRow span {
+  color: #586b7b !important;
+  font-size: 13px !important;
+}
+
+.facultyDashboardPremium .fdp-hero,
+.facultyDashboardPremium .fdp-overview,
+.facultyDashboardPremium .roleActionCenter,
+.facultyDashboardPremium .staffOperationsBoard {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--fdp-line) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 12px rgba(22, 49, 69, .035) !important;
+}
+
+.facultyDashboardPremium .fdp-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(24px, 3vw, 40px);
+  border-top: 3px solid var(--fdp-blue) !important;
+  animation: fdp-rise 340ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.fdp-hero-copy { min-width: 0; max-width: 750px; }
+.fdp-eyebrow, .fdp-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--fdp-blue);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .11em;
+}
+.fdp-eyebrow > span { width: 8px; height: 8px; border-radius: 50%; background: #2e7966; }
+.fdp-hero h2 { margin: 12px 0 9px; color: var(--fdp-ink); font-size: clamp(27px, 2.7vw, 40px); line-height: 1.12; letter-spacing: -.035em; font-weight: 700; }
+.fdp-hero p { max-width: 630px; margin: 0; color: var(--fdp-muted); font-size: 15px; line-height: 1.6; }
+.fdp-hero p strong { color: var(--fdp-ink); font-weight: 650; }
+.fdp-hero-actions { display: flex; flex: none; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.fdp-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 170ms ease-out, background-color 170ms ease-out, border-color 170ms ease-out, box-shadow 170ms ease-out;
+}
+.fdp-button span { font-size: 17px; transition: transform 170ms ease-out; }
+.fdp-button:hover:not(:disabled) span { transform: translate(2px, -1px); }
+.fdp-button:active:not(:disabled) { transform: scale(.98); }
+.fdp-button-primary { border: 1px solid var(--fdp-blue); background: var(--fdp-blue); color: #fff; }
+.fdp-button-primary:hover:not(:disabled) { background: var(--fdp-blue-hover); box-shadow: 0 8px 18px rgba(36, 91, 128, .15); }
+.fdp-button-secondary { border: 1px solid #cbd9e3; background: #fff; color: var(--fdp-ink); }
+.fdp-button-secondary:hover:not(:disabled) { border-color: #9db8ca; background: var(--fdp-soft); }
+.fdp-button:disabled { opacity: .55; cursor: not-allowed; }
+
+.facultyDashboardPremium .fdp-overview { padding: 24px; animation: fdp-rise 340ms 70ms cubic-bezier(.2, .8, .2, 1) both; }
+.fdp-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.fdp-section-heading h2 { margin: 6px 0 0; color: var(--fdp-ink); font-size: 21px; font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
+.fdp-section-heading p { margin: 0; color: var(--fdp-muted); font-size: 12px; }
+.fdp-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.fdp-metric { display: grid; gap: 8px; min-width: 0; padding: 18px; border: 1px solid var(--fdp-line); border-radius: 12px; background: #fbfcfd; transition: border-color 170ms ease-out, box-shadow 170ms ease-out, transform 170ms ease-out; }
+.fdp-metric:hover { transform: translateY(-2px); border-color: #bbd0df; box-shadow: 0 8px 20px rgba(22, 49, 69, .055); }
+.fdp-metric-label { color: var(--fdp-muted); font-size: 13px; font-weight: 650; }
+.fdp-metric strong { color: var(--fdp-ink); font-size: clamp(27px, 2.8vw, 37px); font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.fdp-metric small { color: var(--fdp-muted); font-size: 12px; }
+.fdp-metric-skeleton { display: block; width: 64px; height: 32px; border-radius: 6px; background: #e3eaf0; animation: fdp-pulse 1.1s ease-in-out infinite alternate; }
+
+.facultyDashboardPremium .roleActionCenter,
+.facultyDashboardPremium .staffOperationsBoard { display: grid; gap: 18px; padding: clamp(18px, 2vw, 28px); overflow: visible; animation: fdp-rise 340ms 130ms cubic-bezier(.2, .8, .2, 1) both; }
+.facultyDashboardPremium .roleActionCenter::before,
+.facultyDashboardPremium .staffOperationsBoard::before { display: none; }
+.facultyDashboardPremium .roleActionCenterHeader,
+.facultyDashboardPremium .staffOperationsHeader { align-items: flex-start; padding-bottom: 16px; border-bottom: 1px solid var(--fdp-line); }
+.facultyDashboardPremium .roleActionCenterHeader > div:first-child > span,
+.facultyDashboardPremium .staffOperationsHeader > div:first-child > span { color: var(--fdp-blue) !important; font-size: 11px !important; font-weight: 750; letter-spacing: .11em; }
+.facultyDashboardPremium .roleActionCenterHeader h3,
+.facultyDashboardPremium .staffOperationsHeader h3 { color: var(--fdp-ink) !important; font-family: inherit !important; font-size: clamp(21px, 2vw, 26px) !important; font-weight: 700; letter-spacing: -.025em; }
+.facultyDashboardPremium .roleActionCenterHeader p,
+.facultyDashboardPremium .staffOperationsHeader p { color: var(--fdp-muted) !important; font-size: 13px !important; line-height: 1.55; }
+.facultyDashboardPremium .roleActionCenterHeaderActions,
+.facultyDashboardPremium .staffOperationsHeaderActions { flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; }
+.facultyDashboardPremium .roleActionCenterDate { color: var(--fdp-muted); font-size: 12px; }
+.facultyDashboardPremium .roleActionCenterHeaderActions button,
+.facultyDashboardPremium .staffOperationsHeaderActions button { min-height: 42px; padding: 0 14px; border-radius: 9px; font-size: 12px !important; font-weight: 700; }
+.facultyDashboardPremium .staffOperationsCreate { background: var(--fdp-blue) !important; border: 1px solid var(--fdp-blue) !important; color: #fff !important; }
+.facultyDashboardPremium .staffOperationsRefresh { color: var(--fdp-ink) !important; background: #fff !important; border: 1px solid #cbd9e3 !important; }
+.facultyDashboardPremium .roleActionCenterSummary { min-height: 54px; padding: 8px 12px; border-color: var(--fdp-line); border-radius: 10px; background: var(--fdp-soft) !important; }
+.facultyDashboardPremium .roleActionCenterSummary > div { min-height: 35px; background: #fff; border-color: var(--fdp-line); }
+.facultyDashboardPremium .roleActionCenterSummary strong { font-size: 18px; color: var(--fdp-ink); }
+.facultyDashboardPremium .roleActionCenterSummary span,
+.facultyDashboardPremium .roleActionCenterSummary > p { color: var(--fdp-muted); font-size: 11px; }
+.facultyDashboardPremium .roleActionGrid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr)); gap: 12px; }
+.facultyDashboardPremium .roleActionCard { min-height: 0; padding: 17px; border: 1px solid var(--fdp-line) !important; border-radius: 12px; background: #fff !important; box-shadow: none !important; }
+.facultyDashboardPremium .roleActionCard::before { left: 17px; right: 17px; height: 2px; opacity: .55; }
+.facultyDashboardPremium .roleActionCard:hover { transform: translateY(-2px); border-color: #b8cedd !important; box-shadow: 0 10px 22px rgba(22, 49, 69, .07) !important; }
+.facultyDashboardPremium .roleActionCard header div > span { font-size: 11px !important; }
+.facultyDashboardPremium .roleActionCard header small,
+.facultyDashboardPremium .roleActionCard header em { font-size: 11px !important; }
+.facultyDashboardPremium .roleActionCard h4 { color: var(--fdp-ink) !important; font-size: 16px !important; line-height: 1.3; }
+.facultyDashboardPremium .roleActionCard > p { color: var(--fdp-muted) !important; font-size: 12px !important; line-height: 1.5; }
+.facultyDashboardPremium .roleActionCard footer { gap: 8px; }
+.facultyDashboardPremium .roleActionCard footer button { min-height: 40px; font-size: 12px !important; }
+.facultyDashboardPremium .roleActionOpen { background: var(--fdp-blue) !important; border-color: var(--fdp-blue) !important; color: #fff !important; }
+.facultyDashboardPremium .roleActionDismiss { margin-left: auto; min-width: 40px; border-color: #cbd9e3 !important; }
+.facultyDashboardPremium .roleActionCenterFootnote { gap: 12px; border-color: var(--fdp-line); }
+.facultyDashboardPremium .roleActionCenterFootnote :is(span, p) { color: var(--fdp-muted); font-size: 11px !important; }
+.facultyDashboardPremium .roleActionCenterEmpty,
+.facultyDashboardPremium .staffOperationsEmpty { min-height: 120px; padding: 20px; background: var(--fdp-soft) !important; border: 1px dashed #cbd9e3 !important; border-radius: 11px; }
+.facultyDashboardPremium .roleActionCenterEmpty strong,
+.facultyDashboardPremium .staffOperationsEmpty strong { color: var(--fdp-ink); font-size: 14px !important; }
+.facultyDashboardPremium .roleActionCenterEmpty p,
+.facultyDashboardPremium .staffOperationsEmpty p { color: var(--fdp-muted); font-size: 12px !important; }
+
+.facultyDashboardPremium .roleActionAiPicker { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.facultyDashboardPremium .roleActionAiPicker label { color: var(--fdp-muted); font-size: 12px; font-weight: 650; }
+.facultyDashboardPremium .roleActionAiPicker select { min-width: 130px; max-width: 200px; min-height: 42px; padding: 0 28px 0 10px; border: 1px solid #cbd9e3; border-radius: 9px; background: #fff; color: var(--fdp-ink); font: inherit; font-size: 12px; }
+.facultyDashboardPremium .roleActionAiPicker button:disabled { opacity: .5; cursor: not-allowed; }
+
+/* The tab bar remains the single filter control; the old metric buttons repeated it. */
+.facultyDashboardPremium .staffOperationsMetrics { display: none; }
+.facultyDashboardPremium .staffOperationsToolbar { gap: 12px; }
+.facultyDashboardPremium .staffOperationsFilters { flex-wrap: wrap; gap: 6px; }
+.facultyDashboardPremium .staffOperationsFilters button { min-height: 40px; padding: 0 13px; color: var(--fdp-muted) !important; font-size: 12px !important; font-weight: 650; border-radius: 8px; }
+.facultyDashboardPremium .staffOperationsFilters button.active { color: var(--fdp-blue) !important; background: #e9f2f8 !important; }
+.facultyDashboardPremium .staffFilterCount { margin-left: 5px; font-size: 11px; font-variant-numeric: tabular-nums; }
+.facultyDashboardPremium .staffOperationsToolbar > label { min-width: min(100%, 230px); }
+.facultyDashboardPremium .staffOperationsToolbar input { min-height: 44px; color: var(--fdp-ink); background: #fff; font-size: 13px !important; }
+.facultyDashboardPremium .staffOperationsGrid { gap: 12px; }
+.facultyDashboardPremium .staffOperationCard { border: 1px solid var(--fdp-line) !important; border-radius: 12px; background: #fff !important; box-shadow: none !important; }
+.facultyDashboardPremium .staffOperationCard:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(22, 49, 69, .07) !important; }
+.facultyDashboardPremium .staffOperationCard h4 { color: var(--fdp-ink); font-size: 16px !important; }
+.facultyDashboardPremium .staffOperationCard > p { color: var(--fdp-muted); font-size: 12px !important; }
+.facultyDashboardPremium .staffOperationsForm { border: 1px solid var(--fdp-line); background: var(--fdp-soft) !important; }
+.facultyDashboardPremium .staffOperationsForm h4 { color: var(--fdp-ink); font-size: 18px; }
+.facultyDashboardPremium .staffOperationsFormGrid label > span { color: var(--fdp-ink); font-size: 12px !important; }
+.facultyDashboardPremium .staffOperationsFormGrid :is(input, select, textarea) { min-height: 44px; color: var(--fdp-ink); font-size: 13px !important; }
+.facultyDashboardPremium .staffOperationsForm > footer button { min-height: 44px; font-size: 12px !important; }
+.facultyDashboardPremium .staffOperationsStatus { font-size: 13px !important; }
+.facultyDashboardPremium .fdp-utility { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px 20px; border: 1px solid var(--fdp-line); border-radius: 12px; background: #fff; }
+.fdp-utility > span { color: var(--fdp-muted); font-size: 13px; }
+
+.facultyDashboardPremium :is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 3px solid #2b7199 !important;
+  outline-offset: 3px !important;
+}
+@keyframes fdp-rise { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fdp-pulse { to { opacity: .55; } }
+
+@media (max-width: 1080px) {
+  .facultyDashboardPremium .fdp-hero { align-items: flex-start; flex-direction: column; }
+  .fdp-hero-actions { justify-content: flex-start; }
+  .fdp-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .facultyDashboardPremium { gap: 16px; margin-top: 14px; }
+  .content:has(.facultyDashboardPremium) .dashboardTopBar { padding: 18px !important; }
+  .facultyDashboardPremium .fdp-hero, .facultyDashboardPremium .fdp-overview, .facultyDashboardPremium .roleActionCenter, .facultyDashboardPremium .staffOperationsBoard { padding: 18px; }
+  .fdp-section-heading { align-items: flex-start; flex-direction: column; }
+  .facultyDashboardPremium .roleActionCenterHeader, .facultyDashboardPremium .staffOperationsHeader { flex-direction: column; }
+  .facultyDashboardPremium .roleActionCenterHeaderActions, .facultyDashboardPremium .staffOperationsHeaderActions { width: 100%; justify-content: flex-start; }
+  .facultyDashboardPremium .roleActionCenterSummary { grid-template-columns: repeat(2, max-content); }
+  .facultyDashboardPremium .roleActionCenterSummary > p { grid-column: 1 / -1; justify-content: flex-start; }
+  .facultyDashboardPremium .staffOperationsToolbar { flex-direction: column; align-items: stretch; }
+  .facultyDashboardPremium .staffOperationsToolbar > label { width: 100%; }
+}
+@media (max-width: 460px) {
+  .fdp-hero-actions, .fdp-hero-actions .fdp-button { width: 100%; }
+  .fdp-metrics { gap: 8px; }
+  .fdp-metric { padding: 14px; }
+  .facultyDashboardPremium .roleActionAiPicker { width: 100%; }
+  .facultyDashboardPremium .roleActionAiPicker label { width: 100%; }
+  .facultyDashboardPremium .roleActionAiPicker select { flex: 1; min-width: 0; }
+  .facultyDashboardPremium .staffOperationsFilters { overflow-x: auto; flex-wrap: nowrap; }
+  .facultyDashboardPremium .staffOperationsFilters button { flex: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .facultyDashboardPremium *, .facultyDashboardPremium *::before, .facultyDashboardPremium *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .fdp-metric:hover, .facultyDashboardPremium .roleActionCard:hover, .facultyDashboardPremium .staffOperationCard:hover { transform: none !important; }
+}
+
+/* Detailed task and dialog states use the same readable scale as the overview. */
+.facultyDashboardPremium .roleActionDismiss { display: inline-flex; align-items: center; justify-content: center; gap: 5px; width: auto; min-width: 44px; padding: 0 11px; color: var(--fdp-muted); }
+.facultyDashboardPremium .roleActionDismissIcon { font-size: 17px; line-height: 1; }
+.facultyDashboardPremium .roleActionDismissLabel { font-size: 12px !important; line-height: 1; }
+.facultyDashboardPremium .staffOperationCard > header > span,
+.facultyDashboardPremium .staffOperationCard > header em { font-size: 11px !important; }
+.facultyDashboardPremium .staffOperationOwnership > span { background: var(--fdp-soft) !important; }
+.facultyDashboardPremium .staffOperationOwnership small,
+.facultyDashboardPremium .staffOperationDue small,
+.facultyDashboardPremium .staffOperationControls label > span { color: var(--fdp-muted) !important; font-size: 11px !important; }
+.facultyDashboardPremium .staffOperationOwnership strong,
+.facultyDashboardPremium .staffOperationDue strong { color: var(--fdp-ink) !important; font-size: 12px !important; }
+.facultyDashboardPremium .staffOperationControls select { min-height: 44px; font-size: 12px !important; }
+.facultyDashboardPremium .staffOperationClaim { min-height: 44px; font-size: 12px !important; }
+.facultyDashboardPremium .staffOperationCard > footer { flex-wrap: wrap; }
+.facultyDashboardPremium .staffOperationCard > footer a,
+.facultyDashboardPremium .staffOperationCard > footer button { min-height: 44px; font-size: 12px !important; }
+.facultyDashboardPremium .staffOperationDelete { min-width: 44px; }
+.facultyDashboardPremium .staffCompletionDialog { max-height: min(90dvh, 720px); overflow: auto; border-radius: 14px; background: #fff; }
+.facultyDashboardPremium .staffCompletionDialog > span { font-size: 11px; }
+.facultyDashboardPremium .staffCompletionDialog h4 { color: var(--fdp-ink); font-family: inherit; }
+.facultyDashboardPremium .staffCompletionDialog p { color: var(--fdp-muted); font-size: 13px; }
+.facultyDashboardPremium .staffCompletionDialog textarea { min-height: 110px; font-size: 13px; }
+.facultyDashboardPremium .staffCompletionDialog footer button { min-height: 44px; font-size: 12px; }
+
+/* CAMPUSCONNECT — FACULTY PREMIUM V8 START */
+
+
+/* ==========================================================
+   PREMIUM FACULTY DESIGN TOKENS
+   ========================================================== */
+
+.facultyDashboardPremium {
+  --v8-navy:
+    #102a43;
+
+  --v8-navy-2:
+    #163a59;
+
+  --v8-blue:
+    #246fa8;
+
+  --v8-blue-hover:
+    #1d5d8f;
+
+  --v8-teal:
+    #19816f;
+
+  --v8-violet:
+    #6757aa;
+
+  --v8-amber:
+    #aa742d;
+
+  --v8-red:
+    #b65050;
+
+  --v8-text:
+    #132f43;
+
+  --v8-muted:
+    #657b8d;
+
+  --v8-soft:
+    #f5f8fb;
+
+  --v8-soft-blue:
+    #eef6fc;
+
+  --v8-line:
+    #d9e5ee;
+
+  --v8-line-strong:
+    #c5d7e4;
+
+  --v8-white:
+    #ffffff;
+
+  --v8-shadow:
+    0 10px 30px
+    rgba(
+      18,
+      47,
+      67,
+      .065
+    );
+
+  --v8-shadow-hover:
+    0 18px 38px
+    rgba(
+      18,
+      47,
+      67,
+      .105
+    );
+
+  --v8-ease:
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    );
+
+  position:
+    relative;
+
+  gap:
+    22px !important;
+}
+
+
+/* ==========================================================
+   PAGE BACKGROUND
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium) {
+  background:
+    #f6f8fb !important;
+}
+
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  border-color:
+    #d9e4ed !important;
+
+  background:
+    linear-gradient(
+      120deg,
+      #ffffff 0%,
+      #f8fbfe 100%
+    ) !important;
+
+  box-shadow:
+    0 6px 22px
+    rgba(
+      18,
+      47,
+      67,
+      .045
+    ) !important;
+
+  animation:
+    fdpV8Reveal
+    420ms
+    var(--v8-ease)
+    both;
+}
+
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    28px;
+
+  width:
+    44px;
+
+  height:
+    3px;
+
+  border-radius:
+    0 0 99px 99px;
+
+  background:
+    #2876ad;
+}
+
+
+/* ==========================================================
+   HERO — CLEAR VISUAL FOCUS
+   ========================================================== */
+
+.facultyDashboardPremium
+.fdp-hero {
+  position:
+    relative;
+
+  isolation:
+    isolate;
+
+  min-height:
+    210px;
+
+  overflow:
+    hidden;
+
+  padding:
+    clamp(
+      28px,
+      3.4vw,
+      44px
+    ) !important;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .09
+    ) !important;
+
+  border-top:
+    0 !important;
+
+  border-radius:
+    18px !important;
+
+  color:
+    #ffffff;
+
+  background:
+    linear-gradient(
+      115deg,
+      #102a43 0%,
+      #163a59 100%
+    ) !important;
+
+  box-shadow:
+    0 18px 44px
+    rgba(
+      16,
+      42,
+      67,
+      .17
+    ) !important;
+
+  animation:
+    fdpV8HeroReveal
+    520ms
+    var(--v8-ease)
+    both;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    -95px;
+
+  right:
+    -70px;
+
+  z-index:
+    -1;
+
+  width:
+    290px;
+
+  height:
+    290px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .08
+    );
+
+  border-radius:
+    50%;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  right:
+    90px;
+
+  bottom:
+    -120px;
+
+  z-index:
+    -1;
+
+  width:
+    260px;
+
+  height:
+    260px;
+
+  border:
+    1px solid
+    rgba(
+      112,
+      185,
+      232,
+      .10
+    );
+
+  border-radius:
+    50%;
+}
+
+
+.facultyDashboardPremium
+.fdp-eyebrow {
+  color:
+    #b9d5e9 !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-eyebrow
+> span {
+  position:
+    relative;
+
+  width:
+    8px;
+
+  height:
+    8px;
+
+  background:
+    #60d4a2 !important;
+
+  box-shadow:
+    0 0 0
+    rgba(
+      96,
+      212,
+      162,
+      .25
+    );
+
+  animation:
+    fdpV8LivePulse
+    2.3s
+    ease-out
+    infinite;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero
+h2 {
+  max-width:
+    720px;
+
+  margin-top:
+    15px !important;
+
+  color:
+    #ffffff !important;
+
+  font-size:
+    clamp(
+      2rem,
+      3vw,
+      2.75rem
+    ) !important;
+
+  font-weight:
+    720 !important;
+
+  letter-spacing:
+    -.045em !important;
+
+  text-wrap:
+    balance;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero
+p {
+  max-width:
+    700px;
+
+  color:
+    #c5d6e2 !important;
+
+  font-size:
+    14px !important;
+
+  line-height:
+    1.65 !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero
+p strong {
+  color:
+    #ffffff !important;
+}
+
+
+/* ==========================================================
+   HERO ACTIONS
+   ========================================================== */
+
+.facultyDashboardPremium
+.fdp-hero-actions {
+  gap:
+    9px !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero-actions
+.fdp-button {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  min-height:
+    45px;
+
+  border-radius:
+    10px !important;
+
+  transition:
+    transform
+    160ms
+    var(--v8-ease),
+    background
+    160ms
+    ease,
+    border-color
+    160ms
+    ease,
+    box-shadow
+    160ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero-actions
+.fdp-button::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  background:
+    linear-gradient(
+      110deg,
+      transparent 25%,
+      rgba(
+        255,
+        255,
+        255,
+        .13
+      ) 48%,
+      transparent 72%
+    );
+
+  transform:
+    translateX(
+      -120%
+    );
+
+  transition:
+    transform
+    500ms
+    var(--v8-ease);
+}
+
+
+.facultyDashboardPremium
+.fdp-hero-actions
+.fdp-button:hover::before {
+  transform:
+    translateX(
+      120%
+    );
+}
+
+
+.facultyDashboardPremium
+.fdp-hero-actions
+.fdp-button-primary {
+  border-color:
+    #3f8ec8 !important;
+
+  background:
+    #2674aa !important;
+
+  box-shadow:
+    0 10px 22px
+    rgba(
+      4,
+      25,
+      43,
+      .24
+    ) !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero-actions
+.fdp-button-primary:hover {
+  transform:
+    translateY(
+      -2px
+    );
+
+  background:
+    #3182b9 !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-hero-actions
+.fdp-button-secondary {
+  border-color:
+    rgba(
+      255,
+      255,
+      255,
+      .18
+    ) !important;
+
+  color:
+    #edf7fd !important;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .07
+    ) !important;
+
+  backdrop-filter:
+    blur(
+      6px
+    );
+}
+
+
+.facultyDashboardPremium
+.fdp-hero-actions
+.fdp-button-secondary:hover {
+  transform:
+    translateY(
+      -2px
+    );
+
+  border-color:
+    rgba(
+      255,
+      255,
+      255,
+      .28
+    ) !important;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .12
+    ) !important;
+}
+
+
+/* ==========================================================
+   ACADEMIC SNAPSHOT
+   ========================================================== */
+
+.facultyDashboardPremium
+.fdp-overview {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  padding:
+    27px !important;
+
+  border-radius:
+    18px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    var(--v8-shadow) !important;
+
+  animation:
+    fdpV8Reveal
+    500ms
+    70ms
+    var(--v8-ease)
+    both !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-overview::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    27px;
+
+  width:
+    52px;
+
+  height:
+    3px;
+
+  border-radius:
+    0 0 999px 999px;
+
+  background:
+    #2876ad;
+}
+
+
+.facultyDashboardPremium
+.fdp-kicker {
+  color:
+    #3c7398 !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-section-heading
+h2 {
+  color:
+    var(--v8-text) !important;
+
+  font-size:
+    22px !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-section-heading
+p {
+  color:
+    #7b8f9f !important;
+}
+
+
+/* ==========================================================
+   METRIC CARDS
+   ========================================================== */
+
+.facultyDashboardPremium
+.fdp-metrics {
+  gap:
+    13px !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric {
+  --card-accent:
+    #347dc0;
+
+  --card-tint:
+    rgba(
+      52,
+      125,
+      192,
+      .06
+    );
+
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  padding:
+    20px !important;
+
+  border:
+    1px solid
+    var(--v8-line) !important;
+
+  border-radius:
+    14px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 5px 17px
+    rgba(
+      18,
+      47,
+      67,
+      .04
+    );
+
+  transition:
+    transform
+    230ms
+    var(--v8-ease),
+    border-color
+    230ms
+    ease,
+    box-shadow
+    230ms
+    ease;
+
+  animation:
+    fdpV8MetricReveal
+    480ms
+    var(--v8-ease)
+    both;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric:nth-child(2) {
+  --card-accent:
+    #19816f;
+
+  --card-tint:
+    rgba(
+      25,
+      129,
+      111,
+      .06
+    );
+
+  animation-delay:
+    90ms;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric:nth-child(3) {
+  --card-accent:
+    #6757aa;
+
+  --card-tint:
+    rgba(
+      103,
+      87,
+      170,
+      .06
+    );
+
+  animation-delay:
+    140ms;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric:nth-child(4) {
+  --card-accent:
+    #aa742d;
+
+  --card-tint:
+    rgba(
+      170,
+      116,
+      45,
+      .065
+    );
+
+  animation-delay:
+    190ms;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    18px;
+
+  width:
+    38px;
+
+  height:
+    3px;
+
+  border-radius:
+    0 0 99px 99px;
+
+  background:
+    var(
+      --card-accent
+    );
+
+  transition:
+    width
+    220ms
+    var(--v8-ease);
+}
+
+
+.facultyDashboardPremium
+.fdp-metric::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  right:
+    -36px;
+
+  bottom:
+    -36px;
+
+  width:
+    96px;
+
+  height:
+    96px;
+
+  border-radius:
+    50%;
+
+  background:
+    var(
+      --card-tint
+    );
+
+  transform:
+    scale(
+      .75
+    );
+
+  transition:
+    transform
+    320ms
+    var(--v8-ease);
+}
+
+
+.facultyDashboardPremium
+.fdp-metric:hover {
+  transform:
+    translateY(
+      -4px
+    );
+
+  border-color:
+    var(--v8-line-strong) !important;
+
+  box-shadow:
+    var(--v8-shadow-hover) !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric:hover::before {
+  width:
+    72px;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric:hover::after {
+  transform:
+    scale(
+      1.15
+    );
+}
+
+
+.facultyDashboardPremium
+.fdp-metric-label {
+  color:
+    #6a7f90 !important;
+
+  font-size:
+    12px !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric
+strong {
+  position:
+    relative;
+
+  z-index:
+    1;
+
+  color:
+    var(--v8-text) !important;
+
+  transition:
+    color
+    180ms
+    ease,
+    transform
+    180ms
+    var(--v8-ease);
+}
+
+
+.facultyDashboardPremium
+.fdp-metric:hover
+strong {
+  color:
+    var(--card-accent) !important;
+
+  transform:
+    translateY(
+      -2px
+    );
+}
+
+
+.facultyDashboardPremium
+.fdp-metric
+small {
+  position:
+    relative;
+
+  z-index:
+    1;
+
+  color:
+    #8093a2 !important;
+}
+
+
+/* ==========================================================
+   SKELETON
+   ========================================================== */
+
+.facultyDashboardPremium
+.fdp-metric-skeleton {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  background:
+    #e8eef3 !important;
+
+  animation:
+    none !important;
+}
+
+
+.facultyDashboardPremium
+.fdp-metric-skeleton::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(
+        255,
+        255,
+        255,
+        .92
+      ),
+      transparent
+    );
+
+  transform:
+    translateX(
+      -100%
+    );
+
+  animation:
+    fdpV8Shimmer
+    1.35s
+    ease-in-out
+    infinite;
+}
+
+
+/* ==========================================================
+   TODAY'S ACTION CENTER
+   ========================================================== */
+
+.facultyDashboardPremium
+.roleActionCenter {
+  position:
+    relative;
+
+  overflow:
+    hidden !important;
+
+  border:
+    1px solid
+    var(--v8-line) !important;
+
+  border-radius:
+    18px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    var(--v8-shadow) !important;
+
+  animation:
+    fdpV8Reveal
+    520ms
+    130ms
+    var(--v8-ease)
+    both !important;
+
+  transition:
+    border-color
+    220ms
+    ease,
+    box-shadow
+    220ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.roleActionCenter:hover {
+  border-color:
+    #cadbe7 !important;
+
+  box-shadow:
+    var(--v8-shadow-hover) !important;
+}
+
+
+.facultyDashboardPremium
+.roleActionCenter::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    27px;
+
+  width:
+    58px;
+
+  height:
+    3px;
+
+  border-radius:
+    0 0 99px 99px;
+
+  background:
+    #397fb5;
+
+  pointer-events:
+    none;
+}
+
+
+.facultyDashboardPremium
+.roleActionCenterHeader
+h3 {
+  color:
+    var(--v8-text) !important;
+}
+
+
+.facultyDashboardPremium
+.roleActionCenterSummary {
+  border-color:
+    #dbe7ef !important;
+
+  background:
+    #f5f8fb !important;
+}
+
+
+/* ==========================================================
+   SIGNAL CARDS
+   ========================================================== */
+
+.facultyDashboardPremium
+.roleActionCard {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--v8-line) !important;
+
+  background:
+    #ffffff !important;
+
+  transition:
+    transform
+    220ms
+    var(--v8-ease),
+    border-color
+    220ms
+    ease,
+    box-shadow
+    220ms
+    ease;
+
+  animation:
+    fdpV8CardReveal
+    440ms
+    var(--v8-ease)
+    both;
+}
+
+
+.facultyDashboardPremium
+.roleActionCard:nth-child(1) {
+  animation-delay:
+    100ms;
+}
+
+
+.facultyDashboardPremium
+.roleActionCard:nth-child(2) {
+  animation-delay:
+    150ms;
+}
+
+
+.facultyDashboardPremium
+.roleActionCard:nth-child(3) {
+  animation-delay:
+    200ms;
+}
+
+
+.facultyDashboardPremium
+.roleActionCard:hover {
+  transform:
+    translateY(
+      -3px
+    ) !important;
+
+  border-color:
+    #bfd3e2 !important;
+
+  box-shadow:
+    0 13px 28px
+    rgba(
+      18,
+      47,
+      67,
+      .08
+    ) !important;
+}
+
+
+.facultyDashboardPremium
+.roleActionCard:nth-child(1)::before {
+  background:
+    #347dc0 !important;
+}
+
+
+.facultyDashboardPremium
+.roleActionCard:nth-child(2)::before {
+  background:
+    #6757aa !important;
+}
+
+
+.facultyDashboardPremium
+.roleActionCard:nth-child(3)::before {
+  background:
+    #aa742d !important;
+}
+
+
+/* ==========================================================
+   SIGNAL ACTIONS
+   ========================================================== */
+
+.facultyDashboardPremium
+.roleActionOpen {
+  border-radius:
+    9px !important;
+
+  background:
+    var(--v8-blue) !important;
+
+  box-shadow:
+    0 7px 17px
+    rgba(
+      36,
+      111,
+      168,
+      .16
+    ) !important;
+
+  transition:
+    transform
+    150ms
+    var(--v8-ease),
+    background
+    150ms
+    ease,
+    box-shadow
+    150ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.roleActionOpen:hover {
+  transform:
+    translateY(
+      -2px
+    );
+
+  background:
+    var(--v8-blue-hover) !important;
+
+  box-shadow:
+    0 10px 20px
+    rgba(
+      36,
+      111,
+      168,
+      .20
+    ) !important;
+}
+
+
+.facultyDashboardPremium
+.roleActionOpen
+span {
+  transition:
+    transform
+    150ms
+    var(--v8-ease);
+}
+
+
+.facultyDashboardPremium
+.roleActionOpen:hover
+span {
+  transform:
+    translateX(
+      3px
+    );
+}
+
+
+.facultyDashboardPremium
+.roleActionDismiss {
+  border-radius:
+    9px !important;
+
+  color:
+    #617789 !important;
+
+  background:
+    #ffffff !important;
+
+  transition:
+    transform
+    150ms
+    ease,
+    border-color
+    150ms
+    ease,
+    background
+    150ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.roleActionDismiss:hover {
+  transform:
+    translateY(
+      -1px
+    );
+
+  border-color:
+    #b8ccdb !important;
+
+  color:
+    #38566d !important;
+
+  background:
+    #f5f8fa !important;
+}
+
+
+/* ==========================================================
+   AI SIGNAL PICKER
+   ========================================================== */
+
+.facultyDashboardPremium
+.roleActionAiPicker
+select {
+  transition:
+    border-color
+    150ms
+    ease,
+    box-shadow
+    150ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.roleActionAiPicker
+select:focus {
+  border-color:
+    #70a8cf !important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      36,
+      111,
+      168,
+      .10
+    );
+}
+
+
+.facultyDashboardPremium
+.roleActionAiPicker
+button:not(:disabled) {
+  border:
+    1px solid
+    #2874aa;
+
+  color:
+    #ffffff;
+
+  background:
+    #2874aa;
+
+  transition:
+    transform
+    150ms
+    ease,
+    background
+    150ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.roleActionAiPicker
+button:not(:disabled):hover {
+  transform:
+    translateY(
+      -1px
+    );
+
+  background:
+    #205e8c;
+}
+
+
+/* ==========================================================
+   STAFF OPERATIONS
+   ========================================================== */
+
+.facultyDashboardPremium
+.staffOperationsBoard {
+  position:
+    relative;
+
+  overflow:
+    hidden !important;
+
+  border:
+    1px solid
+    var(--v8-line) !important;
+
+  border-radius:
+    18px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    var(--v8-shadow) !important;
+
+  animation:
+    fdpV8Reveal
+    520ms
+    190ms
+    var(--v8-ease)
+    both !important;
+
+  transition:
+    box-shadow
+    220ms
+    ease,
+    border-color
+    220ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsBoard::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    27px;
+
+  width:
+    58px;
+
+  height:
+    3px;
+
+  border-radius:
+    0 0 99px 99px;
+
+  background:
+    #19816f;
+
+  pointer-events:
+    none;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsBoard:hover {
+  border-color:
+    #cadbe7 !important;
+
+  box-shadow:
+    var(--v8-shadow-hover) !important;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsHeader
+h3 {
+  color:
+    var(--v8-text) !important;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsCreate {
+  background:
+    var(--v8-teal) !important;
+
+  border-color:
+    var(--v8-teal) !important;
+
+  box-shadow:
+    0 8px 17px
+    rgba(
+      25,
+      129,
+      111,
+      .17
+    ) !important;
+
+  transition:
+    transform
+    150ms
+    ease,
+    background
+    150ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsCreate:hover {
+  transform:
+    translateY(
+      -2px
+    );
+
+  background:
+    #126b5c !important;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsRefresh {
+  transition:
+    transform
+    150ms
+    ease,
+    border-color
+    150ms
+    ease,
+    background
+    150ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsRefresh:hover {
+  transform:
+    translateY(
+      -1px
+    );
+
+  border-color:
+    #b8ccda !important;
+
+  background:
+    #f6f9fb !important;
+}
+
+
+/* ==========================================================
+   TASK FILTERS
+   ========================================================== */
+
+.facultyDashboardPremium
+.staffOperationsToolbar {
+  padding:
+    10px !important;
+
+  border:
+    1px solid
+    #dbe6ee;
+
+  border-radius:
+    12px;
+
+  background:
+    #f6f9fb;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsFilters
+button {
+  transition:
+    transform
+    150ms
+    ease,
+    background
+    150ms
+    ease,
+    color
+    150ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsFilters
+button:hover {
+  transform:
+    translateY(
+      -1px
+    );
+
+  color:
+    #315f81 !important;
+
+  background:
+    #edf4f8 !important;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsFilters
+button.active {
+  color:
+    #185f8d !important;
+
+  background:
+    #e4f1f9 !important;
+
+  box-shadow:
+    inset 0 0 0 1px
+    #c1d9e8;
+}
+
+
+/* ==========================================================
+   TASK SEARCH
+   ========================================================== */
+
+.facultyDashboardPremium
+.staffOperationsToolbar
+input {
+  transition:
+    border-color
+    150ms
+    ease,
+    box-shadow
+    150ms
+    ease;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsToolbar
+input:focus {
+  border-color:
+    #70a8cf !important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      36,
+      111,
+      168,
+      .10
+    ) !important;
+}
+
+
+/* ==========================================================
+   EMPTY STATE
+   ========================================================== */
+
+.facultyDashboardPremium
+.staffOperationsEmpty {
+  position:
+    relative;
+
+  border-color:
+    #c7d9e5 !important;
+
+  background:
+    linear-gradient(
+      110deg,
+      #f8fbfd 0%,
+      #f2f8fb 100%
+    ) !important;
+}
+
+
+.facultyDashboardPremium
+.staffOperationsEmpty
+> span {
+  animation:
+    fdpV8SuccessPop
+    440ms
+    var(--v8-ease)
+    both;
+}
+
+
+/* ==========================================================
+   SGPA / CGPA UTILITY
+   ========================================================== */
+
+.facultyDashboardPremium
+.fdp-utility {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--v8-line) !important;
+
+  border-radius:
+    14px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 5px 17px
+    rgba(
+      18,
+      47,
+      67,
+      .04
+    );
+
+  animation:
+    fdpV8Reveal
+    500ms
+    240ms
+    var(--v8-ease)
+    both;
+}
+
+
+.facultyDashboardPremium
+.fdp-utility::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    20px;
+
+  width:
+    36px;
+
+  height:
+    2px;
+
+  background:
+    #6757aa;
+}
+
+
+/* ==========================================================
+   FOCUS STATES
+   ========================================================== */
+
+.facultyDashboardPremium
+:is(
+  button,
+  select,
+  input,
+  textarea,
+  a
+):focus-visible {
+  outline:
+    3px solid
+    rgba(
+      36,
+      111,
+      168,
+      .20
+    ) !important;
+
+  outline-offset:
+    3px !important;
+}
+
+
+/* ==========================================================
+   KEYFRAMES
+   ========================================================== */
+
+@keyframes fdpV8HeroReveal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        12px
+      )
+      scale(
+        .992
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      )
+      scale(
+        1
+      );
+  }
+
+}
+
+
+@keyframes fdpV8Reveal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        10px
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      );
+  }
+
+}
+
+
+@keyframes fdpV8MetricReveal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        10px
+      )
+      scale(
+        .98
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      )
+      scale(
+        1
+      );
+  }
+
+}
+
+
+@keyframes fdpV8CardReveal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        8px
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      );
+  }
+
+}
+
+
+@keyframes fdpV8LivePulse {
+
+  0% {
+    box-shadow:
+      0 0 0 0
+      rgba(
+        96,
+        212,
+        162,
+        .28
+      );
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 8px
+      rgba(
+        96,
+        212,
+        162,
+        0
+      );
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0
+      rgba(
+        96,
+        212,
+        162,
+        0
+      );
+  }
+
+}
+
+
+@keyframes fdpV8Shimmer {
+
+  from {
+    transform:
+      translateX(
+        -100%
+      );
+  }
+
+  to {
+    transform:
+      translateX(
+        100%
+      );
+  }
+
+}
+
+
+@keyframes fdpV8SuccessPop {
+
+  0% {
+    opacity:
+      0;
+
+    transform:
+      scale(
+        .78
+      );
+  }
+
+  70% {
+    transform:
+      scale(
+        1.06
+      );
+  }
+
+  100% {
+    opacity:
+      1;
+
+    transform:
+      scale(
+        1
+      );
+  }
+
+}
+
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+
+@media (max-width: 1080px) {
+
+  .facultyDashboardPremium
+  .fdp-hero {
+    gap:
+      22px;
+  }
+
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 720px) {
+
+  .facultyDashboardPremium {
+    gap:
+      15px !important;
+
+    margin-top:
+      12px !important;
+  }
+
+
+  .facultyDashboardPremium
+  .fdp-hero {
+    min-height:
+      0;
+
+    padding:
+      24px 20px !important;
+
+    border-radius:
+      15px !important;
+  }
+
+
+  .facultyDashboardPremium
+  .fdp-hero
+  h2 {
+    font-size:
+      1.8rem !important;
+  }
+
+
+  .facultyDashboardPremium
+  .fdp-hero-actions {
+    width:
+      100%;
+  }
+
+
+  .facultyDashboardPremium
+  .fdp-hero-actions
+  button {
+    flex:
+      1 1 100%;
+  }
+
+
+  .facultyDashboardPremium
+  .fdp-overview,
+  .facultyDashboardPremium
+  .roleActionCenter,
+  .facultyDashboardPremium
+  .staffOperationsBoard {
+    border-radius:
+      15px !important;
+  }
+
+}
+
+
+/* ==========================================================
+   TOUCH DEVICES
+   ========================================================== */
+
+@media (hover: none) {
+
+  .facultyDashboardPremium
+  .fdp-metric:hover,
+
+  .facultyDashboardPremium
+  .roleActionCard:hover {
+    transform:
+      none !important;
+  }
+
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .facultyDashboardPremium *,
+  .facultyDashboardPremium *::before,
+  .facultyDashboardPremium *::after {
+    animation:
+      none !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+
+
+/* CAMPUSCONNECT — FACULTY PREMIUM V8 END */
+
+
+
+/* CAMPUSCONNECT — FACULTY EDITORIAL ROYAL V2 START */
+
+/* ---------------------------------------------------------
+   PREMIUM FACULTY DASHBOARD — REFERENCE-INSPIRED
+   Deep navy + warm gold + ivory
+   No neon / no cheap gradients
+--------------------------------------------------------- */
+
+.content:has(.facultyDashboardPremium) .roleActionCenter,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #dccfb9 !important;
+  border-radius: 34px !important;
+  background:
+    radial-gradient(circle at top right, rgba(170, 132, 67, 0.09), transparent 18%),
+    linear-gradient(180deg, #fffdfa 0%, #f9f6f0 100%) !important;
+  box-shadow:
+    0 24px 60px rgba(25, 38, 59, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.92) !important;
+  animation: facultyEditorialFadeIn 420ms cubic-bezier(.22,.61,.36,1) both;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, #08264a 0%, #123d75 48%, #b9893b 100%);
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter::after,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center::after,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  right: 18px;
+  width: 320px;
+  height: 180px;
+  pointer-events: none;
+  opacity: 0.08;
+  background:
+    linear-gradient(180deg, rgba(8, 38, 74, 0.14), rgba(8, 38, 74, 0.02)),
+    radial-gradient(circle at 30% 30%, rgba(185, 137, 59, 0.25), transparent 60%);
+  filter: blur(2px);
+  border-radius: 24px;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter h2,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center h2,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter h2 {
+  color: #0c2340 !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(2rem, 3vw, 3.2rem) !important;
+  font-weight: 760 !important;
+  letter-spacing: -0.04em !important;
+  line-height: 1.04 !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter h3,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center h3,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter h3 {
+  color: #122b47 !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter p,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center p,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter p {
+  color: #596d85 !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter small,
+.content:has(.facultyDashboardPremium) .roleActionCenter .eyebrow,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center small,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .eyebrow,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter small,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .eyebrow {
+  color: #335a84 !important;
+  letter-spacing: 0.22em !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter select,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center select,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter select {
+  min-height: 54px !important;
+  border: 1px solid #d6c7af !important;
+  border-radius: 16px !important;
+  background: #fffefb !important;
+  color: #152b45 !important;
+  box-shadow: 0 6px 18px rgba(18, 43, 69, 0.04) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter button,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center button,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter button,
+.content:has(.facultyDashboardPremium) #staff-operations-board button {
+  min-height: 54px;
+  border-radius: 16px !important;
+  transition:
+    transform 160ms cubic-bezier(.22,.61,.36,1),
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter button:hover,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center button:hover,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter button:hover,
+.content:has(.facultyDashboardPremium) #staff-operations-board button:hover {
+  transform: translateY(-1px);
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter button:focus-visible,
+.content:has(.facultyDashboardPremium) .roleActionCenter select:focus-visible,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center button:focus-visible,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center select:focus-visible,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter button:focus-visible,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter select:focus-visible,
+.content:has(.facultyDashboardPremium) #staff-operations-board button:focus-visible,
+.content:has(.facultyDashboardPremium) #staff-operations-board input:focus-visible {
+  outline: 3px solid rgba(39, 83, 148, 0.18);
+  outline-offset: 2px;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .primary,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .primary,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .primary,
+.content:has(.facultyDashboardPremium) #staff-operations-board .primary {
+  border: 1px solid #9f7837 !important;
+  background: linear-gradient(135deg, #8b6327 0%, #c0974d 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 30px rgba(139, 99, 39, 0.22) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .primary:hover,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .primary:hover,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .primary:hover,
+.content:has(.facultyDashboardPremium) #staff-operations-board .primary:hover {
+  box-shadow: 0 18px 34px rgba(139, 99, 39, 0.28) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .secondary,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .secondary,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .secondary,
+.content:has(.facultyDashboardPremium) #staff-operations-board .secondary {
+  border: 1px solid #d7c8b1 !important;
+  background: rgba(255,255,255,0.86) !important;
+  color: #1c3552 !important;
+  box-shadow: 0 8px 20px rgba(17, 38, 61, 0.05) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalSummary,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterSummary,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalSummary,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterSummary,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalSummary,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterSummary {
+  border: 1px solid #e0d6c6 !important;
+  border-radius: 22px !important;
+  background: linear-gradient(180deg, #fffdf9 0%, #fbf7f0 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95);
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalStat,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterStat,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalStat,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterStat,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalStat,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterStat {
+  border: 1px solid #ded3c2 !important;
+  border-radius: 18px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fbf8f3 100%) !important;
+  color: #183250 !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalStat strong,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterStat strong,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalStat strong,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterStat strong,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalStat strong,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterStat strong {
+  color: #0b2545 !important;
+  font-size: 1.9rem !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #d9cebc !important;
+  border-radius: 28px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,247,240,0.96) 100%) !important;
+  box-shadow:
+    0 16px 36px rgba(17, 34, 51, 0.07),
+    inset 0 1px 0 rgba(255,255,255,0.92) !important;
+  transition:
+    transform 180ms cubic-bezier(.22,.61,.36,1),
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard:hover,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard:hover,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard:hover,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard:hover,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard:hover,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 44px rgba(17, 34, 51, 0.10) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard::before,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, #123d75 0%, #2f5e98 55%, #be9756 100%);
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard::after,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard::after,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard::after,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard::after,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard::after,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: -18px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(12, 35, 64, 0.08) 0%, rgba(12, 35, 64, 0.02) 58%, transparent 70%);
+  pointer-events: none;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard:nth-of-type(3n+1),
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard:nth-of-type(3n+1),
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard:nth-of-type(3n+1),
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard:nth-of-type(3n+1),
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard:nth-of-type(3n+1),
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard:nth-of-type(3n+1) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(244,248,255,0.98) 100%) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard:nth-of-type(3n+1)::before,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard:nth-of-type(3n+1)::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard:nth-of-type(3n+1)::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard:nth-of-type(3n+1)::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard:nth-of-type(3n+1)::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard:nth-of-type(3n+1)::before {
+  background: linear-gradient(180deg, #0d3b88 0%, #2c6ac6 100%);
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard:nth-of-type(3n+2),
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard:nth-of-type(3n+2),
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard:nth-of-type(3n+2),
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard:nth-of-type(3n+2),
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard:nth-of-type(3n+2),
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard:nth-of-type(3n+2) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(252,248,240,0.98) 100%) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard:nth-of-type(3n+2)::before,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard:nth-of-type(3n+2)::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard:nth-of-type(3n+2)::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard:nth-of-type(3n+2)::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard:nth-of-type(3n+2)::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard:nth-of-type(3n+2)::before {
+  background: linear-gradient(180deg, #8f6326 0%, #c69a4a 100%);
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard:nth-of-type(3n+3),
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard:nth-of-type(3n+3),
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard:nth-of-type(3n+3),
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard:nth-of-type(3n+3),
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard:nth-of-type(3n+3),
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard:nth-of-type(3n+3) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,245,255,0.98) 100%) !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard:nth-of-type(3n+3)::before,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard:nth-of-type(3n+3)::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard:nth-of-type(3n+3)::before,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard:nth-of-type(3n+3)::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard:nth-of-type(3n+3)::before,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard:nth-of-type(3n+3)::before {
+  background: linear-gradient(180deg, #4b2ea8 0%, #6e54cb 100%);
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard .informationBadge,
+.content:has(.facultyDashboardPremium) .roleActionCenter .pill,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .informationBadge,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .pill,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .informationBadge,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .pill {
+  border: 1px solid #e5dbca !important;
+  background: rgba(255,255,255,0.86) !important;
+  color: #24456b !important;
+  backdrop-filter: blur(4px);
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard .ctaButton,
+.content:has(.facultyDashboardPremium) .roleActionCenter .signalCard .primary,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard .ctaButton,
+.content:has(.facultyDashboardPremium) .roleActionCenter .roleActionCenterCard .primary,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard .ctaButton,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .signalCard .primary,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard .ctaButton,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .roleActionCenterCard .primary,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard .ctaButton,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .signalCard .primary,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard .ctaButton,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .roleActionCenterCard .primary {
+  border-color: transparent !important;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .statusDot,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .statusDot,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .statusDot {
+  animation: facultyEditorialPulse 2s ease-out infinite;
+}
+
+.content:has(.facultyDashboardPremium) .roleActionCenter .footerNote,
+.content:has(.facultyDashboardPremium) #faculty-role-action-center .footerNote,
+.content:has(.facultyDashboardPremium) .facultyRoleActionCenter .footerNote {
+  color: #7b8ca0 !important;
+}
+
+/* Staff operations board */
+.content:has(.facultyDashboardPremium) #staff-operations-board,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #d8cdbd !important;
+  border-radius: 34px !important;
+  background:
+    linear-gradient(180deg, #fffdfa 0%, #faf7f1 100%) !important;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.06);
+}
+
+.content:has(.facultyDashboardPremium) #staff-operations-board::before,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, #0c2340 0%, #1b4b7d 50%, #ba8f4d 100%);
+}
+
+.content:has(.facultyDashboardPremium) #staff-operations-board h2,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard h2 {
+  color: #102946 !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(2rem, 2.8vw, 3rem) !important;
+  letter-spacing: -0.04em !important;
+}
+
+.content:has(.facultyDashboardPremium) #staff-operations-board p,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard p {
+  color: #61748a !important;
+}
+
+.content:has(.facultyDashboardPremium) #staff-operations-board .taskStat,
+.content:has(.facultyDashboardPremium) #staff-operations-board .boardStat,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard .taskStat,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard .boardStat {
+  border: 1px solid #ddd2c0 !important;
+  border-radius: 20px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fbf8f3 100%) !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.content:has(.facultyDashboardPremium) #staff-operations-board .taskStat strong,
+.content:has(.facultyDashboardPremium) #staff-operations-board .boardStat strong,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard .taskStat strong,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard .boardStat strong {
+  color: #0e2948 !important;
+  font-size: 2rem !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+}
+
+.content:has(.facultyDashboardPremium) #staff-operations-board input,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard input {
+  min-height: 52px !important;
+  border: 1px solid #d6cab7 !important;
+  border-radius: 16px !important;
+  background: #fffefb !important;
+  color: #18344f !important;
+  box-shadow: inset 0 1px 2px rgba(16, 41, 70, 0.03);
+}
+
+.content:has(.facultyDashboardPremium) #staff-operations-board .emptyState,
+.content:has(.facultyDashboardPremium) #staff-operations-board .taskEmptyState,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard .emptyState,
+.content:has(.facultyDashboardPremium) .staffOperationsBoard .taskEmptyState {
+  border: 1px dashed #d5c9b5 !important;
+  border-radius: 22px !important;
+  background: linear-gradient(180deg, #fffdfa 0%, #fbf7ef 100%) !important;
+}
+
+@keyframes facultyEditorialFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes facultyEditorialPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(27, 75, 125, 0.22);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(27, 75, 125, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(27, 75, 125, 0);
+  }
+}
+
+@media (max-width: 1100px) {
+  .content:has(.facultyDashboardPremium) .roleActionCenter h2,
+  .content:has(.facultyDashboardPremium) #faculty-role-action-center h2,
+  .content:has(.facultyDashboardPremium) .facultyRoleActionCenter h2,
+  .content:has(.facultyDashboardPremium) #staff-operations-board h2,
+  .content:has(.facultyDashboardPremium) .staffOperationsBoard h2 {
+    font-size: clamp(1.8rem, 5vw, 2.5rem) !important;
+  }
+
+  .content:has(.facultyDashboardPremium) .roleActionCenter,
+  .content:has(.facultyDashboardPremium) #faculty-role-action-center,
+  .content:has(.facultyDashboardPremium) .facultyRoleActionCenter,
+  .content:has(.facultyDashboardPremium) #staff-operations-board,
+  .content:has(.facultyDashboardPremium) .staffOperationsBoard {
+    border-radius: 24px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content:has(.facultyDashboardPremium) .roleActionCenter,
+  .content:has(.facultyDashboardPremium) #faculty-role-action-center,
+  .content:has(.facultyDashboardPremium) .facultyRoleActionCenter,
+  .content:has(.facultyDashboardPremium) #staff-operations-board,
+  .content:has(.facultyDashboardPremium) .staffOperationsBoard,
+  .content:has(.facultyDashboardPremium) .roleActionCenter *,
+  .content:has(.facultyDashboardPremium) #faculty-role-action-center *,
+  .content:has(.facultyDashboardPremium) .facultyRoleActionCenter *,
+  .content:has(.facultyDashboardPremium) #staff-operations-board *,
+  .content:has(.facultyDashboardPremium) .staffOperationsBoard * {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* CAMPUSCONNECT — FACULTY EDITORIAL ROYAL V2 END */
+
+/* CAMPUSCONNECT — FACULTY GREETING V10 START */
+
+
+/* ==========================================================
+   PREMIUM EDITORIAL GREETING
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar {
+  position:
+    relative;
+
+  isolation:
+    isolate;
+
+  overflow:
+    hidden;
+
+  min-height:
+    188px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  padding:
+    34px 40px !important;
+
+  border:
+    1px solid
+    #ddd4c6 !important;
+
+  border-radius:
+    24px !important;
+
+  background:
+    #fffdfa !important;
+
+  box-shadow:
+    0 18px 46px
+    rgba(
+      18,
+      34,
+      51,
+      .075
+    ) !important;
+
+  animation:
+    facultyGreetingReveal
+    480ms
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    )
+    both;
+}
+
+
+/* Navy editorial rail */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    0;
+
+  width:
+    7px;
+
+  height:
+    100%;
+
+  background:
+    #0c2949;
+
+  pointer-events:
+    none;
+}
+
+
+/* Muted gold top detail */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    40px;
+
+  width:
+    88px;
+
+  height:
+    4px;
+
+  border-radius:
+    0 0 999px 999px;
+
+  background:
+    #b68a47;
+
+  pointer-events:
+    none;
+}
+
+
+/* ==========================================================
+   INNER CONTENT
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+> * {
+  position:
+    relative;
+
+  z-index:
+    2;
+}
+
+
+/* Campus label / eyebrow */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+.dashboardEyebrow,
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+.eyebrow {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  color:
+    #365b7b !important;
+
+  font-size:
+    11px !important;
+
+  font-weight:
+    800 !important;
+
+  letter-spacing:
+    .20em !important;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* ==========================================================
+   MAIN GREETING
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+h1 {
+  margin:
+    8px 0 11px !important;
+
+  max-width:
+    900px;
+
+  color:
+    #102b46 !important;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif !important;
+
+  font-size:
+    clamp(
+      2.4rem,
+      4vw,
+      4rem
+    ) !important;
+
+  font-weight:
+    700 !important;
+
+  line-height:
+    1.02 !important;
+
+  letter-spacing:
+    -.045em !important;
+
+  text-wrap:
+    balance;
+}
+
+
+/* Give the user name slightly stronger weight */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+h1
+strong,
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+h1
+b {
+  color:
+    #092642 !important;
+
+  font-weight:
+    760 !important;
+}
+
+
+/* ==========================================================
+   DATE / ROLE META
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+p {
+  margin:
+    0 !important;
+
+  color:
+    #677b8d !important;
+
+  font-size:
+    13px !important;
+
+  font-weight:
+    600 !important;
+
+  line-height:
+    1.55 !important;
+}
+
+
+/*
+ * Any inline separators inherit a restrained gold tone.
+ */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+p
+span,
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+p
+b {
+  color:
+    #9a7442;
+}
+
+
+/* ==========================================================
+   SUBTLE BACKGROUND DETAIL
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+.dashboardTopBarInner::after,
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+.dashboardHeroInner::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    50%;
+
+  right:
+    34px;
+
+  width:
+    200px;
+
+  height:
+    200px;
+
+  transform:
+    translateY(
+      -50%
+    );
+
+  border:
+    1px solid
+    rgba(
+      12,
+      41,
+      73,
+      .055
+    );
+
+  border-radius:
+    50%;
+
+  pointer-events:
+    none;
+}
+
+
+/* ==========================================================
+   ACTIONS — IF PRESENT
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+button,
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+a {
+  min-height:
+    42px;
+
+  border-radius:
+    10px !important;
+
+  font-weight:
+    700 !important;
+
+  transition:
+    transform
+    160ms
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    ),
+    border-color
+    160ms
+    ease,
+    background
+    160ms
+    ease,
+    box-shadow
+    160ms
+    ease;
+}
+
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+button:hover,
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+a:hover {
+  transform:
+    translateY(
+      -2px
+    );
+}
+
+
+/* Primary greeting action */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+button:first-of-type {
+  border-color:
+    #173f68 !important;
+
+  color:
+    #ffffff !important;
+
+  background:
+    #173f68 !important;
+
+  box-shadow:
+    0 9px 20px
+    rgba(
+      15,
+      46,
+      77,
+      .16
+    ) !important;
+}
+
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+button:first-of-type:hover {
+  background:
+    #0f3458 !important;
+}
+
+
+/* Secondary greeting action */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+button:not(:first-of-type) {
+  border:
+    1px solid
+    #d7c9b5 !important;
+
+  color:
+    #27425c !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 6px 14px
+    rgba(
+      20,
+      42,
+      61,
+      .045
+    ) !important;
+}
+
+
+/* ==========================================================
+   VERY SUBTLE LIGHT MOVEMENT
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+.dashboardGreeting,
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+.dashboardTopBarContent {
+  animation:
+    facultyGreetingContent
+    520ms
+    60ms
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    )
+    both;
+}
+
+
+/* ==========================================================
+   FOCUS
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.dashboardTopBar
+:is(
+  button,
+  a
+):focus-visible {
+  outline:
+    3px solid
+    rgba(
+      21,
+      63,
+      104,
+      .18
+    ) !important;
+
+  outline-offset:
+    3px !important;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (
+  max-width:
+  900px
+) {
+
+  .content:has(.facultyDashboardPremium)
+  .dashboardTopBar {
+    min-height:
+      auto;
+
+    padding:
+      28px 25px !important;
+
+    border-radius:
+      19px !important;
+  }
+
+
+  .content:has(.facultyDashboardPremium)
+  .dashboardTopBar::after {
+    left:
+      25px;
+
+    width:
+      64px;
+  }
+
+
+  .content:has(.facultyDashboardPremium)
+  .dashboardTopBar
+  h1 {
+    font-size:
+      clamp(
+        2rem,
+        7vw,
+        3rem
+      ) !important;
+  }
+
+}
+
+
+@media (
+  max-width:
+  560px
+) {
+
+  .content:has(.facultyDashboardPremium)
+  .dashboardTopBar {
+    padding:
+      24px 20px !important;
+  }
+
+
+  .content:has(.facultyDashboardPremium)
+  .dashboardTopBar
+  h1 {
+    font-size:
+      2rem !important;
+  }
+
+}
+
+
+/* ==========================================================
+   MOTION
+   ========================================================== */
+
+@keyframes facultyGreetingReveal {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(
+        8px
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(
+        0
+      );
+  }
+
+}
+
+
+@keyframes facultyGreetingContent {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateX(
+        -6px
+      );
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateX(
+        0
+      );
+  }
+
+}
+
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .content:has(.facultyDashboardPremium)
+  .dashboardTopBar,
+
+  .content:has(.facultyDashboardPremium)
+  .dashboardTopBar
+  * {
+    animation:
+      none !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+
+
+/* CAMPUSCONNECT — FACULTY GREETING V10 END */
+
+/* CAMPUSCONNECT — FACULTY LIQUID BUTTONS V1 START */
+
+
+/* ==========================================================
+   ALL FACULTY DASHBOARD BUTTONS
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .facultyDashboardPremium,
+  .dashboardTopBar
+)
+button {
+  --liquid-border:
+    rgba(18, 45, 72, .20);
+
+  --liquid-text:
+    #17324d;
+
+  --liquid-bg-top:
+    #ffffff;
+
+  --liquid-bg-middle:
+    #edf2f6;
+
+  --liquid-bg-bottom:
+    #dfe7ed;
+
+  --liquid-highlight:
+    rgba(255,255,255,.82);
+
+  position:
+    relative;
+
+  isolation:
+    isolate;
+
+  overflow:
+    hidden;
+
+  min-height:
+    44px;
+
+  padding:
+    0 17px;
+
+  border:
+    1px solid
+    var(--liquid-border)
+    !important;
+
+  border-radius:
+    14px !important;
+
+  color:
+    var(--liquid-text)
+    !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--liquid-bg-top)
+      0%,
+      var(--liquid-bg-middle)
+      48%,
+      var(--liquid-bg-bottom)
+      100%
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(
+      255,
+      255,
+      255,
+      .95
+    ),
+    inset 0 -1px 1px
+    rgba(
+      15,
+      38,
+      60,
+      .08
+    ),
+    0 1px 2px
+    rgba(
+      15,
+      32,
+      50,
+      .12
+    ),
+    0 7px 16px
+    rgba(
+      15,
+      32,
+      50,
+      .07
+    ) !important;
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    -.01em;
+
+  cursor:
+    pointer;
+
+  transform:
+    translateZ(
+      0
+    );
+
+  transition:
+    transform
+    160ms
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    ),
+    box-shadow
+    180ms
+    ease,
+    border-color
+    180ms
+    ease,
+    filter
+    180ms
+    ease;
+
+  -webkit-tap-highlight-color:
+    transparent;
+}
+
+
+/* ==========================================================
+   METAL SURFACE
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .facultyDashboardPremium,
+  .dashboardTopBar
+)
+button::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  inset:
+    1px;
+
+  z-index:
+    -1;
+
+  border-radius:
+    12px;
+
+  background:
+    linear-gradient(
+      115deg,
+      rgba(
+        255,
+        255,
+        255,
+        .70
+      )
+      0%,
+
+      rgba(
+        255,
+        255,
+        255,
+        .12
+      )
+      26%,
+
+      rgba(
+        91,
+        111,
+        130,
+        .08
+      )
+      43%,
+
+      rgba(
+        255,
+        255,
+        255,
+        .42
+      )
+      60%,
+
+      rgba(
+        255,
+        255,
+        255,
+        .06
+      )
+      76%,
+
+      rgba(
+        255,
+        255,
+        255,
+        .62
+      )
+      100%
+    );
+
+  opacity:
+    .65;
+
+  pointer-events:
+    none;
+}
+
+
+/* ==========================================================
+   MOVING LIQUID REFLECTION
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .facultyDashboardPremium,
+  .dashboardTopBar
+)
+button::after {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    -65%;
+
+  left:
+    -60%;
+
+  z-index:
+    2;
+
+  width:
+    55%;
+
+  height:
+    230%;
+
+  transform:
+    rotate(
+      18deg
+    );
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(
+        255,
+        255,
+        255,
+        .58
+      ),
+      transparent
+    );
+
+  opacity:
+    0;
+
+  pointer-events:
+    none;
+}
+
+
+/* ==========================================================
+   HOVER
+   ========================================================== */
+
+@media (hover:hover) {
+
+  .content:has(.facultyDashboardPremium)
+  :is(
+    .facultyDashboardPremium,
+    .dashboardTopBar
+  )
+  button:not(:disabled):hover {
+    transform:
+      translateY(
+        -2px
+      )
+      scale(
+        1.012
+      );
+
+    border-color:
+      rgba(
+        31,
+        72,
+        108,
+        .30
+      )
+      !important;
+
+    box-shadow:
+      inset 0 1px 0
+      rgba(
+        255,
+        255,
+        255,
+        1
+      ),
+      inset 0 -1px 1px
+      rgba(
+        13,
+        37,
+        58,
+        .10
+      ),
+      0 2px 3px
+      rgba(
+        14,
+        35,
+        55,
+        .12
+      ),
+      0 12px 22px
+      rgba(
+        14,
+        35,
+        55,
+        .11
+      )
+      !important;
+  }
+
+
+  .content:has(.facultyDashboardPremium)
+  :is(
+    .facultyDashboardPremium,
+    .dashboardTopBar
+  )
+  button:not(:disabled):hover::after {
+    opacity:
+      .8;
+
+    animation:
+      facultyLiquidButtonSweep
+      720ms
+      cubic-bezier(
+        .22,
+        .61,
+        .36,
+        1
+      )
+      forwards;
+  }
+
+}
+
+
+/* ==========================================================
+   PRESS
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .facultyDashboardPremium,
+  .dashboardTopBar
+)
+button:not(:disabled):active {
+  transform:
+    translateY(
+      1px
+    )
+    scale(
+      .982
+    );
+
+  box-shadow:
+    inset 0 2px 5px
+    rgba(
+      15,
+      35,
+      55,
+      .18
+    ),
+    inset 0 1px 1px
+    rgba(
+      255,
+      255,
+      255,
+      .55
+    ),
+    0 2px 5px
+    rgba(
+      15,
+      35,
+      55,
+      .08
+    ) !important;
+
+  transition-duration:
+    80ms;
+}
+
+
+/* ==========================================================
+   PRIMARY BUTTONS — ROYAL NAVY METAL
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .fdp-button-primary,
+  .roleActionOpen,
+  .staffOperationsCreate,
+  button.primary
+) {
+  --liquid-border:
+    rgba(
+      7,
+      28,
+      55,
+      .78
+    );
+
+  --liquid-text:
+    #ffffff;
+
+  --liquid-bg-top:
+    #315d8c;
+
+  --liquid-bg-middle:
+    #153d68;
+
+  --liquid-bg-bottom:
+    #092847;
+
+  color:
+    #ffffff !important;
+
+  text-shadow:
+    0 1px 1px
+    rgba(
+      0,
+      0,
+      0,
+      .18
+    );
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(
+      255,
+      255,
+      255,
+      .25
+    ),
+    inset 0 -2px 4px
+    rgba(
+      0,
+      0,
+      0,
+      .22
+    ),
+    0 2px 4px
+    rgba(
+      5,
+      27,
+      51,
+      .20
+    ),
+    0 9px 20px
+    rgba(
+      8,
+      38,
+      70,
+      .18
+    ) !important;
+}
+
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .fdp-button-primary,
+  .roleActionOpen,
+  .staffOperationsCreate,
+  button.primary
+)::before {
+  background:
+    linear-gradient(
+      118deg,
+
+      rgba(
+        255,
+        255,
+        255,
+        .22
+      )
+      0%,
+
+      rgba(
+        255,
+        255,
+        255,
+        .03
+      )
+      30%,
+
+      rgba(
+        0,
+        0,
+        0,
+        .12
+      )
+      47%,
+
+      rgba(
+        255,
+        255,
+        255,
+        .13
+      )
+      66%,
+
+      rgba(
+        255,
+        255,
+        255,
+        .03
+      )
+      100%
+    );
+}
+
+
+/* ==========================================================
+   CAMPUS AI — MUTED ROYAL GOLD METAL
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .roleActionAiPicker
+  button:not(:disabled),
+  button[aria-label*="Campus AI"],
+  button[title*="Campus AI"]
+) {
+  --liquid-border:
+    rgba(
+      107,
+      76,
+      29,
+      .55
+    );
+
+  --liquid-text:
+    #fffdf7;
+
+  --liquid-bg-top:
+    #c29a55;
+
+  --liquid-bg-middle:
+    #9b712f;
+
+  --liquid-bg-bottom:
+    #79531f;
+
+  color:
+    #fffdf7 !important;
+
+  text-shadow:
+    0 1px 1px
+    rgba(
+      55,
+      32,
+      8,
+      .24
+    );
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(
+      255,
+      246,
+      219,
+      .35
+    ),
+    inset 0 -2px 4px
+    rgba(
+      55,
+      32,
+      8,
+      .20
+    ),
+    0 2px 4px
+    rgba(
+      82,
+      55,
+      20,
+      .14
+    ),
+    0 9px 20px
+    rgba(
+      105,
+      74,
+      28,
+      .16
+    ) !important;
+}
+
+
+/* ==========================================================
+   DISMISS / SECONDARY / REFRESH
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .roleActionDismiss,
+  .staffOperationsRefresh,
+  .fdp-button-secondary,
+  button.secondary
+) {
+  --liquid-border:
+    rgba(
+      46,
+      69,
+      88,
+      .20
+    );
+
+  --liquid-text:
+    #334e64;
+
+  --liquid-bg-top:
+    #ffffff;
+
+  --liquid-bg-middle:
+    #f0f3f5;
+
+  --liquid-bg-bottom:
+    #e4e9ed;
+
+  color:
+    #334e64 !important;
+
+  text-shadow:
+    none !important;
+}
+
+
+/* ==========================================================
+   ACTIVE FILTER / TAB BUTTON
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+.staffOperationsFilters
+button.active {
+  --liquid-border:
+    rgba(
+      25,
+      66,
+      101,
+      .30
+    );
+
+  --liquid-text:
+    #173e60;
+
+  --liquid-bg-top:
+    #ffffff;
+
+  --liquid-bg-middle:
+    #e8f1f7;
+
+  --liquid-bg-bottom:
+    #d9e8f2;
+
+  color:
+    #173e60 !important;
+}
+
+
+/* ==========================================================
+   DISABLED
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .facultyDashboardPremium,
+  .dashboardTopBar
+)
+button:disabled {
+  cursor:
+    not-allowed;
+
+  opacity:
+    .48;
+
+  transform:
+    none !important;
+
+  filter:
+    saturate(
+      .55
+    );
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(
+      255,
+      255,
+      255,
+      .70
+    ),
+    0 1px 3px
+    rgba(
+      15,
+      32,
+      50,
+      .05
+    )
+    !important;
+}
+
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .facultyDashboardPremium,
+  .dashboardTopBar
+)
+button:disabled::after {
+  display:
+    none;
+}
+
+
+/* ==========================================================
+   FOCUS
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .facultyDashboardPremium,
+  .dashboardTopBar
+)
+button:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      29,
+      76,
+      119,
+      .20
+    )
+    !important;
+
+  outline-offset:
+    3px
+    !important;
+}
+
+
+/* ==========================================================
+   ICON MOTION
+   ========================================================== */
+
+.content:has(.facultyDashboardPremium)
+:is(
+  .facultyDashboardPremium,
+  .dashboardTopBar
+)
+button
+svg {
+  transition:
+    transform
+    180ms
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    );
+}
+
+
+@media (hover:hover) {
+
+  .content:has(.facultyDashboardPremium)
+  :is(
+    .facultyDashboardPremium,
+    .dashboardTopBar
+  )
+  button:not(:disabled):hover
+  svg {
+    transform:
+      translateY(
+        -1px
+      );
+  }
+
+}
+
+
+/* ==========================================================
+   MOBILE / TOUCH
+   ========================================================== */
+
+@media (
+  max-width:
+  720px
+) {
+
+  .content:has(.facultyDashboardPremium)
+  :is(
+    .facultyDashboardPremium,
+    .dashboardTopBar
+  )
+  button {
+    min-height:
+      46px;
+
+    border-radius:
+      13px !important;
+  }
+
+}
+
+
+/* ==========================================================
+   MOTION
+   ========================================================== */
+
+@keyframes facultyLiquidButtonSweep {
+
+  from {
+    left:
+      -60%;
+  }
+
+  to {
+    left:
+      120%;
+  }
+
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .content:has(.facultyDashboardPremium)
+  :is(
+    .facultyDashboardPremium,
+    .dashboardTopBar
+  )
+  button,
+
+  .content:has(.facultyDashboardPremium)
+  :is(
+    .facultyDashboardPremium,
+    .dashboardTopBar
+  )
+  button::before,
+
+  .content:has(.facultyDashboardPremium)
+  :is(
+    .facultyDashboardPremium,
+    .dashboardTopBar
+  )
+  button::after {
+    animation:
+      none !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+
+}
+
+
+/* CAMPUSCONNECT — FACULTY LIQUID BUTTONS V1 END */

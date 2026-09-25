@@ -1,0 +1,92 @@
+
+ ⛅️ wrangler 4.92.0 (update available 4.132.0)
+──────────────────────────────────────────────
+Created:     2026-09-11T17:25:15.653Z
+Author:      harshlucky51@gmail.com
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) 965f0041-ff40-4eae-bff0-350a77dcf4fb
+                 Created:  2026-09-11T17:25:11.336Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-12T21:59:51.195Z
+Author:      harshlucky51@gmail.com
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) d7907bf7-067c-4857-9fd4-34ed83b65324
+                 Created:  2026-09-12T21:59:47.015Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-13T11:32:17.087Z
+Author:      harshlucky51@gmail.com
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) 3171733e-4a38-42f5-b10c-1e6e8b7b6a71
+                 Created:  2026-09-13T11:32:12.875Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-13T21:44:24.189Z
+Author:      harshlucky51@gmail.com
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) 8b6f4ff7-c87e-4c24-8fdb-f3d049fbe339
+                 Created:  2026-09-13T21:44:20.203Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-14T11:52:18.619Z
+Author:      harshlucky51@gmail.com
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) 258ed6d2-84b8-4153-837d-873aa00d9433
+                 Created:  2026-09-14T11:52:14.343Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-14T17:39:26.595Z
+Author:      harshlucky51@gmail.com
+Source:      Unknown (deployment)
+Message:     -
+Version(s):  (100%) b11482bd-af20-4447-84d7-c1d34a311bf4
+                 Created:  2026-09-14T17:39:22.767Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-15T20:01:14.121Z
+Author:      harshlucky51@gmail.com
+Source:      Secret Change
+Message:     -
+Version(s):  (100%) 73e42bfb-e2b9-4572-b319-ff9e13716da3
+                 Created:  2026-09-15T20:01:14.121Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-15T20:01:18.224Z
+Author:      harshlucky51@gmail.com
+Source:      Secret Change
+Message:     -
+Version(s):  (100%) 5cf92706-4e35-4616-9bf3-815727dfe359
+                 Created:  2026-09-15T20:01:18.224Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-15T20:01:21.413Z
+Author:      harshlucky51@gmail.com
+Source:      Secret Change
+Message:     -
+Version(s):  (100%) 68af4602-dbf4-4b3c-a53f-52a655cb671c
+                 Created:  2026-09-15T20:01:21.413Z
+                     Tag:  -
+                 Message:  -
+
+Created:     2026-09-15T20:01:25.185Z
+Author:      harshlucky51@gmail.com
+Source:      Secret Change
+Message:     -
+Version(s):  (100%) 1638c6a3-0d94-4a26-98d9-cf82fca0476d
+                 Created:  2026-09-15T20:01:25.185Z
+                     Tag:  -
+                 Message:  -

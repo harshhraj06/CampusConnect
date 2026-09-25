@@ -66,3 +66,13 @@ supabase/migration-backups/
 supabase/migrations-backup-*/
 app/old-professional-role-dashboard.txt
 app/page.tsx.broken-*
+.env.local
+.env.production
+.env.development
+.env.*.local
+.backups/
+build/
+.output/
+.turbo/
+.cache/
+coverage/

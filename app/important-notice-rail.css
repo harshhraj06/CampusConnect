@@ -750,3 +750,291 @@
     transition: none !important;
   }
 }
+
+/* CAMPUSCONNECT — USABILITY PHASE 3 START */
+
+/*
+ * Important Notice Rail usability refinement.
+ *
+ * Goals:
+ * - constrain excessive width on large screens
+ * - bring notice actions closer to their message
+ * - improve unreadably small labels
+ * - preserve scrolling, targeting, acknowledgement,
+ *   publishing and removal behavior
+ */
+
+
+/* ==========================================================
+   RAIL CONTAINER
+   ========================================================== */
+
+.importantNoticeRail {
+  width:
+    calc(
+      100% - 36px
+    );
+
+  max-width:
+    1180px;
+
+  margin:
+    0 auto 16px !important;
+}
+
+
+/* ==========================================================
+   NOTICE CARD GEOMETRY
+   ========================================================== */
+
+.importantNoticeItem {
+  grid-template-columns:
+    auto
+    minmax(
+      210px,
+      390px
+    )
+    auto
+    auto !important;
+
+  gap:
+    12px !important;
+
+  min-width:
+    min(
+      570px,
+      66vw
+    ) !important;
+
+  padding:
+    10px 14px !important;
+}
+
+
+/*
+ * Keep action buttons grouped beside the content instead of
+ * appearing visually detached at the far edge.
+ */
+
+.importantNoticeActions {
+  justify-content:
+    flex-start;
+
+  gap:
+    7px;
+}
+
+
+/* ==========================================================
+   READABILITY
+   ========================================================== */
+
+.importantNoticePulse {
+  font-size:
+    11px !important;
+
+  line-height:
+    1.25;
+}
+
+
+.importantNoticeRailHead strong {
+  font-size:
+    14px !important;
+
+  line-height:
+    1.25;
+}
+
+
+.importantNoticeCopy small {
+  font-size:
+    10px !important;
+
+  line-height:
+    1.3;
+}
+
+
+.importantNoticeCopy strong {
+  font-size:
+    13px !important;
+
+  line-height:
+    1.35;
+}
+
+
+.importantNoticeCopy p {
+  font-size:
+    12px !important;
+
+  line-height:
+    1.4;
+}
+
+
+.importantNoticeAuthor {
+  font-size:
+    11px !important;
+
+  line-height:
+    1.3;
+}
+
+
+.importantNoticeLink {
+  min-height:
+    36px !important;
+
+  padding:
+    0 12px !important;
+
+  font-size:
+    12px !important;
+
+  line-height:
+    1.2;
+}
+
+
+.importantNoticeAudience small {
+  font-size:
+    10px !important;
+
+  line-height:
+    1.25;
+}
+
+
+.importantNoticeAudience b {
+  font-size:
+    11px !important;
+
+  line-height:
+    1.3;
+}
+
+
+.importantNoticeAcknowledge {
+  min-height:
+    36px !important;
+
+  padding:
+    0 11px !important;
+
+  font-size:
+    12px !important;
+
+  line-height:
+    1.2;
+}
+
+
+.importantNoticeAnalytics {
+  font-size:
+    10px !important;
+
+  line-height:
+    1.3;
+}
+
+
+/* ==========================================================
+   DESKTOP
+   ========================================================== */
+
+@media (min-width: 1200px) {
+
+  .importantNoticeRailHead {
+    min-width:
+      155px;
+  }
+
+
+  .importantNoticeItem {
+    min-width:
+      540px !important;
+  }
+
+}
+
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+
+@media (max-width: 760px) {
+
+  .importantNoticeRail {
+    width:
+      calc(
+        100% - 20px
+      );
+
+    margin:
+      0 auto 13px !important;
+  }
+
+
+  .importantNoticeItem {
+    min-width:
+      min(
+        520px,
+        86vw
+      ) !important;
+
+    grid-template-columns:
+      auto
+      minmax(
+        190px,
+        1fr
+      )
+      auto !important;
+  }
+
+
+  .importantNoticeActions {
+    gap:
+      5px;
+  }
+
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 520px) {
+
+  .importantNoticeItem {
+    min-width:
+      88vw !important;
+
+    padding:
+      10px 12px !important;
+  }
+
+
+  .importantNoticeCopy strong {
+    font-size:
+      12px !important;
+  }
+
+
+  .importantNoticeCopy p {
+    font-size:
+      12px !important;
+  }
+
+
+  .importantNoticeAcknowledge {
+    max-width:
+      100px;
+  }
+
+}
+
+
+/* CAMPUSCONNECT — USABILITY PHASE 3 END */
