@@ -990,3 +990,74 @@
     animation: none !important;
   }
 }
+
+
+/* ============================================================
+   CAMPUS CHRONICLE — IMMERSIVE PHOTO MODE
+   Existing editorial text remains.
+   Photographs are presented in the curved gallery above.
+   ============================================================ */
+
+.magazineSpreadCircular
+.editorialLeftMedia,
+
+.magazineSpreadCircular
+.editorialGallery {
+  display:
+    none;
+}
+
+
+.magazineSpreadCircular
+.magazineLeftPage > h3 {
+  margin-top:
+    34px;
+}
+
+
+.magazineSpreadCircular
+.editorialRightStory {
+  margin-top:
+    35px;
+}
+
+
+.magazinePresentation {
+  margin-top:
+    8px;
+}
+
+
+@media (
+  max-width:
+  720px
+) {
+
+  .magazineSpreadCircular
+  .magazineLeftPage > h3,
+
+  .magazineSpreadCircular
+  .editorialRightStory {
+    margin-top:
+      20px;
+  }
+
+}
+
+
+/* ============================================================
+   CAMPUS CHRONICLE — REMOVE OLD READER BELOW PHOTO GALLERY
+   Editor remains available when Edit spread is selected.
+   ============================================================ */
+
+.magazinePresentationReaderHidden {
+  display: none !important;
+}
+
+
+.campusMagazine:has(.chronicleCircularSection)
+.magazinePagination {
+  margin-top: 18px;
+}
+
+

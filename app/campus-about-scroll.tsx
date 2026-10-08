@@ -7,6 +7,10 @@ import {
 
 import "./campus-about-scroll.css";
 
+import CampusPatraAdminContent from "./campus-patra-admin-content";
+
+import CampusTeam from "./campus-team";
+
 
 type CampusAboutScrollProps = {
   viewerName?: string;
@@ -421,6 +425,11 @@ export function CampusAboutScroll({
               </div>
             </section>
 
+
+            <CampusTeam
+              viewerRole={viewerRole}
+            />
+
             <section className="campusPatraTechnology">
               <div>
                 <span>
@@ -459,6 +468,11 @@ export function CampusAboutScroll({
                 </li>
               </ul>
             </section>
+
+
+            <CampusPatraAdminContent
+              viewerRole={viewerRole}
+            />
 
             <footer className="campusPatraFooter">
               <div>

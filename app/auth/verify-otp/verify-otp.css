@@ -1,0 +1,707 @@
+.ccOtpPage {
+  --ink: #181d19;
+  --muted: #6f756f;
+  --line: #e5e8e3;
+  --surface: #ffffff;
+  --soft: #f7f8f6;
+  --green: #263f33;
+  --green-2: #385747;
+  --gold: #8a6f38;
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 36px 20px;
+  background:
+    linear-gradient(
+      135deg,
+      #f7f8f6 0%,
+      #ffffff 48%,
+      #f2f5f1 100%
+    );
+  color: var(--ink);
+}
+
+.ccOtpAmbient {
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 999px;
+  filter: blur(2px);
+}
+
+.ccOtpAmbientOne {
+  width: 420px;
+  height: 420px;
+  top: -240px;
+  left: -160px;
+  background:
+    radial-gradient(
+      circle,
+      rgba(138,111,56,.13),
+      rgba(138,111,56,0)
+      68%
+    );
+}
+
+.ccOtpAmbientTwo {
+  width: 560px;
+  height: 560px;
+  right: -300px;
+  bottom: -320px;
+  background:
+    radial-gradient(
+      circle,
+      rgba(38,63,51,.12),
+      rgba(38,63,51,0)
+      70%
+    );
+}
+
+.ccOtpCard,
+.ccOtpSuccessCard {
+  width: min(520px, 100%);
+  box-sizing: border-box;
+  border: 1px solid
+    rgba(31,44,35,.1);
+  border-radius: 28px;
+  background:
+    rgba(255,255,255,.96);
+  box-shadow:
+    0 30px 90px
+      rgba(27,37,30,.11),
+    0 2px 8px
+      rgba(27,37,30,.04);
+  backdrop-filter:
+    blur(18px);
+}
+
+.ccOtpCard {
+  padding:
+    30px 34px 24px;
+}
+
+.ccOtpSuccessCard {
+  padding:
+    38px 42px 28px;
+  text-align: center;
+}
+
+.ccOtpHeader {
+  display: flex;
+  align-items: center;
+  justify-content:
+    space-between;
+  gap: 20px;
+}
+
+.ccOtpLogoWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 34px;
+}
+
+.ccOtpLogo {
+  display: block;
+  width: auto;
+  height: 48px;
+  max-width: 230px;
+  object-fit: contain;
+}
+
+.ccOtpSecureBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  padding: 8px 11px;
+  border: 1px solid
+    #e2e7e2;
+  border-radius: 999px;
+  background: #f8faf8;
+  color: #566158;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ccOtpSecureDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #4d765f;
+  box-shadow:
+    0 0 0 4px
+    rgba(77,118,95,.10);
+}
+
+.ccOtpDivider {
+  height: 1px;
+  margin: 25px 0 30px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #e5e8e3 16%,
+      #e5e8e3 84%,
+      transparent
+    );
+}
+
+.ccOtpContent {
+  text-align: center;
+}
+
+.ccOtpIcon {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  margin:
+    0 auto 22px;
+  border: 1px solid
+    #e7e4da;
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      145deg,
+      #fbfaf6,
+      #f4f3ed
+    );
+  color: var(--gold);
+  box-shadow:
+    0 9px 24px
+      rgba(73,62,36,.06);
+}
+
+.ccOtpKicker {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .2em;
+}
+
+.ccOtpContent h1,
+.ccOtpSuccessCard h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size:
+    clamp(
+      31px,
+      5vw,
+      40px
+    );
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+
+.ccOtpLead,
+.ccOtpSuccessLead {
+  max-width: 390px;
+  margin:
+    15px auto 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.ccOtpEmailPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 19px;
+  padding:
+    9px 13px;
+  border: 1px solid
+    #e3e7e2;
+  border-radius: 999px;
+  background: #f8faf8;
+  color: #485149;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ccOtpEmailDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #577562;
+}
+
+.ccOtpForm {
+  margin-top: 29px;
+}
+
+.ccOtpField {
+  text-align: left;
+}
+
+.ccOtpField +
+.ccOtpField {
+  margin-top: 19px;
+}
+
+.ccOtpField label {
+  color: #444c45;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.ccOtpLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content:
+    space-between;
+  margin-bottom: 9px;
+}
+
+.ccOtpLabelRow span {
+  color: #9aa09b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ccOtpField input {
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.ccOtpField input:not(
+  .ccOtpCodeInput
+) {
+  min-height: 52px;
+  padding:
+    0 15px;
+  border: 1px solid
+    #dfe4de;
+  border-radius: 13px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.ccOtpCodeInput {
+  height: 72px;
+  border: 1px solid
+    #dce2dc;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      180deg,
+      #fff,
+      #fbfcfa
+    );
+  color: #27322a;
+  text-align: center;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: .32em;
+  padding-left: .32em;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+.ccOtpCodeInput:focus {
+  border-color:
+    #789081;
+  box-shadow:
+    0 0 0 4px
+      rgba(45,72,56,.08),
+    0 10px 30px
+      rgba(45,72,56,.07);
+  transform:
+    translateY(-1px);
+}
+
+.ccOtpMessage {
+  display: flex;
+  align-items:
+    flex-start;
+  gap: 9px;
+  margin-top: 15px;
+  padding:
+    11px 13px;
+  border-radius: 11px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ccOtpMessage span {
+  flex: 0 0 auto;
+  font-weight: 900;
+}
+
+.ccOtpMessage p {
+  margin: 0;
+}
+
+.ccOtpMessageError {
+  border: 1px solid
+    #efd7d3;
+  background: #fcf4f2;
+  color: #8a433b;
+}
+
+.ccOtpMessageSuccess {
+  border: 1px solid
+    #d9e7dc;
+  background: #f2f8f3;
+  color: #42614b;
+}
+
+.ccOtpPrimary {
+  width: 100%;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content:
+    center;
+  gap: 10px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      135deg,
+      #263f33,
+      #345342
+    );
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow:
+    0 12px 26px
+      rgba(38,63,51,.17);
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    opacity .18s ease;
+}
+
+.ccOtpPrimary:hover:not(
+  :disabled
+) {
+  transform:
+    translateY(-2px);
+  box-shadow:
+    0 16px 32px
+      rgba(38,63,51,.22);
+}
+
+.ccOtpPrimary:disabled {
+  cursor: not-allowed;
+  opacity: .47;
+  box-shadow: none;
+}
+
+.ccOtpButtonSpinner,
+.ccOtpMiniSpinner {
+  border-radius: 999px;
+  animation:
+    ccOtpSpin .7s linear
+    infinite;
+}
+
+.ccOtpButtonSpinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid
+    rgba(255,255,255,.35);
+  border-top-color: #fff;
+}
+
+.ccOtpMiniSpinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid
+    rgba(38,63,51,.18);
+  border-top-color:
+    var(--green);
+}
+
+@keyframes ccOtpSpin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+.ccOtpResend {
+  display: flex;
+  align-items: center;
+  justify-content:
+    center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 20px;
+  color: #858b86;
+  font-size: 12px;
+}
+
+.ccOtpResend button {
+  border: 0;
+  padding: 3px;
+  background: transparent;
+  color: var(--green);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ccOtpResend button:disabled {
+  color: #a8ada9;
+  cursor: default;
+}
+
+.ccOtpTrust {
+  display: flex;
+  align-items: center;
+  justify-content:
+    center;
+  gap: 8px;
+  margin-top: 25px;
+  padding: 12px;
+  border: 1px solid
+    #ebeeea;
+  border-radius: 12px;
+  background: #fafbf9;
+  color: #858c86;
+  font-size: 11px;
+}
+
+.ccOtpSuccessRing {
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  margin:
+    0 auto 28px;
+  border-radius: 999px;
+  background:
+    rgba(52,84,65,.07);
+  animation:
+    ccOtpSuccessPulse
+    1.8s ease-in-out
+    infinite;
+}
+
+.ccOtpSuccessCheck {
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      145deg,
+      #315240,
+      #426851
+    );
+  color: #fff;
+  box-shadow:
+    0 15px 30px
+      rgba(38,63,51,.18);
+  animation:
+    ccOtpSuccessIn
+    .45s cubic-bezier(
+      .2,.8,.2,1
+    )
+    both;
+}
+
+@keyframes
+ccOtpSuccessPulse {
+  50% {
+    transform:
+      scale(1.035);
+  }
+}
+
+@keyframes
+ccOtpSuccessIn {
+  from {
+    opacity: 0;
+    transform:
+      scale(.72)
+      rotate(-8deg);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      scale(1)
+      rotate(0);
+  }
+}
+
+.ccOtpSuccessNotice {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 27px;
+  padding:
+    15px 16px;
+  border: 1px solid
+    #dee8e0;
+  border-radius: 14px;
+  background: #f5f9f5;
+  text-align: left;
+}
+
+.ccOtpNoticeIcon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: #e2eee5;
+  color: #345942;
+  font-weight: 900;
+}
+
+.ccOtpSuccessNotice strong,
+.ccOtpSuccessNotice span {
+  display: block;
+}
+
+.ccOtpSuccessNotice strong {
+  color: #303a32;
+  font-size: 13px;
+}
+
+.ccOtpSuccessNotice span {
+  margin-top: 3px;
+  color: #7d847e;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.ccOtpRedirectStatus {
+  display: flex;
+  align-items: center;
+  justify-content:
+    center;
+  gap: 9px;
+  margin-top: 22px;
+  color: #6c756e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ccOtpProgress {
+  height: 3px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf0ec;
+}
+
+.ccOtpProgress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #8a6f38,
+      #365543
+    );
+  transform-origin: left;
+  animation:
+    ccOtpProgress
+    2.2s linear forwards;
+}
+
+@keyframes ccOtpProgress {
+  from {
+    transform:
+      scaleX(0);
+  }
+
+  to {
+    transform:
+      scaleX(1);
+  }
+}
+
+.ccOtpFooter {
+  margin-top: 27px;
+  padding-top: 19px;
+  border-top: 1px solid
+    #edf0ec;
+  color: #a0a6a1;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .17em;
+}
+
+@media (
+  max-width: 600px
+) {
+  .ccOtpPage {
+    padding: 14px;
+  }
+
+  .ccOtpCard,
+  .ccOtpSuccessCard {
+    border-radius: 22px;
+  }
+
+  .ccOtpCard {
+    padding:
+      25px 20px 21px;
+  }
+
+  .ccOtpSuccessCard {
+    padding:
+      32px 22px 24px;
+  }
+
+  .ccOtpHeader {
+    flex-direction:
+      column;
+  }
+
+  .ccOtpLogo {
+    height: 43px;
+  }
+
+  .ccOtpDivider {
+    margin:
+      20px 0 25px;
+  }
+
+  .ccOtpCodeInput {
+    height: 66px;
+    font-size: 23px;
+    letter-spacing: .24em;
+    padding-left: .24em;
+  }
+}
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .ccOtpSuccessRing,
+  .ccOtpSuccessCheck,
+  .ccOtpProgress span,
+  .ccOtpButtonSpinner,
+  .ccOtpMiniSpinner {
+    animation: none;
+  }
+}

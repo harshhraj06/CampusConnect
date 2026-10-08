@@ -58,7 +58,83 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
-    server: {
+    /*
+     * React-PDF / fontkit contains several CommonJS packages.
+     *
+     * Without explicit pre-bundling Vite can serve those files
+     * directly as browser ESM, causing errors such as:
+     *
+     *   does not provide an export named 'default'
+     *
+     * Keep the complete dependency chain in one optimized bundle.
+     */
+    resolve: {
+      dedupe: [
+        "react",
+        "react-dom",
+        "base64-js",
+        "brotli",
+        "unicode-properties",
+        "unicode-trie",
+        "fontkit",
+      ],
+    },
+    optimizeDeps: {
+      /*
+       * React-PDF mixes ESM and CommonJS packages.
+       * Pre-bundle the complete browser dependency tree so
+       * CommonJS default exports are converted correctly.
+       */
+      include: [
+        "@react-pdf/renderer",
+        "@react-pdf/font",
+        "@react-pdf/pdfkit",
+        "@react-pdf/textkit",
+
+        "fontkit",
+
+        "js-md5",
+
+        "base64-js",
+
+        "brotli",
+        "brotli/decompress",
+
+        "unicode-properties",
+        "unicode-trie",
+
+        "linebreak",
+        "png-js",
+
+        "object-assign",
+        "prop-types",
+        "queue",
+        "events",
+
+        "vite-compatible-readable-stream",
+      ],
+
+      needsInterop: [
+        "js-md5",
+
+        "base64-js",
+
+        "brotli",
+        "brotli/decompress",
+
+        "unicode-properties",
+        "unicode-trie",
+
+        "linebreak",
+        "png-js",
+
+        "object-assign",
+        "prop-types",
+        "queue",
+      ],
+    },
+
+server: {
       host: "0.0.0.0",
       allowedHosts: ["terminal.local"],
       ...(isCodexSeatbeltSandbox

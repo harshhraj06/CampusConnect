@@ -1,733 +1,302 @@
-import {createClient} from "@supabase/supabase-js";
+import { NextResponse } from 'next/server'
+import { withSecurity } from '@/lib/api-auth'
+import { sanitizeString, isValidEmail, isValidPhone } from '@/lib/security'
 
-type CampusRole =
-  | "Student"
-  | "Faculty"
-  | "Coordinator"
-  | "Volunteer"
-  | "Placement Cell"
-  | "Main Admin";
+export const GET = withSecurity(
+  async (_request, { session }) => {
+    const { adminClient } = session
 
-const VALID_ROLES: CampusRole[] = [
-  "Student",
-  "Faculty",
-  "Coordinator",
-  "Volunteer",
-  "Placement Cell",
-  "Main Admin",
-];
+    const [profileResult, guardianResult] = await Promise.all([
+      adminClient
+        .from('profiles')
+        .select('id,full_name,email,role,department,graduation_year,usn,created_at')
+        .order('created_at', { ascending: false })
+        .limit(300),
 
-function adminClient() {
-  const url =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.VITE_SUPABASE_URL ||
-    "";
+      adminClient
+        .from('student_guardian_contacts')
+        .select('student_id,guardian_name,relationship,email,phone,sms_enabled,email_enabled'),
+    ])
 
-  const serviceKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-
-  if (!url || !serviceKey) {
-    throw new Error(
-      "Supabase server configuration is incomplete."
-    );
-  }
-
-  return createClient(url, serviceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
-
-async function getRequestUserRole(request: Request) {
-  const authorization =
-    request.headers.get("authorization") || "";
-
-  const accessToken =
-    authorization.startsWith("Bearer ")
-      ? authorization.slice(7)
-      : "";
-
-  if (!accessToken) {
-    throw new Error("Authentication required.");
-  }
-
-  const admin = adminClient();
-
-  const {
-    data: {user},
-    error: userError,
-  } = await admin.auth.getUser(accessToken);
-
-  if (userError || !user) {
-    throw new Error("Invalid or expired session.");
-  }
-
-  const {data: profile, error: profileError} =
-    await admin
-      .from("profiles")
-      .select("id,role,account_status")
-      .eq("id", user.id)
-      .single();
-
-  if (profileError || !profile) {
-    throw new Error("Campus profile not found.");
-  }
-
-  if (profile.role !== "Main Admin") {
-    throw new Error("Main Admin permission required.");
-  }
-
-  if (
-    profile.account_status &&
-    profile.account_status !== "Active"
-  ) {
-    throw new Error("Administrator account is not active.");
-  }
-
-  return {
-    user,
-    admin,
-  };
-}
-
-
-export async function GET(request: Request) {
-
-  try {
-
-    const {
-      admin,
-    } =
-      await getRequestUserRole(
-        request
-      );
-
-
-    const [
-      profileResult,
-      guardianResult,
-    ] =
-      await Promise.all([
-
-        admin
-          .from("profiles")
-          .select(
-            "id,full_name,email,role,department,graduation_year,usn,created_at"
-          )
-          .order(
-            "created_at",
-            {
-              ascending: false,
-            }
-          )
-          .limit(300),
-
-        admin
-          .from(
-            "student_guardian_contacts"
-          )
-          .select(
-            "student_id,guardian_name,relationship,email,phone,sms_enabled,email_enabled"
-          ),
-
-      ]);
-
-
-    if (
-      profileResult.error
-    ) {
-
-      return Response.json(
-        {
-          error:
-            profileResult
-              .error.message,
-        },
-        {
-          status: 400,
-        }
-      );
-
+    if (profileResult.error) {
+      return NextResponse.json(
+        { error: profileResult.error.message },
+        { status: 400 }
+      )
     }
 
-
-    if (
-      guardianResult.error
-    ) {
-
-      return Response.json(
-        {
-          error:
-            guardianResult
-              .error.message,
-        },
-        {
-          status: 400,
-        }
-      );
-
+    if (guardianResult.error) {
+      return NextResponse.json(
+        { error: guardianResult.error.message },
+        { status: 400 }
+      )
     }
 
-
-    return Response.json(
+    return NextResponse.json(
       {
-        users:
-          profileResult.data ||
-          [],
-
-        guardianContacts:
-          guardianResult.data ||
-          [],
+        users: profileResult.data || [],
+        guardianContacts: guardianResult.data || [],
       },
       {
         headers: {
-          "Cache-Control":
-            "no-store",
+          'Cache-Control': 'no-store',
         },
       }
-    );
-
-  } catch (error) {
-
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Unable to load campus accounts.";
-
-
-    const status =
-      message.includes(
-        "Main Admin permission"
-      )
-        ? 403
-        : 401;
-
-
-    return Response.json(
-      {
-        error:
-          message,
-      },
-      {
-        status,
-      }
-    );
-
+    )
+  },
+  {
+    requireAuth: true,
+    allowedRoles: ['Main Admin'],
+    rateLimit: { windowMs: 60_000, maxRequests: 30, keyPrefix: 'admin-users-get' },
   }
+)
 
-}
-
-
-export async function PATCH(request: Request) {
-
-  try {
+export const PATCH = withSecurity(
+  async (request, { session, body }) => {
+    const { adminClient } = session
 
     const {
-      admin,
-    } =
-      await getRequestUserRole(
-        request
-      );
+      student_id,
+      usn,
+      guardian,
+    } = body as {
+      student_id?: string
+      usn?: string
+      guardian?: {
+        guardian_name?: string
+        relationship?: string
+        email?: string
+        phone?: string
+        sms_enabled?: boolean
+        email_enabled?: boolean
+      }
+    }
 
-
-    const body =
-      (
-        await request.json()
-      ) as {
-        student_id?: string;
-
-        usn?: string;
-
-        guardian?: {
-          guardian_name?: string;
-          relationship?: string;
-          email?: string;
-          phone?: string;
-          sms_enabled?: boolean;
-          email_enabled?: boolean;
-        };
-      };
-
-
-    const studentId =
-      String(
-        body.student_id ||
-        ""
-      ).trim();
-
+    const studentId = sanitizeString(student_id || '')
 
     if (!studentId) {
-
-      return Response.json(
-        {
-          error:
-            "Student account is required.",
-        },
-        {
-          status: 400,
-        }
-      );
-
-    }
-
-
-    const {
-      data: student,
-      error: studentError,
-    } =
-      await admin
-        .from("profiles")
-        .select(
-          "id,role"
-        )
-        .eq(
-          "id",
-          studentId
-        )
-        .single();
-
-
-    if (
-      studentError ||
-      !student
-    ) {
-
-      return Response.json(
-        {
-          error:
-            studentError
-              ?.message ||
-            "Student account was not found.",
-        },
-        {
-          status: 404,
-        }
-      );
-
-    }
-
-
-    if (
-      student.role !==
-      "Student"
-    ) {
-
-      return Response.json(
-        {
-          error:
-            "Only Student identity records can be managed here.",
-        },
-        {
-          status: 400,
-        }
-      );
-
-    }
-
-
-    const usn =
-      String(
-        body.usn ||
-        ""
+      return NextResponse.json(
+        { error: 'Student account is required.' },
+        { status: 400 }
       )
-        .trim()
-        .toUpperCase();
-
-
-    if (
-      usn.length > 80
-    ) {
-
-      return Response.json(
-        {
-          error:
-            "USN is too long.",
-        },
-        {
-          status: 400,
-        }
-      );
-
     }
 
+    // Verify student exists and is a Student
+    const { data: student, error: studentError } = await adminClient
+      .from('profiles')
+      .select('id,role')
+      .eq('id', studentId)
+      .single()
 
-    const guardian =
-      body.guardian ||
-      {};
-
-
-    const guardianName =
-      String(
-        guardian.guardian_name ||
-        ""
-      ).trim();
-
-
-    const relationship =
-      String(
-        guardian.relationship ||
-        "Parent"
-      ).trim() ||
-      "Parent";
-
-
-    const email =
-      String(
-        guardian.email ||
-        ""
+    if (studentError || !student) {
+      return NextResponse.json(
+        { error: studentError?.message || 'Student account was not found.' },
+        { status: 404 }
       )
-        .trim()
-        .toLowerCase();
+    }
 
-
-    const phone =
-      String(
-        guardian.phone ||
-        ""
+    if (student.role !== 'Student') {
+      return NextResponse.json(
+        { error: 'Only Student identity records can be managed here.' },
+        { status: 400 }
       )
-        .trim()
-        .replace(
-          /[\s()-]/g,
-          ""
-        );
+    }
 
+    // Validate USN
+    const cleanUsn = sanitizeString(usn || '', 80).toUpperCase()
 
-    if (
-      email &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        email
+    // Validate guardian data
+    const guardianData = guardian || {}
+    const guardianName = sanitizeString(guardianData.guardian_name || '')
+    const relationship = sanitizeString(guardianData.relationship || 'Parent') || 'Parent'
+    const email = sanitizeString(guardianData.email || '').toLowerCase()
+    const phone = sanitizeString(guardianData.phone || '').replace(/[\s()-]/g, '')
+
+    if (email && !isValidEmail(email)) {
+      return NextResponse.json(
+        { error: 'Enter a valid guardian email address.' },
+        { status: 400 }
       )
-    ) {
-
-      return Response.json(
-        {
-          error:
-            "Enter a valid guardian email address.",
-        },
-        {
-          status: 400,
-        }
-      );
-
     }
 
-
-    if (
-      phone &&
-      !/^\+?[0-9]{8,15}$/.test(
-        phone
+    if (phone && !isValidPhone(phone)) {
+      return NextResponse.json(
+        { error: 'Enter a valid guardian mobile number.' },
+        { status: 400 }
       )
-    ) {
-
-      return Response.json(
-        {
-          error:
-            "Enter a valid guardian mobile number.",
-        },
-        {
-          status: 400,
-        }
-      );
-
     }
 
-
-    const {
-      error: profileError,
-    } =
-      await admin
-        .from("profiles")
-        .update({
-          usn,
-
-          updated_at:
-            new Date()
-              .toISOString(),
-        })
-        .eq(
-          "id",
-          studentId
-        );
-
-
-    if (
-      profileError
-    ) {
-
-      return Response.json(
-        {
-          error:
-            profileError.message,
-        },
-        {
-          status: 400,
-        }
-      );
-
-    }
-
-
-    const {
-      data: savedGuardian,
-      error: guardianError,
-    } =
-      await admin
-        .from(
-          "student_guardian_contacts"
-        )
-        .upsert(
-          {
-            student_id:
-              studentId,
-
-            guardian_name:
-              guardianName,
-
-            relationship,
-
-            email,
-
-            phone,
-
-            sms_enabled:
-              guardian.sms_enabled !==
-              false,
-
-            email_enabled:
-              guardian.email_enabled !==
-              false,
-
-            updated_at:
-              new Date()
-                .toISOString(),
-          },
-          {
-            onConflict:
-              "student_id",
-          }
-        )
-        .select(
-          "student_id,guardian_name,relationship,email,phone,sms_enabled,email_enabled"
-        )
-        .single();
-
-
-    if (
-      guardianError
-    ) {
-
-      return Response.json(
-        {
-          error:
-            guardianError.message,
-        },
-        {
-          status: 400,
-        }
-      );
-
-    }
-
-
-    return Response.json(
-      {
-        ok: true,
-
-        student: {
-          id:
-            studentId,
-
-          usn,
-        },
-
-        guardian:
-          savedGuardian,
-      },
-      {
-        headers: {
-          "Cache-Control":
-            "no-store",
-        },
-      }
-    );
-
-  } catch (error) {
-
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Unable to update Student identity.";
-
-
-    const status =
-      message.includes(
-        "Main Admin permission"
-      )
-        ? 403
-        : 401;
-
-
-    return Response.json(
-      {
-        error:
-          message,
-      },
-      {
-        status,
-      }
-    );
-
-  }
-
-}
-
-
-export async function POST(request: Request) {
-  try {
-    const {admin} = await getRequestUserRole(request);
-
-    type CreateCampusUserBody = {
-      full_name?: string;
-      email?: string;
-      password?: string;
-      role?: string;
-      department?: string;
-      graduation_year?: string;
-      employee_id?: string;
-    };
-
-    const body =
-      (await request.json()) as CreateCampusUserBody;
-
-    const fullName = String(body.full_name || "").trim();
-
-    const email = String(body.email || "")
-      .trim()
-      .toLowerCase();
-
-    const password = String(body.password || "");
-
-    const role =
-      String(body.role || "") as CampusRole;
-
-    const department =
-      String(body.department || "ECE").trim();
-
-    const graduationYear =
-      String(body.graduation_year || "").trim();
-
-    const employeeId =
-      String(body.employee_id || "").trim();
-
-    if (fullName.length < 2) {
-      return Response.json(
-        {error: "Full name is required."},
-        {status: 400}
-      );
-    }
-
-    if (!email || !email.includes("@")) {
-      return Response.json(
-        {error: "A valid institutional email is required."},
-        {status: 400}
-      );
-    }
-
-    if (password.length < 8) {
-      return Response.json(
-        {
-          error:
-            "Temporary password must contain at least 8 characters.",
-        },
-        {status: 400}
-      );
-    }
-
-    if (!VALID_ROLES.includes(role)) {
-      return Response.json(
-        {error: "Invalid CampusConnect role."},
-        {status: 400}
-      );
-    }
-
-    const {data: created, error: createError} =
-      await admin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: role !== "Student",
-        user_metadata: {
-          full_name: fullName,
-          department,
-          graduation_year:
-            (role === "Student" ? graduationYear : ""),
-        },
-      });
-
-    if (createError || !created.user) {
-      return Response.json(
-        {
-          error:
-            createError?.message ||
-            "Unable to create account.",
-        },
-        {status: 400}
-      );
-    }
-
-    const userId = created.user.id;
-
-    const {error: profileError} = await admin
-      .from("profiles")
+    // Update student profile
+    const { error: profileError } = await adminClient
+      .from('profiles')
       .update({
-        full_name: fullName,
-        email,
-        role,
-        department,
-        graduation_year:
-          (role === "Student" ? graduationYear : ""),
-        employee_id: employeeId || null,
-        account_status: "Active",
+        usn: cleanUsn,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", userId);
+      .eq('id', studentId)
 
     if (profileError) {
-      // Avoid leaving an orphan auth account.
-      await admin.auth.admin.deleteUser(userId);
-
-      return Response.json(
-        {error: profileError.message},
-        {status: 400}
-      );
+      return NextResponse.json(
+        { error: profileError.message },
+        { status: 400 }
+      )
     }
 
-    return Response.json({
+    // Upsert guardian contact
+    const { data: savedGuardian, error: guardianError } = await adminClient
+      .from('student_guardian_contacts')
+      .upsert(
+        {
+          student_id: studentId,
+          guardian_name: guardianName,
+          relationship,
+          email,
+          phone,
+          sms_enabled: guardianData.sms_enabled !== false,
+          email_enabled: guardianData.email_enabled !== false,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'student_id' }
+      )
+      .select('student_id,guardian_name,relationship,email,phone,sms_enabled,email_enabled')
+      .single()
+
+    if (guardianError) {
+      return NextResponse.json(
+        { error: guardianError.message },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json(
+      {
+        ok: true,
+        student: { id: studentId, usn: cleanUsn },
+        guardian: savedGuardian,
+      },
+      {
+        headers: { 'Cache-Control': 'no-store' },
+      }
+    )
+  },
+  {
+    requireAuth: true,
+    allowedRoles: ['Main Admin'],
+    rateLimit: { windowMs: 60_000, maxRequests: 20, keyPrefix: 'admin-users-patch' },
+    maxBodySize: 50 * 1024,
+  }
+)
+
+export const POST = withSecurity(
+  async (request, { session, body }) => {
+    const { adminClient } = session
+
+    const {
+      full_name,
+      email,
+      password,
+      role,
+      department,
+      graduation_year,
+      employee_id,
+    } = body as {
+      full_name?: string
+      email?: string
+      password?: string
+      role?: string
+      department?: string
+      graduation_year?: string
+      employee_id?: string
+    }
+
+    const fullName = sanitizeString(full_name || '')
+    const cleanEmail = sanitizeString(email || '').toLowerCase()
+    const cleanPassword = sanitizeString(password || '')
+    const cleanRole = sanitizeString(role || '')
+    const cleanDepartment = sanitizeString(department || 'ECE')
+    const cleanGraduationYear = sanitizeString(graduation_year || '')
+    const cleanEmployeeId = sanitizeString(employee_id || '')
+
+    if (fullName.length < 2) {
+      return NextResponse.json({ error: 'Full name is required.' }, { status: 400 })
+    }
+
+    if (!cleanEmail || !isValidEmail(cleanEmail)) {
+      return NextResponse.json(
+        { error: 'A valid institutional email is required.' },
+        { status: 400 }
+      )
+    }
+
+    if (cleanPassword.length < 8) {
+      return NextResponse.json(
+        { error: 'Temporary password must contain at least 8 characters.' },
+        { status: 400 }
+      )
+    }
+
+    const validRoles = ['Student', 'Faculty', 'Coordinator', 'Volunteer', 'Placement Cell', 'Main Admin']
+    if (!validRoles.includes(cleanRole)) {
+      return NextResponse.json({ error: 'Invalid CampusConnect role.' }, { status: 400 })
+    }
+
+    const { data: created, error: createError } = await adminClient.auth.admin.createUser({
+      email: cleanEmail,
+      password: cleanPassword,
+      email_confirm: cleanRole !== 'Student',
+      user_metadata: {
+        full_name: fullName,
+        department: cleanDepartment,
+        graduation_year: cleanRole === 'Student' ? cleanGraduationYear : '',
+      },
+    })
+
+    if (createError || !created.user) {
+      return NextResponse.json(
+        { error: createError?.message || 'Unable to create account.' },
+        { status: 400 }
+      )
+    }
+
+    const userId = created.user.id
+
+    const { error: profileError } = await adminClient
+      .from('profiles')
+      .update({
+        full_name: fullName,
+        email: cleanEmail,
+        role: cleanRole,
+        department: cleanDepartment,
+        graduation_year: cleanRole === 'Student' ? cleanGraduationYear : '',
+        employee_id: cleanEmployeeId || null,
+        account_status: 'Active',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+
+    if (profileError) {
+      // Cleanup orphan auth account
+      await adminClient.auth.admin.deleteUser(userId)
+      return NextResponse.json({ error: profileError.message }, { status: 400 })
+    }
+
+    return NextResponse.json({
       success: true,
       user: {
         id: userId,
         full_name: fullName,
-        email,
-        role,
-        department,
-        graduation_year:
-          (role === "Student" ? graduationYear : ""),
-        account_status: "Active",
+        email: cleanEmail,
+        role: cleanRole,
+        department: cleanDepartment,
+        graduation_year: cleanRole === 'Student' ? cleanGraduationYear : '',
+        account_status: 'Active',
       },
-    });
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Unable to create campus account.";
-
-    const status =
-      message.includes("permission") ? 403 : 401;
-
-    return Response.json(
-      {error: message},
-      {status}
-    );
+    })
+  },
+  {
+    requireAuth: true,
+    allowedRoles: ['Main Admin'],
+    rateLimit: { windowMs: 60_000, maxRequests: 10, keyPrefix: 'admin-users-post' },
+    maxBodySize: 50 * 1024,
   }
-}
+)

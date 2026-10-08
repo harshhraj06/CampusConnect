@@ -1,5 +1,7 @@
 "use client";
 
+import "./assignments-professional-v3.css";
+
 import {useRef,useEffect, useState, type ChangeEvent, type CSSProperties, type FormEvent, type ReactNode} from "react";
 import {
   BarChart,
@@ -18,6 +20,7 @@ import CampusMessenger from "./campus-messenger";
 import {CommunityPosts} from "./community-posts";
 import {PlacementApplicantProfile} from "./placement-applicant-profile";
 import CampusWorkDelegation from "./campus-work-delegation";
+import TimetableCoordinatorAdmin from "./timetable-coordinator-admin";
 import CampusEventSecurePass from "./campus-event-secure-pass";
 import CampusMarketplace from "./campus-marketplace";
 import PersonalWorkspace from "./personal-workspace";
@@ -73,13 +76,6 @@ const canManageEventRole = (role: Role) =>
     "Faculty",
     "Coordinator",
     "Placement Cell",
-    "Main Admin",
-  ]);
-
-const canCheckInEventRole = (role: Role) =>
-  hasCampusRole(role, [
-    "Volunteer",
-    "Coordinator",
     "Main Admin",
   ]);
 
@@ -882,6 +878,18 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
   const [showEventPass, setShowEventPass] =
     useState(false);
 
+  const [eventCheckInSummary, setEventCheckInSummary] =
+    useState<
+      Record<
+        string,
+        {
+          registered: number;
+          checkedIn: number;
+          waiting: number;
+        }
+      >
+    >({});
+
   const [showCheckInPanel, setShowCheckInPanel] =
     useState(false);
 
@@ -934,7 +942,6 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
   ] = useState(false);
 
   const canOperateSelectedEvent =
-    canCheckInEventRole(profile.role) ||
     selectedEventCanScan;
 
   useEffect(() => {
@@ -942,14 +949,6 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
 
     if (!selectedEvent) {
       setSelectedEventCanScan(false);
-
-      return () => {
-        active = false;
-      };
-    }
-
-    if (canCheckInEventRole(profile.role)) {
-      setSelectedEventCanScan(true);
 
       return () => {
         active = false;
@@ -985,7 +984,6 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
     };
   }, [
     selectedEvent?.id,
-    profile.role,
   ]);
 
   const canPublish =
@@ -1374,6 +1372,72 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
   };
 
 
+  const loadEventCheckInSummary = async (
+    eventId: string
+  ) => {
+    const client = getSupabaseClient();
+
+    if (!client || !eventId) return;
+
+    const {data, error} = await client.rpc(
+      "get_event_checkin_summary",
+      {
+        p_event_id: eventId,
+      }
+    );
+
+    if (error) {
+      console.error(
+        "Unable to load event check-in summary:",
+        error
+      );
+
+      return;
+    }
+
+    const rows =
+      data as unknown as Array<{
+        registered_count:
+          number | string;
+        checked_in_count:
+          number | string;
+        waiting_count:
+          number | string;
+      }> | null;
+
+    const row = rows?.[0];
+
+    if (!row) return;
+
+    const registered =
+      Number(row.registered_count || 0);
+
+    const checkedIn =
+      Number(row.checked_in_count || 0);
+
+    const waiting =
+      Number(row.waiting_count || 0);
+
+    setEventCheckInSummary(current => ({
+      ...current,
+      [eventId]: {
+        registered:
+          Number.isFinite(registered)
+            ? registered
+            : 0,
+        checkedIn:
+          Number.isFinite(checkedIn)
+            ? checkedIn
+            : 0,
+        waiting:
+          Number.isFinite(waiting)
+            ? waiting
+            : 0,
+      },
+    }));
+  };
+
+
   const loadEventOperationsRoster = async (
     eventId: string
   ): Promise<EventRegistration[]> => {
@@ -1396,14 +1460,14 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
         externalResult,
       ] = await Promise.all([
         client.rpc(
-          "get_event_operations_roster",
+          "get_event_organizer_roster",
           {
             p_event_id: eventId,
           }
         ),
 
         client.rpc(
-          "get_external_event_operations_roster",
+          "get_external_event_organizer_roster",
           {
             p_event_id: eventId,
           }
@@ -4111,15 +4175,27 @@ const registrationClosed =
           : 1800
       );
 
-        await Promise.all([
-          loadEventOperationsRoster(
+        const refreshTasks: Promise<unknown>[] = [
+          loadEventCheckInSummary(
             item.id
           ),
           loadEventRegistrationSummary(
             item.id
           ),
           loadEventRegistrations(),
-        ]);
+        ];
+
+        if (canManageEvent(item)) {
+          refreshTasks.push(
+            loadEventOperationsRoster(
+              item.id
+            )
+          );
+        }
+
+        await Promise.all(
+          refreshTasks
+        );
     } catch (error) {
       const message =
         error instanceof Error
@@ -8374,9 +8450,9 @@ const registrationClosed =
 
                                 <p>
                                   Scan the secure QR or enter the manual
-                                  pass code. Access is limited to volunteers,
-                                  coordinators, Main Admin and accounts with
-                                  an active event-specific delegation.
+                                  pass code. Access is limited to the event organizer,
+                                  Main Admin and accounts with an active
+                                  event-specific delegation.
                                 </p>
                               </div>
 
@@ -8394,7 +8470,7 @@ const registrationClosed =
                                   setCheckInMessage("");
 
                                   if (opening) {
-                                    void loadEventOperationsRoster(
+                                    void loadEventCheckInSummary(
                                       selectedEvent.id
                                     );
 
@@ -8417,7 +8493,11 @@ const registrationClosed =
                                     <small>REGISTERED</small>
 
                                     <strong>
-                                      {going}
+                                      {
+                                        eventCheckInSummary[
+                                          selectedEvent.id
+                                        ]?.registered ?? going
+                                      }
                                     </strong>
                                   </div>
 
@@ -8426,11 +8506,9 @@ const registrationClosed =
 
                                     <strong>
                                       {
-                                        eventOperationsGoingRegistrations(
+                                        eventCheckInSummary[
                                           selectedEvent.id
-                                        ).filter(
-                                          row => row.checked_in
-                                        ).length
+                                        ]?.checkedIn ?? 0
                                       }
                                     </strong>
                                   </div>
@@ -8440,11 +8518,9 @@ const registrationClosed =
 
                                     <strong>
                                       {
-                                        eventOperationsGoingRegistrations(
+                                        eventCheckInSummary[
                                           selectedEvent.id
-                                        ).filter(
-                                          row => !row.checked_in
-                                        ).length
+                                        ]?.waiting ?? 0
                                       }
                                     </strong>
                                   </div>
@@ -8741,8 +8817,7 @@ const registrationClosed =
 
                         {/* EVENT CHECK-IN PANEL: END */}
 
-                        {(canManageEvent(selectedEvent) ||
-                          canOperateSelectedEvent) && (
+                        {canManageEvent(selectedEvent) && (
                           <div className="eventOrganizerRegistration">
                             <div>
                               <b>
@@ -8797,8 +8872,7 @@ const registrationClosed =
                         )}
 
                         {showAttendees &&
-                          (canManageEvent(selectedEvent) ||
-                            canOperateSelectedEvent) && (
+                          canManageEvent(selectedEvent) && (
                             <div className="eventAttendeeList">
                               {eventOperationsGoingRegistrations(
                                 selectedEvent.id
@@ -9083,6 +9157,17 @@ function AssignmentsModule({
 }) {
   const [items, setItems] =
     useState<Assignment[]>([]);
+
+  const [
+    assignmentDetails,
+    setAssignmentDetails,
+  ] =
+    useState<
+      Assignment | null
+    >(
+      null
+    );
+
 
   const [submittedIds, setSubmittedIds] =
     useState<string[]>([]);
@@ -11604,7 +11689,7 @@ function AssignmentsModule({
 
 
   return (
-    <div className="moduleStack">
+    <div className="moduleStack assignmentsProfessionalV3">
 
       <ModuleHero
         eyebrow="Work planner"
@@ -12053,10 +12138,40 @@ function AssignmentsModule({
 
             return (
               <article
-                className="assignmentCard card assignmentCrudCard"
+                className="assignmentCard card assignmentCrudCard assignmentDetailsClickable"
                 key={
                   item.id
                 }
+                tabIndex={0}
+                aria-label={`Open details for ${item.title}`}
+                onClick={event => {
+                  const target =
+                    event.target as HTMLElement;
+
+                  if (
+                    target.closest(
+                      "button,a,input,select,textarea,label"
+                    )
+                  ) {
+                    return;
+                  }
+
+                  setAssignmentDetails(
+                    item
+                  );
+                }}
+                onKeyDown={event => {
+                  if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                  ) {
+                    event.preventDefault();
+
+                    setAssignmentDetails(
+                      item
+                    );
+                  }
+                }}
               >
 
                 <div className="assignmentTop">
@@ -12542,7 +12657,322 @@ function AssignmentsModule({
       </section>
 
 
-      {profile.role ===
+      
+      {assignmentDetails && (
+
+        <div
+          className="assignmentDetailsScrim"
+          role="presentation"
+          onMouseDown={event => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setAssignmentDetails(
+                null
+              );
+            }
+          }}
+        >
+
+          <section
+            className="assignmentDetailsModal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Assignment details for ${assignmentDetails.title}`}
+          >
+
+            <header className="assignmentDetailsHeader">
+
+              <div>
+
+                <span
+                  className={`assignmentDetailsKind ${assignmentDetails.kind.toLowerCase()}`}
+                >
+                  {
+                    assignmentDetails.kind
+                  }
+                </span>
+
+
+                <h2>
+                  {
+                    assignmentDetails.title
+                  }
+                </h2>
+
+
+                <p>
+                  {
+                    assignmentDetails.subject
+                  }
+                </p>
+
+              </div>
+
+
+              <button
+                type="button"
+                aria-label="Close assignment details"
+                onClick={() =>
+                  setAssignmentDetails(
+                    null
+                  )
+                }
+              >
+                ×
+              </button>
+
+            </header>
+
+
+            <div className="assignmentDetailsBody">
+
+              <section className="assignmentDetailsDescription">
+
+                <span>
+                  ASSIGNMENT DESCRIPTION
+                </span>
+
+                <p>
+                  {
+                    assignmentDetails.description ||
+                    "No additional description was provided for this assignment."
+                  }
+                </p>
+
+              </section>
+
+
+              <div className="assignmentDetailsMetaGrid">
+
+                <article>
+
+                  <span>
+                    DUE DATE
+                  </span>
+
+                  <strong>
+                    {formatDateTime(
+                      assignmentDetails.due_at
+                    )}
+                  </strong>
+
+                </article>
+
+
+                <article>
+
+                  <span>
+                    AUDIENCE
+                  </span>
+
+                  <strong>
+                    {assignmentDetails.audience_batch_id
+                      ? (() => {
+                          const batch =
+                            assignmentBatches.find(
+                              candidate =>
+                                candidate.id ===
+                                assignmentDetails.audience_batch_id
+                            );
+
+                          return batch
+                            ? `${batch.batch_name} · Section ${batch.section}`
+                            : assignmentDetails.audience_department;
+                        })()
+                      : assignmentDetails.audience_department}
+                  </strong>
+
+                </article>
+
+
+                {(
+                  assignmentDetails as
+                    Assignment & {
+                      created_by_name?: string;
+                    }
+                ).created_by_name && (
+
+                  <article>
+
+                    <span>
+                      ASSIGNED BY
+                    </span>
+
+                    <strong>
+                      {(
+                        assignmentDetails as
+                          Assignment & {
+                            created_by_name?: string;
+                          }
+                      ).created_by_name}
+                    </strong>
+
+                  </article>
+
+                )}
+
+
+                <article>
+
+                  <span>
+                    ATTACHMENTS
+                  </span>
+
+                  <strong>
+                    {
+                      assignmentAttachments.filter(
+                        attachment =>
+                          attachment.assignment_id ===
+                          assignmentDetails.id
+                      ).length
+                    }
+                  </strong>
+
+                </article>
+
+              </div>
+
+
+              {assignmentAttachments.some(
+                attachment =>
+                  attachment.assignment_id ===
+                  assignmentDetails.id
+              ) && (
+
+                <section className="assignmentDetailsAttachments">
+
+                  <span>
+                    ATTACHED MATERIAL
+                  </span>
+
+
+                  <div>
+
+                    {assignmentAttachments
+                      .filter(
+                        attachment =>
+                          attachment.assignment_id ===
+                          assignmentDetails.id
+                      )
+                      .map(
+                        attachment => (
+
+                          <button
+                            type="button"
+                            key={
+                              attachment.id
+                            }
+                            onClick={async () => {
+
+                              const client =
+                                getSupabaseClient();
+
+                              if (!client) {
+                                return;
+                              }
+
+
+                              const {
+                                data,
+                                error,
+                              } =
+                                await client
+                                  .storage
+                                  .from(
+                                    "assignment-files"
+                                  )
+                                  .createSignedUrl(
+                                    attachment.file_path,
+                                    120
+                                  );
+
+
+                              if (
+                                error ||
+                                !data?.signedUrl
+                              ) {
+
+                                setStatus(
+                                  `ERROR: ${
+                                    error?.message ||
+                                    "Unable to open assignment file."
+                                  }`
+                                );
+
+                                return;
+                              }
+
+
+                              window.open(
+                                data.signedUrl,
+                                "_blank",
+                                "noopener,noreferrer"
+                              );
+
+                            }}
+                          >
+
+                            <i>
+                              {
+                                attachment.file_type
+                                  .toUpperCase()
+                              }
+                            </i>
+
+                            <span>
+                              {
+                                attachment.file_name
+                              }
+                            </span>
+
+                            <b>
+                              ↗
+                            </b>
+
+                          </button>
+
+                        )
+                      )}
+
+                  </div>
+
+                </section>
+
+              )}
+
+            </div>
+
+
+            <footer className="assignmentDetailsFooter">
+
+              <span>
+                CampusConnect · Assignment
+              </span>
+
+
+              <button
+                type="button"
+                onClick={() =>
+                  setAssignmentDetails(
+                    null
+                  )
+                }
+              >
+                Close
+              </button>
+
+            </footer>
+
+          </section>
+
+        </div>
+
+      )}
+
+
+{profile.role ===
         "Student" &&
         submissionDraftAssignment && (
 
@@ -24923,8 +25353,8 @@ const normalizeLearningDepartment =
 
 
 type LearningResource = {
+  added_by: string;
   id: string;
-  added_by?: string;
   resource_type: LearningResourceType;
   subject: string;
   title: string;
@@ -24980,8 +25410,89 @@ type CampusBranch = {
 
 function LearningModule({profile}: {profile: ModuleProfile}) {
 
+  const [learningUserId, setLearningUserId] =
+    useState("");
+
+  const [
+    editingResourceId,
+    setEditingResourceId,
+  ] = useState("");
+
+  const [
+    resourceEditSaving,
+    setResourceEditSaving,
+  ] = useState(false);
+
+  const [
+    resourceEditForm,
+    setResourceEditForm,
+  ] = useState({
+    subject: "",
+    title: "",
+    description: "",
+    academic_year: "",
+    semester: "All",
+    url: "",
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return;
+    }
+
+    void client.auth
+      .getUser()
+      .then(({data}) => {
+        if (
+          active &&
+          data.user
+        ) {
+          setLearningUserId(
+            data.user.id
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const canManageLearningResource = (
+    item: LearningResource
+  ) => {
+    if (
+      profile.role ===
+        "Main Admin"
+    ) {
+      return true;
+    }
+
+    if (
+      (
+        profile.role ===
+          "Faculty" ||
+        profile.role ===
+          "Volunteer"
+      ) &&
+      Boolean(learningUserId) &&
+      item.added_by ===
+        learningUserId
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
   const canPublishLearningResources =
     profile.role === "Faculty" ||
+    profile.role === "Volunteer" ||
     profile.role === "Main Admin";
 
   const [selectedBranch, setSelectedBranch] =
@@ -25627,7 +26138,7 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
     ) {
 
       setStatus(
-        "Only Faculty can publish learning resources."
+        "Faculty, Volunteer, and Main Admin can publish learning resources."
       );
 
       return;
@@ -25740,6 +26251,122 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
 
       let fileName: string | null = null;
       let fileSize: number | null = null;
+
+      const {data: assignmentCheck, error: assignmentError} =
+        await client
+          .from("faculty_department_assignments")
+          .select("department")
+          .eq("faculty_id", auth.user.id);
+
+      if (assignmentError) {
+        throw assignmentError;
+      }
+
+      if (profile.role === "Faculty") {
+        const normalizedSelected =
+          form.department.trim().toLowerCase();
+
+        const hasAssignment =
+          (assignmentCheck || []).some(row =>
+            String(row.department || "")
+              .trim()
+              .toLowerCase() === normalizedSelected
+          );
+
+        if (!hasAssignment) {
+          throw new Error(
+            `Your logged-in Faculty account is not assigned to "${form.department}". Ask Main Admin to assign this department first.`
+          );
+        }
+      }
+
+      const {data: dbProfile, error: dbProfileError} =
+        await client
+          .from("profiles")
+          .select("role,department")
+          .eq("id", auth.user.id)
+          .single();
+
+      if (dbProfileError) {
+        throw dbProfileError;
+      }
+
+      if (
+        dbProfile?.role !== "Faculty" &&
+        dbProfile?.role !== "Volunteer" &&
+        dbProfile?.role !== "Main Admin"
+      ) {
+        throw new Error(
+          `Your database role is "${dbProfile?.role || "Unknown"}". Only Faculty, Volunteer, or Main Admin can publish learning resources.`
+        );
+      }
+
+      if (
+        dbProfile?.role === "Volunteer"
+      ) {
+        const normalizeLearningDepartment = (
+          value: unknown
+        ) => {
+          const normalized = String(value || "")
+            .trim()
+            .toLowerCase()
+            .replace(/&/g, "and")
+            .replace(/[^a-z0-9]+/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          const aliases: Record<string, string> = {
+            "ece": "ece",
+            "electronics and communication": "ece",
+            "electronics and communication engineering": "ece",
+
+            "cse": "cse",
+            "computer science": "cse",
+            "computer science engineering": "cse",
+            "computer science and engineering": "cse",
+
+            "ise": "ise",
+            "information science": "ise",
+            "information science engineering": "ise",
+
+            "it": "it",
+            "information technology": "it",
+
+            "eee": "eee",
+            "electrical and electronics": "eee",
+            "electrical and electronics engineering": "eee",
+
+            "mech": "mech",
+            "mechanical": "mech",
+            "mechanical engineering": "mech",
+
+            "civil": "civil",
+            "civil engineering": "civil",
+          };
+
+          return aliases[normalized] || normalized;
+        };
+
+        const volunteerDepartment =
+          normalizeLearningDepartment(
+            dbProfile.department
+          );
+
+        const selectedDepartment =
+          normalizeLearningDepartment(
+            form.department
+          );
+
+        if (
+          !volunteerDepartment ||
+          volunteerDepartment !==
+            selectedDepartment
+        ) {
+          throw new Error(
+            `Volunteers can publish learning resources only for their own department.`
+          );
+        }
+      }
 
       if (resourceFile) {
         const safeName =
@@ -26051,6 +26678,303 @@ function LearningModule({profile}: {profile: ModuleProfile}) {
   };
 
 
+  const startEditingLearningResource = (
+    item: LearningResource
+  ) => {
+    if (
+      !canManageLearningResource(
+        item
+      )
+    ) {
+      setStatus(
+        "You do not have permission to edit this resource."
+      );
+      return;
+    }
+
+    setEditingResourceId(
+      item.id
+    );
+
+    setResourceEditForm({
+      subject:
+        item.subject || "",
+      title:
+        item.title || "",
+      description:
+        item.description || "",
+      academic_year:
+        item.academic_year || "",
+      semester:
+        item.semester || "All",
+      url:
+        item.url || "",
+    });
+
+    setStatus("");
+  };
+
+
+  const saveLearningResourceEdit = async (
+    item: LearningResource
+  ) => {
+    if (
+      !canManageLearningResource(
+        item
+      )
+    ) {
+      return setStatus(
+        "You do not have permission to edit this resource."
+      );
+    }
+
+    if (
+      !resourceEditForm.subject.trim() ||
+      !resourceEditForm.title.trim()
+    ) {
+      return setStatus(
+        "Subject and resource title are required."
+      );
+    }
+
+    if (
+      item.resource_type ===
+        "Video" &&
+      !isYouTubeUrl(
+        resourceEditForm.url
+      )
+    ) {
+      return setStatus(
+        "Video resources require a valid YouTube URL."
+      );
+    }
+
+    if (
+      item.resource_type ===
+        "External Link" &&
+      !isWebUrl(
+        resourceEditForm.url
+      )
+    ) {
+      return setStatus(
+        "Add a valid HTTPS resource link."
+      );
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return setStatus(
+        "CampusConnect is not connected to Supabase."
+      );
+    }
+
+    setResourceEditSaving(true);
+    setStatus("");
+
+    try {
+      const updates = {
+        subject:
+          resourceEditForm
+            .subject
+            .trim(),
+        title:
+          resourceEditForm
+            .title
+            .trim(),
+        description:
+          resourceEditForm
+            .description
+            .trim(),
+        academic_year:
+          resourceEditForm
+            .academic_year
+            .trim(),
+        semester:
+          resourceEditForm
+            .semester ||
+          "All",
+        url:
+          resourceEditForm
+            .url
+            .trim(),
+      };
+
+      const {
+        data,
+        error,
+      } = await client
+        .from(
+          "learning_resources"
+        )
+        .update(updates)
+        .eq(
+          "id",
+          item.id
+        )
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      setItems(current =>
+        current.map(resource =>
+          resource.id === item.id
+            ? (
+                data as
+                  LearningResource
+              )
+            : resource
+        )
+      );
+
+      setEditingResourceId(
+        ""
+      );
+
+      setStatus(
+        "Learning resource updated successfully."
+      );
+    } catch (error) {
+      const message =
+        error &&
+        typeof error ===
+          "object" &&
+        "message" in error
+          ? String(
+              error.message
+            )
+          : "Unable to update learning resource.";
+
+      setStatus(message);
+    } finally {
+      setResourceEditSaving(
+        false
+      );
+    }
+  };
+
+
+  const deleteLearningResource = async (
+    item: LearningResource
+  ) => {
+    if (
+      !canManageLearningResource(
+        item
+      )
+    ) {
+      return setStatus(
+        "You do not have permission to delete this resource."
+      );
+    }
+
+    const confirmed =
+      window.confirm(
+        `Delete “${item.title}”? This cannot be undone.`
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (!client) {
+      return setStatus(
+        "CampusConnect is not connected to Supabase."
+      );
+    }
+
+    setStatus(
+      "Deleting learning resource..."
+    );
+
+    try {
+      const {
+        error: deleteError,
+      } = await client
+        .from(
+          "learning_resources"
+        )
+        .delete()
+        .eq(
+          "id",
+          item.id
+        );
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      if (item.file_path) {
+        const {
+          error: storageError,
+        } = await client.storage
+          .from(
+            "learning-resources"
+          )
+          .remove([
+            item.file_path,
+          ]);
+
+        if (storageError) {
+          console.warn(
+            "Learning resource file cleanup:",
+            storageError.message
+          );
+        }
+      }
+
+      setItems(current =>
+        current.filter(
+          resource =>
+            resource.id !==
+            item.id
+        )
+      );
+
+      setAiDocuments(current => {
+        const next = {
+          ...current,
+        };
+
+        delete next[item.id];
+
+        return next;
+      });
+
+      if (
+        editingResourceId ===
+        item.id
+      ) {
+        setEditingResourceId(
+          ""
+        );
+      }
+
+      setStatus(
+        "Learning resource deleted successfully."
+      );
+    } catch (error) {
+      const message =
+        error &&
+        typeof error ===
+          "object" &&
+        "message" in error
+          ? String(
+              error.message
+            )
+          : "Unable to delete learning resource.";
+
+      setStatus(message);
+    }
+  };
+
+
   const openResource = async (
     item: LearningResource
   ) => {
@@ -26205,9 +27129,7 @@ const visible = items.filter(item => {
           <FormHeading
             title="Add learning material"
             text={
-              canVerifyLearningRole(profile.role)
-                ? "Your authorized role can publish verified learning resources."
-                : "Your upload will be reviewed before receiving verified status."
+              "Published resources appear immediately in the learning library."
             }
           />
 
@@ -27093,15 +28015,9 @@ const visible = items.filter(item => {
                   {item.academic_year}
                 </span>
 
-                {item.is_verified ? (
-                  <b className="verifiedBadge">
-                    ✓ Verified
-                  </b>
-                ) : (
-                  <b className="reviewBadge">
-                    Review pending
-                  </b>
-                )}
+                <b className="verifiedBadge">
+                  ✓ Published
+                </b>
               </div>
 
               <h3>{item.title}</h3>
@@ -27117,6 +28033,191 @@ const visible = items.filter(item => {
                 {item.contributor_role}
               </small>
 
+              {editingResourceId ===
+                item.id && (
+                <div className="moduleForm card">
+                  <FormHeading
+                    title="Edit learning resource"
+                    text="Update this resource and save the changes immediately."
+                  />
+
+                  <div className="formGrid formGridThree">
+                    <Field label="Subject">
+                      <input
+                        value={
+                          resourceEditForm.subject
+                        }
+                        onChange={event =>
+                          setResourceEditForm(
+                            current => ({
+                              ...current,
+                              subject:
+                                event.target.value,
+                            })
+                          )
+                        }
+                      />
+                    </Field>
+
+                    <Field label="Title">
+                      <input
+                        value={
+                          resourceEditForm.title
+                        }
+                        onChange={event =>
+                          setResourceEditForm(
+                            current => ({
+                              ...current,
+                              title:
+                                event.target.value,
+                            })
+                          )
+                        }
+                      />
+                    </Field>
+
+                    <Field label="Academic year">
+                      <input
+                        value={
+                          resourceEditForm.academic_year
+                        }
+                        onChange={event =>
+                          setResourceEditForm(
+                            current => ({
+                              ...current,
+                              academic_year:
+                                event.target.value,
+                            })
+                          )
+                        }
+                      />
+                    </Field>
+                  </div>
+
+                  <div className="formGrid">
+                    <Field label="Semester">
+                      <select
+                        value={
+                          resourceEditForm.semester
+                        }
+                        onChange={event =>
+                          setResourceEditForm(
+                            current => ({
+                              ...current,
+                              semester:
+                                event.target.value,
+                            })
+                          )
+                        }
+                      >
+                        <option value="All">
+                          All
+                        </option>
+                        {Array.from(
+                          {
+                            length: 12,
+                          },
+                          (_, index) =>
+                            String(
+                              index + 1
+                            )
+                        ).map(
+                          semester => (
+                            <option
+                              key={
+                                semester
+                              }
+                              value={
+                                semester
+                              }
+                            >
+                              Semester{" "}
+                              {semester}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </Field>
+
+                    {(item.resource_type ===
+                      "Video" ||
+                      item.resource_type ===
+                        "External Link" ||
+                      Boolean(item.url)) && (
+                      <Field label="Resource URL">
+                        <input
+                          type="url"
+                          value={
+                            resourceEditForm.url
+                          }
+                          onChange={event =>
+                            setResourceEditForm(
+                              current => ({
+                                ...current,
+                                url:
+                                  event.target.value,
+                              })
+                            )
+                          }
+                          placeholder="https://..."
+                        />
+                      </Field>
+                    )}
+                  </div>
+
+                  <Field label="Description">
+                    <textarea
+                      value={
+                        resourceEditForm.description
+                      }
+                      onChange={event =>
+                        setResourceEditForm(
+                          current => ({
+                            ...current,
+                            description:
+                              event.target.value,
+                          })
+                        )
+                      }
+                    />
+                  </Field>
+
+                  <div className="formActions">
+                    <button
+                      type="button"
+                      className="primary"
+                      disabled={
+                        resourceEditSaving
+                      }
+                      onClick={() =>
+                        void saveLearningResourceEdit(
+                          item
+                        )
+                      }
+                    >
+                      {resourceEditSaving
+                        ? "Saving..."
+                        : "Save changes"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="ghost"
+                      disabled={
+                        resourceEditSaving
+                      }
+                      onClick={() =>
+                        setEditingResourceId(
+                          ""
+                        )
+                      }
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="resourceActions">
                 <button
                   type="button"
@@ -27131,6 +28232,36 @@ const visible = items.filter(item => {
                     ? "Open resource ↗"
                     : "Open link ↗"}
                 </button>
+
+                {canManageLearningResource(
+                  item
+                ) && (
+                  <>
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={() =>
+                        startEditingLearningResource(
+                          item
+                        )
+                      }
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={() =>
+                        void deleteLearningResource(
+                          item
+                        )
+                      }
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
 
                 <button
                   type="button"
@@ -28985,6 +30116,8 @@ function ProfileModule({
                 ? "Change cover"
                 : "Add cover"}
             </label>
+
+            
 
             <button
               type="button"
@@ -32680,6 +33813,10 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
   const [users, setUsers] =
     useState<AdminProfile[]>(emptyAdminProfiles);
 
+  const [adminSection, setAdminSection] = useState("faculty");
+  const [accountsLoading, setAccountsLoading] = useState(true);
+  const [accountsLoaded, setAccountsLoaded] = useState(false);
+  const [accountsError, setAccountsError] = useState("");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("");
 
@@ -32714,16 +33851,20 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
     }
 
 
+    setAccountsLoading(true);
+    setAccountsError("");
+
     const client =
       getSupabaseClient();
 
 
     if (!client) {
 
-      setStatus(
+      setAccountsError(
         "CampusConnect is not connected to Supabase."
       );
 
+      setAccountsLoading(false);
       return;
     }
 
@@ -32742,7 +33883,7 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
         !session?.access_token
       ) {
 
-        setStatus(
+        setAccountsError(
           "Your administrator session has expired. Sign in again."
         );
 
@@ -32783,7 +33924,7 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
 
       if (!response.ok) {
 
-        setStatus(
+        setAccountsError(
           payload.error ||
             "Unable to load campus accounts."
         );
@@ -32798,16 +33939,19 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
       );
 
 
-      setStatus("");
+      setAccountsLoaded(true);
+      setAccountsError("");
 
     } catch (error) {
 
-      setStatus(
+      setAccountsError(
         error instanceof Error
           ? error.message
           : "Unable to load campus accounts."
       );
 
+    } finally {
+      setAccountsLoading(false);
     }
 
   };
@@ -33188,6 +34332,8 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
 
 
   const visible = users.filter(user =>
+    (adminSection !== "faculty" || user.role === "Faculty") &&
+    (adminSection !== "students" || user.role === "Student") &&
     `${user.full_name} ${user.email} ${user.department} ${user.role}`
       .toLowerCase()
       .includes(query.toLowerCase())
@@ -33205,12 +34351,12 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
   }
 
   return (
-    <div className="moduleStack adminWorkspace">
+    <div className="moduleStack adminWorkspace adminProfessional">
 
       <ModuleHero
-        eyebrow="Access governance"
-        title="Campus account management"
-        copy="Create institutional accounts, assign verified roles and control CampusConnect access from one secure workspace."
+        eyebrow="CAMPUS ADMINISTRATION"
+        title="Administration centre"
+        copy="One workspace for faculty, students and campus access."
         action={
           <button
             type="button"
@@ -33226,11 +34372,74 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
         }
       />
 
+      <section className="adminSummary">
+        <MetricTile
+          label="Loaded accounts"
+          value={!accountsLoaded || accountsError ? "—" : String(users.length)}
+          note="Accounts returned by the directory"
+        />
+
+        <MetricTile
+          label="Students"
+          value={!accountsLoaded || accountsError ? "—" : String(
+            users.filter(
+              user => user.role === "Student"
+            ).length
+          )}
+          note="Student workspace access"
+        />
+
+        <MetricTile
+          label="Faculty"
+          value={!accountsLoaded || accountsError ? "—" : String(
+            users.filter(
+              user => user.role === "Faculty"
+            ).length
+          )}
+          note="Academic staff access"
+        />
+
+        <MetricTile
+          label="Operations"
+          value={!accountsLoaded || accountsError ? "—" : String(
+            users.filter(user =>
+              [
+                "Coordinator",
+                "Volunteer",
+                "Placement Cell",
+              ].includes(user.role)
+            ).length
+          )}
+          note="Campus operational accounts"
+        />
+      </section>
+      {accountsError && (
+        <div className="adminLoadError" role="alert">
+          <div><strong>Accounts could not be loaded</strong><p>{accountsError}</p></div>
+          <button type="button" className="ghost" disabled={accountsLoading} onClick={() => void loadUsers()}>
+            {accountsLoading ? "Retrying…" : "Retry"}
+          </button>
+        </div>
+      )}
+      <nav className="adminSectionNav" aria-label="Administration sections">
+        {[
+          
+          ["faculty", "Faculty Centre", "Staff & departments"],
+          ["students", "Student Centre", "Accounts & identity"],
+          ["accounts", "Accounts & roles", "All campus accounts"],
+          ["delegations", "Delegations", "Temporary access"],
+        ].map(([id, label, description]) => (
+          <button key={id} type="button" aria-current={adminSection === id ? "page" : undefined}
+            aria-controls={`admin-panel-${id}`} onClick={() => setAdminSection(id)}>
+            <strong>{label}</strong><small>{description}</small>
+          </button>
+        ))}
+      </nav>
       {status && (
-        <StatusLine text={status}/>
+        <div className="adminNotice" role="status">{status}</div>
       )}
 
-      <CampusWorkDelegation />
+
 
       {showCreateAccount && (
         <form
@@ -33428,53 +34637,24 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
         </form>
       )}
 
-      <section className="adminSummary">
-        <MetricTile
-          label="Total accounts"
-          value={String(users.length)}
-          note="Registered campus identities"
-        />
 
-        <MetricTile
-          label="Students"
-          value={String(
-            users.filter(
-              user => user.role === "Student"
-            ).length
-          )}
-          note="Student workspace access"
-        />
 
-        <MetricTile
-          label="Faculty"
-          value={String(
-            users.filter(
-              user => user.role === "Faculty"
-            ).length
-          )}
-          note="Academic staff access"
-        />
+      
+      <div id="admin-panel-faculty" className="adminSectionPanel" hidden={adminSection !== "faculty"}>
+        <FacultyDepartmentManagement />
+        <TimetableCoordinatorAdmin profile={profile} />
+      </div>
 
-        <MetricTile
-          label="Operations"
-          value={String(
-            users.filter(user =>
-              [
-                "Coordinator",
-                "Volunteer",
-                "Placement Cell",
-              ].includes(user.role)
-            ).length
-          )}
-          note="Campus operational accounts"
-        />
-      </section>
-
-      <FacultyDepartmentManagement />
-
-      <StudentIdentityManagement />
+      <div id="admin-panel-students" className="adminSectionPanel" hidden={adminSection !== "students"}>
+        <StudentIdentityManagement />
+      </div>
+      <div id="admin-panel-delegations" className="adminSectionPanel" hidden={adminSection !== "delegations"}>
+        <CampusWorkDelegation />
+      </div>
 
       <section
+        id="admin-panel-accounts"
+        hidden={!["accounts", "faculty", "students"].includes(adminSection)}
         className={
           `adminUsers card ${
             showAccountDirectory
@@ -33486,7 +34666,7 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
         <header>
           <div>
             <span>CAMPUS DIRECTORY</span>
-            <h3>Accounts & permissions</h3>
+            <h3>{adminSection === "faculty" ? "Faculty accounts & Employee IDs" : adminSection === "students" ? "Student accounts" : "Accounts & permissions"}</h3>
 
             <p>
               Roles shown here control which CampusConnect
@@ -33538,6 +34718,7 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
                     event.target.value
                   )
                 }
+                aria-label="Search accounts"
                 placeholder="Search name, email, role or department"
               />
 
@@ -33546,7 +34727,8 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
           </div>
         </header>
 
-        <div className="adminTable">
+        {accountsLoading && <p className="adminLoading" role="status">Loading campus accounts…</p>}
+        <div className="adminTable" aria-busy={accountsLoading}>
           <div className="adminTableHead">
             <span>User</span>
             <span>Department</span>
@@ -33625,7 +34807,7 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
             </div>
           ))}
 
-          {!visible.length && (
+          {!accountsLoading && !accountsError && accountsLoaded && !visible.length && (
             <EmptyState
               title="No matching accounts"
               text="Try another name, email, department or role."

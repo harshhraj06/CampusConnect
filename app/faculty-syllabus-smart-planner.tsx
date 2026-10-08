@@ -5,8 +5,20 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
+
+import {
+  Document,
+  Page,
+  StyleSheet,
+  Text,
+  View,
+  pdf,
+} from "@react-pdf/renderer";
+
+import * as XLSX from "xlsx";
 
 import {
   getSupabaseClient,
@@ -58,69 +70,130 @@ type PlannerDraft = {
 };
 
 
-type PlannedTopic = {
-  unitIndex: number;
-  topicIndex: number;
-  unitNumber: number;
-  unitTitle: string;
-  topicOrder: number;
-  topicTitle: string;
-  plannedClasses: number;
-};
-
-
-type TeachingAllocation = {
-  id: string;
-  weekly_hours: number;
-  session_length_periods: number;
-  allocation_type: string;
-  subgroup: string;
-  status: string;
-};
-
-
-type TimetableEntry = {
-  id: string;
-  batch_id: string;
-  batch_subject_id: string;
-  faculty_id: string;
-  day_of_week: string;
-  period_order: number;
-  start_time: string;
-  end_time: string;
-  class_type: string;
-  subgroup: string;
-};
-
-
-type CapacityState = {
-  loading: boolean;
-  weeklySessions: number;
-  weeklyPeriods: number;
-  source:
-    | "allocation"
-    | "timetable"
-    | "unavailable";
-  message: string;
+type SyllabusWorkload = {
+  lectureHours: number;
+  tutorialHours: number;
+  practicalHours: number;
+  selfLearningHours: number;
+  semesterHours: number;
+  detectedText: string;
 };
 
 
 type ScanPayload = {
   success?: boolean;
-  readOnly?: boolean;
   sourceType?: string;
-  mode?: string;
   fileName?: string;
   mimeType?: string;
   pages?: number;
   draft?: PlannerDraft;
-  warnings?: string[];
-  message?: string;
   error?: string;
+  message?: string;
+
+  syllabusMeta?: {
+    lectureHours?: number;
+    tutorialHours?: number;
+    practicalHours?: number;
+    selfLearningHours?: number;
+    semesterHours?: number;
+    totalHours?: number;
+    ltp?: string;
+    ltpSl?: string;
+  };
+
+  rawText?: string;
+  extractedText?: string;
+  text?: string;
 };
 
 
-type FacultySyllabusSmartPlannerProps = {
+type RawFacultyTimetable = {
+  id?: string;
+  publicationId?: string;
+  batchId?: string;
+  batchName?: string;
+  section?: string;
+  department?: string;
+  academicYear?: string;
+  semester?: string;
+  batchSubjectId?: string;
+  subjectName?: string;
+  subjectCode?: string;
+  facultyId?: string;
+  facultyName?: string;
+  dayOfWeek?: string;
+  periodOrder?: number;
+  startTime?: string;
+  endTime?: string;
+  room?: string;
+  classType?: string;
+  subgroup?: string;
+};
+
+
+type RawBatchTimetable = {
+  id?: string;
+  batch_id?: string;
+  batch_subject_id?: string;
+  faculty_id?: string;
+  faculty_name?: string;
+  day_of_week?: string;
+  period_order?: number;
+  start_time?: string;
+  end_time?: string;
+  room?: string;
+  class_type?: string;
+  subgroup?: string;
+};
+
+
+type TimetableEntry = {
+  id: string;
+  batchId: string;
+  batchSubjectId: string;
+  subjectName: string;
+  subjectCode: string;
+  facultyId: string;
+  facultyName: string;
+  dayOfWeek: string;
+  periodOrder: number;
+  startTime: string;
+  endTime: string;
+  room: string;
+  classType: string;
+  subgroup: string;
+};
+
+
+type TopicInfo = {
+  unitNumber: number;
+  unitTitle: string;
+  topicOrder: number;
+  topicTitle: string;
+  topicDescription: string;
+};
+
+
+type ScheduleRow = {
+  id: string;
+  lessonNumber: number;
+  classDate: string;
+  dayOfWeek: string;
+  periodOrder: number | null;
+  startTime: string;
+  endTime: string;
+  room: string;
+  classType: string;
+  extraClass: boolean;
+  unitNumber: number;
+  unitTitle: string;
+  topicOrder: number;
+  topicTitle: string;
+  topicDescription: string;
+};
+
+
+type Props = {
   subject: PlannerSubject;
   batch: PlannerBatch | null;
 
@@ -138,7 +211,7 @@ const MAX_FILE_SIZE =
   20 * 1024 * 1024;
 
 
-const ALLOWED_FILE_TYPES =
+const ALLOWED_TYPES =
   new Set([
     "application/pdf",
     "image/jpeg",
@@ -147,267 +220,1079 @@ const ALLOWED_FILE_TYPES =
   ]);
 
 
-const cleanText = (
-  value: unknown
-) =>
-  String(
-    value ?? ""
-  ).trim();
+const DAY_INDEX:
+  Record<string, number> = {
+    Sunday: 0,
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+  };
 
 
-const roundTwo = (
-  value: number
-) =>
-  Math.round(
-    value * 100
-  ) / 100;
+const normalize =
+  (
+    value: unknown
+  ) =>
+    String(
+      value ?? ""
+    )
+      .trim()
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9]+/g,
+        ""
+      );
 
 
-const countTopics = (
-  draft: PlannerDraft | null
-) =>
-  draft
-    ? draft.units.reduce(
-        (
-          total,
-          unit
-        ) =>
-          total +
-          unit.topics.length,
-        0
+const clean =
+  (
+    value: unknown
+  ) =>
+    String(
+      value ?? ""
+    ).trim();
+
+
+const isoDate =
+  (
+    date: Date
+  ) => {
+
+    const year =
+      date.getFullYear();
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(
+        2,
+        "0"
+      );
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(
+        2,
+        "0"
+      );
+
+    return `${year}-${month}-${day}`;
+  };
+
+
+const formatDate =
+  (
+    value: string
+  ) => {
+
+    if (!value) {
+      return "";
+    }
+
+    return new Intl.DateTimeFormat(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    ).format(
+      new Date(
+        `${value}T00:00:00`
       )
-    : 0;
+    );
+  };
 
 
-const buildTeachingPlan = (
-  draft: PlannerDraft,
-  totalClasses: number
-): PlannedTopic[] => {
+const fileSlug =
+  (
+    value: string
+  ) =>
+    clean(
+      value
+    )
+      .replace(
+        /[^a-z0-9]+/gi,
+        "-"
+      )
+      .replace(
+        /^-+|-+$/g,
+        ""
+      )
+      .toLowerCase() ||
+    "syllabus-plan";
 
-  const topics =
-    draft.units.flatMap(
-      (
-        unit,
-        unitIndex
-      ) =>
-        unit.topics.map(
-          (
-            topic,
-            topicIndex
-          ) => ({
-            unitIndex,
-            topicIndex,
-            unitNumber:
-              unit.unitNumber,
-            unitTitle:
-              unit.title,
-            topicOrder:
-              topic.topicOrder,
-            topicTitle:
-              topic.title,
-          })
+
+const extractWorkloadMetadata =
+  (
+    value: unknown
+  ): SyllabusWorkload => {
+
+    const source =
+      typeof value === "string"
+        ? value
+        : JSON.stringify(
+            value ??
+            ""
+          );
+
+
+    const normalized =
+      source
+        .replace(
+          /\\n/g,
+          " "
         )
-    );
+        .replace(
+          /\s+/g,
+          " "
+        );
 
 
-  if (
-    !topics.length ||
-    totalClasses <= 0
-  ) {
-    return [];
-  }
+    let lectureHours =
+      0;
+
+    let tutorialHours =
+      0;
+
+    let practicalHours =
+      0;
+
+    let selfLearningHours =
+      0;
+
+    let semesterHours =
+      0;
 
 
-  /*
-   * Production rule:
-   *
-   * 1. Every syllabus topic has equal baseline importance.
-   * 2. Whole teaching classes are allocated only.
-   * 3. Remaining classes are spread across the syllabus,
-   *    instead of all extra classes being front-loaded.
-   * 4. Faculty can edit the result before anything is saved.
-   *
-   * AI is intentionally NOT used to invent topic complexity.
-   */
-  const baseClasses =
-    Math.floor(
-      totalClasses /
-      topics.length
-    );
+    const ltpPatterns =
+      [
+        /L\s*[:\-]?\s*T\s*[:\-]?\s*P[^0-9]{0,35}\(?\s*(\d+)\s*[:\-]\s*(\d+)\s*[:\-]\s*(\d+)\s*\)?/i,
+
+        /\(\s*L\s*:\s*T\s*:\s*P\s*\)\s*\+\s*SL\s*\(?\s*(\d+)\s*:\s*(\d+)\s*:\s*(\d+)\s*\)?/i,
+
+        /LTP[^0-9]{0,20}(\d+)\s*[:\-]\s*(\d+)\s*[:\-]\s*(\d+)/i,
+      ];
 
 
-  const remainder =
-    totalClasses %
-    topics.length;
-
-
-  const extraIndexes =
-    new Set<number>();
-
-
-  if (
-    remainder > 0
-  ) {
     for (
-      let extra = 0;
-      extra < remainder;
-      extra += 1
+      const pattern
+      of ltpPatterns
     ) {
 
-      const index =
-        Math.floor(
-          (
-            extra *
-            topics.length
-          ) /
-          remainder
+      const match =
+        normalized.match(
+          pattern
         );
 
 
-      extraIndexes.add(
-        Math.min(
-          topics.length - 1,
-          index
-        )
-      );
+      if (match) {
+
+        lectureHours =
+          Number(
+            match[1]
+          ) ||
+          0;
+
+        tutorialHours =
+          Number(
+            match[2]
+          ) ||
+          0;
+
+        practicalHours =
+          Number(
+            match[3]
+          ) ||
+          0;
+
+        break;
+      }
     }
-  }
 
 
-  return topics.map(
-    (
-      topic,
-      index
-    ) => ({
-      ...topic,
+    const semesterPatterns =
+      [
+        /(\d{1,3})\s*Hours?\s*\/\s*Sem(?:ester)?/i,
 
-      plannedClasses:
-        baseClasses +
-        (
-          extraIndexes.has(
-            index
-          )
-            ? 1
-            : 0
+        /(\d{1,3})\s*Hours?\s*(?:per|\/)\s*Semester/i,
+
+        /Total\s+(?:Teaching\s+)?Hours?[^0-9]{0,15}(\d{1,3})/i,
+
+        /Semester\s+Hours?[^0-9]{0,15}(\d{1,3})/i,
+      ];
+
+
+    for (
+      const pattern
+      of semesterPatterns
+    ) {
+
+      const match =
+        normalized.match(
+          pattern
+        );
+
+
+      if (match) {
+
+        semesterHours =
+          Number(
+            match[1]
+          ) ||
+          0;
+
+        break;
+      }
+    }
+
+
+    const slMatch =
+      normalized.match(
+        /SL[^0-9]{0,10}(\d+)\s*(?:Hours?|Hrs?)?/i
+      );
+
+
+    if (slMatch) {
+
+      selfLearningHours =
+        Number(
+          slMatch[1]
+        ) ||
+        0;
+    }
+
+
+    return {
+      lectureHours,
+      tutorialHours,
+      practicalHours,
+      selfLearningHours,
+      semesterHours,
+      detectedText:
+        normalized,
+    };
+  };
+
+
+const downloadBlob =
+  (
+    blob: Blob,
+    fileName: string
+  ) => {
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+    const anchor =
+      document.createElement(
+        "a"
+      );
+
+    anchor.href =
+      url;
+
+    anchor.download =
+      fileName;
+
+    document.body.appendChild(
+      anchor
+    );
+
+    anchor.click();
+
+    anchor.remove();
+
+    window.setTimeout(
+      () =>
+        URL.revokeObjectURL(
+          url
         ),
-    })
-  );
-};
+      1000
+    );
+  };
 
 
-const countTimetableSessions = (
-  entries: TimetableEntry[]
-) => {
+const pdfStyles =
+  StyleSheet.create({
 
-  const grouped =
-    new Map<
-      string,
-      TimetableEntry[]
-    >();
+    page: {
+      paddingTop: 0,
+      paddingBottom: 42,
+      paddingHorizontal: 0,
+      fontFamily: "Helvetica",
+      fontSize: 8,
+      color: "#1b2638",
+      backgroundColor: "#ffffff",
+    },
+
+    brandBand: {
+      height: 9,
+      backgroundColor: "#294fc7",
+    },
+
+    header: {
+      paddingTop: 25,
+      paddingHorizontal: 32,
+      paddingBottom: 20,
+      backgroundColor: "#f7f9fd",
+      borderBottomWidth: 1,
+      borderBottomColor: "#e5eaf3",
+    },
+
+    brandRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 17,
+    },
+
+    brandBlock: {
+      flexDirection: "column",
+    },
+
+    brand: {
+      fontSize: 8,
+      color: "#294fc7",
+      fontFamily: "Helvetica-Bold",
+      letterSpacing: 1.5,
+      marginBottom: 3,
+    },
+
+    documentType: {
+      fontSize: 6.5,
+      color: "#7b8698",
+      letterSpacing: 0.7,
+    },
+
+    badge: {
+      borderWidth: 1,
+      borderColor: "#d8e0f2",
+      backgroundColor: "#ffffff",
+      borderRadius: 12,
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      fontSize: 6.5,
+      color: "#40506c",
+    },
+
+    title: {
+      fontSize: 22,
+      lineHeight: 1.12,
+      fontFamily: "Helvetica-Bold",
+      color: "#182338",
+      marginBottom: 6,
+    },
+
+    subtitle: {
+      fontSize: 8,
+      lineHeight: 1.45,
+      color: "#6e7b90",
+    },
+
+    body: {
+      paddingHorizontal: 32,
+      paddingTop: 18,
+    },
+
+    metaGrid: {
+      flexDirection: "row",
+      gap: 8,
+      marginBottom: 9,
+    },
+
+    metaCard: {
+      flexGrow: 1,
+      flexBasis: 0,
+      minHeight: 45,
+      borderWidth: 1,
+      borderColor: "#e3e8f0",
+      borderRadius: 7,
+      paddingVertical: 8,
+      paddingHorizontal: 9,
+      backgroundColor: "#ffffff",
+    },
+
+    metaLabel: {
+      fontSize: 5.5,
+      fontFamily: "Helvetica-Bold",
+      color: "#8c97a8",
+      letterSpacing: 0.7,
+      marginBottom: 4,
+    },
+
+    metaValue: {
+      fontSize: 7.6,
+      fontFamily: "Helvetica-Bold",
+      color: "#26344b",
+      lineHeight: 1.25,
+    },
+
+    summary: {
+      marginTop: 6,
+      marginBottom: 14,
+      borderWidth: 1,
+      borderColor: "#dce6fb",
+      borderRadius: 7,
+      backgroundColor: "#f5f8ff",
+      paddingVertical: 9,
+      paddingHorizontal: 11,
+    },
+
+    summaryTitle: {
+      fontSize: 6,
+      fontFamily: "Helvetica-Bold",
+      color: "#294fc7",
+      letterSpacing: 0.7,
+      marginBottom: 3,
+    },
+
+    summaryText: {
+      fontSize: 7,
+      lineHeight: 1.45,
+      color: "#58667d",
+    },
+
+    table: {
+      borderWidth: 1,
+      borderColor: "#e2e7ef",
+      borderRadius: 7,
+      overflow: "hidden",
+    },
+
+    tableHead: {
+      flexDirection: "row",
+      alignItems: "center",
+      minHeight: 29,
+      backgroundColor: "#202f49",
+    },
+
+    headText: {
+      color: "#ffffff",
+      fontFamily: "Helvetica-Bold",
+      fontSize: 6,
+      letterSpacing: 0.45,
+      paddingHorizontal: 5,
+    },
+
+    row: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      minHeight: 34,
+      paddingVertical: 7,
+      borderBottomWidth: 1,
+      borderBottomColor: "#e9edf3",
+      backgroundColor: "#ffffff",
+    },
+
+    rowAlt: {
+      backgroundColor: "#fafbfd",
+    },
+
+    rowExtra: {
+      backgroundColor: "#fff9ea",
+    },
+
+    cell: {
+      paddingHorizontal: 5,
+      color: "#344158",
+      fontSize: 6.6,
+      lineHeight: 1.4,
+    },
+
+    dateCol: {
+      width: "14%",
+    },
+
+    dayCol: {
+      width: "10%",
+    },
+
+    periodCol: {
+      width: "9%",
+    },
+
+    unitCol: {
+      width: "24%",
+    },
+
+    topicCol: {
+      width: "35%",
+    },
+
+    typeCol: {
+      width: "8%",
+    },
+
+    strongCell: {
+      fontFamily: "Helvetica-Bold",
+      color: "#233149",
+    },
+
+    footerLine: {
+      position: "absolute",
+      left: 32,
+      right: 32,
+      bottom: 28,
+      borderTopWidth: 1,
+      borderTopColor: "#e7ebf1",
+    },
+
+    footer: {
+      position: "absolute",
+      left: 32,
+      right: 32,
+      bottom: 15,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      color: "#929bab",
+      fontSize: 5.8,
+    },
+  });
+
+function PlannerPdf({
+  rows,
+  subject,
+  batch,
+  syllabusWorkload,
+  semesterHours,
+  weeklyPeriods,
+}: {
+  rows: ScheduleRow[];
+  subject: PlannerSubject;
+  batch: PlannerBatch | null;
+  syllabusWorkload: SyllabusWorkload;
+  semesterHours: number;
+  weeklyPeriods: number;
+}) {
+
+  const className =
+    batch
+      ? [
+          batch.batch_name,
+          batch.section,
+        ]
+          .filter(Boolean)
+          .join(" · ")
+      : "Assigned batch";
 
 
-  entries.forEach(
-    entry => {
+  return (
+    <Document>
 
-      const key =
-        [
-          entry.day_of_week,
-          cleanText(
-            entry.subgroup
-          ),
-          cleanText(
-            entry.class_type
-          ),
-        ].join(
-          "::"
-        );
-
-
-      const current =
-        grouped.get(
-          key
-        ) || [];
-
-
-      current.push(
-        entry
-      );
-
-
-      grouped.set(
-        key,
-        current
-      );
-    }
-  );
-
-
-  let sessions =
-    0;
-
-
-  grouped.forEach(
-    rows => {
-
-      const ordered =
-        [...rows].sort(
-          (
-            a,
-            b
-          ) =>
-            a.period_order -
-            b.period_order
-        );
-
-
-      let previous:
-        TimetableEntry |
-        null = null;
-
-
-      ordered.forEach(
-        row => {
-
-          const continuous =
-            previous !==
-              null &&
-            row.period_order ===
-              previous.period_order +
-                1 &&
-            cleanText(
-              row.start_time
-            ) ===
-              cleanText(
-                previous.end_time
-              );
-
-
-          if (
-            !continuous
-          ) {
-            sessions +=
-              1;
-          }
-
-
-          previous =
-            row;
+      <Page
+        size="A4"
+        style={
+          pdfStyles.page
         }
-      );
-    }
+      >
+
+        <View
+          style={
+            pdfStyles.brandBand
+          }
+          fixed
+        />
+
+
+        <View
+          style={
+            pdfStyles.header
+          }
+        >
+
+          <View
+            style={
+              pdfStyles.brandRow
+            }
+          >
+
+            <View
+              style={
+                pdfStyles.brandBlock
+              }
+            >
+
+              <Text
+                style={
+                  pdfStyles.brand
+                }
+              >
+                CAMPUSCONNECT
+              </Text>
+
+              <Text
+                style={
+                  pdfStyles.documentType
+                }
+              >
+                FACULTY ACADEMIC PLANNING
+              </Text>
+
+            </View>
+
+
+            <Text
+              style={
+                pdfStyles.badge
+              }
+            >
+              SMART SYLLABUS PLANNER
+            </Text>
+
+          </View>
+
+
+          <Text
+            style={
+              pdfStyles.title
+            }
+          >
+            Semester Teaching Plan
+          </Text>
+
+
+          <Text
+            style={
+              pdfStyles.subtitle
+            }
+          >
+            {subject.subject_name}
+            {" · "}
+            {subject.subject_code}
+          </Text>
+
+        </View>
+
+
+        <View
+          style={
+            pdfStyles.body
+          }
+        >
+
+          <View
+            style={
+              pdfStyles.metaGrid
+            }
+          >
+
+            <View
+              style={
+                pdfStyles.metaCard
+              }
+            >
+
+              <Text
+                style={
+                  pdfStyles.metaLabel
+                }
+              >
+                FACULTY
+              </Text>
+
+              <Text
+                style={
+                  pdfStyles.metaValue
+                }
+              >
+                {subject.faculty_name ||
+                  "Faculty"}
+              </Text>
+
+            </View>
+
+
+            <View
+              style={
+                pdfStyles.metaCard
+              }
+            >
+
+              <Text
+                style={
+                  pdfStyles.metaLabel
+                }
+              >
+                CLASS
+              </Text>
+
+              <Text
+                style={
+                  pdfStyles.metaValue
+                }
+              >
+                {className}
+              </Text>
+
+            </View>
+
+
+            <View
+              style={
+                pdfStyles.metaCard
+              }
+            >
+
+              <Text
+                style={
+                  pdfStyles.metaLabel
+                }
+              >
+                L : T : P
+              </Text>
+
+              <Text
+                style={
+                  pdfStyles.metaValue
+                }
+              >
+                {syllabusWorkload.lectureHours}
+                {" : "}
+                {syllabusWorkload.tutorialHours}
+                {" : "}
+                {syllabusWorkload.practicalHours}
+              </Text>
+
+            </View>
+
+          </View>
+
+
+          <View
+            style={
+              pdfStyles.metaGrid
+            }
+          >
+
+            <View
+              style={
+                pdfStyles.metaCard
+              }
+            >
+
+              <Text
+                style={
+                  pdfStyles.metaLabel
+                }
+              >
+                HOURS / SEMESTER
+              </Text>
+
+              <Text
+                style={
+                  pdfStyles.metaValue
+                }
+              >
+                {semesterHours ||
+                  rows.length}
+              </Text>
+
+            </View>
+
+
+            <View
+              style={
+                pdfStyles.metaCard
+              }
+            >
+
+              <Text
+                style={
+                  pdfStyles.metaLabel
+                }
+              >
+                PERIODS / WEEK
+              </Text>
+
+              <Text
+                style={
+                  pdfStyles.metaValue
+                }
+              >
+                {weeklyPeriods}
+              </Text>
+
+            </View>
+
+
+            <View
+              style={
+                pdfStyles.metaCard
+              }
+            >
+
+              <Text
+                style={
+                  pdfStyles.metaLabel
+                }
+              >
+                PLANNED CLASSES
+              </Text>
+
+              <Text
+                style={
+                  pdfStyles.metaValue
+                }
+              >
+                {rows.length}
+              </Text>
+
+            </View>
+
+          </View>
+
+
+          <View
+            style={
+              pdfStyles.summary
+            }
+          >
+
+            <Text
+              style={
+                pdfStyles.summaryTitle
+              }
+            >
+              PLAN SUMMARY
+            </Text>
+
+            <Text
+              style={
+                pdfStyles.summaryText
+              }
+            >
+              CampusConnect generated this teaching plan by distributing the extracted syllabus across the faculty member&apos;s scheduled teaching days.
+            </Text>
+
+          </View>
+
+
+          <View
+            style={
+              pdfStyles.table
+            }
+          >
+
+            <View
+              style={
+                pdfStyles.tableHead
+              }
+              fixed
+            >
+
+              <Text
+                style={[
+                  pdfStyles.headText,
+                  pdfStyles.dateCol,
+                ]}
+              >
+                DATE
+              </Text>
+
+              <Text
+                style={[
+                  pdfStyles.headText,
+                  pdfStyles.dayCol,
+                ]}
+              >
+                DAY
+              </Text>
+
+              <Text
+                style={[
+                  pdfStyles.headText,
+                  pdfStyles.periodCol,
+                ]}
+              >
+                PERIOD
+              </Text>
+
+              <Text
+                style={[
+                  pdfStyles.headText,
+                  pdfStyles.unitCol,
+                ]}
+              >
+                UNIT
+              </Text>
+
+              <Text
+                style={[
+                  pdfStyles.headText,
+                  pdfStyles.topicCol,
+                ]}
+              >
+                PLANNED LESSON
+              </Text>
+
+              <Text
+                style={[
+                  pdfStyles.headText,
+                  pdfStyles.typeCol,
+                ]}
+              >
+                TYPE
+              </Text>
+
+            </View>
+
+
+            {rows.map(
+              (
+                row,
+                index
+              ) => (
+
+                <View
+                  key={
+                    row.id
+                  }
+                  wrap={
+                    false
+                  }
+                  style={[
+                    pdfStyles.row,
+                    index % 2 === 1
+                      ? pdfStyles.rowAlt
+                      : {},
+                    row.extraClass
+                      ? pdfStyles.rowExtra
+                      : {},
+                  ]}
+                >
+
+                  <Text
+                    style={[
+                      pdfStyles.cell,
+                      pdfStyles.dateCol,
+                      pdfStyles.strongCell,
+                    ]}
+                  >
+                    {formatDate(
+                      row.classDate
+                    )}
+                  </Text>
+
+
+                  <Text
+                    style={[
+                      pdfStyles.cell,
+                      pdfStyles.dayCol,
+                    ]}
+                  >
+                    {row.dayOfWeek}
+                  </Text>
+
+
+                  <Text
+                    style={[
+                      pdfStyles.cell,
+                      pdfStyles.periodCol,
+                    ]}
+                  >
+                    {row.extraClass
+                      ? "Extra"
+                      : row.periodOrder ??
+                        "-"}
+                  </Text>
+
+
+                  <Text
+                    style={[
+                      pdfStyles.cell,
+                      pdfStyles.unitCol,
+                      pdfStyles.strongCell,
+                    ]}
+                  >
+                    {row.unitTitle}
+                  </Text>
+
+
+                  <Text
+                    style={[
+                      pdfStyles.cell,
+                      pdfStyles.topicCol,
+                    ]}
+                  >
+                    {row.topicTitle}
+                  </Text>
+
+
+                  <Text
+                    style={[
+                      pdfStyles.cell,
+                      pdfStyles.typeCol,
+                    ]}
+                  >
+                    {row.extraClass
+                      ? "Extra"
+                      : "Class"}
+                  </Text>
+
+                </View>
+              )
+            )}
+
+          </View>
+
+        </View>
+
+
+        <View
+          style={
+            pdfStyles.footerLine
+          }
+          fixed
+        />
+
+
+        <View
+          style={
+            pdfStyles.footer
+          }
+          fixed
+        >
+
+          <Text>
+            CampusConnect · {subject.faculty_name || "Faculty"}
+          </Text>
+
+          <Text
+            render={({
+              pageNumber,
+              totalPages,
+            }) =>
+              `Page ${pageNumber} of ${totalPages}`
+            }
+          />
+
+        </View>
+
+      </Page>
+
+    </Document>
   );
-
-
-  return sessions;
-};
-
+}
 
 export default function FacultySyllabusSmartPlanner({
   subject,
   batch,
   onStatus,
   onApplied,
-}: FacultySyllabusSmartPlannerProps) {
+}: Props) {
+
+  const fileInputRef =
+    useRef<HTMLInputElement>(
+      null
+    );
+
 
   const [
     sourceMode,
@@ -422,8 +1307,8 @@ export default function FacultySyllabusSmartPlanner({
 
 
   const [
-    file,
-    setFile,
+    syllabusFile,
+    setSyllabusFile,
   ] =
     useState<
       File |
@@ -437,36 +1322,7 @@ export default function FacultySyllabusSmartPlanner({
     driveUrl,
     setDriveUrl,
   ] =
-    useState(
-      ""
-    );
-
-
-  const [
-    scanning,
-    setScanning,
-  ] =
-    useState(
-      false
-    );
-
-
-  const [
-    scanMessage,
-    setScanMessage,
-  ] =
-    useState(
-      ""
-    );
-
-
-  const [
-    saving,
-    setSaving,
-  ] =
-    useState(
-      false
-    );
+    useState("");
 
 
   const [
@@ -482,187 +1338,253 @@ export default function FacultySyllabusSmartPlanner({
 
 
   const [
-    capacity,
-    setCapacity,
+    syllabusWorkload,
+    setSyllabusWorkload,
   ] =
-    useState<
-      CapacityState
-    >({
-      loading:
-        true,
-
-      weeklySessions:
+    useState<SyllabusWorkload>({
+      lectureHours:
         0,
 
-      weeklyPeriods:
+      tutorialHours:
         0,
 
-      source:
-        "unavailable",
+      practicalHours:
+        0,
 
-      message:
+      selfLearningHours:
+        0,
+
+      semesterHours:
+        0,
+
+      detectedText:
         "",
     });
 
 
   const [
-    teachingWeeks,
-    setTeachingWeeks,
+    scanning,
+    setScanning,
   ] =
     useState(
-      14
+      false
     );
 
 
   const [
-    manualWeeklySessions,
-    setManualWeeklySessions,
+    timetableLoading,
+    setTimetableLoading,
   ] =
     useState(
-      ""
+      true
     );
 
 
   const [
-    planRows,
-    setPlanRows,
+    timetable,
+    setTimetable,
   ] =
     useState<
-      PlannedTopic[]
+      TimetableEntry[]
     >(
       []
     );
 
 
-  const topicCount =
-    useMemo(
+  const [
+    timetableDiagnostic,
+    setTimetableDiagnostic,
+  ] =
+    useState("");
+
+
+  const [
+    allocationWeeklyPeriods,
+    setAllocationWeeklyPeriods,
+  ] =
+    useState(
+      0
+    );
+
+
+  const [
+    fallbackDays,
+    setFallbackDays,
+  ] =
+    useState<string[]>(
+      []
+    );
+
+
+  const [
+    semesterStart,
+    setSemesterStart,
+  ] =
+    useState(
       () =>
-        countTopics(
-          draft
-        ),
+        isoDate(
+          new Date()
+        )
+    );
+
+
+  const [
+    semesterEnd,
+    setSemesterEnd,
+  ] =
+    useState(
+      () => {
+
+        const date =
+          new Date();
+
+        date.setMonth(
+          date.getMonth() +
+            4
+        );
+
+        return isoDate(
+          date
+        );
+      }
+    );
+
+
+  const [
+    extraClasses,
+    setExtraClasses,
+  ] =
+    useState(
+      0
+    );
+
+
+  const [
+    schedule,
+    setSchedule,
+  ] =
+    useState<
+      ScheduleRow[]
+    >(
+      []
+    );
+
+
+  const [
+    message,
+    setMessage,
+  ] =
+    useState("");
+
+
+  const [
+    saving,
+    setSaving,
+  ] =
+    useState(
+      false
+    );
+
+
+  const topics =
+    useMemo<TopicInfo[]>(
+      () =>
+        draft?.units.flatMap(
+          unit =>
+            unit.topics.map(
+              topic => ({
+                unitNumber:
+                  unit.unitNumber,
+
+                unitTitle:
+                  unit.title,
+
+                topicOrder:
+                  topic.topicOrder,
+
+                topicTitle:
+                  topic.title,
+
+                topicDescription:
+                  topic.description,
+              })
+            )
+        ) ?? [],
       [
         draft,
       ]
     );
 
 
-  const effectiveWeeklySessions =
-    useMemo(
-      () => {
-
-        const manual =
-          Number(
-            manualWeeklySessions
-          );
-
-
-        if (
-          cleanText(
-            manualWeeklySessions
-          ) &&
-          Number.isFinite(
-            manual
-          ) &&
-          manual > 0
-        ) {
-          return Math.floor(
-            manual
-          );
-        }
-
-
-        return capacity
-          .weeklySessions;
-      },
-      [
-        manualWeeklySessions,
-        capacity.weeklySessions,
-      ]
-    );
-
-
-  const totalClasses =
+  const uniqueTeachingDays =
     useMemo(
       () =>
-        Math.max(
-          0,
-          Math.floor(
-            effectiveWeeklySessions *
-            Math.max(
-              1,
-              teachingWeeks
+        Array.from(
+          new Set(
+            timetable.map(
+              item =>
+                item.dayOfWeek
             )
           )
         ),
       [
-        effectiveWeeklySessions,
-        teachingWeeks,
+        timetable,
       ]
     );
 
 
-  const planTotal =
-    useMemo(
-      () =>
-        planRows.reduce(
-          (
-            total,
-            row
-          ) =>
-            total +
-            row.plannedClasses,
-          0
-        ),
-      [
-        planRows,
-      ]
+  const syllabusSemesterHours =
+    Math.max(
+      0,
+      syllabusWorkload
+        .semesterHours
     );
 
 
-  const planBalance =
-    totalClasses -
-    planTotal;
+  const syllabusWeeklyStructure =
+    syllabusWorkload
+      .lectureHours +
+    syllabusWorkload
+      .tutorialHours +
+    syllabusWorkload
+      .practicalHours;
 
 
-  const uncoveredPlanTopics =
-    useMemo(
-      () =>
-        planRows.filter(
-          row =>
-            row.plannedClasses <=
-            0
-        ).length,
-      [
-        planRows,
-      ]
-    );
+  const effectiveWeeklyPeriods =
+    timetable.length ||
+    allocationWeeklyPeriods;
 
 
-  const classesPerTopic =
-    useMemo(
-      () => {
+  const fallbackReady =
+    !timetable.length &&
+    allocationWeeklyPeriods > 0 &&
+    fallbackDays.length > 0;
 
-        if (
-          !topicCount ||
-          !totalClasses
-        ) {
-          return null;
+
+  const setStatus =
+    useCallback(
+      (
+        value: string
+      ) => {
+
+        setMessage(
+          value
+        );
+
+        if (value) {
+          onStatus(
+            value
+          );
         }
 
-
-        return roundTwo(
-          totalClasses /
-          topicCount
-        );
       },
       [
-        topicCount,
-        totalClasses,
+        onStatus,
       ]
     );
 
 
-  const loadTeachingCapacity =
+  const loadTimetable =
     useCallback(
       async () => {
 
@@ -670,36 +1592,39 @@ export default function FacultySyllabusSmartPlanner({
           getSupabaseClient();
 
 
+        setTimetableLoading(
+          true
+        );
+
+        setTimetableDiagnostic(
+          ""
+        );
+
+        setAllocationWeeklyPeriods(
+          0
+        );
+
+        setFallbackDays(
+          []
+        );
+
+
         if (!client) {
 
-          setCapacity({
-            loading:
-              false,
+          setTimetable(
+            []
+          );
 
-            weeklySessions:
-              0,
+          setTimetableDiagnostic(
+            "CampusConnect is not connected to Supabase."
+          );
 
-            weeklyPeriods:
-              0,
-
-            source:
-              "unavailable",
-
-            message:
-              "CampusConnect is not connected to Supabase.",
-          });
+          setTimetableLoading(
+            false
+          );
 
           return;
         }
-
-
-        setCapacity(
-          current => ({
-            ...current,
-            loading:
-              true,
-          })
-        );
 
 
         try {
@@ -718,16 +1643,538 @@ export default function FacultySyllabusSmartPlanner({
             authError ||
             !authData.user
           ) {
+
             throw new Error(
               authError?.message ||
-              "Your session is unavailable."
+              "Your CampusConnect session is unavailable."
             );
           }
 
 
+          const userId =
+            authData.user.id;
+
+
+          const selectedCode =
+            normalize(
+              subject.subject_code
+            );
+
+
+          const selectedName =
+            normalize(
+              subject.subject_name
+            );
+
+
+          /*
+           * --------------------------------------------------
+           * SOURCE 1
+           * Official faculty timetable RPC.
+           * --------------------------------------------------
+           */
+
           const {
             data:
-              allocationData,
+              facultyData,
+            error:
+              facultyError,
+          } =
+            await client.rpc(
+              "get_my_faculty_timetable"
+            );
+
+
+          const facultyRows:
+            RawFacultyTimetable[] =
+            (
+              !facultyError &&
+              Array.isArray(
+                facultyData
+              )
+            )
+              ? (
+                  facultyData as
+                    RawFacultyTimetable[]
+                )
+              : [];
+
+
+          const facultyBatchRows =
+            facultyRows.filter(
+              row =>
+                clean(
+                  row.batchId
+                ) ===
+                subject.batch_id
+            );
+
+
+          const exactFacultyRows =
+            facultyBatchRows.filter(
+              row =>
+                clean(
+                  row.batchSubjectId
+                ) ===
+                subject.id
+            );
+
+
+          const semanticFacultyRows =
+            facultyBatchRows.filter(
+              row => {
+
+                const code =
+                  normalize(
+                    row.subjectCode
+                  );
+
+
+                const name =
+                  normalize(
+                    row.subjectName
+                  );
+
+
+                return Boolean(
+                  (
+                    selectedCode &&
+                    code &&
+                    selectedCode ===
+                      code
+                  ) ||
+                  (
+                    selectedName &&
+                    name &&
+                    selectedName ===
+                      name
+                  )
+                );
+              }
+            );
+
+
+          const matchedFacultyRows =
+            exactFacultyRows.length
+              ? exactFacultyRows
+              : semanticFacultyRows;
+
+
+          if (
+            matchedFacultyRows.length
+          ) {
+
+            const mapped =
+              matchedFacultyRows
+                .map(
+                  (
+                    row,
+                    index
+                  ) => ({
+                    id:
+                      clean(
+                        row.id
+                      ) ||
+                      `faculty-${index}`,
+
+                    batchId:
+                      clean(
+                        row.batchId
+                      ),
+
+                    batchSubjectId:
+                      clean(
+                        row.batchSubjectId
+                      ),
+
+                    subjectName:
+                      clean(
+                        row.subjectName
+                      ),
+
+                    subjectCode:
+                      clean(
+                        row.subjectCode
+                      ),
+
+                    facultyId:
+                      clean(
+                        row.facultyId
+                      ),
+
+                    facultyName:
+                      clean(
+                        row.facultyName
+                      ),
+
+                    dayOfWeek:
+                      clean(
+                        row.dayOfWeek
+                      ),
+
+                    periodOrder:
+                      Number(
+                        row.periodOrder
+                      ) || 0,
+
+                    startTime:
+                      clean(
+                        row.startTime
+                      ),
+
+                    endTime:
+                      clean(
+                        row.endTime
+                      ),
+
+                    room:
+                      clean(
+                        row.room
+                      ),
+
+                    classType:
+                      clean(
+                        row.classType
+                      ),
+
+                    subgroup:
+                      clean(
+                        row.subgroup
+                      ),
+                  })
+                )
+                .filter(
+                  row =>
+                    Boolean(
+                      row.dayOfWeek
+                    ) &&
+                    row.periodOrder >
+                      0
+                );
+
+
+            if (
+              mapped.length
+            ) {
+
+              setTimetable(
+                mapped
+              );
+
+              setAllocationWeeklyPeriods(
+                mapped.length
+              );
+
+              setTimetableDiagnostic(
+                exactFacultyRows.length
+                  ? "CampusConnect found the published timetable and linked it to this subject."
+                  : "CampusConnect found the published timetable by matching the subject code/name. A legacy subject-ID mismatch was handled automatically."
+              );
+
+              return;
+            }
+          }
+
+
+          /*
+           * --------------------------------------------------
+           * SOURCE 2
+           *
+           * Find every subject record in this batch representing
+           * the same subject. This fixes old/duplicate subject IDs.
+           * --------------------------------------------------
+           */
+
+          const {
+            data:
+              subjectRows,
+            error:
+              subjectRowsError,
+          } =
+            await client
+              .from(
+                "attendance_batch_subjects"
+              )
+              .select(
+                "id,batch_id,subject_name,subject_code,faculty_id,faculty_name"
+              )
+              .eq(
+                "batch_id",
+                subject.batch_id
+              );
+
+
+          if (
+            subjectRowsError
+          ) {
+
+            console.warn(
+              "[Planner subject mapping]",
+              subjectRowsError
+            );
+          }
+
+
+          const candidateSubjectIds =
+            new Set<string>(
+              [
+                subject.id,
+              ]
+            );
+
+
+          (
+            subjectRows ||
+            []
+          ).forEach(
+            row => {
+
+              const code =
+                normalize(
+                  row.subject_code
+                );
+
+
+              const name =
+                normalize(
+                  row.subject_name
+                );
+
+
+              const sameSubject =
+                (
+                  selectedCode &&
+                  code &&
+                  selectedCode ===
+                    code
+                ) ||
+                (
+                  selectedName &&
+                  name &&
+                  selectedName ===
+                    name
+                );
+
+
+              if (
+                sameSubject &&
+                row.id
+              ) {
+
+                candidateSubjectIds.add(
+                  String(
+                    row.id
+                  )
+                );
+              }
+            }
+          );
+
+
+          /*
+           * --------------------------------------------------
+           * SOURCE 3
+           *
+           * Published batch timetable.
+           *
+           * IMPORTANT:
+           * Do not require row.faculty_id === current user here.
+           * Older timetable publications can retain an old
+           * faculty UUID while the current subject assignment is
+           * correct. Access is already scoped by the selected
+           * faculty subject and batch.
+           * --------------------------------------------------
+           */
+
+          const {
+            data:
+              batchTimetableData,
+            error:
+              batchTimetableError,
+          } =
+            await client.rpc(
+              "get_current_batch_timetable_entries",
+              {
+                p_batch_ids: [
+                  subject.batch_id,
+                ],
+              }
+            );
+
+
+          if (
+            !batchTimetableError &&
+            Array.isArray(
+              batchTimetableData
+            )
+          ) {
+
+            const matchingBatchRows =
+              (
+                batchTimetableData as
+                  RawBatchTimetable[]
+              )
+                .filter(
+                  row =>
+                    clean(
+                      row.batch_id
+                    ) ===
+                      subject.batch_id &&
+                    candidateSubjectIds.has(
+                      clean(
+                        row.batch_subject_id
+                      )
+                    )
+                )
+                .map(
+                  (
+                    row,
+                    index
+                  ) => ({
+                    id:
+                      clean(
+                        row.id
+                      ) ||
+                      `batch-${index}`,
+
+                    batchId:
+                      clean(
+                        row.batch_id
+                      ),
+
+                    batchSubjectId:
+                      clean(
+                        row.batch_subject_id
+                      ),
+
+                    subjectName:
+                      subject.subject_name,
+
+                    subjectCode:
+                      subject.subject_code,
+
+                    facultyId:
+                      clean(
+                        row.faculty_id
+                      ),
+
+                    facultyName:
+                      clean(
+                        row.faculty_name
+                      ),
+
+                    dayOfWeek:
+                      clean(
+                        row.day_of_week
+                      ),
+
+                    periodOrder:
+                      Number(
+                        row.period_order
+                      ) || 0,
+
+                    startTime:
+                      clean(
+                        row.start_time
+                      ),
+
+                    endTime:
+                      clean(
+                        row.end_time
+                      ),
+
+                    room:
+                      clean(
+                        row.room
+                      ),
+
+                    classType:
+                      clean(
+                        row.class_type
+                      ),
+
+                    subgroup:
+                      clean(
+                        row.subgroup
+                      ),
+                  })
+                )
+                .filter(
+                  row =>
+                    Boolean(
+                      row.dayOfWeek
+                    ) &&
+                    row.periodOrder >
+                      0
+                );
+
+
+            if (
+              matchingBatchRows.length
+            ) {
+
+              const unique =
+                Array.from(
+                  new Map(
+                    matchingBatchRows.map(
+                      row => [
+                        [
+                          row.dayOfWeek,
+                          row.periodOrder,
+                          row.startTime,
+                          row.endTime,
+                        ].join(
+                          "|"
+                        ),
+                        row,
+                      ]
+                    )
+                  ).values()
+                );
+
+
+              setTimetable(
+                unique
+              );
+
+              setAllocationWeeklyPeriods(
+                unique.length
+              );
+
+              setTimetableDiagnostic(
+                candidateSubjectIds.size >
+                  1
+                  ? "Published timetable found. CampusConnect automatically repaired the planner lookup across duplicate/legacy subject records."
+                  : "Published timetable found for this subject."
+              );
+
+              return;
+            }
+
+          } else if (
+            batchTimetableError
+          ) {
+
+            console.warn(
+              "[Planner batch timetable]",
+              batchTimetableError
+            );
+          }
+
+
+          /*
+           * --------------------------------------------------
+           * SOURCE 4
+           * Active teaching allocation.
+           *
+           * Never display 0 when CampusConnect already knows
+           * the faculty has weekly teaching hours.
+           * --------------------------------------------------
+           */
+
+          const {
+            data:
+              allocationRows,
             error:
               allocationError,
           } =
@@ -736,11 +2183,15 @@ export default function FacultySyllabusSmartPlanner({
                 "faculty_teaching_allocations"
               )
               .select(
-                "id,weekly_hours,session_length_periods,allocation_type,subgroup,status"
+                "id,batch_id,batch_subject_id,faculty_id,weekly_hours,status"
               )
               .eq(
-                "batch_subject_id",
-                subject.id
+                "faculty_id",
+                userId
+              )
+              .eq(
+                "batch_id",
+                subject.batch_id
               )
               .eq(
                 "status",
@@ -751,241 +2202,152 @@ export default function FacultySyllabusSmartPlanner({
           if (
             allocationError
           ) {
-            throw allocationError;
+
+            console.warn(
+              "[Planner allocation]",
+              allocationError
+            );
           }
 
 
           const allocations =
             (
-              allocationData ||
+              allocationRows ||
               []
-            ) as TeachingAllocation[];
-
-
-          const configuredAllocations =
-            allocations.filter(
-              item =>
-                Number(
-                  item.weekly_hours
-                ) >
-                0
+            ).filter(
+              row =>
+                candidateSubjectIds.has(
+                  clean(
+                    row.batch_subject_id
+                  )
+                )
             );
 
 
+          const weeklyAllocation =
+            allocations.reduce(
+              (
+                total,
+                row
+              ) =>
+                Math.max(
+                  total,
+                  Number(
+                    row.weekly_hours
+                  ) || 0
+                ),
+              0
+            );
+
+
+          setTimetable(
+            []
+          );
+
+
+          setAllocationWeeklyPeriods(
+            weeklyAllocation
+          );
+
+
           if (
-            configuredAllocations.length
+            weeklyAllocation >
+            0
           ) {
 
-            const weeklyPeriods =
-              configuredAllocations.reduce(
-                (
-                  total,
-                  item
-                ) =>
-                  total +
-                  Math.max(
-                    0,
-                    Number(
-                      item.weekly_hours
-                    ) ||
-                      0
-                  ),
-                0
-              );
+            setTimetableDiagnostic(
+              `CampusConnect found ${weeklyAllocation} weekly teaching period${weeklyAllocation === 1 ? "" : "s"} for this subject, but the old timetable publication is not linked to the current subject record. Select the actual teaching day(s) below and the planner can still generate correctly.`
+            );
+
+          } else if (
+            facultyBatchRows.length
+          ) {
+
+            const availableSubjects =
+              facultyBatchRows
+                .map(
+                  row => {
+
+                    const code =
+                      clean(
+                        row.subjectCode
+                      );
 
 
-            const weeklySessions =
-              configuredAllocations.reduce(
-                (
-                  total,
-                  item
-                ) => {
-
-                  const hours =
-                    Math.max(
-                      0,
-                      Number(
-                        item.weekly_hours
-                      ) ||
-                        0
-                    );
+                    const name =
+                      clean(
+                        row.subjectName
+                      );
 
 
-                  const sessionLength =
-                    Math.max(
-                      1,
-                      Math.floor(
-                        Number(
-                          item.session_length_periods
-                        ) ||
-                          1
+                    return [
+                      code,
+                      name,
+                    ]
+                      .filter(
+                        Boolean
                       )
-                    );
+                      .join(
+                        " — "
+                      );
+                  }
+                )
+                .filter(
+                  Boolean
+                );
 
 
-                  return (
-                    total +
-                    hours /
-                      sessionLength
-                  );
-                },
-                0
-              );
+            setTimetableDiagnostic(
+              availableSubjects.length
+                ? `The published timetable exists for this class, but this subject is not linked to the same timetable subject record. Found: ${availableSubjects.join(", ")}.`
+                : "The published timetable exists, but CampusConnect could not match this selected subject."
+            );
 
+          } else {
 
-            setCapacity({
-              loading:
-                false,
-
-              weeklySessions:
-                roundTwo(
-                  weeklySessions
-                ),
-
-              weeklyPeriods:
-                roundTwo(
-                  weeklyPeriods
-                ),
-
-              source:
-                "allocation",
-
-              message:
-                "Calculated from your active faculty teaching allocation.",
-            });
-
-            return;
+            setTimetableDiagnostic(
+              "CampusConnect could not find a published timetable entry or active weekly teaching allocation for this subject."
+            );
           }
-
-
-          /*
-           * Older/backfilled allocations may have weekly_hours = 0.
-           * In that case use the currently published timetable as
-           * a read-only fallback.
-           */
-          const {
-            data:
-              timetableData,
-            error:
-              timetableError,
-          } =
-            await client
-              .rpc(
-                "get_current_batch_timetable_entries",
-                {
-                  p_batch_ids: [
-                    subject.batch_id,
-                  ],
-                }
-              );
-
-
-          if (
-            timetableError
-          ) {
-            throw timetableError;
-          }
-
-
-          const ownEntries =
-            (
-              timetableData ||
-              []
-            )
-              .filter(
-                (
-                  row:
-                    TimetableEntry
-                ) =>
-                  row.batch_subject_id ===
-                    subject.id &&
-                  row.faculty_id ===
-                    authData.user.id
-              ) as TimetableEntry[];
-
-
-          if (
-            ownEntries.length
-          ) {
-
-            const sessions =
-              countTimetableSessions(
-                ownEntries
-              );
-
-
-            setCapacity({
-              loading:
-                false,
-
-              weeklySessions:
-                sessions,
-
-              weeklyPeriods:
-                ownEntries.length,
-
-              source:
-                "timetable",
-
-              message:
-                "Teaching allocation hours are not configured, so CampusConnect calculated this from your currently published timetable.",
-            });
-
-            return;
-          }
-
-
-          setCapacity({
-            loading:
-              false,
-
-            weeklySessions:
-              0,
-
-            weeklyPeriods:
-              0,
-
-            source:
-              "unavailable",
-
-            message:
-              "No weekly teaching hours or published timetable sessions are configured for this subject yet.",
-          });
 
         } catch (
           error
         ) {
 
           console.error(
-            "[Smart Syllabus Planner capacity]",
+            "[CampusConnect Planner timetable]",
             error
           );
 
 
-          setCapacity({
-            loading:
-              false,
+          setTimetable(
+            []
+          );
 
-            weeklySessions:
-              0,
+          setAllocationWeeklyPeriods(
+            0
+          );
 
-            weeklyPeriods:
-              0,
 
-            source:
-              "unavailable",
+          setTimetableDiagnostic(
+            error instanceof
+              Error
+              ? error.message
+              : "Unable to load the timetable."
+          );
 
-            message:
-              error instanceof
-                Error
-                ? error.message
-                : "Unable to calculate teaching capacity.",
-          });
+        } finally {
+
+          setTimetableLoading(
+            false
+          );
         }
       },
       [
-        subject.id,
         subject.batch_id,
+        subject.id,
+        subject.subject_code,
+        subject.subject_name,
       ]
     );
 
@@ -993,8 +2355,150 @@ export default function FacultySyllabusSmartPlanner({
   useEffect(
     () => {
 
-      setFile(
+      setDraft(
         null
+      );
+
+      setSyllabusWorkload({
+        lectureHours:
+          0,
+
+        tutorialHours:
+          0,
+
+        practicalHours:
+          0,
+
+        selfLearningHours:
+          0,
+
+        semesterHours:
+          0,
+
+        detectedText:
+          "",
+      });
+
+      setSyllabusFile(
+        null
+      );
+
+      setDriveUrl(
+        ""
+      );
+
+      setSchedule(
+        []
+      );
+
+      setExtraClasses(
+        0
+      );
+
+      setAllocationWeeklyPeriods(
+        0
+      );
+
+      setFallbackDays(
+        []
+      );
+
+      setMessage(
+        ""
+      );
+
+      void loadTimetable();
+
+    },
+    [
+      subject.id,
+      loadTimetable,
+    ]
+  );
+
+
+  const handleFile =
+    (
+      event:
+        ChangeEvent<HTMLInputElement>
+    ) => {
+
+      const nextFile =
+        event.target.files?.[
+          0
+        ] ||
+        null;
+
+
+      if (!nextFile) {
+        return;
+      }
+
+
+      if (
+        nextFile.size >
+        MAX_FILE_SIZE
+      ) {
+
+        event.target.value =
+          "";
+
+        setSyllabusFile(
+          null
+        );
+
+        setStatus(
+          "The syllabus file must be 20 MB or smaller."
+        );
+
+        return;
+      }
+
+
+      if (
+        !ALLOWED_TYPES.has(
+          nextFile.type
+        )
+      ) {
+
+        const extension =
+          nextFile.name
+            .split(".")
+            .pop()
+            ?.toLowerCase();
+
+
+        if (
+          ![
+            "pdf",
+            "jpg",
+            "jpeg",
+            "png",
+            "webp",
+          ].includes(
+            extension ||
+              ""
+          )
+        ) {
+
+          event.target.value =
+            "";
+
+          setSyllabusFile(
+            null
+          );
+
+          setStatus(
+            "Supported syllabus formats: PDF, JPG, JPEG, PNG and WEBP."
+          );
+
+          return;
+        }
+      }
+
+
+      setSyllabusFile(
+        nextFile
       );
 
       setDriveUrl(
@@ -1005,136 +2509,27 @@ export default function FacultySyllabusSmartPlanner({
         null
       );
 
-      setScanMessage(
-        ""
-      );
-
-      setManualWeeklySessions(
-        ""
-      );
-
-      setPlanRows(
+      setSchedule(
         []
       );
 
-      void loadTeachingCapacity();
-
-    },
-    [
-      subject.id,
-      loadTeachingCapacity,
-    ]
-  );
-
-
-  useEffect(
-    () => {
-
-      /*
-       * Any syllabus edit or capacity change invalidates the
-       * previously generated allocation. This prevents stale
-       * plans being mistaken for the current syllabus.
-       */
-      setPlanRows(
-        []
-      );
-
-    },
-    [
-      draft,
-      totalClasses,
-    ]
-  );
-
-
-  const handleFile =
-    (
-      event:
-        ChangeEvent<
-          HTMLInputElement
-        >
-    ) => {
-
-      const selected =
-        event.target
-          .files?.[0] ||
-        null;
-
-
-      if (!selected) {
-        setFile(
-          null
-        );
-
-        return;
-      }
-
-
-      if (
-        selected.size >
-        MAX_FILE_SIZE
-      ) {
-        event.target.value =
-          "";
-
-        setFile(
-          null
-        );
-
-        setScanMessage(
-          "Syllabus files must be 20 MB or smaller."
-        );
-
-        return;
-      }
-
-
-      if (
-        selected.type &&
-        !ALLOWED_FILE_TYPES.has(
-          selected.type
-        )
-      ) {
-        event.target.value =
-          "";
-
-        setFile(
-          null
-        );
-
-        setScanMessage(
-          "Use PDF, JPG, JPEG, PNG or WEBP."
-        );
-
-        return;
-      }
-
-
-      setFile(
-        selected
-      );
-
-      setScanMessage(
-        ""
-      );
-
-      setDraft(
-        null
+      setStatus(
+        `${nextFile.name} selected.`
       );
     };
 
 
-  const scanSyllabus =
+  const extractSyllabus =
     async () => {
 
       if (
         sourceMode ===
           "upload" &&
-        !file
+        !syllabusFile
       ) {
 
-        setScanMessage(
-          "Choose a syllabus PDF or image first."
+        setStatus(
+          "Choose a PDF or image syllabus first."
         );
 
         return;
@@ -1144,13 +2539,13 @@ export default function FacultySyllabusSmartPlanner({
       if (
         sourceMode ===
           "drive" &&
-        !cleanText(
+        !clean(
           driveUrl
         )
       ) {
 
-        setScanMessage(
-          "Paste a shared Google Drive syllabus link."
+        setStatus(
+          "Paste the Google Drive syllabus link first."
         );
 
         return;
@@ -1162,7 +2557,8 @@ export default function FacultySyllabusSmartPlanner({
 
 
       if (!client) {
-        setScanMessage(
+
+        setStatus(
           "CampusConnect is not connected to Supabase."
         );
 
@@ -1174,12 +2570,16 @@ export default function FacultySyllabusSmartPlanner({
         true
       );
 
-      setScanMessage(
-        ""
-      );
-
       setDraft(
         null
+      );
+
+      setSchedule(
+        []
+      );
+
+      setStatus(
+        "Extracting syllabus…"
       );
 
 
@@ -1195,19 +2595,21 @@ export default function FacultySyllabusSmartPlanner({
             .getSession();
 
 
-        const accessToken =
-          sessionData.session
+        const token =
+          sessionData
+            .session
             ?.access_token ||
           "";
 
 
         if (
           sessionError ||
-          !accessToken
+          !token
         ) {
           throw new Error(
-            sessionError?.message ||
-            "Your session is unavailable."
+            sessionError
+              ?.message ||
+              "Your CampusConnect session is unavailable."
           );
         }
 
@@ -1225,22 +2627,19 @@ export default function FacultySyllabusSmartPlanner({
         if (
           sourceMode ===
             "upload" &&
-          file
+          syllabusFile
         ) {
+
           formData.set(
             "file",
-            file
+            syllabusFile
           );
-        }
 
+        } else {
 
-        if (
-          sourceMode ===
-            "drive"
-        ) {
           formData.set(
             "driveUrl",
-            cleanText(
+            clean(
               driveUrl
             )
           );
@@ -1256,7 +2655,7 @@ export default function FacultySyllabusSmartPlanner({
 
               headers: {
                 Authorization:
-                  `Bearer ${accessToken}`,
+                  `Bearer ${token}`,
               },
 
               body:
@@ -1265,19 +2664,11 @@ export default function FacultySyllabusSmartPlanner({
           );
 
 
-        let payload:
-          ScanPayload;
-
-
-        try {
-          payload =
+        const payload =
+          (
             await response
-              .json();
-        } catch {
-          throw new Error(
-            `Syllabus scanner returned HTTP ${response.status}.`
-          );
-        }
+              .json()
+          ) as ScanPayload;
 
 
         if (
@@ -1285,9 +2676,11 @@ export default function FacultySyllabusSmartPlanner({
           !payload.success ||
           !payload.draft
         ) {
+
           throw new Error(
             payload.error ||
-            "Unable to scan the syllabus."
+            payload.message ||
+            "CampusConnect could not extract this syllabus."
           );
         }
 
@@ -1297,22 +2690,252 @@ export default function FacultySyllabusSmartPlanner({
         );
 
 
-        const extractedTopics =
-          countTopics(
-            payload.draft
+        const detectedWorkload =
+          extractWorkloadMetadata(
+            {
+              payload,
+
+              draft:
+                payload.draft,
+
+              fileName:
+                payload.fileName,
+
+              rawText:
+                payload.rawText,
+
+              extractedText:
+                payload.extractedText,
+
+              scanText:
+                payload.text,
+            }
           );
 
 
-        const message =
-          `Extracted ${payload.draft.units.length} unit${payload.draft.units.length === 1 ? "" : "s"} and ${extractedTopics} topic${extractedTopics === 1 ? "" : "s"} for review. Nothing has been saved yet.`;
+        const apiSemesterHours =
+          Number(
+            payload
+              .syllabusMeta
+              ?.semesterHours ??
+            payload
+              .syllabusMeta
+              ?.totalHours ??
+            0
+          );
 
 
-        setScanMessage(
-          message
-        );
+        const apiL =
+          Number(
+            payload
+              .syllabusMeta
+              ?.lectureHours ??
+            0
+          );
 
-        onStatus(
-          message
+
+        const apiT =
+          Number(
+            payload
+              .syllabusMeta
+              ?.tutorialHours ??
+            0
+          );
+
+
+        const apiP =
+          Number(
+            payload
+              .syllabusMeta
+              ?.practicalHours ??
+            0
+          );
+
+
+        setSyllabusWorkload({
+          lectureHours:
+            apiL ||
+            detectedWorkload
+              .lectureHours,
+
+          tutorialHours:
+            apiT ||
+            detectedWorkload
+              .tutorialHours,
+
+          practicalHours:
+            apiP ||
+            detectedWorkload
+              .practicalHours,
+
+          selfLearningHours:
+            Number(
+              payload
+                .syllabusMeta
+                ?.selfLearningHours ??
+              0
+            ) ||
+            detectedWorkload
+              .selfLearningHours,
+
+          semesterHours:
+            apiSemesterHours ||
+            detectedWorkload
+              .semesterHours,
+
+          detectedText:
+            detectedWorkload
+              .detectedText,
+        });
+
+
+        /*
+         * Read official workload separately from the original
+         * PDF so topic count is never mistaken for class count.
+         */
+
+        if (
+          syllabusFile &&
+          syllabusFile.type ===
+            "application/pdf"
+        ) {
+
+          try {
+
+            const workloadForm =
+              new FormData();
+
+
+            workloadForm.set(
+              "file",
+              syllabusFile
+            );
+
+
+            const workloadResponse =
+              await fetch(
+                "/api/academics/syllabus/workload",
+                {
+                  method:
+                    "POST",
+
+                  headers: {
+                    Authorization:
+                      `Bearer ${token}`,
+                  },
+
+                  body:
+                    workloadForm,
+                }
+              );
+
+
+            const workloadPayload =
+              (
+                await workloadResponse.json()
+              ) as {
+                success?: boolean;
+                error?: string;
+                workload?: {
+                  lectureHours?: number;
+                  tutorialHours?: number;
+                  practicalHours?: number;
+                  selfLearningHours?: number;
+                  semesterHours?: number;
+                };
+              };
+
+
+            if (
+              workloadResponse.ok &&
+              workloadPayload
+                ?.success &&
+              workloadPayload
+                ?.workload
+            ) {
+
+              const official =
+                workloadPayload
+                  .workload;
+
+
+              setSyllabusWorkload(
+                current => ({
+                  lectureHours:
+                    Number(
+                      official
+                        .lectureHours
+                    ) ||
+                    current
+                      .lectureHours,
+
+                  tutorialHours:
+                    Number(
+                      official
+                        .tutorialHours
+                    ) ||
+                    current
+                      .tutorialHours,
+
+                  practicalHours:
+                    Number(
+                      official
+                        .practicalHours
+                    ) ||
+                    current
+                      .practicalHours,
+
+                  selfLearningHours:
+                    Number(
+                      official
+                        .selfLearningHours
+                    ) ||
+                    current
+                      .selfLearningHours,
+
+                  semesterHours:
+                    Number(
+                      official
+                        .semesterHours
+                    ) ||
+                    current
+                      .semesterHours,
+
+                  detectedText:
+                    current
+                      .detectedText,
+                })
+              );
+            }
+
+          } catch (
+            workloadError
+          ) {
+
+            console.warn(
+              "[Planner workload extraction]",
+              workloadError
+            );
+          }
+        }
+
+
+        const extractedTopics =
+          payload.draft
+            .units
+            .reduce(
+              (
+                total,
+                unit
+              ) =>
+                total +
+                unit.topics.length,
+              0
+            );
+
+
+        setStatus(
+          `Extracted ${payload.draft.units.length} unit(s) and ${extractedTopics} lesson(s) from ${payload.fileName || "the syllabus"}.`
         );
 
       } catch (
@@ -1320,16 +2943,16 @@ export default function FacultySyllabusSmartPlanner({
       ) {
 
         console.error(
-          "[Smart Syllabus Planner scan]",
+          "[CampusConnect Planner syllabus scan]",
           error
         );
 
 
-        setScanMessage(
+        setStatus(
           error instanceof
             Error
             ? error.message
-            : "Unable to scan syllabus."
+            : "Unable to extract the syllabus."
         );
 
       } finally {
@@ -1341,236 +2964,332 @@ export default function FacultySyllabusSmartPlanner({
     };
 
 
-  const updateUnit =
-    (
-      unitIndex:
-        number,
-      field:
-        "title" |
-        "description",
-      value:
-        string
-    ) => {
+  const regularSlots =
+    useCallback(
+      () => {
 
-      setDraft(
-        current => {
-
-          if (!current) {
-            return current;
-          }
-
-
-          return {
-            ...current,
-
-            units:
-              current.units.map(
-                (
-                  unit,
-                  index
-                ) =>
-                  index ===
-                    unitIndex
-                    ? {
-                        ...unit,
-                        [field]:
-                          value,
-                      }
-                    : unit
-              ),
-          };
+        if (
+          !semesterStart ||
+          !semesterEnd ||
+          semesterStart >
+            semesterEnd
+        ) {
+          return [];
         }
-      );
-    };
 
 
-  const updateTopic =
-    (
-      unitIndex:
-        number,
-      topicIndex:
-        number,
-      field:
-        "title" |
-        "description",
-      value:
-        string
-    ) => {
-
-      setDraft(
-        current => {
-
-          if (!current) {
-            return current;
-          }
+        let sourceEntries:
+          TimetableEntry[] =
+          timetable;
 
 
-          return {
-            ...current,
+        /*
+         * If the old timetable publication cannot be linked but
+         * CampusConnect knows the real weekly allocation, faculty
+         * confirms only the actual teaching weekdays.
+         *
+         * We do not invent weekdays.
+         */
 
-            units:
-              current.units.map(
+        if (
+          !sourceEntries.length &&
+          allocationWeeklyPeriods >
+            0 &&
+          fallbackDays.length
+        ) {
+
+          const selectedDays =
+            [
+              ...fallbackDays,
+            ].sort(
+              (
+                first,
+                second
+              ) =>
                 (
-                  unit,
-                  index
-                ) => {
-
-                  if (
-                    index !==
-                    unitIndex
-                  ) {
-                    return unit;
-                  }
-
-
-                  return {
-                    ...unit,
-
-                    topics:
-                      unit.topics.map(
-                        (
-                          topic,
-                          childIndex
-                        ) =>
-                          childIndex ===
-                            topicIndex
-                            ? {
-                                ...topic,
-                                [field]:
-                                  value,
-                              }
-                            : topic
-                      ),
-                  };
-                }
-              ),
-          };
-        }
-      );
-    };
-
-
-  const removeTopic =
-    (
-      unitIndex:
-        number,
-      topicIndex:
-        number
-    ) => {
-
-      setDraft(
-        current => {
-
-          if (!current) {
-            return current;
-          }
-
-
-          return {
-            ...current,
-
-            units:
-              current.units.map(
+                  DAY_INDEX[
+                    first
+                  ] ??
+                  99
+                ) -
                 (
-                  unit,
-                  index
-                ) => {
-
-                  if (
-                    index !==
-                    unitIndex
-                  ) {
-                    return unit;
-                  }
-
-
-                  return {
-                    ...unit,
-
-                    topics:
-                      unit.topics
-                        .filter(
-                          (
-                            _topic,
-                            childIndex
-                          ) =>
-                            childIndex !==
-                            topicIndex
-                        )
-                        .map(
-                          (
-                            topic,
-                            childIndex
-                          ) => ({
-                            ...topic,
-                            topicOrder:
-                              childIndex +
-                              1,
-                          })
-                        ),
-                  };
-                }
-              ),
-          };
-        }
-      );
-    };
-
-
-  const removeUnit =
-    (
-      unitIndex:
-        number
-    ) => {
-
-      setDraft(
-        current => {
-
-          if (!current) {
-            return current;
-          }
-
-
-          return {
-            ...current,
-
-            units:
-              current.units
-                .filter(
-                  (
-                    _unit,
-                    index
-                  ) =>
-                    index !==
-                    unitIndex
+                  DAY_INDEX[
+                    second
+                  ] ??
+                  99
                 )
-                .map(
-                  (
-                    unit,
-                    index
-                  ) => ({
-                    ...unit,
-                    unitNumber:
-                      index +
-                      1,
-                  })
-                ),
-          };
+            );
+
+
+          const base =
+            Math.floor(
+              allocationWeeklyPeriods /
+              selectedDays.length
+            );
+
+
+          const remainder =
+            allocationWeeklyPeriods %
+            selectedDays.length;
+
+
+          const generatedEntries:
+            TimetableEntry[] =
+            [];
+
+
+          selectedDays.forEach(
+            (
+              day,
+              dayIndex
+            ) => {
+
+              const count =
+                base +
+                (
+                  dayIndex <
+                  remainder
+                    ? 1
+                    : 0
+                );
+
+
+              for (
+                let periodIndex =
+                  0;
+                periodIndex <
+                count;
+                periodIndex +=
+                  1
+              ) {
+
+                generatedEntries.push({
+                  id:
+                    `fallback-${day}-${periodIndex + 1}`,
+
+                  batchId:
+                    subject.batch_id,
+
+                  batchSubjectId:
+                    subject.id,
+
+                  subjectName:
+                    subject.subject_name,
+
+                  subjectCode:
+                    subject.subject_code,
+
+                  facultyId:
+                    subject.faculty_id,
+
+                  facultyName:
+                    subject.faculty_name,
+
+                  dayOfWeek:
+                    day,
+
+                  periodOrder:
+                    periodIndex +
+                    1,
+
+                  startTime:
+                    "",
+
+                  endTime:
+                    "",
+
+                  room:
+                    "",
+
+                  classType:
+                    "Teaching Allocation",
+
+                  subgroup:
+                    "",
+                });
+              }
+            }
+          );
+
+
+          sourceEntries =
+            generatedEntries;
         }
-      );
-    };
 
 
-  const generateTeachingPlan =
+        if (
+          !sourceEntries.length
+        ) {
+          return [];
+        }
+
+
+        const byDay =
+          new Map<
+            number,
+            TimetableEntry[]
+          >();
+
+
+        sourceEntries.forEach(
+          entry => {
+
+            const dayIndex =
+              DAY_INDEX[
+                entry.dayOfWeek
+              ];
+
+
+            if (
+              dayIndex ===
+              undefined
+          ) {
+              return;
+            }
+
+
+            const existing =
+              byDay.get(
+                dayIndex
+              ) ||
+              [];
+
+
+            existing.push(
+              entry
+            );
+
+
+            existing.sort(
+              (
+                first,
+                second
+              ) =>
+                first.periodOrder -
+                second.periodOrder
+            );
+
+
+            byDay.set(
+              dayIndex,
+              existing
+            );
+          }
+        );
+
+
+        const result:
+          Array<
+            Omit<
+              ScheduleRow,
+              | "lessonNumber"
+              | "unitNumber"
+              | "unitTitle"
+              | "topicOrder"
+              | "topicTitle"
+              | "topicDescription"
+            >
+          > =
+          [];
+
+
+        const cursor =
+          new Date(
+            `${semesterStart}T00:00:00`
+          );
+
+
+        const endDate =
+          new Date(
+            `${semesterEnd}T00:00:00`
+          );
+
+
+        while (
+          cursor <=
+          endDate
+        ) {
+
+          const entries =
+            byDay.get(
+              cursor.getDay()
+            ) ||
+            [];
+
+
+          entries.forEach(
+            entry => {
+
+              result.push({
+
+                id:
+                  `${isoDate(cursor)}-${entry.id}`,
+
+                classDate:
+                  isoDate(
+                    cursor
+                  ),
+
+                dayOfWeek:
+                  entry.dayOfWeek,
+
+                periodOrder:
+                  entry.periodOrder,
+
+                startTime:
+                  entry.startTime,
+
+                endTime:
+                  entry.endTime,
+
+                room:
+                  entry.room,
+
+                classType:
+                  entry.classType,
+
+                extraClass:
+                  false,
+              });
+            }
+          );
+
+
+          cursor.setDate(
+            cursor.getDate() +
+              1
+          );
+        }
+
+
+        return result;
+      },
+      [
+        semesterStart,
+        semesterEnd,
+        timetable,
+        allocationWeeklyPeriods,
+        fallbackDays,
+        subject.batch_id,
+        subject.id,
+        subject.subject_name,
+        subject.subject_code,
+        subject.faculty_id,
+        subject.faculty_name,
+      ]
+    );
+
+
+  const generatePlan =
     () => {
 
       if (
         !draft ||
-        !topicCount
+        !topics.length
       ) {
 
-        setScanMessage(
-          "Review at least one syllabus topic before generating the teaching plan."
+        setStatus(
+          "Extract the syllabus first."
         );
 
         return;
@@ -1578,115 +3297,650 @@ export default function FacultySyllabusSmartPlanner({
 
 
       if (
-        totalClasses <= 0
+        !timetable.length &&
+        !fallbackReady
       ) {
 
-        setScanMessage(
-          "CampusConnect needs at least one available teaching class before it can generate the plan."
+        setStatus(
+          allocationWeeklyPeriods >
+            0
+            ? "Select the actual teaching day(s) first."
+            : "CampusConnect could not find weekly teaching periods for this subject."
         );
 
         return;
       }
 
 
-      const nextPlan =
-        buildTeachingPlan(
-          draft,
-          totalClasses
+      if (
+        !semesterStart ||
+        !semesterEnd ||
+        semesterStart >
+          semesterEnd
+      ) {
+
+        setStatus(
+          "Choose a valid semester start and end date."
+        );
+
+        return;
+      }
+
+
+      const timetableSlots =
+        regularSlots();
+
+
+      if (
+        !timetableSlots.length
+      ) {
+
+        setStatus(
+          "No teaching dates were found inside the selected semester dates."
+        );
+
+        return;
+      }
+
+
+      /*
+       * The official syllabus workload is the source of truth.
+       *
+       * Example:
+       *
+       * (L:T:P) + SL (3:2:0) + 45 Hours/Sem
+       *
+       * semesterTarget = 45
+       *
+       * NOT:
+       *
+       * extractedTopics.length = 93 classes.
+       */
+
+      const semesterTarget =
+        syllabusSemesterHours >
+          0
+          ? syllabusSemesterHours
+          : Math.min(
+              timetableSlots.length,
+              Math.max(
+                effectiveWeeklyPeriods,
+                topics.length
+              )
+            );
+
+
+      /*
+       * Extra classes are additional teaching sessions.
+       */
+
+      /*
+       * We first use actual timetable dates.
+       */
+
+      const regularTarget =
+        Math.min(
+          semesterTarget,
+          timetableSlots.length
         );
 
 
-      setPlanRows(
-        nextPlan
-      );
+      const selectedRegularSlots =
+        timetableSlots.slice(
+          0,
+          regularTarget
+        );
 
 
-      const zeroCount =
-        nextPlan.filter(
-          row =>
-            row.plannedClasses <=
-            0
-        ).length;
+      /*
+       * If the selected date range does not contain enough
+       * timetable classes for the official semester hours,
+       * only then should CampusConnect ask for an extension.
+       */
 
-
-      const message =
-        zeroCount > 0
-          ? `Generated a ${totalClasses}-class draft, but ${zeroCount} topic${zeroCount === 1 ? "" : "s"} currently have no dedicated class. Review or combine topics before saving.`
-          : `Generated a ${totalClasses}-class teaching plan across ${nextPlan.length} topic${nextPlan.length === 1 ? "" : "s"}. Review every allocation before saving.`;
-
-
-      setScanMessage(
-        message
-      );
-
-      onStatus(
-        message
-      );
-    };
-
-
-  const updatePlannedClasses =
-    (
-      unitIndex:
-        number,
-      topicIndex:
-        number,
-      value:
-        number
-    ) => {
-
-      const safeValue =
+      const shortage =
         Math.max(
           0,
-          Math.min(
-            1000,
-            Math.floor(
-              Number.isFinite(
-                value
-              )
-                ? value
-                : 0
-            )
-          )
+          semesterTarget -
+            timetableSlots.length
         );
 
 
-      setPlanRows(
-        current =>
-          current.map(
-            row =>
-              row.unitIndex ===
-                unitIndex &&
-              row.topicIndex ===
-                topicIndex
-                ? {
-                    ...row,
-                    plannedClasses:
-                      safeValue,
+      if (
+        shortage >
+        0
+      ) {
+
+        setSchedule(
+          []
+        );
+
+
+        setStatus(
+          `The official syllabus requires ${semesterTarget} teaching hours, but the selected semester dates contain only ${timetableSlots.length} timetable classes. Extend the semester end date to include ${shortage} more scheduled class${shortage === 1 ? "" : "es"}.`
+        );
+
+        return;
+      }
+
+
+      /*
+       * Explicit extra classes are added after the official
+       * semester teaching-hour target.
+       */
+
+      const extra =
+        Array.from(
+          {
+            length:
+              Math.max(
+                0,
+                extraClasses
+              ),
+          },
+          (
+            _,
+            index
+          ) => {
+
+            const date =
+              new Date(
+                `${semesterEnd}T00:00:00`
+              );
+
+
+            date.setDate(
+              date.getDate() +
+                index +
+                1
+            );
+
+
+            return {
+
+              id:
+                `extra-${index + 1}`,
+
+              classDate:
+                isoDate(
+                  date
+                ),
+
+              dayOfWeek:
+                date.toLocaleDateString(
+                  "en-US",
+                  {
+                    weekday:
+                      "long",
                   }
-                : row
-          )
+                ),
+
+              periodOrder:
+                null,
+
+              startTime:
+                "",
+
+              endTime:
+                "",
+
+              room:
+                "",
+
+              classType:
+                "Extra Class",
+
+              extraClass:
+                true,
+            };
+          }
+        );
+
+
+      const allSlots =
+        [
+          ...selectedRegularSlots,
+          ...extra,
+        ];
+
+
+      /*
+       * ------------------------------------------------------
+       * DISTRIBUTE EVERY EXTRACTED SYLLABUS ITEM ACROSS THE
+       * OFFICIAL NUMBER OF TEACHING SESSIONS.
+       *
+       * Example:
+       *
+       * 93 syllabus points
+       * 45 Hours/Sem
+       *
+       * approximately:
+       *
+       * class 1 -> topic 1 + topic 2 + topic 3
+       * class 2 -> topic 4 + topic 5
+       * ...
+       *
+       * No syllabus item is lost.
+       * No fake 93-class requirement is created.
+       * ------------------------------------------------------
+       */
+
+      const groupedTopics:
+        TopicInfo[][] =
+        Array.from(
+          {
+            length:
+              allSlots.length,
+          },
+          () => []
+        );
+
+
+      topics.forEach(
+        (
+          topic,
+          topicIndex
+        ) => {
+
+          const classIndex =
+            Math.min(
+              allSlots.length -
+                1,
+
+              Math.floor(
+                (
+                  topicIndex *
+                  allSlots.length
+                ) /
+                topics.length
+              )
+            );
+
+
+          groupedTopics[
+            classIndex
+          ].push(
+            topic
+          );
+        }
+      );
+
+
+      /*
+       * If explicit extra classes were added only for revision,
+       * some may naturally have no new syllabus points.
+       */
+
+      const lastTopic =
+        topics[
+          topics.length -
+            1
+        ];
+
+
+      const generated:
+        ScheduleRow[] =
+        allSlots.map(
+          (
+            slot,
+            index
+          ) => {
+
+            const group =
+              groupedTopics[
+                index
+              ];
+
+
+            const firstTopic =
+              group[0] ||
+              lastTopic;
+
+
+            const combinedTitle =
+              group.length
+                ? group
+                    .map(
+                      topic =>
+                        topic.topicTitle
+                    )
+                    .join(
+                      " • "
+                    )
+                : "Revision / Buffer / Academic Adjustment";
+
+
+            const combinedDescription =
+              group.length
+                ? group
+                    .map(
+                      topic =>
+                        topic.topicDescription
+                    )
+                    .filter(
+                      Boolean
+                    )
+                    .join(
+                      " | "
+                    )
+                : "";
+
+
+            const combinedUnitTitle =
+              Array.from(
+                new Set(
+                  group.length
+                    ? group.map(
+                        topic =>
+                          `Unit ${topic.unitNumber}: ${topic.unitTitle}`
+                      )
+                    : [
+                        `Unit ${lastTopic.unitNumber}: ${lastTopic.unitTitle}`,
+                      ]
+                )
+              ).join(
+                " / "
+              );
+
+
+            return {
+
+              ...slot,
+
+              lessonNumber:
+                index + 1,
+
+              unitNumber:
+                firstTopic.unitNumber,
+
+              unitTitle:
+                combinedUnitTitle,
+
+              topicOrder:
+                firstTopic.topicOrder,
+
+              topicTitle:
+                combinedTitle,
+
+              topicDescription:
+                combinedDescription,
+            };
+          }
+        );
+
+
+      setSchedule(
+        generated
+      );
+
+
+      setStatus(
+        syllabusSemesterHours >
+          0
+          ? `Planner generated ${generated.length} class${generated.length === 1 ? "" : "es"} using the official ${syllabusSemesterHours} Hours/Sem workload. ${topics.length} extracted syllabus items were distributed across the real timetable.`
+          : `Planner generated ${generated.length} dated teaching classes from the available timetable.`
       );
     };
 
 
-  const saveApprovedPlan =
-    async () => {
+  const changeExtraDate =
+    (
+      rowId: string,
+      value: string
+    ) => {
 
-      if (
-        saving
-      ) {
-        return;
-      }
+      setSchedule(
+        current =>
+          current
+            .map(
+              row => {
 
+                if (
+                  row.id !==
+                  rowId
+                ) {
+                  return row;
+                }
+
+
+                const date =
+                  value
+                    ? new Date(
+                        `${value}T00:00:00`
+                      )
+                    : null;
+
+
+                return {
+                  ...row,
+
+                  classDate:
+                    value,
+
+                  dayOfWeek:
+                    date
+                      ? date.toLocaleDateString(
+                          "en-US",
+                          {
+                            weekday:
+                              "long",
+                          }
+                        )
+                      : "",
+                };
+              }
+            )
+            .sort(
+              (
+                first,
+                second
+              ) => {
+
+                const dateCompare =
+                  first.classDate.localeCompare(
+                    second.classDate
+                  );
+
+
+                if (
+                  dateCompare
+                ) {
+                  return dateCompare;
+                }
+
+
+                return (
+                  (
+                    first.periodOrder ??
+                    999
+                  ) -
+                  (
+                    second.periodOrder ??
+                    999
+                  )
+                );
+              }
+            )
+      );
+    };
+
+
+  const unitsForSave =
+    () => {
 
       if (
         !draft ||
-        !planRows.length
+        !schedule.length
+      ) {
+        return [];
+      }
+
+
+      /*
+       * IMPORTANT:
+       *
+       * The extracted syllabus may contain many syllabus items.
+       *
+       * Example:
+       *   93 extracted items
+       *   45 Hours/Sem
+       *
+       * Those 93 items are already combined into the 45 actual
+       * teaching sessions inside schedule.
+       *
+       * The database planner therefore saves ONE planned topic
+       * for each actual teaching session.
+       *
+       * This guarantees:
+       *
+       *   sum(plannedClasses) === schedule.length
+       *
+       * and prevents:
+       *
+       *   Allocated topic classes (94)
+       *   do not equal available teaching classes (45)
+       */
+
+      const unitMap =
+        new Map<
+          number,
+          {
+            unitNumber: number;
+            title: string;
+            description: string;
+            rows: ScheduleRow[];
+          }
+        >();
+
+
+      schedule.forEach(
+        row => {
+
+          const existing =
+            unitMap.get(
+              row.unitNumber
+            );
+
+
+          if (
+            existing
+          ) {
+
+            existing.rows.push(
+              row
+            );
+
+            return;
+          }
+
+
+          const originalUnit =
+            draft.units.find(
+              unit =>
+                unit.unitNumber ===
+                row.unitNumber
+            );
+
+
+          unitMap.set(
+            row.unitNumber,
+            {
+              unitNumber:
+                row.unitNumber,
+
+              title:
+                clean(
+                  originalUnit?.title ||
+                  row.unitTitle ||
+                  `Unit ${row.unitNumber}`
+                ),
+
+              description:
+                clean(
+                  originalUnit?.description ||
+                  ""
+                ),
+
+              rows: [
+                row,
+              ],
+            }
+          );
+        }
+      );
+
+
+      return Array.from(
+        unitMap.values()
+      )
+        .sort(
+          (
+            first,
+            second
+          ) =>
+            first.unitNumber -
+            second.unitNumber
+        )
+        .map(
+          unit => ({
+
+            unitNumber:
+              unit.unitNumber,
+
+            title:
+              unit.title,
+
+            description:
+              unit.description,
+
+            topics:
+              unit.rows
+                .sort(
+                  (
+                    first,
+                    second
+                  ) =>
+                    first.lessonNumber -
+                    second.lessonNumber
+                )
+                .map(
+                  (
+                    row,
+                    index
+                  ) => ({
+
+                    topicOrder:
+                      index + 1,
+
+                    title:
+                      clean(
+                        row.topicTitle
+                      ) ||
+                      `Teaching Session ${row.lessonNumber}`,
+
+                    description:
+                      clean(
+                        row.topicDescription
+                      ),
+
+                    plannedClasses:
+                      1,
+                  })
+                ),
+          })
+        );
+    };
+
+  const savePlan =
+    async () => {
+
+      if (
+        !draft ||
+        !schedule.length
       ) {
 
-        setScanMessage(
-          "Generate the teaching plan before saving."
+        setStatus(
+          "Generate the teaching plan first."
         );
 
         return;
@@ -1694,42 +3948,14 @@ export default function FacultySyllabusSmartPlanner({
 
 
       if (
-        planBalance !==
-        0
+        schedule.some(
+          row =>
+            !row.classDate
+        )
       ) {
 
-        setScanMessage(
-          "The teaching plan is not balanced. Every available class must be allocated before saving."
-        );
-
-        return;
-      }
-
-
-      if (
-        uncoveredPlanTopics >
-        0
-      ) {
-
-        setScanMessage(
-          "Every syllabus topic must have at least one planned teaching class before saving."
-        );
-
-        return;
-      }
-
-
-      if (
-        effectiveWeeklySessions <=
-          0 ||
-        teachingWeeks <=
-          0 ||
-        totalClasses <=
-          0
-      ) {
-
-        setScanMessage(
-          "Teaching capacity is incomplete. Recalculate classes and regenerate the plan."
+        setStatus(
+          "Every class must have a date before saving."
         );
 
         return;
@@ -1742,7 +3968,7 @@ export default function FacultySyllabusSmartPlanner({
 
       if (!client) {
 
-        setScanMessage(
+        setStatus(
           "CampusConnect is not connected to Supabase."
         );
 
@@ -1754,21 +3980,12 @@ export default function FacultySyllabusSmartPlanner({
         true
       );
 
-
-      setScanMessage(
-        "Checking existing syllabus and Faculty Diary progress…"
+      setStatus(
+        "Saving syllabus plan…"
       );
 
 
       try {
-
-        /*
-         * First perform the read-only safety check.
-         *
-         * The atomic apply RPC repeats these checks inside the
-         * transaction, so this browser check is UX only and
-         * cannot be used to bypass database protection.
-         */
 
         const {
           data:
@@ -1792,89 +4009,31 @@ export default function FacultySyllabusSmartPlanner({
         }
 
 
-        const rawStatus =
-          Array.isArray(
-            statusData
-          )
-            ? statusData[0]
-            : statusData;
-
-
-        const statusRecord =
+        const existing =
           (
-            rawStatus &&
-            typeof rawStatus ===
-              "object"
-          )
-            ? rawStatus as Record<
+            Array.isArray(
+              statusData
+            )
+              ? statusData[
+                  0
+                ]
+              : statusData
+          ) as
+            | Record<
                 string,
                 unknown
               >
-            : null;
+            | null;
 
 
         if (
-          !statusRecord
+          existing?.hasProgress ===
+          true
         ) {
+
           throw new Error(
-            "CampusConnect could not verify the existing syllabus state."
+            "This subject already contains Faculty Diary progress. CampusConnect blocked syllabus replacement to protect teaching history."
           );
-        }
-
-
-        const hasExistingSyllabus =
-          statusRecord
-            .hasExistingSyllabus ===
-          true;
-
-
-        const hasProgress =
-          statusRecord
-            .hasProgress ===
-          true;
-
-
-        const existingUnits =
-          Number(
-            statusRecord
-              .existingUnits
-          ) ||
-          0;
-
-
-        const existingTopics =
-          Number(
-            statusRecord
-              .existingTopics
-          ) ||
-          0;
-
-
-        const completionEvents =
-          Number(
-            statusRecord
-              .completionEvents
-          ) ||
-          0;
-
-
-        if (
-          hasProgress
-        ) {
-
-          const message =
-            `This syllabus already has ${completionEvents} Faculty Diary progress event${completionEvents === 1 ? "" : "s"}. Smart replacement is blocked to protect teaching history. Use the existing manual syllabus tools for safe edits instead.`;
-
-
-          setScanMessage(
-            message
-          );
-
-          onStatus(
-            message
-          );
-
-          return;
         }
 
 
@@ -1883,171 +4042,63 @@ export default function FacultySyllabusSmartPlanner({
 
 
         if (
-          hasExistingSyllabus
+          existing
+            ?.hasExistingSyllabus ===
+          true
         ) {
 
-          const confirmed =
+          replaceExisting =
             window.confirm(
-              [
-                "Replace the existing syllabus?",
-                "",
-                `Existing units: ${existingUnits}`,
-                `Existing topics: ${existingTopics}`,
-                "",
-                "No Faculty Diary progress has been recorded for this syllabus.",
-                "",
-                "Continuing will replace the current units and topics with the reviewed Smart Syllabus Planner version.",
-                "",
-                "This action cannot be undone automatically.",
-              ].join(
-                "\n"
-              )
+              "A syllabus plan already exists for this subject. Replace it with this new plan?"
             );
 
 
           if (
-            !confirmed
+            !replaceExisting
           ) {
 
-            setScanMessage(
-              "Save cancelled. The existing syllabus was not changed."
+            setStatus(
+              "Save cancelled."
             );
 
             return;
           }
-
-
-          replaceExisting =
-            true;
         }
 
 
-        /*
-         * Join each reviewed topic with its faculty-controlled
-         * planned class allocation.
-         */
-
-        const planLookup =
-          new Map<
-            string,
-            number
-          >();
-
-
-        planRows.forEach(
-          row => {
-
-            planLookup.set(
-              `${row.unitIndex}:${row.topicIndex}`,
-              row.plannedClasses
-            );
-          }
-        );
-
-
-        const unitsPayload =
-          draft.units.map(
-            (
-              unit,
-              unitIndex
-            ) => ({
-
-              unitNumber:
-                unitIndex +
-                1,
-
-              title:
-                cleanText(
-                  unit.title
-                ),
-
-              description:
-                cleanText(
-                  unit.description
-                ),
-
-              topics:
-                unit.topics.map(
-                  (
-                    topic,
-                    topicIndex
-                  ) => {
-
-                    const plannedClasses =
-                      planLookup.get(
-                        `${unitIndex}:${topicIndex}`
-                      ) ||
-                      0;
-
-
-                    return {
-
-                      topicOrder:
-                        topicIndex +
-                        1,
-
-                      title:
-                        cleanText(
-                          topic.title
-                        ),
-
-                      description:
-                        cleanText(
-                          topic.description
-                        ),
-
-                      plannedClasses,
-                    };
-                  }
-                ),
-            })
-          );
-
-
-        /*
-         * One PostgreSQL RPC performs:
-         *
-         * - final authorization
-         * - final validation
-         * - replacement protection
-         * - units
-         * - topics
-         * - planned_periods
-         * - planner configuration
-         * - Diary progress backfill
-         *
-         * Any failure rolls the database transaction back.
-         */
-
-        setScanMessage(
-          "Saving approved syllabus and teaching plan…"
-        );
-
-
         const {
-          data:
-            applyData,
           error:
             applyError,
         } =
           await client.rpc(
             "apply_faculty_syllabus_plan",
             {
-
               p_batch_subject_id:
                 subject.id,
 
               p_units:
-                unitsPayload,
+                unitsForSave(),
 
+              /*
+               * apply_faculty_syllabus_plan validates:
+               *
+               * weekly_sessions × teaching_weeks
+               * = total_planned_classes
+               *
+               * The dated calendar RPC below stores the real
+               * timetable periods/week and semester weeks.
+               *
+               * Therefore this first atomic save uses the full
+               * generated plan as one temporary capacity block.
+               */
               p_weekly_sessions:
-                effectiveWeeklySessions,
+                schedule.length,
 
               p_teaching_weeks:
-                teachingWeeks,
+                1,
 
               p_total_planned_classes:
-                totalClasses,
+                schedule.length,
 
               p_replace_existing:
                 replaceExisting,
@@ -2062,164 +4113,183 @@ export default function FacultySyllabusSmartPlanner({
         }
 
 
-        const rawResult =
-          Array.isArray(
-            applyData
-          )
-            ? applyData[0]
-            : applyData;
+        const start =
+          new Date(
+            `${semesterStart}T00:00:00`
+          );
 
 
-        const result =
-          (
-            rawResult &&
-            typeof rawResult ===
-              "object"
-          )
-            ? rawResult as Record<
-                string,
-                unknown
-              >
-            : null;
+        const end =
+          new Date(
+            `${semesterEnd}T00:00:00`
+          );
+
+
+        const weeks =
+          Math.max(
+            1,
+            Math.ceil(
+              (
+                end.getTime() -
+                start.getTime()
+              ) /
+                (
+                  7 *
+                  24 *
+                  60 *
+                  60 *
+                  1000
+                )
+            ) +
+              1
+          );
+
+
+        const {
+          error:
+            calendarError,
+        } =
+          await client.rpc(
+            "save_faculty_syllabus_calendar_plan",
+            {
+              p_batch_subject_id:
+                subject.id,
+
+              p_start_date:
+                semesterStart,
+
+              p_end_date:
+                semesterEnd,
+
+              p_weekly_periods:
+                Math.max(
+                  1,
+                  effectiveWeeklyPeriods
+                ),
+
+              p_teaching_weeks:
+                weeks,
+
+              p_rows:
+                schedule.map(
+                  row => ({
+                    classDate:
+                      row.classDate,
+
+                    dayOfWeek:
+                      row.dayOfWeek,
+
+                    periodOrder:
+                      row.periodOrder,
+
+                    startTime:
+                      row.startTime ||
+                      null,
+
+                    endTime:
+                      row.endTime ||
+                      null,
+
+                    room:
+                      row.room,
+
+                    extraClass:
+                      row.extraClass,
+
+                    unitNumber:
+                      row.unitNumber,
+
+                    unitTitle:
+                      row.unitTitle,
+
+                    topicOrder:
+                      row.topicOrder,
+
+                    topicTitle:
+                      row.topicTitle,
+
+                    lessonNumber:
+                      row.lessonNumber,
+                  })
+                ),
+            }
+          );
 
 
         if (
-          !result ||
-          result.success !==
-            true
+          calendarError
         ) {
+
           throw new Error(
-            "CampusConnect did not confirm the syllabus save."
+            `Syllabus structure was saved, but the dated planner could not be saved: ${calendarError.message}`
           );
         }
 
 
-        const unitsInserted =
-          Number(
-            result
-              .unitsInserted
-          ) ||
-          draft.units.length;
-
-
-        const topicsInserted =
-          Number(
-            result
-              .topicsInserted
-          ) ||
-          topicCount;
-
-
-        const backfilled =
-          Number(
-            result
-              .backfilledCompletionEvents
-          ) ||
-          0;
-
-
-        /*
-         * The save is already committed at this point.
-         * Refresh failures must therefore NOT be reported as
-         * database-save failures.
-         */
-
-        let refreshWarning =
-          "";
+        setStatus(
+          `Saved ${schedule.length} planned classes successfully.`
+        );
 
 
         try {
-
           await onApplied();
-
         } catch (
           refreshError
         ) {
-
           console.error(
-            "[Smart Syllabus Planner refresh]",
+            "[CampusConnect Planner refresh]",
             refreshError
           );
-
-
-          refreshWarning =
-            " The syllabus was saved, but the screen could not refresh automatically.";
-
         }
-
-
-        const message =
-          `Approved syllabus saved: ${unitsInserted} unit${unitsInserted === 1 ? "" : "s"}, ${topicsInserted} topic${topicsInserted === 1 ? "" : "s"} and ${totalClasses} planned teaching class${totalClasses === 1 ? "" : "es"}.${backfilled > 0 ? ` ${backfilled} existing Faculty Diary class${backfilled === 1 ? "" : "es"} matched the approved syllabus automatically.` : ""}${refreshWarning}`;
-
-
-        /*
-         * Clear the temporary AI review state after a confirmed
-         * save so the same draft cannot accidentally be applied
-         * twice.
-         */
-
-        setDraft(
-          null
-        );
-
-        setPlanRows(
-          []
-        );
-
-        setFile(
-          null
-        );
-
-        setDriveUrl(
-          ""
-        );
-
-        setScanMessage(
-          message
-        );
-
-        onStatus(
-          message
-        );
 
       } catch (
         error
       ) {
 
         console.error(
-          "[Smart Syllabus Planner save]",
+          "[CampusConnect Planner save]",
           error
         );
 
 
-        const message =
-          error instanceof
-            Error
-            ? error.message
-            : (
-                error &&
-                typeof error ===
-                  "object" &&
-                "message" in
-                  error
-              )
-              ? String(
-                  (
-                    error as {
-                      message?: unknown;
-                    }
-                  ).message ||
-                  "Unable to save the approved syllabus."
-                )
-              : "Unable to save the approved syllabus.";
+        const saveError =
+          error as {
+            message?: string;
+            details?: string;
+            hint?: string;
+            code?: string;
+          };
 
 
-        setScanMessage(
-          message
+        const saveMessage =
+          saveError?.message ||
+          saveError?.details ||
+          (
+            typeof error ===
+              "string"
+              ? error
+              : ""
+          ) ||
+          "Unable to save the plan.";
+
+
+        console.error(
+          "[CampusConnect Planner save details]",
+          {
+            message:
+              saveError?.message,
+            details:
+              saveError?.details,
+            hint:
+              saveError?.hint,
+            code:
+              saveError?.code,
+          }
         );
 
-        onStatus(
-          message
+
+        setStatus(
+          saveMessage
         );
 
       } finally {
@@ -2231,1174 +4301,2265 @@ export default function FacultySyllabusSmartPlanner({
     };
 
 
+  const exportData =
+    () =>
+      schedule.map(
+        row => ({
+
+          Date:
+            row.classDate,
+
+          Day:
+            row.dayOfWeek,
+
+          Period:
+            row.extraClass
+              ? "Extra"
+              : row.periodOrder ??
+                "",
+
+          Time:
+            row.startTime &&
+            row.endTime
+              ? `${row.startTime.slice(0, 5)} - ${row.endTime.slice(0, 5)}`
+              : "",
+
+          Room:
+            row.room,
+
+          Unit:
+            `Unit ${row.unitNumber}: ${row.unitTitle}`,
+
+          Lesson:
+            row.topicTitle,
+
+          Type:
+            row.extraClass
+              ? "Extra Class"
+              : "Timetable Class",
+        })
+      );
+
+
+  const exportBaseName =
+    () =>
+      `CampusConnect-${fileSlug(
+        subject.subject_code ||
+        subject.subject_name
+      )}-Syllabus-Plan`;
+
+
+  const downloadCsv =
+    () => {
+
+      if (
+        !schedule.length
+      ) {
+        return;
+      }
+
+
+      const rows =
+        exportData();
+
+
+      const sheet =
+        XLSX.utils.json_to_sheet(
+          rows
+        );
+
+
+      const csv =
+        [
+          `CampusConnect Smart Syllabus Planner`,
+          `Faculty Name,${JSON.stringify(subject.faculty_name || "Faculty")}`,
+          `Subject,${JSON.stringify(subject.subject_name)}`,
+          `Subject Code,${JSON.stringify(subject.subject_code)}`,
+          `L:T:P,${JSON.stringify(
+            syllabusWeeklyStructure
+              ? `${syllabusWorkload.lectureHours}:${syllabusWorkload.tutorialHours}:${syllabusWorkload.practicalHours}`
+              : ""
+          )}`,
+          `Hours/Sem,${syllabusSemesterHours || ""}`,
+          "",
+          XLSX.utils.sheet_to_csv(
+            sheet
+          ),
+        ].join(
+          "\n"
+        );
+
+
+      downloadBlob(
+        new Blob(
+          [
+            "\uFEFF",
+            csv,
+          ],
+          {
+            type:
+              "text/csv;charset=utf-8",
+          }
+        ),
+        `${exportBaseName()}.csv`
+      );
+    };
+
+
+  const downloadExcel =
+    () => {
+
+      if (
+        !schedule.length
+      ) {
+        return;
+      }
+
+
+      const workbook =
+        XLSX.utils.book_new();
+
+
+      const className =
+        batch
+          ? [
+              batch.batch_name,
+              batch.section,
+            ]
+              .filter(Boolean)
+              .join(" · ")
+          : "Assigned batch";
+
+
+      const rows =
+        schedule.map(
+          row => [
+            row.lessonNumber,
+            row.classDate,
+            row.dayOfWeek,
+            row.extraClass
+              ? "Extra"
+              : row.periodOrder ??
+                "",
+            row.startTime &&
+            row.endTime
+              ? `${row.startTime.slice(0, 5)} - ${row.endTime.slice(0, 5)}`
+              : "",
+            row.room,
+            row.unitTitle,
+            row.topicTitle,
+            row.extraClass
+              ? "Extra Class"
+              : "Timetable Class",
+          ]
+        );
+
+
+      const worksheet =
+        XLSX.utils.aoa_to_sheet([
+          [
+            "CAMPUSCONNECT · SMART SYLLABUS PLANNER",
+          ],
+
+          [
+            "Semester Teaching Plan",
+          ],
+
+          [],
+
+          [
+            "Faculty Name",
+            subject.faculty_name ||
+              "Faculty",
+          ],
+
+          [
+            "Subject",
+            subject.subject_name,
+          ],
+
+          [
+            "Subject Code",
+            subject.subject_code,
+          ],
+
+          [
+            "Class",
+            className,
+          ],
+
+          [
+            "L : T : P",
+            `${syllabusWorkload.lectureHours} : ${syllabusWorkload.tutorialHours} : ${syllabusWorkload.practicalHours}`,
+          ],
+
+          [
+            "Hours / Semester",
+            syllabusSemesterHours ||
+              schedule.length,
+          ],
+
+          [
+            "Periods / Week",
+            effectiveWeeklyPeriods,
+          ],
+
+          [
+            "Planned Classes",
+            schedule.length,
+          ],
+
+          [],
+
+          [
+            "#",
+            "Date",
+            "Day",
+            "Period",
+            "Time",
+            "Room",
+            "Unit",
+            "Planned Lesson",
+            "Type",
+          ],
+
+          ...rows,
+        ]);
+
+
+      worksheet["!merges"] = [
+        {
+          s: {
+            r: 0,
+            c: 0,
+          },
+          e: {
+            r: 0,
+            c: 8,
+          },
+        },
+        {
+          s: {
+            r: 1,
+            c: 0,
+          },
+          e: {
+            r: 1,
+            c: 8,
+          },
+        },
+      ];
+
+
+      worksheet["!cols"] = [
+        {
+          wch: 6,
+        },
+        {
+          wch: 14,
+        },
+        {
+          wch: 12,
+        },
+        {
+          wch: 10,
+        },
+        {
+          wch: 18,
+        },
+        {
+          wch: 13,
+        },
+        {
+          wch: 38,
+        },
+        {
+          wch: 65,
+        },
+        {
+          wch: 16,
+        },
+      ];
+
+
+      worksheet["!rows"] = [
+        {
+          hpt: 28,
+        },
+        {
+          hpt: 22,
+        },
+      ];
+
+
+      worksheet["!autofilter"] = {
+        ref:
+          `A13:I${13 + rows.length}`,
+      };
+
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Semester Plan"
+      );
+
+
+      workbook.Props = {
+        Title:
+          "CampusConnect Smart Syllabus Planner",
+
+        Subject:
+          subject.subject_name,
+
+        Author:
+          subject.faculty_name ||
+          "CampusConnect",
+
+        Company:
+          "CampusConnect",
+
+        Comments:
+          "Generated using CampusConnect Faculty Smart Syllabus Planner",
+      };
+
+
+      XLSX.writeFile(
+        workbook,
+        `${exportBaseName()}.xlsx`
+      );
+    };
+
+  const downloadPdf =
+    async () => {
+
+      if (
+        !schedule.length
+      ) {
+        return;
+      }
+
+
+      const blob =
+        await pdf(
+          <PlannerPdf
+            rows={
+              schedule
+            }
+            subject={
+              subject
+            }
+            batch={
+              batch
+            }
+            syllabusWorkload={
+              syllabusWorkload
+            }
+            semesterHours={
+              syllabusSemesterHours
+            }
+            weeklyPeriods={
+              effectiveWeeklyPeriods
+            }
+          />
+        ).toBlob();
+
+
+      downloadBlob(
+        blob,
+        `${exportBaseName()}.pdf`
+      );
+    };
+
+
+  const downloadJpeg =
+    () => {
+
+      if (
+        !schedule.length
+      ) {
+        return;
+      }
+
+
+      const width =
+        1800;
+
+      const headerHeight =
+        360;
+
+      const tableHeaderHeight =
+        62;
+
+      const rowHeight =
+        86;
+
+      const footerHeight =
+        90;
+
+      const height =
+        headerHeight +
+        tableHeaderHeight +
+        schedule.length *
+          rowHeight +
+        footerHeight;
+
+
+      const canvas =
+        document.createElement(
+          "canvas"
+        );
+
+
+      canvas.width =
+        width;
+
+      canvas.height =
+        height;
+
+
+      const ctx =
+        canvas.getContext(
+          "2d"
+        );
+
+
+      if (!ctx) {
+        return;
+      }
+
+
+      const roundedRect =
+        (
+          x: number,
+          y: number,
+          w: number,
+          h: number,
+          radius: number
+        ) => {
+
+          ctx.beginPath();
+
+          ctx.roundRect(
+            x,
+            y,
+            w,
+            h,
+            radius
+          );
+
+          ctx.closePath();
+        };
+
+
+      const wrapText =
+        (
+          value: string,
+          x: number,
+          y: number,
+          maxWidth: number,
+          lineHeight: number,
+          maxLines:
+            number =
+            2
+        ) => {
+
+          const words =
+            String(
+              value ||
+              ""
+            ).split(
+              /\s+/
+            );
+
+
+          const lines:
+            string[] =
+            [];
+
+          let line =
+            "";
+
+
+          words.forEach(
+            word => {
+
+              const test =
+                line
+                  ? `${line} ${word}`
+                  : word;
+
+
+              if (
+                ctx.measureText(
+                  test
+                ).width >
+                  maxWidth &&
+                line
+              ) {
+
+                lines.push(
+                  line
+                );
+
+                line =
+                  word;
+
+              } else {
+
+                line =
+                  test;
+              }
+            }
+          );
+
+
+          if (line) {
+            lines.push(
+              line
+            );
+          }
+
+
+          const visible =
+            lines.slice(
+              0,
+              maxLines
+            );
+
+
+          if (
+            lines.length >
+            maxLines &&
+            visible.length
+          ) {
+
+            visible[
+              visible.length -
+                1
+            ] =
+              `${visible[
+                visible.length -
+                  1
+              ].slice(
+                0,
+                -1
+              )}…`;
+          }
+
+
+          visible.forEach(
+            (
+              item,
+              index
+            ) => {
+
+              ctx.fillText(
+                item,
+                x,
+                y +
+                  index *
+                    lineHeight
+              );
+            }
+          );
+        };
+
+
+      ctx.fillStyle =
+        "#f5f7fb";
+
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+      );
+
+
+      const gradient =
+        ctx.createLinearGradient(
+          0,
+          0,
+          width,
+          0
+        );
+
+
+      gradient.addColorStop(
+        0,
+        "#172544"
+      );
+
+      gradient.addColorStop(
+        1,
+        "#315fdf"
+      );
+
+
+      ctx.fillStyle =
+        gradient;
+
+      ctx.fillRect(
+        0,
+        0,
+        width,
+        245
+      );
+
+
+      ctx.fillStyle =
+        "#ffffff";
+
+      ctx.font =
+        "700 24px Arial";
+
+      ctx.fillText(
+        "CAMPUSCONNECT",
+        70,
+        62
+      );
+
+
+      ctx.font =
+        "700 48px Arial";
+
+      ctx.fillText(
+        "Semester Teaching Plan",
+        70,
+        132
+      );
+
+
+      ctx.fillStyle =
+        "rgba(255,255,255,0.82)";
+
+      ctx.font =
+        "22px Arial";
+
+      ctx.fillText(
+        `${subject.subject_name} · ${subject.subject_code}`,
+        70,
+        176
+      );
+
+
+      ctx.font =
+        "18px Arial";
+
+      ctx.fillText(
+        `Faculty: ${subject.faculty_name || "Faculty"}`,
+        70,
+        214
+      );
+
+
+      roundedRect(
+        1410,
+        48,
+        310,
+        52,
+        26
+      );
+
+      ctx.fillStyle =
+        "rgba(255,255,255,0.14)";
+
+      ctx.fill();
+
+
+      ctx.fillStyle =
+        "#ffffff";
+
+      ctx.font =
+        "700 15px Arial";
+
+      ctx.textAlign =
+        "center";
+
+      ctx.fillText(
+        "SMART SYLLABUS PLANNER",
+        1565,
+        81
+      );
+
+      ctx.textAlign =
+        "left";
+
+
+      const cards =
+        [
+          [
+            "L : T : P",
+            `${syllabusWorkload.lectureHours} : ${syllabusWorkload.tutorialHours} : ${syllabusWorkload.practicalHours}`,
+          ],
+
+          [
+            "HOURS / SEM",
+            String(
+              syllabusSemesterHours ||
+              schedule.length
+            ),
+          ],
+
+          [
+            "PERIODS / WEEK",
+            String(
+              effectiveWeeklyPeriods
+            ),
+          ],
+
+          [
+            "PLANNED CLASSES",
+            String(
+              schedule.length
+            ),
+          ],
+        ];
+
+
+      const cardWidth =
+        392;
+
+      cards.forEach(
+        (
+          card,
+          index
+        ) => {
+
+          const x =
+            70 +
+            index *
+              (
+                cardWidth +
+                22
+              );
+
+
+          roundedRect(
+            x,
+            274,
+            cardWidth,
+            62,
+            13
+          );
+
+          ctx.fillStyle =
+            "#ffffff";
+
+          ctx.fill();
+
+          ctx.strokeStyle =
+            "#dfe5ef";
+
+          ctx.lineWidth =
+            1;
+
+          ctx.stroke();
+
+
+          ctx.fillStyle =
+            "#8a95a6";
+
+          ctx.font =
+            "700 12px Arial";
+
+          ctx.fillText(
+            card[0],
+            x +
+              17,
+            297
+          );
+
+
+          ctx.fillStyle =
+            "#25334b";
+
+          ctx.font =
+            "700 22px Arial";
+
+          ctx.fillText(
+            card[1],
+            x +
+              17,
+            323
+          );
+        }
+      );
+
+
+      const columns =
+        [
+          {
+            label:
+              "DATE",
+            x:
+              70,
+            width:
+              205,
+          },
+
+          {
+            label:
+              "DAY",
+            x:
+              275,
+            width:
+              155,
+          },
+
+          {
+            label:
+              "PERIOD",
+            x:
+              430,
+            width:
+              125,
+          },
+
+          {
+            label:
+              "UNIT",
+            x:
+              555,
+            width:
+              390,
+          },
+
+          {
+            label:
+              "PLANNED LESSON",
+            x:
+              945,
+            width:
+              705,
+          },
+
+          {
+            label:
+              "TYPE",
+            x:
+              1650,
+            width:
+              90,
+          },
+        ];
+
+
+      let y =
+        headerHeight;
+
+
+      roundedRect(
+        70,
+        y,
+        1670,
+        tableHeaderHeight,
+        11
+      );
+
+      ctx.fillStyle =
+        "#202f49";
+
+      ctx.fill();
+
+
+      ctx.fillStyle =
+        "#ffffff";
+
+      ctx.font =
+        "700 14px Arial";
+
+
+      columns.forEach(
+        column => {
+
+          ctx.fillText(
+            column.label,
+            column.x +
+              12,
+            y +
+              38
+          );
+        }
+      );
+
+
+      y +=
+        tableHeaderHeight;
+
+
+      schedule.forEach(
+        (
+          row,
+          index
+        ) => {
+
+          ctx.fillStyle =
+            row.extraClass
+              ? "#fff9e9"
+              : index % 2
+                ? "#fafbfd"
+                : "#ffffff";
+
+
+          ctx.fillRect(
+            70,
+            y,
+            1670,
+            rowHeight
+          );
+
+
+          ctx.strokeStyle =
+            "#e6eaf0";
+
+          ctx.beginPath();
+
+          ctx.moveTo(
+            70,
+            y +
+              rowHeight
+          );
+
+          ctx.lineTo(
+            1740,
+            y +
+              rowHeight
+          );
+
+          ctx.stroke();
+
+
+          ctx.fillStyle =
+            "#26344a";
+
+          ctx.font =
+            "700 17px Arial";
+
+          ctx.fillText(
+            formatDate(
+              row.classDate
+            ),
+            82,
+            y +
+              36
+          );
+
+
+          ctx.fillStyle =
+            "#566277";
+
+          ctx.font =
+            "16px Arial";
+
+          ctx.fillText(
+            row.dayOfWeek,
+            287,
+            y +
+              36
+          );
+
+
+          ctx.fillText(
+            row.extraClass
+              ? "Extra"
+              : String(
+                  row.periodOrder ??
+                  "-"
+                ),
+            442,
+            y +
+              36
+          );
+
+
+          ctx.fillStyle =
+            "#27364d";
+
+          ctx.font =
+            "700 15px Arial";
+
+          wrapText(
+            row.unitTitle,
+            567,
+            y +
+              30,
+            360,
+            20,
+            2
+          );
+
+
+          ctx.fillStyle =
+            "#45546b";
+
+          ctx.font =
+            "15px Arial";
+
+          wrapText(
+            row.topicTitle,
+            957,
+            y +
+              29,
+            675,
+            20,
+            3
+          );
+
+
+          roundedRect(
+            1662,
+            y +
+              23,
+            65,
+            27,
+            14
+          );
+
+
+          ctx.fillStyle =
+            row.extraClass
+              ? "#fff0c7"
+              : "#edf3ff";
+
+          ctx.fill();
+
+
+          ctx.fillStyle =
+            row.extraClass
+              ? "#8a620b"
+              : "#315fdf";
+
+          ctx.font =
+            "700 11px Arial";
+
+          ctx.textAlign =
+            "center";
+
+          ctx.fillText(
+            row.extraClass
+              ? "EXTRA"
+              : "CLASS",
+            1694,
+            y +
+              41
+          );
+
+          ctx.textAlign =
+            "left";
+
+
+          y +=
+            rowHeight;
+        }
+      );
+
+
+      ctx.fillStyle =
+        "#f5f7fb";
+
+      ctx.fillRect(
+        0,
+        height -
+          footerHeight,
+        width,
+        footerHeight
+      );
+
+
+      ctx.strokeStyle =
+        "#dfe4eb";
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        70,
+        height -
+          footerHeight
+      );
+
+      ctx.lineTo(
+        1740,
+        height -
+          footerHeight
+      );
+
+      ctx.stroke();
+
+
+      ctx.fillStyle =
+        "#758195";
+
+      ctx.font =
+        "14px Arial";
+
+      ctx.fillText(
+        `CampusConnect · ${subject.faculty_name || "Faculty"} · ${subject.subject_code}`,
+        70,
+        height -
+          38
+      );
+
+
+      ctx.textAlign =
+        "right";
+
+      ctx.fillText(
+        "Faculty Smart Syllabus Planner",
+        1740,
+        height -
+          38
+      );
+
+      ctx.textAlign =
+        "left";
+
+
+      canvas.toBlob(
+        blob => {
+
+          if (!blob) {
+            return;
+          }
+
+
+          downloadBlob(
+            blob,
+            `${exportBaseName()}.jpg`
+          );
+        },
+        "image/jpeg",
+        0.96
+      );
+    };
+
   return (
-    <section className="facultySmartSyllabus">
 
-      <header className="facultySmartSyllabusHeader">
+    <section
+      className="ccMinimalPlanner"
+    >
 
-        <div>
+      <header
+        className="ccPlannerHeader"
+      >
 
-          <span>
+        <div
+          className="ccPlannerHeaderCopy"
+        >
+
+          <span
+            className="ccPlannerEyebrow"
+          >
             SMART SYLLABUS PLANNER
           </span>
 
           <h2>
-            Upload once. Plan every class.
+            Turn your syllabus into a real teaching plan.
           </h2>
 
           <p>
-            CampusConnect extracts the syllabus, calculates your real weekly teaching capacity and prepares a reviewable teaching plan before anything is saved.
+            Upload the syllabus, let CampusConnect read your published timetable, then automatically distribute lessons across actual class days.
           </p>
 
         </div>
 
 
-        <div className="facultySmartSyllabusBadge">
-          AI Assisted
+        <div
+          className="ccPlannerSubjectCard"
+        >
+
+          <span>
+            CURRENT SUBJECT
+          </span>
+
+          <strong>
+            {subject.subject_name}
+          </strong>
+
+          <small>
+            {subject.subject_code}
+
+            {batch?.batch_name
+              ? ` · ${batch.batch_name}`
+              : ""}
+
+            {batch?.section
+              ? ` · ${batch.section}`
+              : ""}
+          </small>
+
         </div>
 
       </header>
 
 
-      <div className="facultySmartSyllabusGrid">
-
-        <section className="facultySmartSyllabusSource">
-
-          <div className="facultySmartSyllabusSectionTitle">
-
-            <div>
-              1
-            </div>
-
-            <span>
-              <strong>
-                Add syllabus source
-              </strong>
-
-              <small>
-                PDF, image or shared Google Drive file
-              </small>
-            </span>
-
-          </div>
-
-
-          <div
-            className="facultySmartSyllabusTabs"
-            role="tablist"
-            aria-label="Syllabus source"
-          >
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={
-                sourceMode ===
-                "upload"
-              }
-              className={
-                sourceMode ===
-                  "upload"
-                  ? "active"
-                  : ""
-              }
-              onClick={() => {
-                setSourceMode(
-                  "upload"
-                );
-
-                setScanMessage(
-                  ""
-                );
-              }}
-            >
-              Upload File
-            </button>
-
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={
-                sourceMode ===
-                "drive"
-              }
-              className={
-                sourceMode ===
-                  "drive"
-                  ? "active"
-                  : ""
-              }
-              onClick={() => {
-                setSourceMode(
-                  "drive"
-                );
-
-                setScanMessage(
-                  ""
-                );
-              }}
-            >
-              Google Drive
-            </button>
-
-          </div>
-
-
-          {sourceMode ===
-          "upload" ? (
-            <label className="facultySmartSyllabusDrop">
-
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
-                onChange={
-                  handleFile
-                }
-              />
-
-              <span className="facultySmartSyllabusDropIcon">
-                ↑
-              </span>
-
-              <strong>
-                {file
-                  ? file.name
-                  : "Choose syllabus file"}
-              </strong>
-
-              <small>
-                PDF · JPG · PNG · WEBP · Maximum 20 MB
-              </small>
-
-              {file && (
-                <em>
-                  {(
-                    file.size /
-                    1024 /
-                    1024
-                  ).toFixed(
-                    2
-                  )} MB
-                </em>
-              )}
-
-            </label>
-          ) : (
-            <div className="facultySmartSyllabusDrive">
-
-              <label htmlFor="faculty-syllabus-drive-url">
-                Shared Google Drive link
-              </label>
-
-              <input
-                id="faculty-syllabus-drive-url"
-                type="url"
-                inputMode="url"
-                value={
-                  driveUrl
-                }
-                onChange={
-                  event => {
-                    setDriveUrl(
-                      event.target
-                        .value
-                    );
-
-                    setDraft(
-                      null
-                    );
-                  }
-                }
-                placeholder="https://drive.google.com/file/d/..."
-                autoComplete="off"
-              />
-
-              <small>
-                The file must be shared as “Anyone with the link”. Private Drive files are not bypassed.
-              </small>
-
-            </div>
-          )}
-
-
-          <button
-            type="button"
-            className="facultySmartSyllabusScan"
-            disabled={
-              scanning ||
-              (
-                sourceMode ===
-                  "upload"
-                  ? !file
-                  : !cleanText(
-                      driveUrl
-                    )
-              )
-            }
-            onClick={() =>
-              void scanSyllabus()
-            }
-          >
-            {scanning
-              ? "Reading syllabus…"
-              : "Scan Syllabus with Campus AI"}
-          </button>
-
-
-          {scanMessage && (
-            <div className="facultySmartSyllabusMessage">
-              {scanMessage}
-            </div>
-          )}
-
-        </section>
-
-
-        <section className="facultySmartSyllabusCapacity">
-
-          <div className="facultySmartSyllabusSectionTitle">
-
-            <div>
-              2
-            </div>
-
-            <span>
-              <strong>
-                Teaching capacity
-              </strong>
-
-              <small>
-                Detected from CampusConnect
-              </small>
-            </span>
-
-          </div>
-
-
-          {capacity.loading ? (
-            <div className="facultySmartSyllabusCapacityLoading">
-              Calculating weekly classes…
-            </div>
-          ) : (
-            <>
-
-              <div className="facultySmartSyllabusCapacityCards">
-
-                <article>
-
-                  <span>
-                    CLASSES / WEEK
-                  </span>
-
-                  <strong>
-                    {
-                      capacity
-                        .weeklySessions
-                    }
-                  </strong>
-
-                  <small>
-                    Actual teaching sessions
-                  </small>
-
-                </article>
-
-
-                <article>
-
-                  <span>
-                    PERIODS / WEEK
-                  </span>
-
-                  <strong>
-                    {
-                      capacity
-                        .weeklyPeriods
-                    }
-                  </strong>
-
-                  <small>
-                    Timetable periods
-                  </small>
-
-                </article>
-
-              </div>
-
-
-              <label className="facultySmartSyllabusWeeks">
-
-                <span>
-                  Teaching weeks
-                </span>
-
-                <input
-                  type="number"
-                  min="1"
-                  max="60"
-                  value={
-                    teachingWeeks
-                  }
-                  onChange={
-                    event =>
-                      setTeachingWeeks(
-                        Math.max(
-                          1,
-                          Math.min(
-                            60,
-                            Math.floor(
-                              Number(
-                                event.target
-                                  .value
-                              ) ||
-                                1
-                            )
-                          )
-                        )
-                      )
-                  }
-                />
-
-              </label>
-
-
-              <div className="facultySmartSyllabusTotal">
-
-                <span>
-                  Available teaching classes
-                </span>
-
-                <strong>
-                  {
-                    totalClasses
-                  }
-                </strong>
-
-                <small>
-                  {effectiveWeeklySessions} classes/week × {teachingWeeks} weeks
-                </small>
-
-              </div>
-
-
-              <p className={`facultySmartSyllabusCapacityNote ${capacity.source}`}>
-                {manualWeeklySessions
-                  ? `Manual override active: ${effectiveWeeklySessions} teaching classes per week. CampusConnect detected ${capacity.weeklySessions} automatically.`
-                  : capacity.message}
-              </p>
-
-
-              <label className="facultySmartSyllabusManualCapacity">
-
-                <span>
-                  Optional classes/week override
-                </span>
-
-                <input
-                  type="number"
-                  min="1"
-                  max="60"
-                  step="1"
-                  inputMode="numeric"
-                  value={
-                    manualWeeklySessions
-                  }
-                  placeholder={
-                    capacity.weeklySessions >
-                      0
-                      ? String(
-                          capacity.weeklySessions
-                        )
-                      : "e.g. 4"
-                  }
-                  onChange={
-                    event => {
-
-                      const value =
-                        event.target
-                          .value;
-
-
-                      if (
-                        value ===
-                        ""
-                      ) {
-                        setManualWeeklySessions(
-                          ""
-                        );
-
-                        return;
-                      }
-
-
-                      const parsed =
-                        Math.max(
-                          1,
-                          Math.min(
-                            60,
-                            Math.floor(
-                              Number(
-                                value
-                              ) ||
-                                1
-                            )
-                          )
-                        );
-
-
-                      setManualWeeklySessions(
-                        String(
-                          parsed
-                        )
-                      );
-                    }
-                  }
-                />
-
-                <small>
-                  Leave blank to use the allocation or published timetable detected by CampusConnect.
-                </small>
-
-              </label>
-
-
-              <button
-                type="button"
-                className="facultySmartSyllabusRefresh"
-                onClick={() =>
-                  void loadTeachingCapacity()
-                }
-              >
-                Recalculate from CampusConnect
-              </button>
-
-            </>
-          )}
-
-        </section>
+      <div
+        className="ccPlannerFlow"
+      >
+
+        <div
+          className={
+            draft
+              ? "complete"
+              : "active"
+          }
+        >
+          <b>
+            1
+          </b>
+          <span>
+            Syllabus
+          </span>
+        </div>
+
+        <i />
+
+        <div
+          className={
+            schedule.length
+              ? "complete"
+              : draft
+                ? "active"
+                : ""
+          }
+        >
+          <b>
+            2
+          </b>
+          <span>
+            Plan
+          </span>
+        </div>
+
+        <i />
+
+        <div
+          className={
+            schedule.length
+              ? "active"
+              : ""
+          }
+        >
+          <b>
+            3
+          </b>
+          <span>
+            Save & Download
+          </span>
+        </div>
 
       </div>
 
 
-      {draft && (
-        <section className="facultySmartSyllabusReview">
+      <section
+        className="ccPlannerCard"
+      >
 
-          <div className="facultySmartSyllabusReviewHeader">
+        <div
+          className="ccPlannerSectionTitle"
+        >
 
-            <div>
+          <div>
 
-              <span>
-                3 · FACULTY REVIEW
+            <span>
+              STEP 01
+            </span>
+
+            <h3>
+              Add syllabus
+            </h3>
+
+            <p>
+              Upload PDF, JPG, JPEG, PNG or WEBP directly from your device, or import from Google Drive.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          className="ccPlannerSourceTabs"
+        >
+
+          <button
+            type="button"
+            className={
+              sourceMode ===
+              "upload"
+                ? "active"
+                : ""
+            }
+            onClick={
+              () => {
+
+                setSourceMode(
+                  "upload"
+                );
+
+                setDriveUrl(
+                  ""
+                );
+              }
+            }
+          >
+            Upload file
+          </button>
+
+
+          <button
+            type="button"
+            className={
+              sourceMode ===
+              "drive"
+                ? "active"
+                : ""
+            }
+            onClick={
+              () => {
+
+                setSourceMode(
+                  "drive"
+                );
+
+                setSyllabusFile(
+                  null
+                );
+
+                if (
+                  fileInputRef.current
+                ) {
+                  fileInputRef
+                    .current
+                    .value =
+                    "";
+                }
+              }
+            }
+          >
+            Google Drive
+          </button>
+
+        </div>
+
+
+        {sourceMode ===
+        "upload" ? (
+
+          <div
+            className="ccPlannerUpload"
+          >
+
+            <input
+              ref={
+                fileInputRef
+              }
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
+              onChange={
+                handleFile
+              }
+            />
+
+
+            <button
+              type="button"
+              className="ccPlannerUploadBox"
+              onClick={
+                () =>
+                  fileInputRef
+                    .current
+                    ?.click()
+              }
+            >
+
+              <span
+                className="ccPlannerUploadIcon"
+              >
+                ↑
               </span>
 
-              <h3>
-                Check extracted syllabus
-              </h3>
+              <strong>
+                {syllabusFile
+                  ? syllabusFile.name
+                  : "Choose syllabus file"}
+              </strong>
 
-              <p>
-                AI extraction is never saved automatically. Edit or remove anything that does not match the official syllabus.
-              </p>
+              <small>
+                PDF · JPG · JPEG · PNG · WEBP · Maximum 20 MB
+              </small>
+
+            </button>
+
+          </div>
+
+        ) : (
+
+          <div
+            className="ccPlannerDrive"
+          >
+
+            <input
+              value={
+                driveUrl
+              }
+              onChange={
+                event => {
+
+                  setDriveUrl(
+                    event.target
+                      .value
+                  );
+
+                  setDraft(
+                    null
+                  );
+
+                  setSchedule(
+                    []
+                  );
+                }
+              }
+              placeholder="Paste Google Drive / Docs / Slides / Sheets link"
+            />
+
+          </div>
+        )}
+
+
+        <div
+          className="ccPlannerActionRow"
+        >
+
+          <button
+            type="button"
+            className="ccPlannerPrimary"
+            disabled={
+              scanning
+            }
+            onClick={
+              () =>
+                void extractSyllabus()
+            }
+          >
+            {scanning
+              ? "Extracting syllabus…"
+              : "Extract syllabus"}
+          </button>
+
+        </div>
+
+
+        {draft ? (
+
+          <div
+            className="ccPlannerSuccessStrip"
+          >
+
+            <div>
+              <strong>
+                {draft.units.length}
+              </strong>
+              <span>
+                Units
+              </span>
+            </div>
+
+            <div>
+              <strong>
+                {topics.length}
+              </strong>
+              <span>
+                Lessons
+              </span>
+            </div>
+
+            <p>
+              {draft.documentTitle ||
+                draft.detectedSubject ||
+                "Syllabus extracted successfully"}
+            </p>
+
+          </div>
+
+        ) : null}
+
+      </section>
+
+
+      <section
+        className="ccPlannerCard"
+      >
+
+        <div
+          className="ccPlannerSectionTitle ccPlannerTitleWithAction"
+        >
+
+          <div>
+
+            <span>
+              STEP 02
+            </span>
+
+            <h3>
+              Published timetable
+            </h3>
+
+            <p>
+              CampusConnect automatically reads this faculty member&apos;s real published periods.
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            className="ccPlannerSecondary"
+            disabled={
+              timetableLoading
+            }
+            onClick={
+              () =>
+                void loadTimetable()
+            }
+          >
+            {timetableLoading
+              ? "Checking…"
+              : "Refresh"}
+          </button>
+
+        </div>
+
+
+        <div
+          className="ccPlannerStats"
+        >
+
+          <article>
+
+            <span>
+              PERIODS / WEEK
+            </span>
+
+            <strong>
+              {timetableLoading
+                ? "—"
+                : effectiveWeeklyPeriods}
+            </strong>
+
+            <small>
+              {timetable.length
+                ? uniqueTeachingDays.join(
+                    " · "
+                  )
+                : allocationWeeklyPeriods > 0
+                  ? (
+                      fallbackDays.length
+                        ? fallbackDays.join(
+                            " · "
+                          )
+                        : "Select teaching day(s) below"
+                    )
+                  : "Waiting for timetable"}
+            </small>
+
+          </article>
+
+
+          <article>
+
+            <span>
+              SYLLABUS ITEMS
+            </span>
+
+            <strong>
+              {topics.length ||
+                "—"}
+            </strong>
+
+            <small>
+              {draft
+                ? (
+                    syllabusSemesterHours >
+                    0
+                      ? `${draft.units.length} unit(s) · ${syllabusSemesterHours} Hours/Sem`
+                      : `${draft.units.length} unit(s)`
+                  )
+                : "Extract syllabus first"}
+            </small>
+
+          </article>
+
+
+          <article>
+
+            <span>
+              EXTRA CLASSES
+            </span>
+
+            <strong>
+              {extraClasses}
+            </strong>
+
+            <small>
+              Optional catch-up classes
+            </small>
+
+          </article>
+
+        </div>
+
+
+        <div
+          className={
+            timetable.length
+              ? "ccPlannerTimetableStatus success"
+              : "ccPlannerTimetableStatus"
+          }
+        >
+
+          <strong>
+            {timetable.length
+              ? `${timetable.length} published period${timetable.length === 1 ? "" : "s"} found`
+              : timetableLoading
+                ? "Reading timetable…"
+                : allocationWeeklyPeriods > 0
+                  ? `${allocationWeeklyPeriods} weekly period${allocationWeeklyPeriods === 1 ? "" : "s"} found`
+                  : "Timetable needs attention"}
+          </strong>
+
+          <span>
+            {timetableDiagnostic}
+          </span>
+
+        </div>
+
+
+        {!timetableLoading &&
+        !timetable.length &&
+        allocationWeeklyPeriods >
+          0 ? (
+
+          <div
+            className="ccPlannerFallback"
+          >
+
+            <div
+              className="ccPlannerFallbackCopy"
+            >
+
+              <strong>
+                Select your actual teaching day(s)
+              </strong>
+
+              <span>
+                Your weekly allocation is available, but the old timetable record is not linked to this subject. Select only the day(s) on which you really teach this subject.
+              </span>
 
             </div>
 
 
-            <div className="facultySmartSyllabusReviewStats">
+            <div
+              className="ccPlannerDayPicker"
+            >
 
-              <article>
-                <strong>
-                  {
-                    draft.units
-                      .length
-                  }
-                </strong>
+              {[
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+              ].map(
+                day => {
 
-                <span>
-                  Units
-                </span>
-              </article>
-
-
-              <article>
-                <strong>
-                  {
-                    topicCount
-                  }
-                </strong>
-
-                <span>
-                  Topics
-                </span>
-              </article>
+                  const selected =
+                    fallbackDays.includes(
+                      day
+                    );
 
 
-              <article>
-                <strong>
-                  {
-                    totalClasses
-                  }
-                </strong>
+                  return (
 
-                <span>
-                  Classes
-                </span>
-              </article>
+                    <button
+                      key={
+                        day
+                      }
+                      type="button"
+                      className={
+                        selected
+                          ? "selected"
+                          : ""
+                      }
+                      onClick={
+                        () => {
+
+                          setFallbackDays(
+                            current =>
+                              current.includes(
+                                day
+                              )
+                                ? current.filter(
+                                    item =>
+                                      item !==
+                                      day
+                                  )
+                                : [
+                                    ...current,
+                                    day,
+                                  ]
+                          );
+
+                          setSchedule(
+                            []
+                          );
+                        }
+                      }
+                    >
+                      {day.slice(
+                        0,
+                        3
+                      )}
+                    </button>
+                  );
+                }
+              )}
 
             </div>
 
           </div>
 
-
-          {draft.detectedSubject && (
-            <div className="facultySmartSyllabusDetected">
-
-              <span>
-                Detected from document
-              </span>
-
-              <strong>
-                {
-                  draft.detectedSubject
-                }
-              </strong>
-
-              <small>
-                Selected CampusConnect subject: {subject.subject_code} · {subject.subject_name}
-              </small>
-
-            </div>
-          )}
+        ) : null}
 
 
-          {!!draft.warnings.length && (
-            <div className="facultySmartSyllabusWarnings">
+        {timetable.length ? (
 
-              <strong>
-                Review notes
-              </strong>
+          <div
+            className="ccPlannerMiniTimetable"
+          >
 
-              {draft.warnings.map(
-                (
-                  warning,
-                  index
-                ) => (
-                  <p
-                    key={`${warning}-${index}`}
-                  >
-                    {warning}
-                  </p>
-                )
-              )}
+            {timetable.map(
+              item => (
 
-            </div>
-          )}
-
-
-          {topicCount >
-            totalClasses &&
-          totalClasses >
-            0 && (
-            <div className="facultySmartSyllabusWarningStrong">
-
-              There are {topicCount} extracted topics but only {totalClasses} available teaching classes. Some topics will need to be combined, additional teaching weeks added, or the timetable capacity increased.
-
-            </div>
-          )}
-
-
-          {classesPerTopic !==
-            null && (
-            <div className="facultySmartSyllabusPlanningPreview">
-
-              <div>
-
-                <span>
-                  CURRENT CAPACITY
-                </span>
-
-                <strong>
-                  {totalClasses} classes for {topicCount} topics
-                </strong>
-
-              </div>
-
-
-              <div>
-
-                <span>
-                  AVERAGE
-                </span>
-
-                <strong>
-                  ~{classesPerTopic} classes/topic
-                </strong>
-
-              </div>
-
-
-              <small>
-                The final planner will distribute whole classes topic-by-topic after your review. Nothing is assigned yet.
-              </small>
-
-            </div>
-          )}
-
-
-          <div className="facultySmartSyllabusUnits">
-
-            {draft.units.map(
-              (
-                unit,
-                unitIndex
-              ) => (
-                <article
-                  key={`unit-${unitIndex}`}
-                  className="facultySmartSyllabusUnit"
+                <div
+                  key={
+                    item.id
+                  }
                 >
 
-                  <header>
+                  <strong>
+                    {item.dayOfWeek}
+                  </strong>
 
-                    <div className="facultySmartSyllabusUnitNumber">
-                      {
-                        unit.unitNumber
-                      }
-                    </div>
+                  <span>
+                    Period{" "}
+                    {item.periodOrder}
+                  </span>
 
-
-                    <div className="facultySmartSyllabusUnitFields">
-
-                      <label>
-
-                        <span>
-                          Unit title
-                        </span>
-
-                        <input
-                          type="text"
-                          value={
-                            unit.title
-                          }
-                          maxLength={
-                            240
-                          }
-                          onChange={
-                            event =>
-                              updateUnit(
-                                unitIndex,
-                                "title",
-                                event.target
-                                  .value
-                              )
-                          }
-                        />
-
-                      </label>
-
-
-                      <label>
-
-                        <span>
-                          Description
-                        </span>
-
-                        <textarea
-                          value={
-                            unit.description
-                          }
-                          maxLength={
-                            2000
-                          }
-                          rows={2}
-                          onChange={
-                            event =>
-                              updateUnit(
-                                unitIndex,
-                                "description",
-                                event.target
-                                  .value
-                              )
-                          }
-                        />
-
-                      </label>
-
-                    </div>
-
-
-                    <button
-                      type="button"
-                      className="facultySmartSyllabusRemove"
-                      onClick={() =>
-                        removeUnit(
-                          unitIndex
+                  <small>
+                    {item.startTime
+                      ? item.startTime.slice(
+                          0,
+                          5
                         )
-                      }
-                      aria-label={`Remove Unit ${unit.unitNumber}`}
-                    >
-                      Remove
-                    </button>
+                      : ""}
 
-                  </header>
+                    {item.endTime
+                      ? ` – ${item.endTime.slice(
+                          0,
+                          5
+                        )}`
+                      : ""}
+                  </small>
 
-
-                  <div className="facultySmartSyllabusTopics">
-
-                    {unit.topics.map(
-                      (
-                        topic,
-                        topicIndex
-                      ) => (
-                        <div
-                          key={`unit-${unitIndex}-topic-${topicIndex}`}
-                          className="facultySmartSyllabusTopic"
-                        >
-
-                          <span className="facultySmartSyllabusTopicNumber">
-                            {
-                              topicIndex +
-                              1
-                            }
-                          </span>
-
-
-                          <div>
-
-                            <input
-                              type="text"
-                              value={
-                                topic.title
-                              }
-                              maxLength={
-                                240
-                              }
-                              aria-label={`Unit ${unit.unitNumber} topic ${topicIndex + 1} title`}
-                              onChange={
-                                event =>
-                                  updateTopic(
-                                    unitIndex,
-                                    topicIndex,
-                                    "title",
-                                    event.target
-                                      .value
-                                  )
-                              }
-                            />
-
-
-                            <textarea
-                              value={
-                                topic.description
-                              }
-                              maxLength={
-                                1500
-                              }
-                              rows={2}
-                              aria-label={`Unit ${unit.unitNumber} topic ${topicIndex + 1} description`}
-                              placeholder="Optional topic details"
-                              onChange={
-                                event =>
-                                  updateTopic(
-                                    unitIndex,
-                                    topicIndex,
-                                    "description",
-                                    event.target
-                                      .value
-                                  )
-                              }
-                            />
-
-                          </div>
-
-
-                          <button
-                            type="button"
-                            className="facultySmartSyllabusTopicRemove"
-                            onClick={() =>
-                              removeTopic(
-                                unitIndex,
-                                topicIndex
-                              )
-                            }
-                            aria-label={`Remove topic ${topicIndex + 1}`}
-                          >
-                            ×
-                          </button>
-
-                        </div>
-                      )
-                    )}
-
-                  </div>
-
-                </article>
+                </div>
               )
             )}
 
           </div>
 
+        ) : null}
 
-          {!!planRows.length && (
-            <section className="facultySmartSyllabusGeneratedPlan">
 
-              <header>
+        <div
+          className="ccPlannerDateControls"
+        >
+
+          <label>
+
+            <span>
+              Semester starts
+            </span>
+
+            <input
+              type="date"
+              value={
+                semesterStart
+              }
+              onChange={
+                event => {
+
+                  setSemesterStart(
+                    event.target
+                      .value
+                  );
+
+                  setSchedule(
+                    []
+                  );
+                }
+              }
+            />
+
+          </label>
+
+
+          <label>
+
+            <span>
+              Semester ends
+            </span>
+
+            <input
+              type="date"
+              min={
+                semesterStart
+              }
+              value={
+                semesterEnd
+              }
+              onChange={
+                event => {
+
+                  setSemesterEnd(
+                    event.target
+                      .value
+                  );
+
+                  setSchedule(
+                    []
+                  );
+                }
+              }
+            />
+
+          </label>
+
+
+          <label>
+
+            <span>
+              Extra classes
+            </span>
+
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={
+                extraClasses
+              }
+              onChange={
+                event => {
+
+                  setExtraClasses(
+                    Math.max(
+                      0,
+                      Math.min(
+                        100,
+                        Number(
+                          event.target
+                            .value
+                        ) ||
+                        0
+                      )
+                    )
+                  );
+
+                  setSchedule(
+                    []
+                  );
+                }
+              }
+            />
+
+          </label>
+
+
+          <button
+            type="button"
+            className="ccPlannerPrimary"
+            disabled={
+              !draft ||
+              (
+                !timetable.length &&
+                !fallbackReady
+              )
+            }
+            onClick={
+              generatePlan
+            }
+          >
+            Generate planner
+          </button>
+
+        </div>
+
+      </section>
+
+
+      {schedule.length ? (
+
+        <section
+          className="ccPlannerCard"
+        >
+
+          <div
+            className="ccPlannerSectionTitle ccPlannerTitleWithAction"
+          >
+
+            <div>
+
+              <span>
+                STEP 03
+              </span>
+
+              <h3>
+                Teaching plan
+              </h3>
+
+              <p>
+                {schedule.length} classes automatically distributed across the real timetable.
+              </p>
+
+            </div>
+
+
+            <div
+              className="ccPlannerDownloadButtons"
+            >
+
+              <button
+                type="button"
+                onClick={
+                  () =>
+                    void downloadPdf()
+                }
+              >
+                PDF
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  downloadJpeg
+                }
+              >
+                JPEG
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  downloadExcel
+                }
+              >
+                Excel
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  downloadCsv
+                }
+              >
+                CSV
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <details
+            className="ccPlannerTeachingDetails"
+            open
+          >
+
+            <summary
+              className="ccPlannerTeachingToggle"
+            >
+
+              <div>
+
+                <span
+                  className="ccPlannerTeachingToggleIcon"
+                >
+                  ▾
+                </span>
 
                 <div>
 
-                  <span>
-                    4 · TEACHING PLAN
-                  </span>
+                  <strong>
+                    Teaching plan
+                  </strong>
 
-                  <h3>
-                    Class allocation
-                  </h3>
-
-                  <p>
-                    CampusConnect used an equal deterministic baseline. Adjust any topic that needs more or fewer classes.
-                  </p>
+                  <small>
+                    View or hide the complete date-wise plan
+                  </small>
 
                 </div>
-
-
-                <div className="facultySmartSyllabusPlanMetrics">
-
-                  <article>
-
-                    <span>
-                      AVAILABLE
-                    </span>
-
-                    <strong>
-                      {
-                        totalClasses
-                      }
-                    </strong>
-
-                  </article>
-
-
-                  <article>
-
-                    <span>
-                      ALLOCATED
-                    </span>
-
-                    <strong>
-                      {
-                        planTotal
-                      }
-                    </strong>
-
-                  </article>
-
-
-                  <article
-                    className={
-                      planBalance ===
-                        0
-                        ? "balanced"
-                        : "unbalanced"
-                    }
-                  >
-
-                    <span>
-                      BALANCE
-                    </span>
-
-                    <strong>
-                      {
-                        planBalance >
-                          0
-                          ? `+${planBalance}`
-                          : planBalance
-                      }
-                    </strong>
-
-                  </article>
-
-                </div>
-
-              </header>
-
-
-              {planBalance !==
-                0 && (
-                <div className="facultySmartSyllabusPlanAlert">
-
-                  {planBalance > 0
-                    ? `${planBalance} available class${planBalance === 1 ? "" : "es"} still need to be assigned.`
-                    : `${Math.abs(planBalance)} too many class${Math.abs(planBalance) === 1 ? "" : "es"} are currently allocated.`}
-
-                </div>
-              )}
-
-
-              {uncoveredPlanTopics >
-                0 && (
-                <div className="facultySmartSyllabusPlanAlert warning">
-
-                  {uncoveredPlanTopics} topic{uncoveredPlanTopics === 1 ? "" : "s"} currently have 0 dedicated classes. Increase capacity, combine topics intentionally, or rebalance before saving.
-
-                </div>
-              )}
-
-
-              <div className="facultySmartSyllabusPlanUnits">
-
-                {draft.units.map(
-                  (
-                    unit,
-                    unitIndex
-                  ) => {
-
-                    const unitRows =
-                      planRows.filter(
-                        row =>
-                          row.unitIndex ===
-                          unitIndex
-                      );
-
-
-                    if (
-                      !unitRows.length
-                    ) {
-                      return null;
-                    }
-
-
-                    const unitClasses =
-                      unitRows.reduce(
-                        (
-                          total,
-                          row
-                        ) =>
-                          total +
-                          row.plannedClasses,
-                        0
-                      );
-
-
-                    return (
-                      <article
-                        key={`plan-unit-${unitIndex}`}
-                        className="facultySmartSyllabusPlanUnit"
-                      >
-
-                        <header>
-
-                          <div>
-
-                            <span>
-                              UNIT {unit.unitNumber}
-                            </span>
-
-                            <strong>
-                              {unit.title}
-                            </strong>
-
-                          </div>
-
-
-                          <b>
-                            {unitClasses} class{unitClasses === 1 ? "" : "es"}
-                          </b>
-
-                        </header>
-
-
-                        <div>
-
-                          {unitRows.map(
-                            row => (
-                              <label
-                                key={`plan-${row.unitIndex}-${row.topicIndex}`}
-                                className="facultySmartSyllabusPlanRow"
-                              >
-
-                                <span className="facultySmartSyllabusPlanTopic">
-
-                                  <small>
-                                    Topic {row.topicOrder}
-                                  </small>
-
-                                  <strong>
-                                    {row.topicTitle}
-                                  </strong>
-
-                                </span>
-
-
-                                <span className="facultySmartSyllabusPlanInput">
-
-                                  <input
-                                    type="number"
-                                    min="0"
-                                    max="1000"
-                                    step="1"
-                                    value={
-                                      row.plannedClasses
-                                    }
-                                    aria-label={`${row.topicTitle} planned classes`}
-                                    onChange={
-                                      event =>
-                                        updatePlannedClasses(
-                                          row.unitIndex,
-                                          row.topicIndex,
-                                          Number(
-                                            event.target
-                                              .value
-                                          )
-                                        )
-                                    }
-                                  />
-
-                                  <small>
-                                    classes
-                                  </small>
-
-                                </span>
-
-                              </label>
-                            )
-                          )}
-
-                        </div>
-
-                      </article>
-                    );
-                  }
-                )}
 
               </div>
 
 
-              <footer>
-
-                {planBalance ===
-                  0 &&
-                uncoveredPlanTopics ===
-                  0 ? (
-                  <strong className="ready">
-                    ✓ Every available class is allocated and every topic has teaching time.
-                  </strong>
-                ) : (
-                  <strong className="needsReview">
-                    Review the allocation before this plan can be saved.
-                  </strong>
-                )}
+              <div
+                className="ccPlannerTeachingToggleMeta"
+              >
 
                 <span>
-                  This is still a preview. No syllabus or class allocation has been written to Supabase.
+                  {schedule.length} classes
                 </span>
 
-              </footer>
+                <b>
+                  Toggle
+                </b>
 
-            </section>
-          )}
+              </div>
+
+            </summary>
 
 
-          <footer className="facultySmartSyllabusReviewFooter">
+            <div
+              className="ccPlannerTeachingBody"
+            >
+
+          <div
+            className="ccPlannerTableWrap"
+          >
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    #
+                  </th>
+
+                  <th>
+                    Date
+                  </th>
+
+                  <th>
+                    Day
+                  </th>
+
+                  <th>
+                    Period
+                  </th>
+
+                  <th>
+                    Unit
+                  </th>
+
+                  <th>
+                    Lesson
+                  </th>
+
+                  <th>
+                    Type
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                {schedule.map(
+                  row => (
+
+                    <tr
+                      key={
+                        row.id
+                      }
+                      className={
+                        row.extraClass
+                          ? "extra"
+                          : ""
+                      }
+                    >
+
+                      <td>
+                        {row.lessonNumber}
+                      </td>
+
+
+                      <td>
+
+                        {row.extraClass ? (
+
+                          <input
+                            type="date"
+                            value={
+                              row.classDate
+                            }
+                            onChange={
+                              event =>
+                                changeExtraDate(
+                                  row.id,
+                                  event.target
+                                    .value
+                                )
+                            }
+                          />
+
+                        ) : (
+                          formatDate(
+                            row.classDate
+                          )
+                        )}
+
+                      </td>
+
+
+                      <td>
+                        {row.dayOfWeek}
+                      </td>
+
+
+                      <td>
+
+                        {row.extraClass
+                          ? "—"
+                          : row.periodOrder}
+
+                        {!row.extraClass &&
+                        row.startTime ? (
+
+                          <small>
+                            {row.startTime.slice(
+                              0,
+                              5
+                            )}
+
+                            {row.endTime
+                              ? ` – ${row.endTime.slice(
+                                  0,
+                                  5
+                                )}`
+                              : ""}
+                          </small>
+
+                        ) : null}
+
+                      </td>
+
+
+                      <td>
+
+                        <small>
+                          UNIT{" "}
+                          {row.unitNumber}
+                        </small>
+
+                        <strong>
+                          {row.unitTitle}
+                        </strong>
+
+                      </td>
+
+
+                      <td>
+                        {row.topicTitle}
+                      </td>
+
+
+                      <td>
+
+                        <span
+                          className={
+                            row.extraClass
+                              ? "ccPlannerBadge extra"
+                              : "ccPlannerBadge"
+                          }
+                        >
+                          {row.extraClass
+                            ? "Extra"
+                            : "Timetable"}
+                        </span>
+
+                      </td>
+
+                    </tr>
+                  )
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          <div
+            className="ccPlannerSave"
+          >
 
             <div>
 
               <strong>
-                Faculty-controlled planning
+                Ready to save
               </strong>
 
               <span>
-                Generate a baseline, then adjust class counts before anything is saved.
+                Save the syllabus structure and complete date-wise teaching plan to CampusConnect.
               </span>
 
             </div>
 
 
-            <div className="facultySmartSyllabusReviewActions">
+            <button
+              type="button"
+              className="ccPlannerPrimary"
+              disabled={
+                saving
+              }
+              onClick={
+                () =>
+                  void savePlan()
+              }
+            >
+              {saving
+                ? "Saving…"
+                : "Save planner"}
+            </button>
 
-              <button
-                type="button"
-                disabled={
-                  saving ||
-                  !draft ||
-                  topicCount <=
-                    0 ||
-                  totalClasses <=
-                    0
-                }
-                title={
-                  totalClasses <=
-                    0
-                    ? "Set teaching capacity before generating the plan."
-                    : "Generate an editable class allocation."
-                }
-                onClick={
-                  generateTeachingPlan
-                }
-              >
-                {planRows.length
-                  ? "Regenerate Teaching Plan"
-                  : "Generate Teaching Plan"}
-              </button>
-
-
-              <button
-                type="button"
-                className="facultySmartSyllabusSavePlan"
-                disabled={
-                  saving ||
-                  !planRows.length ||
-                  planBalance !==
-                    0 ||
-                  uncoveredPlanTopics >
-                    0
-                }
-                title={
-                  !planRows.length
-                    ? "Generate the teaching plan first."
-                    : planBalance !==
-                        0
-                      ? "Every available class must be allocated before saving."
-                      : uncoveredPlanTopics >
-                          0
-                        ? "Every topic needs at least one planned class."
-                        : "Save the reviewed syllabus and teaching plan."
-                }
-                onClick={() =>
-                  void saveApprovedPlan()
-                }
-              >
-                {saving
-                  ? "Saving Approved Plan…"
-                  : "Save Approved Plan"}
-              </button>
+          </div>
 
             </div>
 
-          </footer>
+          </details>
 
         </section>
-      )}
+
+      ) : null}
 
 
-      <footer className="facultySmartSyllabusContext">
+      {message ? (
 
-        <span>
-          {
-            subject.subject_code
-          }
-        </span>
+        <div
+          className="ccPlannerMessage"
+          role="status"
+        >
+          {message}
+        </div>
 
-        <strong>
-          {
-            subject.subject_name
-          }
-        </strong>
-
-        <small>
-          {batch
-            ? `${batch.batch_name} · Section ${batch.section} · ${batch.department}`
-            : "Assigned faculty subject"}
-        </small>
-
-      </footer>
+      ) : null}
 
     </section>
   );

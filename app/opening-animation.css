@@ -1,0 +1,521 @@
+/* CAMPUSCONNECT PROFESSIONAL OPENING */
+
+.ccOpening {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #17243a;
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(49, 89, 217, 0.11),
+      transparent 36%
+    ),
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f5f7fb 52%,
+      #edf2ff 100%
+    );
+  isolation: isolate;
+  animation: ccOpeningExit 5.2s ease both;
+}
+
+.ccOpeningGrid {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  opacity: 0.42;
+  background-image:
+    linear-gradient(
+      rgba(49, 89, 217, 0.045) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(49, 89, 217, 0.045) 1px,
+      transparent 1px
+    );
+  background-size: 48px 48px;
+  mask-image:
+    radial-gradient(
+      circle at center,
+      #000 5%,
+      transparent 68%
+    );
+  -webkit-mask-image:
+    radial-gradient(
+      circle at center,
+      #000 5%,
+      transparent 68%
+    );
+  animation: ccOpeningGridMove 5s ease-out both;
+}
+
+.ccOpeningGlow {
+  position: absolute;
+  z-index: -2;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+}
+
+.ccOpeningGlowOne {
+  top: -190px;
+  right: -120px;
+  background: rgba(49, 89, 217, 0.16);
+  animation: ccOpeningGlowOne 5s ease-in-out both;
+}
+
+.ccOpeningGlowTwo {
+  bottom: -230px;
+  left: -140px;
+  background: rgba(115, 85, 199, 0.12);
+  animation: ccOpeningGlowTwo 5s ease-in-out both;
+}
+
+.ccOpeningStage {
+  width: min(650px, calc(100% - 40px));
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.ccOpeningLogoScene {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  display: grid;
+  place-items: center;
+}
+
+.ccOpeningLogoCard {
+  position: relative;
+  z-index: 3;
+  width: 126px;
+  height: 126px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(49, 89, 217, 0.14);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 25px 70px rgba(24, 34, 56, 0.15),
+    0 8px 24px rgba(49, 89, 217, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: scale(0.45) rotate(-8deg);
+  opacity: 0;
+  animation:
+    ccOpeningLogoIn 0.9s
+    cubic-bezier(0.16, 1, 0.3, 1)
+    0.2s forwards;
+}
+
+.ccOpeningLogo {
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+}
+
+.ccOpeningOrbit {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(49, 89, 217, 0.18);
+  border-radius: 50%;
+  opacity: 0;
+  animation:
+    ccOpeningOrbitIn 0.7s ease 0.65s forwards,
+    ccOpeningOrbitSpin 9s linear 0.65s infinite;
+}
+
+.ccOpeningOrbit::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 17px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #3159d9;
+  box-shadow:
+    0 0 0 6px rgba(49, 89, 217, 0.09),
+    0 0 22px rgba(49, 89, 217, 0.45);
+}
+
+.ccOpeningOrbitTwo {
+  inset: 22px;
+  border-style: dashed;
+  animation:
+    ccOpeningOrbitIn 0.7s ease 0.8s forwards,
+    ccOpeningOrbitSpinReverse 7s linear 0.8s infinite;
+}
+
+.ccOpeningOrbitTwo::before {
+  top: auto;
+  bottom: 4px;
+  left: auto;
+  right: 27px;
+  width: 6px;
+  height: 6px;
+  background: #7355c7;
+}
+
+.ccOpeningCopy {
+  margin-top: 17px;
+}
+
+.ccOpeningEyebrow {
+  display: block;
+  color: #3159d9;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: ccOpeningTextIn 0.65s ease 0.75s forwards;
+}
+
+.ccOpeningCopy h1 {
+  margin: 11px 0 8px;
+  color: #17243a;
+  font-size: clamp(37px, 6vw, 59px);
+  line-height: 1;
+  letter-spacing: -0.055em;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: ccOpeningTextIn 0.75s ease 0.9s forwards;
+}
+
+.ccOpeningCopy h1 span {
+  font-weight: 750;
+}
+
+.ccOpeningCopy h1 strong {
+  color: #3159d9;
+  font-weight: 900;
+}
+
+.ccOpeningCopy p {
+  margin: 0;
+  color: #68758a;
+  font-size: clamp(11px, 1.5vw, 14px);
+  line-height: 1.7;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: ccOpeningTextIn 0.7s ease 1.1s forwards;
+}
+
+.ccOpeningProgress {
+  width: min(250px, 60vw);
+  height: 3px;
+  margin-top: 32px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(49, 89, 217, 0.1);
+  opacity: 0;
+  animation: ccOpeningProgressIn 0.4s ease 1.25s forwards;
+}
+
+.ccOpeningProgress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #3159d9,
+      #5578e5,
+      #7355c7
+    );
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: ccOpeningProgressFill 3.35s ease 1.3s forwards;
+}
+
+.ccOpeningSkip {
+  position: absolute;
+  right: 24px;
+  bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 15px;
+  border: 1px solid #dce3f1;
+  border-radius: 999px;
+  color: #536075;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 10px 30px rgba(24, 34, 56, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+  opacity: 0;
+  animation: ccOpeningSkipIn 0.5s ease 1.4s forwards;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.ccOpeningSkip:hover {
+  color: #3159d9;
+  border-color: rgba(49, 89, 217, 0.35);
+  transform: translateY(-2px);
+}
+
+.ccOpeningSkip:focus-visible {
+  outline: 3px solid rgba(49, 89, 217, 0.28);
+  outline-offset: 3px;
+}
+
+@keyframes ccOpeningLogoIn {
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes ccOpeningOrbitIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ccOpeningOrbitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ccOpeningOrbitSpinReverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes ccOpeningTextIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ccOpeningProgressIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ccOpeningProgressFill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes ccOpeningSkipIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ccOpeningGridMove {
+  from {
+    transform: scale(1.08);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes ccOpeningGlowOne {
+  50% {
+    transform: translate(-70px, 70px);
+  }
+}
+
+@keyframes ccOpeningGlowTwo {
+  50% {
+    transform: translate(80px, -40px);
+  }
+}
+
+@keyframes ccOpeningExit {
+  0%,
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 640px) {
+  .ccOpeningLogoScene {
+    width: 160px;
+    height: 160px;
+  }
+
+  .ccOpeningLogoCard {
+    width: 108px;
+    height: 108px;
+    border-radius: 25px;
+  }
+
+  .ccOpeningLogo {
+    width: 88px;
+    height: 88px;
+  }
+
+  .ccOpeningCopy {
+    margin-top: 13px;
+  }
+
+  .ccOpeningSkip {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ccOpening *,
+  .ccOpening {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+}
+
+@keyframes ccOpeningLogoIn {
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes ccOpeningOrbitIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ccOpeningOrbitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ccOpeningOrbitSpinReverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes ccOpeningTextIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ccOpeningProgressIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ccOpeningProgressFill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes ccOpeningSkipIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ccOpeningGridMove {
+  from {
+    transform: scale(1.08);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes ccOpeningGlowOne {
+  50% {
+    transform: translate(-70px, 70px);
+  }
+}
+
+@keyframes ccOpeningGlowTwo {
+  50% {
+    transform: translate(80px, -40px);
+  }
+}
+
+@keyframes ccOpeningExit {
+  0%,
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.ccOpening {
+  background:
+    radial-gradient(
+      circle at 78% 12%,
+      rgba(214, 190, 145, 0.22),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 12% 88%,
+      rgba(196, 166, 117, 0.14),
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      #fbf8f2 0%,
+      #f6efe4 52%,
+      #f2e8d8 100%
+    ) !important;
+}
+
+.ccOpeningStage {
+  background: transparent !important;
+}
+
+.ccOpeningGrid {
+  opacity: 0.22 !important;
+}
+
+.ccOpeningGlowOne {
+  background:
+    rgba(201, 169, 112, 0.16) !important;
+}
+
+.ccOpeningGlowTwo {
+  background:
+    rgba(226, 206, 169, 0.2) !important;
+}

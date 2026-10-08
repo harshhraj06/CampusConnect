@@ -1,15 +1,40 @@
 "use client";
 
-import UserManual from "./user-manual";
 
-import FacultyWorkspace from "./faculty-workspace";
-import FacultyTodayClasses from "./faculty-today-classes";
-import FacultyTeachingSchedule from "./faculty-teaching-schedule";
-import TimetableCoordinatorStudio from "./timetable-coordinator-studio";
-import TimetableDigitalBuilder from "./timetable-digital-builder";
-import TimetableCoordinatorAdmin from "./timetable-coordinator-admin";
-import FacultyDiary from "./faculty-diary";
-import FacultySyllabusProgress from "./faculty-syllabus-progress";
+let dashboardStylesPromise:
+  Promise<unknown[]> | null =
+    null;
+
+function ensureDashboardStyles() {
+  if (!dashboardStylesPromise) {
+    dashboardStylesPromise =
+      Promise.all([
+        import("./globals.css"),
+        import("./dashboard-parchment.css"),
+        import("./student-dashboard-polish.css"),
+      ]);
+  }
+
+  return dashboardStylesPromise;
+}
+
+
+
+import {BellAlertIcon} from "@/components/ui/bell-alert-icon";
+import {CampusConnectFooter} from "@/components/ui/footer-2";
+import { DashboardHeroGreetingHandwriting } from "../components/ui/dashboard-hero-greeting-handwriting";
+import { AppleHelloEnglishEffect } from "../components/ui/apple-hello-effect";
+
+
+
+import CampusConnectLanding from "./campusconnect-landing-v2";
+
+
+import {
+  StudentUpcomingClasses,
+} from "./student-upcoming-classes";
+
+
 
 import {
   getOfflineTimetableFiles,
@@ -32,12 +57,23 @@ import {
 import Image from "next/image";
 import type {User} from "@supabase/supabase-js";
 import {lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode} from "react";
+
+const AcademicMarksReferenceDashboard = lazy(() => import("./academic-marks-reference-dashboard"));
+const FacultyWorkspace = lazy(() => import("./faculty-workspace"));
+const FacultyTodayClasses = lazy(() => import("./faculty-today-classes"));
+const FacultyTeachingSchedule = lazy(() => import("./faculty-teaching-schedule"));
+const TimetableCoordinatorStudio = lazy(() => import("./timetable-coordinator-studio"));
+const TimetableDigitalBuilder = lazy(() => import("./timetable-digital-builder"));
+const TimetableCoordinatorAdmin = lazy(() => import("./timetable-coordinator-admin"));
+const FacultyDiary = lazy(() => import("./faculty-diary"));
+const FacultySyllabusProgress = lazy(() => import("./faculty-syllabus-progress"));
+const FacultyWorkloadManager = lazy(() => import("./faculty-workload-manager"));
+const FacultyAvailabilityManager = lazy(() => import("./faculty-availability-manager"));
+const FacultyCoverageManager = lazy(() => import("./faculty-coverage-manager"));
+const FacultyCoverageControlCenter = lazy(() => import("./faculty-coverage-control-center"));
+const TimetableAutomationManager = lazy(() => import("./timetable-automation-manager"));
 import {getSupabaseClient} from "../lib/supabase";
-import FacultyWorkloadManager from "./faculty-workload-manager";
-import FacultyAvailabilityManager from "./faculty-availability-manager";
-import FacultyCoverageManager from "./faculty-coverage-manager";
-import FacultyCoverageControlCenter from "./faculty-coverage-control-center";
-import TimetableAutomationManager from "./timetable-automation-manager";
+import {calculateResumeAtsScore} from "../lib/resume-ats-score";
 import {
   campusModuleSubtitle,
   isCampusModuleView,
@@ -369,8 +405,7 @@ async function savePlacementApplication(
 }
 
 
-type View =
-  | SearchTarget
+type View = | SearchTarget
   | "Faculty Workspace"
   | "My Batches"
   | "Today's Classes"
@@ -381,8 +416,7 @@ type View =
   | "Faculty Availability"
   | "Faculty Coverage"
   | "Timetable Coordinator"
-  | "Timetable Assignment"
-  | "User Manual";
+  | "Timetable Assignment";
 type Role = "Student" | "Faculty" | "Placement Cell" | "Coordinator" | "Volunteer" | "Main Admin";
 type Screen = "welcome" | "auth" | "dashboard";
 type AuthMode = "login" | "register" | "forgot" | "reset";
@@ -409,7 +443,6 @@ const viewSlugs: Record<View, string> = {
   "Faculty Coverage": "faculty-coverage",
   "Timetable Coordinator": "timetable-coordinator",
   "Timetable Assignment": "timetable-assignment",
-  "User Manual": "user-manual",
   "My Campus": "my-campus",
   "Campus Map": "campus-map",
   "Campus AI": "campus-ai",
@@ -622,80 +655,6 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Profile", "◌"],
   ],
 };
-
-
-/*
- * USER MANUAL NAVIGATION
- *
- * The manual is inserted automatically for every CampusConnect role.
- * It is placed immediately before Profile when Profile exists.
- *
- * The manual itself reads directly from navByRole, so every future
- * feature added to a role navigation automatically appears as a guide.
- */
-
-(
-  Object.keys(
-    navByRole
-  ) as Role[]
-).forEach(
-  roleName => {
-
-    const roleItems =
-      navByRole[
-        roleName
-      ];
-
-
-    if (
-      roleItems.some(
-        ([view]) =>
-          view ===
-            "User Manual"
-      )
-    ) {
-      return;
-    }
-
-
-    const profileIndex =
-      roleItems.findIndex(
-        ([view]) =>
-          view ===
-            "Profile"
-      );
-
-
-    const manualItem:
-      [View, string] =
-        [
-          "User Manual",
-          "?",
-        ];
-
-
-    if (
-      profileIndex >=
-        0
-    ) {
-
-      roleItems.splice(
-        profileIndex,
-        0,
-        manualItem
-      );
-
-      return;
-
-    }
-
-
-    roleItems.push(
-      manualItem
-    );
-
-  }
-);
 
 
 const sidebarStatus: Record<Role, {value: string; title: string; note: string}> = {
@@ -973,12 +932,20 @@ export default function Home() {
    * hard-codes dryRun: true.
    */
   const [screen, setScreen] = useState<Screen>("welcome");
-  const [showOpeningAnimation, setShowOpeningAnimation] = useState(true);
+
+  useEffect(() => {
+    if (screen === "auth") {
+      void ensureDashboardStyles();
+    }
+  }, [screen]);
+
+  const [showOpeningAnimation, setShowOpeningAnimation] =
+    useState(true);
 
   useEffect(() => {
     const animationFallback = window.setTimeout(() => {
       setShowOpeningAnimation(false);
-    }, 5200);
+    }, 5000);
 
     return () => {
       window.clearTimeout(animationFallback);
@@ -999,10 +966,15 @@ export default function Home() {
 
   const setV = (next: View | ((current: View) => View)) => {
     const current = viewRef.current;
-    const resolved =
+    const requested =
       typeof next === "function"
         ? next(current)
         : next;
+
+    const resolved: View =
+      requested === "Campus AI"
+        ? "My Campus"
+        : requested;
 
     if (resolved === current) {
       return;
@@ -1069,6 +1041,91 @@ export default function Home() {
   const [applied, setApplied] = useState<string[]>([]);
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
     const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadPersistedResumeScore =
+      async () => {
+        const client =
+          getSupabaseClient();
+
+        if (
+          !client ||
+          role !== "Student"
+        ) {
+          if (active) {
+            setScore(0);
+          }
+
+          return;
+        }
+
+        const {
+          data: auth,
+          error: authError,
+        } =
+          await client.auth
+            .getUser();
+
+        if (
+          authError ||
+          !auth.user ||
+          !active
+        ) {
+          return;
+        }
+
+        const {
+          data,
+          error,
+        } =
+          await client
+            .from(
+              "student_resumes"
+            )
+            .select(
+              "resume_builder_data"
+            )
+            .eq(
+              "user_id",
+              auth.user.id
+            )
+            .maybeSingle();
+
+        if (!active) {
+          return;
+        }
+
+        if (error) {
+          console.error(
+            "[Dashboard] Resume score load failed:",
+            error
+          );
+
+          return;
+        }
+
+        const nextScore =
+          calculateResumeAtsScore(
+            data?.resume_builder_data
+          );
+
+        setScore(
+          nextScore
+        );
+      };
+
+    void loadPersistedResumeScore();
+
+    return () => {
+      active = false;
+    };
+  }, [
+    role,
+    profile.email,
+  ]);
+
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationFilter, setNotificationFilter] = useState<NotificationFilter>("all");
   const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
@@ -1210,6 +1267,32 @@ export default function Home() {
           restoredProfile.role
         ];
 
+      const facultyWorkspaceViews: readonly View[] = [
+        "Faculty Workspace",
+        "My Batches",
+        "Today's Classes",
+        "My Teaching Schedule",
+        "Faculty Diary",
+        "Syllabus Progress",
+        "Faculty Workload",
+        "Faculty Availability",
+        "Faculty Coverage",
+        "Timetable Coordinator",
+        "Timetable Assignment",
+      ];
+
+      const coordinatorWorkspaceViews: readonly View[] = [
+        "Timetable Coordinator",
+        "Timetable Assignment",
+      ];
+
+      const roleSecondaryViews =
+        restoredProfile.role === "Faculty" ||
+        restoredProfile.role === "Main Admin"
+          ? facultyWorkspaceViews
+          : restoredProfile.role === "Coordinator"
+            ? coordinatorWorkspaceViews
+            : [];
 
       const viewIsAllowed =
         (candidate: View | null) =>
@@ -1219,9 +1302,14 @@ export default function Home() {
           candidate === "Alumni" ||
           (
             candidate &&
-            roleViews.some(
-              ([viewName]) =>
-                viewName === candidate
+            (
+              roleViews.some(
+                ([viewName]) =>
+                  viewName === candidate
+              ) ||
+              roleSecondaryViews.includes(
+                candidate
+              )
             )
           );
 
@@ -1239,6 +1327,12 @@ export default function Home() {
         "",
         pathnameForView(initialView)
       );
+
+      await ensureDashboardStyles();
+
+      if (!active) {
+        return;
+      }
 
       setScreen("dashboard");
     }).catch(() => {
@@ -1367,6 +1461,10 @@ export default function Home() {
 
 
   useEffect(() => {
+    if (screen !== "dashboard") {
+      return;
+    }
+
     let active = true;
     const client = getSupabaseClient();
     if (!client) return;
@@ -1868,7 +1966,7 @@ export default function Home() {
     const navigate = (event: Event) => { const target = (event as CustomEvent<string>).detail; if (target) setV(target as View); };
     window.addEventListener("campus-navigate", navigate);
     return () => window.removeEventListener("campus-navigate", navigate);
-  }, []);
+  }, [screen]);
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -1929,7 +2027,7 @@ export default function Home() {
 
             <div className="ccOpeningLogoCard">
               <img
-                src="/campusconnect-logo.png"
+                src="/campusconnect-logo-square.webp"
                 alt="CampusConnect logo"
                 width="116"
                 height="116"
@@ -1998,7 +2096,9 @@ export default function Home() {
       setRole(nextProfile.role);
       setReadNotificationIds(getStoredNotificationReads(nextProfile));
       setV("Dashboard");
-      setScreen("dashboard");
+      void ensureDashboardStyles().then(() => {
+        setScreen("dashboard");
+      });
     }}/>;
   }
 
@@ -2122,7 +2222,7 @@ export default function Home() {
           aria-label="Open CampusConnect dashboard"
         >
           <img
-            src="/campusconnect-logo.png"
+            src="/campusconnect-logo-ui.webp"
             alt="CampusConnect Pro"
             className="campusConnectLogo"
           />
@@ -2208,7 +2308,7 @@ export default function Home() {
               title="Dashboard"
             >
               <img
-                src="/campusconnect-logo.png"
+                src="/campusconnect-logo-ui.webp"
                 alt="CampusConnect Pro"
                 className="workspaceBrandLogo"
               />
@@ -2251,7 +2351,14 @@ export default function Home() {
                 }
               />
               <button className={`notificationBell ${notificationsOpen ? "active" : ""}`} onClick={() => setNotificationsOpen(value => !value)} aria-label={`Notifications, ${unreadCount} unread`} aria-expanded={notificationsOpen}>
-                <span aria-hidden="true">♢</span>{unreadCount > 0 && <b>{unreadCount}</b>}
+                <BellAlertIcon
+                  className="notificationBellAnimatedIcon"
+                  size={21}
+                  aria-hidden="true"
+                />
+                {unreadCount > 0 && (
+                  <b>{unreadCount}</b>
+                )}
               </button>
               {notificationsOpen && <>
                 <button className="notificationScrim" aria-label="Close notifications" onClick={() => setNotificationsOpen(false)}/>
@@ -2345,7 +2452,7 @@ export default function Home() {
             </div>
           )}
 
-          <div className={`heading professionalHeading ${v === "Dashboard" ? "dashboardTopBar" : ""}`}>
+          <div data-admin-greeting={role === "Main Admin" && v === "Dashboard" ? "true" : undefined} className={`heading professionalHeading ${v === "Dashboard" ? "dashboardTopBar" : ""}`}>
             <div className="headingMain">
               <div className="campusPageHeading">
                 {v === "Dashboard" ? (
@@ -2358,6 +2465,7 @@ export default function Home() {
 
                     <LiveDashboardGreeting
                       firstName={firstName}
+                      role={role}
                     />
 
                     <div className="dashboardMetaRow">
@@ -2376,7 +2484,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <>
-                    <h1>{viewLabel(v)}</h1>
+                    <h1>{v === "Admin" ? "Administration" : "Student workspace overview"}</h1>
                     <p>
                       {subtitle(v, role)}
                       <span className="roleContext">
@@ -2695,7 +2803,14 @@ export default function Home() {
             }}
           />)}
           {v === "Network" && <Network profile={profile}/>}
-          {v === "Resume" && <Resume profile={profile} score={score} improve={() => setScore(current => Math.min(100, current + 6))}/>}
+          {v === "Resume" && (
+            <Resume
+              profile={profile}
+              onScoreChange={
+                setScore
+              }
+            />
+          )}
           {v === "Academics" && <Academics role={role} profile={profile}/>}
           {v === "Academic Control" && (
             <AcademicControl
@@ -2739,18 +2854,6 @@ export default function Home() {
               viewerRole={role}
             />
           )}
-          {v === "User Manual" && (
-            <UserManual
-              role={role}
-              navigation={navByRole}
-              onOpen={target =>
-                setV(
-                  target as View
-                )
-              }
-            />
-          )}
-
           {v === "Profile" && <ProfilePage profile={profile} onProfileChange={next => { setProfile(next); setRole(next.role); }} onSignOut={signOut}/>}
           {isCampusModuleView(v) && (
             <CampusModule
@@ -2787,7 +2890,15 @@ export default function Home() {
               }
             />
           )}
-        </div>
+        
+          {v === "Dashboard" && (
+            <CampusConnectFooter
+              role={role}
+              go={setV}
+            />
+          )}
+
+</div>
         </Suspense>
         <footer>{roleNav.slice(0, 5).map(([n, i]) => <button className={v === n ? "active" : ""} onClick={() => {
   setV(n);
@@ -2831,98 +2942,15 @@ type RoleDashboardQuickAction = {
 };
 
 
-function WelcomeDashboard({onEnter}: {onEnter: (role: Role) => void}) {
-  const [selectedRole, setSelectedRole] = useState<Role>("Student");
-
+function WelcomeDashboard({
+  onEnter,
+}: {
+  onEnter: (role: Role) => void;
+}) {
   return (
-    <main className="welcome">
-      <nav className="welcomeNav">
-        <button className="welcomeBrand" onClick={() => onEnter(selectedRole)}><b>C</b><span>CampusConnect</span></button>
-        <div>
-          <a href="#about">About</a>
-          <a href="#why">Why use it</a>
-          <a href="#inside">Inside</a>
-          <button onClick={() => onEnter(selectedRole)}>Enter dashboard</button>
-        </div>
-      </nav>
-
-      <section className="welcomeHero">
-        <div className="heroCopy">
-          <span className="eyebrow">Campus success platform</span>
-          <h1>One professional dashboard for college life, placements and growth.</h1>
-          <p>
-            CampusConnect brings placements, resume building, attendance, events, notices and verified student networking into one clean workspace for students and colleges.
-          </p>
-          <div className="heroActions">
-            <button className="enterBtn" onClick={() => onEnter(selectedRole)}>Enter as {selectedRole}</button>
-            <a href="#why">See why it matters</a>
-          </div>
-          <div className="roleChooser" aria-label="Choose CampusConnect role">
-            {roleCards.map(card => <button className={selectedRole === card.role ? "selected" : ""} onClick={() => setSelectedRole(card.role)} key={card.role}>
-              <i>{card.icon}</i>
-              <span><b>{card.title}</b><small>{card.text}</small></span>
-            </button>)}
-          </div>
-          <div className="proofStrip">
-            {proofPoints.map(([value, label]) => <p key={label}><b>{value}</b><small>{label}</small></p>)}
-          </div>
-        </div>
-
-        <div className="heroMedia" aria-label="CampusConnect students collaboration preview">
-          <Image src="/campusconnect-hero.png" alt="Students collaborating on a college campus with a laptop" fill priority unoptimized sizes="(max-width: 1040px) 100vw, 50vw"/>
-          <div className="floatingMetric metricOne"><b>94%</b><span>profile match</span></div>
-          <div className="floatingMetric metricTwo"><b>ATS 78</b><span>resume score</span></div>
-          <div className="miniPanel">
-            <span>Today</span>
-            <strong>Placement workshop</strong>
-            <small>3:15 PM · Seminar Hall</small>
-          </div>
-        </div>
-      </section>
-
-      <section className="aboutBand" id="about">
-        <div>
-          <span className="eyebrow">About CampusConnect</span>
-          <h2>Built for students who want more than scattered WhatsApp updates.</h2>
-        </div>
-        <p>
-          The idea is simple: every student should know what to do next. CampusConnect gives one verified place for opportunities, resources, campus updates, student achievements and career progress.
-        </p>
-      </section>
-
-      <section className="whyGrid" id="why">
-        <div className="sectionTitle">
-          <span className="eyebrow">Why use CampusConnect</span>
-          <h2>It turns campus information into action.</h2>
-        </div>
-        {reasons.map(([title, text], index) => <article style={{"--delay": `${index * 90}ms`} as CSSProperties} key={title}>
-          <i>{index + 1}</i>
-          <h3>{title}</h3>
-          <p>{text}</p>
-        </article>)}
-      </section>
-
-      <section className="insideShowcase" id="inside">
-        <div className="insideCopy">
-          <span className="eyebrow">What is inside</span>
-          <h2>A complete student operating system.</h2>
-          <p>Open the dashboard to move through placement drives, networking, resume scoring, academics, events and official notices.</p>
-          <button className="enterBtn" onClick={() => onEnter(selectedRole)}>Go inside the website</button>
-        </div>
-        <div className="dashboardPreview">
-          <div className="previewTop"><span/><span/><span/></div>
-          <div className="previewLayout">
-            <aside>{modules.map(([title]) => <b key={title}>{title}</b>)}</aside>
-            <section>
-              <div className="previewHero"/>
-              <div className="previewCards">
-                {modules.slice(0, 4).map(([title, text]) => <article key={title}><b>{title}</b><small>{text}</small></article>)}
-              </div>
-            </section>
-          </div>
-        </div>
-      </section>
-    </main>
+    <CampusConnectLanding
+      onEnter={onEnter}
+    />
   );
 }
 
@@ -2988,11 +3016,16 @@ function AuthScreen({initialRole, initialMode, onBack, onAuthenticated}: {
         return;
       }
       if (mode === "register") {
-        const {data, error: authError} = await supabase.auth.signUp({
+        const redirectTo = "https://campusconnect-pro.in/auth/verified";
+
+        const {
+          data,
+          error: authError,
+        } = await supabase.auth.signUp({
           email,
           password: form.password,
           options: {
-          emailRedirectTo: `${window.location.origin}/auth/verified`,
+            emailRedirectTo: redirectTo,
             data: {
               full_name: form.name.trim(),
               department: form.department,
@@ -3001,11 +3034,75 @@ function AuthScreen({initialRole, initialMode, onBack, onAuthenticated}: {
           },
         });
 
-        if (authError) throw authError;
-        if (data.session) await supabase.auth.signOut();
-        setForm(current => ({...current, password: ""}));
-        setMode("login");
-        setSuccess(data.user && !data.session ? "Registration successful. Check your email if confirmation is required, then sign in." : "Registration successful. Please sign in with your new account.");
+        if (authError) {
+          throw authError;
+        }
+
+        if (data.session) {
+          await supabase.auth.signOut();
+        }
+
+        const identities =
+          data.user?.identities || [];
+
+        /*
+         * Supabase intentionally returns an obfuscated
+         * successful response when the email already exists.
+         *
+         * Explicitly request another signup confirmation email
+         * so existing unconfirmed users are not left stuck.
+         */
+        if (
+          data.user &&
+          identities.length === 0
+        ) {
+          const {
+            error: resendError,
+          } = await supabase.auth.resend({
+            type: "signup",
+            email,
+            options: {
+              emailRedirectTo:
+                redirectTo,
+            },
+          });
+
+          if (resendError) {
+            throw resendError;
+          }
+
+          setForm(current => ({
+            ...current,
+            password: "",
+          }));
+
+          setMode("login");
+
+          setSuccess(
+            "This account already exists. A new verification email has been requested. Check your inbox and spam folder."
+          );
+
+          return;
+        }
+
+        setForm(current => ({
+          ...current,
+          password: "",
+        }));
+
+        if (typeof window !== "undefined") {
+          window.sessionStorage.setItem(
+            "campusconnect_pending_verification_email",
+            email
+          );
+
+          window.location.assign(
+            `/auth/verify-otp?email=${encodeURIComponent(email)}`
+          );
+
+          return;
+        }
+
         return;
       }
 
@@ -3033,7 +3130,7 @@ function AuthScreen({initialRole, initialMode, onBack, onAuthenticated}: {
   return (
     <main className="authPage">
       <section className="authVisual">
-        <Image src="/campusconnect-hero.png" alt="Students working together on campus" fill priority unoptimized sizes="(max-width: 720px) 100vw, 48vw"/>
+        <Image src="/branding/rnsit-login-20260930-191123.webp" alt="Students working together on campus" fill priority unoptimized sizes="(max-width: 720px) 100vw, 48vw"/>
         <button className="authBack" onClick={onBack}>← Back to CampusConnect</button>
         <div className="authVisualCopy">
           <span>Verified campus workspace</span>
@@ -3045,7 +3142,7 @@ function AuthScreen({initialRole, initialMode, onBack, onAuthenticated}: {
 
       <section className="authPanel">
         <div className="authBox">
-          <button className="authBrand" onClick={onBack}><b>C</b><span>CampusConnect</span></button>
+          <button className="authBrand" onClick={onBack} aria-label="CampusConnect home"><img src="/campusconnect-logo-ui.webp" alt="CampusConnect Pro" /></button>
           <div className="authHeading">
             <span>{mode === "login" ? "Welcome back" : "Join your campus"}</span>
             <h2>{mode === "login" ? "Sign in to continue" : "Create your account"}</h2>
@@ -4992,9 +5089,29 @@ function Dashboard({
             <small>{dateLabel}</small>
           </div>
 
-          <h2>
-            <span>{dashboardHeroGreeting},</span>
-            {studentName}.
+          <h2 className="studentHeroAnimatedHeading">
+            <span className="studentHeroGreetingText">
+              <DashboardHeroGreetingHandwriting
+                key={dashboardHeroGreeting}
+                greeting={dashboardHeroGreeting}
+              />
+            </span>
+            <svg
+              className="studentNameHandwriting"
+              viewBox="0 0 900 190"
+              role="img"
+              aria-label={studentName}
+            >
+              <title>{studentName}</title>
+              <text
+                key={studentName}
+                x="12"
+                y="135"
+                fontSize={Math.min(150, 1250 / Math.max(Array.from(studentName).length, 1))}
+              >
+                {studentName}
+              </text>
+            </svg>
           </h2>
 
           <p>
@@ -5093,10 +5210,7 @@ function Dashboard({
 
       <section className="studentDashboardStats">
 
-        <button
-          className="dashboardStatCard"
-          onClick={() => go("Attendance")}
-        >
+        <article className="dashboardStatCard studentAttendanceSummaryCard">
           <div>
             <span className="dashboardStatIcon">A</span>
             <small>ATTENDANCE</small>
@@ -5111,12 +5225,9 @@ function Dashboard({
               ? `${safeSubjects} safe · ${shortageSubjects} shortage`
               : "No attendance recorded yet"}
           </p>
-        </button>
+        </article>
 
-        <button
-          className="dashboardStatCard"
-          onClick={() => go("Assignments")}
-        >
+        <article className="dashboardStatCard studentSummaryCard">
           <div>
             <span className="dashboardStatIcon">T</span>
             <small>UPCOMING TASKS</small>
@@ -5131,12 +5242,9 @@ function Dashboard({
               ? "Assignments with upcoming deadlines"
               : "No upcoming assignments"}
           </p>
-        </button>
+        </article>
 
-        <button
-          className="dashboardStatCard"
-          onClick={() => go("Placements")}
-        >
+        <article className="dashboardStatCard studentSummaryCard">
           <div>
             <span className="dashboardStatIcon">P</span>
             <small>PLACEMENTS</small>
@@ -5151,12 +5259,9 @@ function Dashboard({
               ? "Live recruitment opportunities"
               : "No live drives right now"}
           </p>
-        </button>
+        </article>
 
-        <button
-          className="dashboardStatCard"
-          onClick={() => go("Applications")}
-        >
+        <article className="dashboardStatCard studentSummaryCard">
           <div>
             <span className="dashboardStatIcon">J</span>
             <small>APPLICATIONS</small>
@@ -5171,9 +5276,16 @@ function Dashboard({
               ? "Placement applications submitted"
               : "No applications submitted yet"}
           </p>
-        </button>
+        </article>
 
       </section>
+
+      <StudentUpcomingClasses
+        onOpenTimetable={() =>
+          go("Academics")
+        }
+      />
+
 
 
       {(() => {
@@ -6295,11 +6407,27 @@ function Dashboard({
                 <button
                   type="button"
                   className="studentActionBriefNext"
-                  onClick={() =>
+                  onClick={() => {
+                    if (
+                      sortedPriorities[0].target ===
+                      "Attendance"
+                    ) {
+                      document
+                        .getElementById(
+                          "student-attendance-overview"
+                        )
+                        ?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+
+                      return;
+                    }
+
                     go(
                       sortedPriorities[0].target
-                    )
-                  }
+                    );
+                  }}
                 >
                   <small>
                     NEXT PRIORITY
@@ -6358,11 +6486,27 @@ function Dashboard({
                       key={
                         item.id
                       }
-                      onClick={() =>
+                      onClick={() => {
+                        if (
+                          item.target ===
+                          "Attendance"
+                        ) {
+                          document
+                            .getElementById(
+                              "student-attendance-overview"
+                            )
+                            ?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+
+                          return;
+                        }
+
                         go(
                           item.target
-                        )
-                      }
+                        );
+                      }}
                     >
 
                       <span className="studentPriorityNumber">
@@ -6476,14 +6620,24 @@ function Dashboard({
 
         <div className="studentDashboardPrimaryColumn">
 
-          <section className="dashboardPanel card">
+          <section
+            id="student-attendance-overview"
+            className="dashboardPanel card"
+          >
             <header className="dashboardPanelHeader">
               <div>
                 <span>ACADEMIC HEALTH</span>
                 <h3>Attendance overview</h3>
               </div>
 
-              <button onClick={() => go("Attendance")}>
+              <button onClick={() => document
+                    .getElementById(
+                      "student-attendance-overview"
+                    )
+                    ?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    })}>
                 View details →
               </button>
             </header>
@@ -6562,9 +6716,7 @@ function Dashboard({
                   Your subject-wise attendance will appear here
                   once faculty starts recording classes.
                 </p>
-                <button onClick={() => go("Attendance")}>
-                  Open attendance
-                </button>
+
               </div>
             )}
           </section>
@@ -6576,9 +6728,7 @@ function Dashboard({
                 <h3>Subject performance</h3>
               </div>
 
-              <button onClick={() => go("Attendance")}>
-                Full analytics →
-              </button>
+
             </header>
 
             {dashboardAttendanceChart.length > 0 ? (
@@ -6630,9 +6780,7 @@ function Dashboard({
                   subject-wise academic health.
                 </p>
 
-                <button onClick={() => go("Attendance")}>
-                  Open attendance →
-                </button>
+
               </div>
             )}
           </section>
@@ -6794,7 +6942,27 @@ function Dashboard({
                   <button
                     className="dashboardActivityItem"
                     key={item.id}
-                    onClick={() => go(item.target)}
+                    onClick={() => {
+                        if (
+                          item.target ===
+                          "Attendance"
+                        ) {
+                          document
+                            .getElementById(
+                              "student-attendance-overview"
+                            )
+                            ?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+
+                          return;
+                        }
+
+                        go(
+                          item.target
+                        );
+                      }}
                   >
                     <span className={`dashboardActivityIcon ${item.type}`}>
                       {item.type === "attendance"
@@ -6829,47 +6997,6 @@ function Dashboard({
                 </p>
               </div>
             )}
-          </section>
-
-          <section className="dashboardPanel card">
-            <header className="dashboardPanelHeader">
-              <div>
-                <span>QUICK ACCESS</span>
-                <h3>Student tools</h3>
-              </div>
-            </header>
-
-            <div className="dashboardQuickActions">
-              <button onClick={() => go("Attendance")}>
-                <span>A</span>
-                Attendance
-              </button>
-
-              <button onClick={() => go("Assignments")}>
-                <span>T</span>
-                Assignments
-              </button>
-
-              <button onClick={() => go("Learning")}>
-                <span>L</span>
-                Learning
-              </button>
-
-              <button onClick={() => go("Network")}>
-                <span>N</span>
-                Network
-              </button>
-
-              <button onClick={() => go("Academics")}>
-                <span>C</span>
-                Academics
-              </button>
-
-              <button onClick={() => go("Profile")}>
-                <span>P</span>
-                Profile
-              </button>
-            </div>
           </section>
 
         </aside>
@@ -7130,6 +7257,18 @@ function Network({profile}: {profile: Profile}) {
   const [networkTab, setNetworkTab] = useState<"Feed" | "Discover">("Feed");
   const [selectedNetworkProfileId, setSelectedNetworkProfileId] =
     useState<string | null>(null);
+
+  const [
+    networkPeoplePanel,
+    setNetworkPeoplePanel,
+  ] =
+    useState<
+      "Connections" |
+      "Sent" |
+      "Invitations" |
+      null
+    >(null);
+
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [busyUserId, setBusyUserId] =
@@ -7803,6 +7942,58 @@ function Network({profile}: {profile: Profile}) {
       .filter(Boolean)
       .slice(0, 5);
 
+
+  const networkPanelPeople: Person[] =
+    networkPeoplePanel ===
+      "Connections"
+      ? people
+          .filter(
+            person =>
+              connectedIds.has(
+                person.id
+              )
+          )
+          .sort(
+            (a, b) =>
+              a.full_name.localeCompare(
+                b.full_name
+              )
+          )
+      : networkPeoplePanel ===
+        "Sent"
+      ? people
+          .filter(
+            person =>
+              pendingOutgoingIds.has(
+                person.id
+              )
+          )
+          .sort(
+            (a, b) =>
+              a.full_name.localeCompare(
+                b.full_name
+              )
+          )
+      : networkPeoplePanel ===
+        "Invitations"
+      ? incoming
+          .map(
+            request =>
+              people.find(
+                person =>
+                  person.id ===
+                  request.requester_id
+              )
+          )
+          .filter(
+            (
+              person
+            ): person is Person =>
+              Boolean(person)
+          )
+      : [];
+
+
   return (
     <div className="linkedinNetworkPage">
       <section className="linkedinNetworkTopbar">
@@ -8160,43 +8351,85 @@ function Network({profile}: {profile: Profile}) {
             </header>
 
             <div>
-              <p>
+              <button
+                type="button"
+                className="linkedinNetworkMenuItem"
+                onClick={() =>
+                  setNetworkPeoplePanel(
+                    "Connections"
+                  )
+                }
+              >
                 <span className="linkedinMenuIcon">
                   ◎
                 </span>
+
                 <b>
                   Connections
                 </b>
+
                 <strong>
                   {connectedIds.size}
                 </strong>
-              </p>
 
-              <p>
+                <i>
+                  →
+                </i>
+              </button>
+
+              <button
+                type="button"
+                className="linkedinNetworkMenuItem"
+                onClick={() =>
+                  setNetworkPeoplePanel(
+                    "Sent"
+                  )
+                }
+              >
                 <span className="linkedinMenuIcon">
                   ↗
                 </span>
+
                 <b>
                   Sent requests
                 </b>
+
                 <strong>
                   {
                     pendingOutgoingIds.size
                   }
                 </strong>
-              </p>
 
-              <p>
+                <i>
+                  →
+                </i>
+              </button>
+
+              <button
+                type="button"
+                className="linkedinNetworkMenuItem"
+                onClick={() =>
+                  setNetworkPeoplePanel(
+                    "Invitations"
+                  )
+                }
+              >
                 <span className="linkedinMenuIcon">
                   ✦
                 </span>
+
                 <b>
                   Invitations
                 </b>
+
                 <strong>
                   {incoming.length}
                 </strong>
-              </p>
+
+                <i>
+                  →
+                </i>
+              </button>
             </div>
           </section>
         </aside>
@@ -8754,6 +8987,341 @@ function Network({profile}: {profile: Profile}) {
           </section>
         </aside>
       </div>
+    {networkPeoplePanel && (
+
+      <div
+        className="linkedinNetworkPeoplePanelScrim"
+        role="presentation"
+        onMouseDown={event => {
+          if (
+            event.target ===
+            event.currentTarget
+          ) {
+            setNetworkPeoplePanel(
+              null
+            );
+          }
+        }}
+      >
+
+        <section
+          className="linkedinNetworkPeoplePanel"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${networkPeoplePanel} people`}
+        >
+
+          <header>
+
+            <div>
+
+              <span>
+                MY NETWORK
+              </span>
+
+              <h2>
+                {networkPeoplePanel ===
+                "Sent"
+                  ? "Sent requests"
+                  : networkPeoplePanel}
+              </h2>
+
+              <p>
+                {networkPeoplePanel ===
+                "Connections"
+                  ? "People already connected with you."
+                  : networkPeoplePanel ===
+                    "Sent"
+                  ? "People waiting to respond to your connection request."
+                  : "People who want to connect with you."}
+              </p>
+
+            </div>
+
+
+            <div className="linkedinNetworkPeoplePanelHeaderActions">
+
+              <strong>
+                {
+                  networkPanelPeople
+                    .length
+                }
+              </strong>
+
+              <button
+                type="button"
+                aria-label="Close network list"
+                onClick={() =>
+                  setNetworkPeoplePanel(
+                    null
+                  )
+                }
+              >
+                ×
+              </button>
+
+            </div>
+
+          </header>
+
+
+          <div className="linkedinNetworkPeoplePanelList">
+
+            {networkPanelPeople.map(
+              person => {
+
+                const invitation =
+                  networkPeoplePanel ===
+                    "Invitations"
+                    ? incoming.find(
+                        request =>
+                          request.requester_id ===
+                          person.id
+                      )
+                    : null;
+
+                const busy =
+                  busyUserId ===
+                  person.id;
+
+                return (
+
+                  <article
+                    className="linkedinNetworkPeopleRow"
+                    key={
+                      person.id
+                    }
+                  >
+
+                    <button
+                      type="button"
+                      className="linkedinNetworkPeopleIdentity"
+                      onClick={() => {
+                        setNetworkPeoplePanel(
+                          null
+                        );
+
+                        setSelectedNetworkProfileId(
+                          person.id
+                        );
+                      }}
+                    >
+
+                      <Avatar
+                        t={getInitials(
+                          person.full_name
+                        )}
+                        src={
+                          person.avatar_url ||
+                          undefined
+                        }
+                        alt={`${person.full_name} profile`}
+                      />
+
+
+                      <span>
+
+                        <b>
+                          {
+                            person.full_name
+                          }
+
+                          <em title="Verified CampusConnect profile">
+                            ✓
+                          </em>
+                        </b>
+
+
+                        <small>
+                          {
+                            person.role
+                          }
+
+                          {person.department
+                            ? ` · ${person.department}`
+                            : ""}
+                        </small>
+
+
+                        {person.campus_uid && (
+                          <i>
+                            {
+                              person.campus_uid
+                            }
+                          </i>
+                        )}
+
+                      </span>
+
+                    </button>
+
+
+                    <div className="linkedinNetworkPeopleActions">
+
+                      {networkPeoplePanel ===
+                        "Connections" && (
+                        <>
+
+                          <button
+                            type="button"
+                            className="secondary"
+                            onClick={() => {
+                              setNetworkPeoplePanel(
+                                null
+                              );
+
+                              setSelectedNetworkProfileId(
+                                person.id
+                              );
+                            }}
+                          >
+                            View profile
+                          </button>
+
+
+                          <button
+                            type="button"
+                            className="primary"
+                            onClick={() => {
+                              setNetworkPeoplePanel(
+                                null
+                              );
+
+                              openNetworkMessage(
+                                person.id
+                              );
+                            }}
+                          >
+                            Message
+                          </button>
+
+                        </>
+                      )}
+
+
+                      {networkPeoplePanel ===
+                        "Sent" && (
+                        <>
+
+                          <span className="linkedinNetworkPendingBadge">
+                            Pending
+                          </span>
+
+
+                          <button
+                            type="button"
+                            className="secondary"
+                            onClick={() => {
+                              setNetworkPeoplePanel(
+                                null
+                              );
+
+                              setSelectedNetworkProfileId(
+                                person.id
+                              );
+                            }}
+                          >
+                            View profile
+                          </button>
+
+                        </>
+                      )}
+
+
+                      {networkPeoplePanel ===
+                        "Invitations" &&
+                        invitation && (
+                        <>
+
+                          <button
+                            type="button"
+                            className="secondary"
+                            disabled={
+                              busy
+                            }
+                            onClick={() =>
+                              void respond(
+                                invitation.id,
+                                "Rejected"
+                              )
+                            }
+                          >
+                            Ignore
+                          </button>
+
+
+                          <button
+                            type="button"
+                            className="primary"
+                            disabled={
+                              busy
+                            }
+                            onClick={() =>
+                              void respond(
+                                invitation.id,
+                                "Accepted"
+                              )
+                            }
+                          >
+                            {busy
+                              ? "Accepting…"
+                              : "Accept"}
+                          </button>
+
+                        </>
+                      )}
+
+                    </div>
+
+                  </article>
+
+                );
+
+              }
+            )}
+
+
+            {!networkPanelPeople.length && (
+
+              <div className="linkedinNetworkPeopleEmpty">
+
+                <span>
+                  ◎
+                </span>
+
+                <b>
+                  {networkPeoplePanel ===
+                  "Connections"
+                    ? "No connections yet"
+                    : networkPeoplePanel ===
+                      "Sent"
+                    ? "No sent requests"
+                    : "No invitations"}
+                </b>
+
+                <p>
+                  {networkPeoplePanel ===
+                  "Connections"
+                    ? "Connect with verified campus members and they will appear here."
+                    : networkPeoplePanel ===
+                      "Sent"
+                    ? "Requests you send will appear here until they are accepted."
+                    : "New connection invitations will appear here."}
+                </p>
+
+              </div>
+
+            )}
+
+          </div>
+
+        </section>
+
+      </div>
+
+    )}
+
+
     {selectedNetworkProfileId && (
       <NetworkProfileModal
         key={selectedNetworkProfileId}
@@ -9431,7 +9999,7 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
             "/api/account/delete",
             {
               method:
-                "POST",
+                "DELETE",
 
               headers: {
                 Authorization:
@@ -9901,6 +10469,102 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
         </section>
       )}
 
+      {profile.role === "Student" && (
+
+        <section className="card profileCard contineoAccessCard">
+
+          <div className="contineoAccessTop">
+
+            <div className="contineoAccessIcon">
+              C
+            </div>
+
+            <div>
+
+              <span>
+                RNSIT STUDENT PORTAL
+              </span>
+
+              <h3>
+                Contineo
+              </h3>
+
+            </div>
+
+          </div>
+
+
+          <p className="contineoAccessDescription">
+            Open the official RNS Institute of Technology
+            student portal for attendance, academic records
+            and college services.
+          </p>
+
+
+          <div className="contineoStudentIdentity">
+
+            <span>
+              CAMPUSCONNECT IDENTITY
+            </span>
+
+            <div>
+
+              <small>
+                USN
+              </small>
+
+              <strong>
+                {profile.usn || "Not assigned"}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div className="contineoAccessStatus">
+
+            <i />
+
+            <span>
+
+              <b>
+                Official portal
+              </b>
+
+              <small>
+                Opens securely in a new tab
+              </small>
+
+            </span>
+
+          </div>
+
+
+          <button
+            type="button"
+            className="contineoOpenButton"
+            onClick={() => {
+              window.open(
+                "https://rnsit-students.contineo.in/parents/index.php",
+                "_blank",
+                "noopener,noreferrer"
+              );
+            }}
+          >
+            <span>
+              Open Contineo
+            </span>
+
+            <b>
+              ↗
+            </b>
+          </button>
+
+        </section>
+
+      )}
+
       <section className="card profileCard securityCard"><header><div><span>ACCOUNT & SECURITY</span><h3>Security controls</h3></div></header><button className="securityAction" onClick={() => {const client=getSupabaseClient(); if(client) void client.auth.resetPasswordForEmail(profile.email, {redirectTo: window.location.origin}); setMessage("Password reset email requested. Check your inbox.")}}>Change password <span>→</span></button><button
           className="securityAction"
           onClick={() =>
@@ -9946,12 +10610,12 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
 
 function Resume({
   profile,
-  score,
-  improve,
+  onScoreChange,
 }: {
   profile: Profile;
-  score: number;
-  improve: () => void;
+  onScoreChange: (
+    score: number
+  ) => void;
 }) {
   type ResumeSection =
     | "Personal"
@@ -11461,6 +12125,20 @@ ${resumeHtml}
         0
       )
     );
+
+  useEffect(() => {
+    if (!saved) {
+      return;
+    }
+
+    onScoreChange(
+      ats
+    );
+  }, [
+    ats,
+    saved,
+    onScoreChange,
+  ]);
 
   const atsPassed =
     atsChecks.filter(
@@ -15916,7 +16594,7 @@ if (role !== "Student") {
         item.attended /
           item.total *
           100 <
-          75
+          85
     );
 
 
@@ -17312,129 +17990,9 @@ if (role !== "Student") {
 
           {tab === "Marks" && (
 
-            <section className="academicProSection">
-
-              <header className="academicProSectionHeading">
-
-                <div>
-                  <span>
-                    INTERNAL ASSESSMENT
-                  </span>
-
-                  <h2>
-                    CIE & internal marks
-                  </h2>
-
-                  <p>
-                    Published assessment
-                    performance by subject.
-                  </p>
-                </div>
-
-                <strong>
-                  {visibleMarks.length}
-                  {" "}
-                  records
-                </strong>
-
-              </header>
-
-
-              <div className="academicMarksProTable">
-
-                <header>
-                  <span>SUBJECT</span>
-                  <span>ASSESSMENT</span>
-                  <span>SCORE</span>
-                  <span>PERFORMANCE</span>
-                </header>
-
-
-                {visibleMarks.map(
-                  item => {
-                    const percent =
-                      item.max_marks
-                        ? Math.round(
-                            Number(
-                              item.marks || 0
-                            ) /
-                              Number(
-                                item.max_marks
-                              ) *
-                              100
-                          )
-                        : null;
-
-                    return (
-                      <article
-                        key={item.id}
-                      >
-
-                        <div>
-                          <strong>
-                            {item.subject_name}
-                          </strong>
-
-                          <small>
-                            {item.subject_code ||
-                              "—"}
-                          </small>
-                        </div>
-
-                        <span>
-                          {item.assessment}
-                        </span>
-
-                        <strong>
-                          {item.marks ?? "—"}
-
-                          {item.max_marks
-                            ? ` / ${item.max_marks}`
-                            : ""}
-                        </strong>
-
-
-                        <div className="academicMarksProgress">
-
-                          {percent !== null ? (
-                            <>
-                              <i>
-                                <span
-                                  style={{
-                                    width:
-                                      `${Math.min(
-                                        percent,
-                                        100
-                                      )}%`,
-                                  }}
-                                />
-                              </i>
-
-                              <small>
-                                {percent}%
-                              </small>
-                            </>
-                          ) : (
-                            <small>—</small>
-                          )}
-
-                        </div>
-
-                      </article>
-                    );
-                  }
-                )}
-
-              </div>
-
-
-              {!visibleMarks.length && (
-                <EmptyAcademic
-                  text="No internal marks synced yet."
-                />
-              )}
-
-            </section>
+            <AcademicMarksReferenceDashboard
+              marks={visibleMarks}
+            />
 
           )}
 
@@ -18459,7 +19017,7 @@ function AcademicTimetableManager({
           await fetch(
             "/api/academics/timetable/scan",
             {
-              method: "POST",
+              method: "DELETE",
 
               headers: {
                 Authorization:
@@ -20359,7 +20917,7 @@ function AcademicTimetableGrid({
           className="studentDigitalTimetableTable"
           style={{
             gridTemplateColumns:
-              `128px repeat(${slots.length}, minmax(158px, 1fr))`,
+              `106px repeat(${slots.length}, minmax(112px, 1fr))`,
           }}
         >
 
@@ -24400,6 +24958,169 @@ function Campus({
         </header>
 
 
+        {recruiters.length > 0 && (
+
+          <section
+            className="campusRecruiterLogoMarquee"
+            aria-label="Campus recruiting partners"
+          >
+
+            <div className="campusRecruiterLogoMarqueeEyebrow">
+              <span />
+              RECRUITING PARTNERS
+              <span />
+            </div>
+
+
+            <div className="campusRecruiterLogoMarqueeViewport">
+
+              <div className="campusRecruiterLogoMarqueeTrack">
+
+                {[0, 1].map(copyIndex => (
+
+                  <div
+                    className="campusRecruiterLogoMarqueeGroup"
+                    key={`recruiter-marquee-group-${copyIndex}`}
+                    aria-hidden={
+                      copyIndex === 1
+                        ? true
+                        : undefined
+                    }
+                  >
+
+                    {recruiters.map(
+                      recruiter => {
+
+                        const fallbackLogo =
+                          recruiter.website_url
+                            ? `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(
+                                recruiter.website_url
+                              )}&sz=128`
+                            : "";
+
+                        const logoSource =
+                          recruiter.logo_url ||
+                          fallbackLogo;
+
+                        const initials =
+                          recruiter.company_name
+                            .split(" ")
+                            .filter(Boolean)
+                            .slice(0, 2)
+                            .map(
+                              word =>
+                                word.charAt(0)
+                            )
+                            .join("")
+                            .toUpperCase();
+
+                        return (
+
+                          <a
+                            className="campusRecruiterLogoMarqueeItem"
+                            key={`${copyIndex}-${recruiter.id}`}
+                            href={
+                              recruiter.website_url ||
+                              undefined
+                            }
+                            target={
+                              recruiter.website_url
+                                ? "_blank"
+                                : undefined
+                            }
+                            rel={
+                              recruiter.website_url
+                                ? "noopener noreferrer"
+                                : undefined
+                            }
+                            tabIndex={
+                              copyIndex === 1
+                                ? -1
+                                : 0
+                            }
+                            title={
+                              recruiter.company_name
+                            }
+                          >
+
+                            <span className="campusRecruiterLogoMarqueeLogo">
+
+                              {logoSource ? (
+
+                                <img
+                                  src={
+                                    logoSource
+                                  }
+                                  alt={
+                                    copyIndex === 0
+                                      ? `${recruiter.company_name} logo`
+                                      : ""
+                                  }
+                                  loading="lazy"
+                                  referrerPolicy="no-referrer"
+                                />
+
+                              ) : (
+
+                                <b>
+                                  {initials}
+                                </b>
+
+                              )}
+
+                            </span>
+
+
+                            <strong>
+                              {
+                                recruiter.company_name
+                              }
+                            </strong>
+
+                          </a>
+
+                        );
+
+                      }
+                    )}
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            </div>
+
+
+            {canManageRecruiters && (
+
+              <div className="campusRecruiterLogoMarqueeAdmin">
+
+                <span>
+                  Placement Cell controls
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowRecruiterForm(
+                      true
+                    )
+                  }
+                >
+                  + Add company
+                </button>
+
+              </div>
+
+            )}
+
+          </section>
+
+        )}
+
+
         {recruiters.length ? (
           <div className="campusRecruiterViewport">
 
@@ -27662,8 +28383,10 @@ function dashboardGreetingForDate(
 
 function LiveDashboardGreeting({
   firstName,
+  role,
 }: {
   firstName: string;
+  role: Role;
 }) {
   const [
     greeting,
@@ -27712,10 +28435,48 @@ function LiveDashboardGreeting({
     };
   }, []);
 
+  if (role === "Student") {
+    return (
+      <h1
+        className="dashboardGreeting studentDashboardGreetingV2"
+        data-student-dashboard-greeting="true"
+      >
+        <span className="studentGreetingText">
+          {greeting},
+        </span>
+
+        {" "}
+
+        <span className="studentGreetingHighlight">
+          <strong>{firstName}</strong>
+        </span>
+
+        <span
+          className="greetingWave"
+          aria-hidden="true"
+        >
+          👋
+        </span>
+      </h1>
+    );
+  }
+
   return (
-    <h1 className="dashboardGreeting">
-      <span>{greeting},</span>
+    <h1 className="dashboardGreeting appleDashboardGreeting">
+      <span
+        className="appleDashboardHello"
+        aria-label={`Hello. ${greeting}`}
+      >
+        <AppleHelloEnglishEffect
+          speed={0.72}
+          aria-hidden="true"
+        />
+      </span>
+
+      <span className="appleDashboardComma">,</span>
+
       {" "}
+
       <strong>{firstName}</strong>
 
       <span

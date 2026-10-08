@@ -13,6 +13,24 @@ export default function PwaRegister() {
 
     const register = async () => {
       try {
+        const CAMPUSCONNECT_LOCAL_SW_GUARD = true;
+        const isLocalCampusConnect =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1";
+
+        if (isLocalCampusConnect) {
+          void navigator.serviceWorker.getRegistrations().then(
+            registrations =>
+              Promise.all(
+                registrations.map(
+                  registration =>
+                    registration.unregister()
+                )
+              )
+          );
+          return;
+        }
+
         await navigator.serviceWorker.register(
           "/sw.js",
           {

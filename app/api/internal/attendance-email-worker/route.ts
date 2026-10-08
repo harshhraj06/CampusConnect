@@ -155,9 +155,13 @@ export async function POST(
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     "";
 
-  const resendApiKey =
-    process.env.RESEND_API_KEY ||
+  const brevoApiKey =
+    process.env.BREVO_API_KEY ||
     "";
+
+  const emailFromName =
+    process.env.BREVO_SENDER_NAME ||
+    "CampusConnect";
 
   const emailFrom =
     process.env.ATTENDANCE_EMAIL_FROM ||
@@ -176,7 +180,7 @@ export async function POST(
 
 
   if (
-    !resendApiKey ||
+    !brevoApiKey ||
     !emailFrom
   ) {
     return jsonError(
@@ -246,7 +250,7 @@ export async function POST(
    * Important:
    * - does not call claim_next_attendance_email_delivery()
    * - does not recover stale rows
-   * - does not call Resend
+   * - does not call Brevo
    * - does not change attempts/status/timestamps
    * ----------------------------------------------------------
    */
@@ -556,8 +560,9 @@ export async function POST(
       await deliverClaimedAttendanceEmail({
         admin,
         claimed: job,
-        resendApiKey,
+        brevoApiKey,
         emailFrom,
+        emailFromName,
       });
 
 

@@ -16,10 +16,6 @@ import {
 
 import JsBarcode from "jsbarcode";
 
-import {
-  getSupabaseClient,
-} from "../../../../lib/supabase";
-
 import "./external-pass.css";
 
 
@@ -176,43 +172,39 @@ export default function ExternalEventPassPage() {
   useEffect(() => {
     const loadPass =
       async () => {
-        const client =
-          getSupabaseClient();
-
-        if (!client) {
-          setError(
-            "CampusConnect pass service is unavailable."
-          );
-
-          setLoading(false);
-
-          return;
-        }
-
-
         try {
-          const {
-            data,
-            error:
-              rpcError,
-          } =
-            await client.rpc(
-              "get_external_event_pass",
+          const response =
+            await fetch(
+              "/api/events/external-pass",
               {
-                p_claim_token:
-                  token,
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
+
+                cache: "no-store",
+
+                body:
+                  JSON.stringify({
+                    token,
+                  }),
               }
             );
 
 
-          if (rpcError) {
-            throw rpcError;
-          }
-
-
           const result =
-            data as
+            await response.json() as
               ExternalPass;
+
+
+          if (!response.ok) {
+            throw new Error(
+              result?.error ||
+                "This event pass is unavailable."
+            );
+          }
 
 
           if (

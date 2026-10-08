@@ -1,0 +1,381 @@
+.campusPatraCustomContent {
+  margin-top: 42px;
+  padding-top: 34px;
+  border-top: 1px solid rgba(102, 75, 46, .22);
+}
+
+.campusPatraCustomHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.campusPatraCustomHeader > div {
+  max-width: 650px;
+}
+
+.campusPatraCustomHeader span {
+  color: #987247;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .16em;
+}
+
+.campusPatraCustomHeader h3 {
+  margin: 7px 0 8px;
+  color: #43301f;
+  font-family: Georgia, serif;
+  font-size: 29px;
+  font-weight: 500;
+}
+
+.campusPatraCustomHeader p {
+  margin: 0;
+  color: #786958;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.campusPatraAddButton {
+  min-height: 40px;
+  flex: 0 0 auto;
+  padding: 0 14px;
+  border: 1px solid #694726;
+  border-radius: 7px;
+  background: #694726;
+  color: #fff8ed;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.campusPatraCustomGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.campusPatraCustomEntry {
+  display: grid;
+  grid-template-columns:
+    minmax(0, .72fr)
+    minmax(0, 1.28fr);
+  overflow: hidden;
+  border: 1px solid rgba(107, 78, 47, .19);
+  border-radius: 4px;
+  background: rgba(255, 249, 234, .42);
+}
+
+.campusPatraCustomEntry:not(:has(img)) {
+  grid-template-columns: 1fr;
+}
+
+.campusPatraCustomEntry.isDraft {
+  opacity: .7;
+  border-style: dashed;
+}
+
+.campusPatraCustomEntry > img {
+  width: 100%;
+  height: 100%;
+  min-height: 230px;
+  object-fit: cover;
+  filter: sepia(.16) saturate(.82);
+}
+
+.campusPatraCustomEntryCopy {
+  padding: 25px 27px;
+}
+
+.campusPatraCustomMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.campusPatraCustomMeta span {
+  color: #9c7549;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .15em;
+}
+
+.campusPatraCustomMeta em {
+  padding: 4px 7px;
+  border: 1px solid #ae8054;
+  border-radius: 999px;
+  color: #8a6039;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.campusPatraCustomEntry h4 {
+  margin: 11px 0 10px;
+  color: #3e2d1e;
+  font-family: Georgia, serif;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.campusPatraCustomEntry p {
+  margin: 0;
+  color: #756554;
+  font-size: 11px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.campusPatraCustomEntry a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 17px;
+  color: #6e4929;
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.campusPatraCustomAdminActions {
+  display: flex;
+  gap: 7px;
+  margin-top: 20px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(107, 78, 47, .14);
+}
+
+.campusPatraCustomAdminActions button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #cbb89f;
+  border-radius: 6px;
+  background: rgba(255,255,255,.48);
+  color: #654b31;
+  font: inherit;
+  font-size: 8px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.campusPatraCustomAdminActions button:last-child {
+  color: #944d42;
+}
+
+.campusPatraCustomEmpty {
+  margin: 12px 0 0;
+  color: #8c7d6c;
+  font-size: 10px;
+}
+
+.campusPatraCustomEmpty.admin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border: 1px dashed #c9b597;
+}
+
+.campusPatraCustomEmpty.admin button {
+  border: 0;
+  background: none;
+  color: #774f2d;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.campusPatraEntryEditorBackdrop {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(36, 26, 19, .64);
+  backdrop-filter: blur(8px);
+}
+
+.campusPatraEntryEditor {
+  width: min(100%, 610px);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  display: grid;
+  gap: 14px;
+  padding: 25px;
+  border: 1px solid #c8b69e;
+  border-radius: 12px;
+  background: #fffaf0;
+  box-shadow: 0 30px 100px rgba(34, 23, 16, .3);
+}
+
+.campusPatraEntryEditor > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e0d4c4;
+}
+
+.campusPatraEntryEditor header span {
+  color: #9b7345;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .14em;
+}
+
+.campusPatraEntryEditor header h3 {
+  margin: 5px 0 0;
+  color: #3d2c1d;
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.campusPatraEntryEditor header > button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d4c4ae;
+  border-radius: 50%;
+  background: transparent;
+  color: #634a32;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.campusPatraEntryEditor label {
+  display: grid;
+  gap: 6px;
+}
+
+.campusPatraEntryEditor label > span {
+  color: #645341;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.campusPatraEntryEditor input,
+.campusPatraEntryEditor textarea {
+  width: 100%;
+  border: 1px solid #d8c9b5;
+  border-radius: 7px;
+  background: #fffdf7;
+  color: #3e3429;
+  padding: 10px 11px;
+  font: inherit;
+  font-size: 10px;
+  outline: none;
+}
+
+.campusPatraEntryEditor input {
+  min-height: 41px;
+}
+
+.campusPatraEntryEditor textarea {
+  min-height: 145px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.campusPatraEntryEditor input:focus,
+.campusPatraEntryEditor textarea:focus {
+  border-color: #a88153;
+  box-shadow: 0 0 0 3px rgba(168, 129, 83, .12);
+}
+
+.campusPatraEntryEditor label small {
+  color: #988979;
+  font-size: 8px;
+}
+
+.campusPatraEntryEditorRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.campusPatraPublishedToggle {
+  align-self: end;
+  min-height: 41px;
+  display: flex !important;
+  grid-template-columns: auto 1fr;
+  flex-direction: row;
+  align-items: center;
+  gap: 9px !important;
+  padding: 0 11px;
+  border: 1px solid #d8c9b5;
+  border-radius: 7px;
+  background: #fffdf7;
+}
+
+.campusPatraPublishedToggle input {
+  width: 15px;
+  height: 15px;
+  min-height: 0;
+  margin: 0;
+}
+
+.campusPatraEditorStatus {
+  margin: 0;
+  padding: 9px 10px;
+  border-left: 3px solid #9b6544;
+  background: #f6e9de;
+  color: #79472f;
+  font-size: 9px;
+}
+
+.campusPatraEntryEditor footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 7px;
+}
+
+.campusPatraEntryEditor footer button {
+  min-height: 39px;
+  padding: 0 14px;
+  border: 1px solid #cdbba5;
+  border-radius: 7px;
+  background: transparent;
+  color: #5c4937;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.campusPatraEntryEditor footer button[type="submit"] {
+  border-color: #684725;
+  background: #684725;
+  color: white;
+}
+
+.campusPatraEntryEditor footer button:disabled {
+  opacity: .55;
+}
+
+@media (max-width: 720px) {
+  .campusPatraCustomHeader,
+  .campusPatraCustomEmpty.admin {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .campusPatraCustomEntry {
+    grid-template-columns: 1fr;
+  }
+
+  .campusPatraCustomEntry > img {
+    min-height: 210px;
+  }
+
+  .campusPatraEntryEditorRow {
+    grid-template-columns: 1fr;
+  }
+}

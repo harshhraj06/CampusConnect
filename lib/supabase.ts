@@ -1,6 +1,9 @@
 import {
-  createClient,
-  type SupabaseClient,
+  createBrowserClient,
+} from "@supabase/ssr";
+
+import type {
+  SupabaseClient,
 } from "@supabase/supabase-js";
 
 let browserClient:
@@ -51,7 +54,7 @@ export function getSupabaseClient():
   }
 
   browserClient =
-    createClient(
+    createBrowserClient(
       url,
       publishableKey,
       {

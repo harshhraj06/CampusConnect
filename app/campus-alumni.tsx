@@ -1354,137 +1354,208 @@ export function CampusAlumni({
 
                 <button
                   type="button"
-                  className="campusAlumniCardMain"
+                  className="campusAlumniCardMain campusAlumniFlipCard"
                   onClick={() =>
                     setSelected(
                       item
                     )
                   }
+                  aria-label={`Open ${item.full_name} alumni profile`}
                 >
 
-                  <div className="campusAlumniPhoto">
+                  <div className="campusAlumniFlipInner">
 
-                    {item.photo_url ? (
-                      <img
-                        src={
-                          item.photo_url
-                        }
-                        alt={
-                          item.full_name
-                        }
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span>
-                        {initials(
-                          item.full_name
+                    <div className="campusAlumniFlipFront">
+
+                      <div className="campusAlumniPhoto">
+
+                        {item.photo_url ? (
+
+                          <img
+                            src={
+                              item.photo_url
+                            }
+                            alt={
+                              item.full_name
+                            }
+                            loading="lazy"
+                          />
+
+                        ) : (
+
+                          <span className="campusAlumniInitials">
+                            {initials(
+                              item.full_name
+                            )}
+                          </span>
+
                         )}
-                      </span>
-                    )}
 
 
-                    <div className="campusAlumniPhotoBadges">
+                        <div className="campusAlumniPhotoOverlay"/>
 
-                      {item.is_featured && (
-                        <b className="featured">
-                          Featured
-                        </b>
-                      )}
 
-                      {canManage &&
-                        item.status !==
-                          "Published" && (
-                        <b
-                          className={
-                            item.status.toLowerCase()
-                          }
-                        >
-                          {item.status}
-                        </b>
-                      )}
+                        <div className="campusAlumniPhotoBadges">
+
+                          {item.is_featured && (
+                            <b className="featured">
+                              Featured
+                            </b>
+                          )}
+
+                          {canManage &&
+                            item.status !==
+                              "Published" && (
+
+                            <b
+                              className={
+                                item.status.toLowerCase()
+                              }
+                            >
+                              {item.status}
+                            </b>
+
+                          )}
+
+                        </div>
+
+
+                        <div className="campusAlumniFrontIdentity">
+
+                          <small>
+                            CLASS OF{" "}
+                            {item.graduation_year}
+                          </small>
+
+                          <h3>
+                            {item.full_name}
+                          </h3>
+
+                          {(item.job_title ||
+                            item.company) && (
+
+                            <p>
+                              {item.job_title ||
+                                "Professional"}
+
+                              {item.company
+                                ? ` · ${item.company}`
+                                : ""}
+                            </p>
+
+                          )}
+
+                        </div>
+
+
+
+                      </div>
 
                     </div>
 
-                  </div>
 
+                    <div className="campusAlumniFlipBack">
 
-                  <div className="campusAlumniCardBody">
-
-                    <small>
-                      Class of{" "}
-                      {
-                        item.graduation_year
-                      }
-                      {item.department
-                        ? ` · ${item.department}`
-                        : ""}
-                    </small>
-
-                    <h3>
-                      {item.full_name}
-                    </h3>
-
-
-                    {(item.job_title ||
-                      item.company) && (
-                      <div className="campusAlumniCareer">
-
-                        <strong>
-                          {item.job_title ||
-                            "Professional"}
-                        </strong>
-
-                        {item.company && (
-                          <span>
-                            at{" "}
-                            {
-                              item.company
-                            }
-                          </span>
-                        )}
-
-                      </div>
-                    )}
-
-
-                    {item.achievement && (
-                      <div className="campusAlumniAchievement">
+                      <div className="campusAlumniBackTop">
 
                         <span>
-                          ACHIEVEMENT
+                          ALUMNI STORY
                         </span>
 
+                        <small>
+                          {item.graduation_year}
+                        </small>
+
+                      </div>
+
+
+                      <div className="campusAlumniBackIdentity">
+
+                        <h3>
+                          {item.full_name}
+                        </h3>
+
                         <p>
-                          {
-                            item.achievement
-                          }
+                          {[
+                            item.department,
+                            item.location,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
                         </p>
 
                       </div>
-                    )}
 
 
-                    {item.biography && (
-                      <p className="campusAlumniBiography">
-                        {
-                          item.biography
-                        }
-                      </p>
-                    )}
+                      {(item.job_title ||
+                        item.company) && (
+
+                        <div className="campusAlumniBackCareer">
+
+                          <small>
+                            CURRENT ROLE
+                          </small>
+
+                          <strong>
+                            {item.job_title ||
+                              "Professional"}
+                          </strong>
+
+                          {item.company && (
+                            <span>
+                              {item.company}
+                            </span>
+                          )}
+
+                        </div>
+
+                      )}
 
 
-                    <footer>
+                      {item.achievement && (
 
-                      <span>
-                        {item.location ||
-                          "India"}
-                      </span>
+                        <div className="campusAlumniBackAchievement">
 
-                      <b>
-                        View profile →
-                      </b>
+                          <small>
+                            ACHIEVEMENT
+                          </small>
 
-                    </footer>
+                          <p>
+                            {item.achievement}
+                          </p>
+
+                        </div>
+
+                      )}
+
+
+                      <div className="campusAlumniBackBiography">
+
+                        <small>
+                          ABOUT
+                        </small>
+
+                        <p>
+                          {item.biography ||
+                            "Explore this alumni profile to learn more about their journey after RNSIT."}
+                        </p>
+
+                      </div>
+
+
+                      <footer className="campusAlumniBackFooter">
+
+                        <span>
+                          View full profile
+                        </span>
+
+                        <b>
+                          →
+                        </b>
+
+                      </footer>
+
+                    </div>
 
                   </div>
 

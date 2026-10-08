@@ -836,6 +836,8 @@ export default function StudentCalendar({
     setSelectedDate(now);
   };
 
+
+
   return (
     <div className="studentCalendarPage">
       <section className="studentCalendarHero">

@@ -1,0 +1,46 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# CampusConnect Pre-commit Security Checks
+
+echo "🔒 Running pre-commit security checks..."
+
+# 1. Check for secrets in STAGED files only
+echo "  Checking for secrets..."
+staged_files=$(git diff --cached --name-only)
+if [ -n "$staged_files" ]; then
+  echo "$staged_files" | xargs grep -l -E "(api[_-]?key|secret|password|token).*=.*[\"'][a-zA-Z0-9_-]{20,}[\"']" 2>/dev/null && {
+    echo "❌ ERROR: Potential secrets detected in staged files!"
+    echo "   Remove secrets and use environment variables instead."
+    exit 1
+  }
+fi
+
+# 2. Check for .env.local in staged files
+if git diff --cached --name-only | grep -q "^\.env\.local$"; then
+  echo "❌ ERROR: .env.local should not be committed!"
+  echo "   Run: git restore --staged .env.local"
+  exit 1
+fi
+
+# 3. Run lint on staged files
+echo "  Running linter..."
+staged_ts_files=$(git diff --cached --name-only -- '*.ts' '*.tsx' '*.js' '*.jsx' 2>/dev/null)
+if [ -n "$staged_ts_files" ]; then
+  echo "$staged_ts_files" | xargs npx eslint --max-warnings=0 2>/dev/null || {
+    echo "❌ Linting failed. Fix errors before committing."
+    exit 1
+  }
+fi
+
+# 4. Check for console.log in production code (non-test files)
+echo "  Checking for console.log..."
+staged_ts_only=$(git diff --cached --name-only -- '*.ts' '*.tsx' 2>/dev/null)
+if [ -n "$staged_ts_only" ]; then
+  echo "$staged_ts_only" | xargs grep -l "console\.log" 2>/dev/null | grep -v "\.test\." | grep -v "\.spec\." && {
+    echo "⚠️  WARNING: console.log found in non-test files"
+    echo "   Consider removing or using proper logging."
+  }
+fi
+
+echo "✅ Pre-commit checks passed"

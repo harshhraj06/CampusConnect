@@ -11,6 +11,10 @@ import {
   getSupabaseClient,
 } from "../lib/supabase";
 
+import {
+  FlickeringGrid,
+} from "./flickering-grid";
+
 import "./role-action-center.css";
 
 
@@ -1106,6 +1110,17 @@ export function RoleActionCenter({
       className="roleActionCenter"
       aria-labelledby="role-action-center-title"
     >
+      {role === "Faculty" && (
+        <FlickeringGrid
+          className="roleActionCenterFlicker"
+          squareSize={3}
+          gridGap={7}
+          flickerChance={0.12}
+          color="#2c5940"
+          maxOpacity={0.20}
+        />
+      )}
+
       <header className="roleActionCenterHeader">
         <div>
           <span>
@@ -1145,12 +1160,43 @@ export function RoleActionCenter({
               </select>
               <button
                 type="button"
-                disabled={!visibleItems.some(item => item.key === selectedAiSource)}
                 onClick={() => {
-                  const item = visibleItems.find(signal => signal.key === selectedAiSource);
-                  if (item) askCampusAi(item);
+                  const item =
+                    visibleItems.find(
+                      signal =>
+                        signal.key ===
+                        selectedAiSource
+                    );
+
+                  if (item) {
+                    askCampusAi(item);
+                    return;
+                  }
+
+                  go("My Campus");
+
+                  window.setTimeout(
+                    () => {
+                      document
+                        .getElementById(
+                          "campusconnect-ai-workspace"
+                        )
+                        ?.scrollIntoView({
+                          behavior:
+                            window.matchMedia(
+                              "(prefers-reduced-motion: reduce)"
+                            ).matches
+                              ? "auto"
+                              : "smooth",
+                          block: "start",
+                        });
+                    },
+                    80
+                  );
                 }}
-              >Ask Campus AI</button>
+              >
+                Ask Campus AI
+              </button>
             </div>
           )}
 

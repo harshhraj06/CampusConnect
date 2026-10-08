@@ -1,0 +1,1060 @@
+/* ============================================================
+   STUDENT DASHBOARD — PROFESSIONAL POLISH
+   Hero and flipping book intentionally untouched.
+   ============================================================ */
+
+.studentDashboard {
+  --student-ink:
+    #232824;
+
+  --student-muted:
+    #717972;
+
+  --student-line:
+    #e0e3df;
+
+  --student-line-strong:
+    #cdd3ce;
+
+  --student-surface:
+    #ffffff;
+
+  --student-soft:
+    #faf9f6;
+
+  --student-forest:
+    #234a36;
+
+  --student-forest-dark:
+    #173425;
+
+  --student-forest-soft:
+    #eaf2ed;
+
+  --student-gold:
+    #a77d48;
+
+  --student-gold-soft:
+    #f5ecdf;
+}
+
+
+/* ============================================================
+   SUMMARY METRICS
+   ============================================================ */
+
+.studentDashboard
+.studentDashboardStats {
+  gap:
+    0 !important;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--student-line);
+
+  border-radius:
+    14px !important;
+
+  background:
+    var(--student-surface);
+
+  box-shadow:
+    0 1px 2px rgba(25,34,29,.02),
+    0 10px 30px rgba(25,34,29,.045);
+}
+
+
+.studentDashboard
+.studentDashboardStats
+.dashboardStatCard {
+  min-height:
+    112px !important;
+
+  margin:
+    0 !important;
+
+  border:
+    0 !important;
+
+  border-right:
+    1px solid
+    var(--student-line) !important;
+
+  border-radius:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.studentDashboard
+.studentDashboardStats
+.dashboardStatCard:last-child {
+  border-right:
+    0 !important;
+}
+
+
+.studentDashboard
+.studentSummaryCard {
+  cursor:
+    default !important;
+}
+
+
+.studentDashboard
+.studentSummaryCard:hover {
+  transform:
+    none !important;
+
+  background:
+    var(--student-soft) !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* ============================================================
+   NEXT CLASSES
+   ============================================================ */
+
+.studentNextClasses {
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  padding:
+    20px;
+
+  border:
+    1px solid
+    var(--student-line);
+
+  border-radius:
+    15px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #fcfbf8
+    );
+
+  box-shadow:
+    0 1px 2px rgba(25,34,29,.02),
+    0 13px 34px rgba(25,34,29,.05);
+}
+
+
+.studentNextClasses::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  top:
+    0;
+
+  left:
+    22px;
+
+  width:
+    78px;
+
+  height:
+    3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--student-forest),
+      var(--student-gold)
+    );
+
+  border-radius:
+    0 0 999px 999px;
+}
+
+
+.studentNextClassesHeader {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    18px;
+
+  margin-bottom:
+    15px;
+}
+
+
+.studentNextClassesHeader
+> div
+> span {
+  color:
+    #876a46;
+
+  font-size:
+    8px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .15em;
+}
+
+
+.studentNextClassesHeader
+h2 {
+  margin:
+    7px 0 4px;
+
+  color:
+    var(--student-ink);
+
+  font-size:
+    19px;
+
+  font-weight:
+    750;
+
+  letter-spacing:
+    -.025em;
+}
+
+
+.studentNextClassesHeader
+p {
+  margin:
+    0;
+
+  color:
+    var(--student-muted);
+
+  font-size:
+    10px;
+
+  line-height:
+    1.5;
+}
+
+
+.studentNextClassesHeader
+button {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  min-height:
+    38px;
+
+  padding:
+    0 13px;
+
+  border:
+    1px solid
+    var(--student-line-strong);
+
+  border-radius:
+    8px;
+
+  background:
+    #ffffff;
+
+  color:
+    var(--student-forest-dark);
+
+  font-size:
+    10px;
+
+  font-weight:
+    750;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease;
+}
+
+
+.studentNextClassesHeader
+button:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #aeb9b1;
+
+  box-shadow:
+    0 7px 17px rgba(28,39,32,.08);
+}
+
+
+.studentNextClassesHeader
+button
+span {
+  transition:
+    transform .16s ease;
+}
+
+
+.studentNextClassesHeader
+button:hover
+span {
+  transform:
+    translateX(2px);
+}
+
+
+.studentNextClassesGrid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--student-line);
+
+  border-radius:
+    12px;
+
+  background:
+    #ffffff;
+}
+
+
+.studentNextClassesGrid
+article {
+  min-width:
+    0;
+
+  padding:
+    15px;
+
+  border-right:
+    1px solid
+    var(--student-line);
+
+  background:
+    #ffffff;
+}
+
+
+.studentNextClassesGrid
+article:last-child {
+  border-right:
+    0;
+}
+
+
+.studentNextClassesGrid
+article.live {
+  background:
+    linear-gradient(
+      145deg,
+      #eff6f1,
+      #ffffff
+    );
+}
+
+
+.studentNextClassesGrid
+article
+> header {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    8px;
+}
+
+
+.studentNextClassesGrid
+article
+> header
+> span {
+  padding:
+    4px 7px;
+
+  border:
+    1px solid
+    #e1d3bd;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--student-gold-soft);
+
+  color:
+    #7b5931;
+
+  font-size:
+    8px;
+
+  font-weight:
+    800;
+}
+
+
+.studentNextClassesGrid
+article.live
+> header
+> span {
+  border-color:
+    #cfe0d5;
+
+  background:
+    #e6f3ea;
+
+  color:
+    #315f45;
+}
+
+
+.studentNextClassesGrid
+article
+> header
+small {
+  color:
+    #8a918b;
+
+  font-size:
+    8px;
+
+  font-weight:
+    750;
+}
+
+
+.studentNextClassTitle {
+  display:
+    grid;
+
+  grid-template-columns:
+    32px
+    minmax(0,1fr);
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  margin:
+    14px 0;
+}
+
+
+.studentNextClassTitle
+> i {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    32px;
+
+  height:
+    32px;
+
+  border:
+    1px solid
+    #d4dfd7;
+
+  border-radius:
+    8px;
+
+  background:
+    var(--student-forest-soft);
+
+  color:
+    var(--student-forest);
+
+  font-size:
+    8px;
+
+  font-style:
+    normal;
+
+  font-weight:
+    800;
+}
+
+
+.studentNextClassTitle
+h3 {
+  overflow:
+    hidden;
+
+  margin:
+    0;
+
+  color:
+    var(--student-ink);
+
+  font-size:
+    14px;
+
+  font-weight:
+    740;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.studentNextClassTitle
+p {
+  overflow:
+    hidden;
+
+  margin:
+    3px 0 0;
+
+  color:
+    var(--student-muted);
+
+  font-size:
+    8px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.studentNextClassesGrid
+footer {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+
+  gap:
+    7px;
+
+  padding-top:
+    11px;
+
+  border-top:
+    1px solid
+    #ebedea;
+}
+
+
+.studentNextClassesGrid
+footer
+span {
+  min-width:
+    0;
+}
+
+
+.studentNextClassesGrid
+footer
+small {
+  display:
+    block;
+
+  margin-bottom:
+    3px;
+
+  color:
+    #989d99;
+
+  font-size:
+    7px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .08em;
+}
+
+
+.studentNextClassesGrid
+footer
+strong {
+  display:
+    block;
+
+  overflow:
+    hidden;
+
+  color:
+    #444c47;
+
+  font-size:
+    8px;
+
+  font-weight:
+    700;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.studentNextClassesLoading {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+
+  gap:
+    9px;
+}
+
+
+.studentNextClassesLoading
+i {
+  height:
+    142px;
+
+  border-radius:
+    11px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #f1f1ee,
+      #faf9f6,
+      #f1f1ee
+    );
+
+  background-size:
+    220% 100%;
+
+  animation:
+    studentClassShimmer
+    1.5s
+    linear
+    infinite;
+}
+
+
+.studentNextClassesEmpty {
+  padding:
+    22px;
+
+  border:
+    1px dashed
+    var(--student-line-strong);
+
+  border-radius:
+    11px;
+
+  background:
+    var(--student-soft);
+}
+
+
+.studentNextClassesEmpty
+strong {
+  display:
+    block;
+
+  color:
+    var(--student-ink);
+
+  font-size:
+    11px;
+}
+
+
+.studentNextClassesEmpty
+p {
+  margin:
+    5px 0 0;
+
+  color:
+    var(--student-muted);
+
+  font-size:
+    9px;
+}
+
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+
+.studentDashboard
+.studentDashboardMainGrid {
+  gap:
+    15px !important;
+}
+
+
+.studentDashboard
+.studentDashboardPrimaryColumn,
+
+.studentDashboard
+.studentDashboardSideColumn {
+  gap:
+    15px !important;
+}
+
+
+.studentDashboard
+.dashboardPanel,
+
+.studentDashboard
+.studentPriorityCenter {
+  border:
+    1px solid
+    var(--student-line) !important;
+
+  border-radius:
+    14px !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    0 1px 2px rgba(25,34,29,.02),
+    0 9px 27px rgba(25,34,29,.04) !important;
+}
+
+
+/* ============================================================
+   SECTION HEADERS
+   ============================================================ */
+
+.studentDashboard
+.dashboardPanelHeader {
+  border-bottom-color:
+    #e8eae7 !important;
+}
+
+
+.studentDashboard
+.dashboardPanelHeader
+> div
+> span {
+  color:
+    #7b6d59 !important;
+
+  letter-spacing:
+    .12em;
+}
+
+
+.studentDashboard
+.dashboardPanelHeader
+h3 {
+  color:
+    var(--student-ink) !important;
+
+  letter-spacing:
+    -.02em;
+}
+
+
+.studentDashboard
+.dashboardPanelHeader
+button {
+  min-height:
+    35px;
+
+  padding:
+    0 10px;
+
+  border:
+    1px solid
+    var(--student-line-strong) !important;
+
+  border-radius:
+    7px !important;
+
+  background:
+    #ffffff !important;
+
+  color:
+    var(--student-forest-dark) !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* ============================================================
+   ACTION CENTER
+   ============================================================ */
+
+.studentDashboard
+.studentPriorityItem {
+  border-color:
+    #e2e5e1 !important;
+
+  background:
+    #ffffff !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.studentDashboard
+.studentPriorityItem:hover {
+  border-color:
+    #bcc7bf !important;
+
+  background:
+    #fbfcfa !important;
+}
+
+
+.studentDashboard
+.studentPriorityIcon {
+  background:
+    var(--student-forest-soft) !important;
+
+  color:
+    var(--student-forest) !important;
+}
+
+
+/* ============================================================
+   ATTENDANCE PRIMARY CTA
+   ============================================================ */
+
+.studentDashboard
+.studentPanelAction {
+  border-color:
+    var(--student-forest) !important;
+
+  background:
+    var(--student-forest) !important;
+
+  color:
+    #ffffff !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+.studentDashboard
+.studentPanelAction:hover {
+  background:
+    var(--student-forest-dark) !important;
+
+  border-color:
+    var(--student-forest-dark) !important;
+}
+
+
+/* ============================================================
+   ROW INTERACTION
+   ============================================================ */
+
+.studentDashboard
+.dashboardAssignmentRow,
+
+.studentDashboard
+.dashboardAnnouncement,
+
+.studentDashboard
+.dashboardActivityItem {
+  border-color:
+    #e6e9e6 !important;
+
+  background:
+    #ffffff !important;
+
+  transition:
+    transform .15s ease,
+    border-color .15s ease,
+    background-color .15s ease;
+}
+
+
+.studentDashboard
+.dashboardAssignmentRow:hover,
+
+.studentDashboard
+.dashboardAnnouncement:hover,
+
+.studentDashboard
+.dashboardActivityItem:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #ccd3cd !important;
+
+  background:
+    #fafbf9 !important;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (
+  max-width:
+  1100px
+) {
+
+  .studentNextClassesGrid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .studentNextClassesGrid
+  article {
+    border-right:
+      0;
+
+    border-bottom:
+      1px solid
+      var(--student-line);
+  }
+
+
+  .studentNextClassesGrid
+  article:last-child {
+    border-bottom:
+      0;
+  }
+
+}
+
+
+@media (
+  max-width:
+  700px
+) {
+
+  .studentNextClasses {
+    padding:
+      16px;
+  }
+
+
+  .studentNextClassesHeader {
+    flex-direction:
+      column;
+  }
+
+
+  .studentNextClassesHeader
+  button {
+    width:
+      100%;
+
+    justify-content:
+      center;
+  }
+
+
+  .studentNextClassesGrid
+  footer {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+
+
+@keyframes studentClassShimmer {
+
+  to {
+    background-position:
+      -220% 0;
+  }
+
+}
+
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .studentNextClassesLoading
+  i {
+    animation:
+      none;
+  }
+
+
+  .studentNextClassesHeader
+  button,
+
+  .studentDashboard
+  .dashboardAssignmentRow,
+
+  .studentDashboard
+  .dashboardAnnouncement,
+
+  .studentDashboard
+  .dashboardActivityItem {
+    transition:
+      none !important;
+  }
+
+}

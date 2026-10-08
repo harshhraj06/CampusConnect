@@ -9,8 +9,6 @@ import {
 
 import {useParams} from "next/navigation";
 
-import {getSupabaseClient} from "../../../../lib/supabase";
-
 import "./external-event-registration.css";
 
 
@@ -210,39 +208,42 @@ export default function ExternalEventRegistrationPage() {
       return;
     }
 
-    const client =
-      getSupabaseClient();
-
-    if (!client) {
-      setPageError(
-        "CampusConnect registration service is unavailable."
-      );
-
-      setLoading(false);
-
-      return;
-    }
-
     setLoading(true);
     setPageError("");
 
     try {
-      const {
-        data,
-        error,
-      } = await client.rpc(
-        "get_public_event_registration",
-        {
-          p_slug: slug,
-        }
-      );
+      const response =
+        await fetch(
+          "/api/events/public-registration",
+          {
+            method: "POST",
 
-      if (error) {
-        throw error;
-      }
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            cache: "no-store",
+
+            body:
+              JSON.stringify({
+                slug,
+              }),
+          }
+        );
+
 
       const result =
-        data as PublicEventResponse;
+        await response.json() as
+          PublicEventResponse;
+
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+            "This registration link is unavailable."
+        );
+      }
 
       if (
         !result.success ||
@@ -347,58 +348,62 @@ export default function ExternalEventRegistrationPage() {
       }
 
 
-      const client =
-        getSupabaseClient();
-
-      if (!client) {
-        return setFormError(
-          "CampusConnect registration service is unavailable."
-        );
-      }
-
-
       setSubmitting(true);
       setFormError("");
       setPaymentRequired(null);
 
 
       try {
-        const {
-          data,
-          error,
-        } = await client.rpc(
-          "register_external_event_attendee",
-          {
-            p_slug: slug,
+        const response =
+          await fetch(
+            "/api/events/external-register",
+            {
+              method: "POST",
 
-            p_full_name:
-              fullName,
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
 
-            p_email:
-              email,
+              cache: "no-store",
 
-            p_phone:
-              phone,
+              body:
+                JSON.stringify({
+                  slug,
 
-            p_college_name:
-              college,
+                  full_name:
+                    fullName,
 
-            p_department:
-              form.department.trim(),
+                  email,
 
-            p_graduation_year:
-              form.graduation_year.trim(),
-          }
-        );
+                  phone,
 
+                  college_name:
+                    college,
 
-        if (error) {
-          throw error;
-        }
+                  department:
+                    form.department.trim(),
+
+                  graduation_year:
+                    form.graduation_year.trim(),
+                }),
+            }
+          );
 
 
         const result =
-          data as RegistrationResponse;
+          await response.json() as
+            RegistrationResponse & {
+              error?: string;
+            };
+
+
+        if (!response.ok) {
+          throw new Error(
+            result.error ||
+              "Unable to complete registration."
+          );
+        }
 
 
         if (

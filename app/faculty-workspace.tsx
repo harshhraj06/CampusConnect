@@ -11,6 +11,8 @@ import {
   getSupabaseClient,
 } from "../lib/supabase";
 
+import FacultyWorkspaceWarp from "../components/ui/faculty-workspace-warp";
+
 
 type FacultyWorkspaceProfile = {
   name: string;
@@ -699,7 +701,9 @@ export default function FacultyWorkspace({
 
       <header className="facultyWorkspaceHero">
 
-        <div>
+        <FacultyWorkspaceWarp />
+
+        <div className="facultyWorkspaceHeroContent">
 
           <span className="facultyWorkspaceEyebrow">
             FACULTY WORKSPACE
@@ -1426,7 +1430,7 @@ export default function FacultyWorkspace({
           </section>
 
 
-          <section className="facultyWorkspaceSection">
+          <section className="facultyWorkspaceSection facultyWorkspaceAssignments">
 
             <header>
               <div>

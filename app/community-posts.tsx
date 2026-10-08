@@ -134,6 +134,23 @@ export function CommunityPosts({profile}: {profile: CommunityProfile}) {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
 
+  const [editingPostId, setEditingPostId] =
+    useState("");
+
+  const [editPostTitle, setEditPostTitle] =
+    useState("");
+
+  const [editPostBody, setEditPostBody] =
+    useState("");
+
+  const [
+    editPostCategory,
+    setEditPostCategory,
+  ] =
+    useState<
+      (typeof categories)[number]
+    >("General");
+
   const loadPosts = useCallback(async () => {
     const client = getSupabaseClient();
 
@@ -516,6 +533,141 @@ export function CommunityPosts({profile}: {profile: CommunityProfile}) {
     }
   }
 
+  function beginEditPost(
+    post: CommunityPost
+  ) {
+    setEditingPostId(
+      post.id
+    );
+
+    setEditPostTitle(
+      post.title
+    );
+
+    setEditPostBody(
+      post.body
+    );
+
+    setEditPostCategory(
+      post.category as
+        (typeof categories)[number]
+    );
+
+    setStatus("");
+  }
+
+
+  function cancelEditPost() {
+    setEditingPostId("");
+    setEditPostTitle("");
+    setEditPostBody("");
+    setEditPostCategory(
+      "General"
+    );
+  }
+
+
+  async function saveEditedPost(
+    post: CommunityPost
+  ) {
+    const nextTitle =
+      editPostTitle.trim();
+
+    const nextBody =
+      editPostBody.trim();
+
+    if (
+      nextTitle.length < 5
+    ) {
+      setStatus(
+        "Post title must contain at least 5 characters."
+      );
+
+      return;
+    }
+
+    if (
+      nextBody.length < 10
+    ) {
+      setStatus(
+        "Post description must contain at least 10 characters."
+      );
+
+      return;
+    }
+
+    const client =
+      getSupabaseClient();
+
+    if (
+      !client ||
+      busy
+    ) {
+      return;
+    }
+
+    setBusy(true);
+    setStatus("");
+
+    const {
+      data,
+      error,
+    } =
+      await client
+        .from(
+          "community_posts"
+        )
+        .update({
+          title:
+            nextTitle,
+
+          body:
+            nextBody,
+
+          category:
+            editPostCategory,
+        })
+        .eq(
+          "id",
+          post.id
+        )
+        .select("*")
+        .single();
+
+    if (error) {
+      setStatus(
+        error.message
+      );
+
+      setBusy(false);
+
+      return;
+    }
+
+    const updated =
+      data as CommunityPost;
+
+    setPosts(
+      current =>
+        current.map(
+          item =>
+            item.id ===
+            updated.id
+              ? updated
+              : item
+        )
+    );
+
+    cancelEditPost();
+
+    setStatus(
+      "Post updated successfully."
+    );
+
+    setBusy(false);
+  }
+
+
   async function toggleResolved(post: CommunityPost) {
     const client = getSupabaseClient();
     if (!client || busy) return;
@@ -646,15 +798,171 @@ export function CommunityPosts({profile}: {profile: CommunityProfile}) {
                 </div>
               </header>
               <div className="communityPostBody">
-                <h3>{post.title}</h3>
-                <p>{post.body}</p>
+
+                {editingPostId ===
+                post.id ? (
+
+                  <div className="communityPostEditPanel">
+
+                    <span className="communityPostEditEyebrow">
+                      EDIT POST
+                    </span>
+
+                    <select
+                      value={
+                        editPostCategory
+                      }
+                      onChange={event =>
+                        setEditPostCategory(
+                          event.target.value as
+                            (typeof categories)[number]
+                        )
+                      }
+                    >
+                      {categories.map(
+                        option => (
+                          <option
+                            value={option}
+                            key={option}
+                          >
+                            {option}
+                          </option>
+                        )
+                      )}
+                    </select>
+
+                    <input
+                      value={
+                        editPostTitle
+                      }
+                      maxLength={160}
+                      onChange={event =>
+                        setEditPostTitle(
+                          event.target.value
+                        )
+                      }
+                    />
+
+                    <textarea
+                      value={
+                        editPostBody
+                      }
+                      maxLength={5000}
+                      onChange={event =>
+                        setEditPostBody(
+                          event.target.value
+                        )
+                      }
+                    />
+
+                    <div className="communityPostEditActions">
+
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={
+                          cancelEditPost
+                        }
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        className="save"
+                        disabled={busy}
+                        onClick={() =>
+                          void saveEditedPost(
+                            post
+                          )
+                        }
+                      >
+                        {busy
+                          ? "Saving..."
+                          : "Save changes"}
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                ) : (
+
+                  <>
+
+                    <h3>
+                      {post.title}
+                    </h3>
+
+                    <p>
+                      {post.body}
+                    </p>
+
+                  </>
+
+                )}
+
               </div>
               <footer className="communityPostActions">
                 <button type="button" onClick={() => void toggleReplies(post.id)}>
                   <i>↳</i>{post.reply_count} {post.reply_count === 1 ? "reply" : "replies"}
                 </button>
-                {canManage && <button type="button" onClick={() => void toggleResolved(post)}>{post.status === "Resolved" ? "Reopen" : "Mark resolved"}</button>}
-                {canManage && <button type="button" className="danger" onClick={() => void removePost(post)}>Delete</button>}
+                {canManage && (
+
+                  <button
+                    type="button"
+                    className="communityPostEditButton"
+                    disabled={
+                      editingPostId ===
+                      post.id
+                    }
+                    onClick={() =>
+                      beginEditPost(
+                        post
+                      )
+                    }
+                  >
+                    <i>✎</i>
+                    Edit
+                  </button>
+
+                )}
+
+                {canManage && (
+
+                  <button
+                    type="button"
+                    className="communityPostResolveButton"
+                    onClick={() =>
+                      void toggleResolved(
+                        post
+                      )
+                    }
+                  >
+                    {post.status ===
+                    "Resolved"
+                      ? "↻ Reopen"
+                      : "✓ Mark resolved"}
+                  </button>
+
+                )}
+
+                {canManage && (
+
+                  <button
+                    type="button"
+                    className="danger communityPostDeleteButton"
+                    onClick={() =>
+                      void removePost(
+                        post
+                      )
+                    }
+                  >
+                    <i>×</i>
+                    Delete
+                  </button>
+
+                )}
               </footer>
 
               {expanded && (

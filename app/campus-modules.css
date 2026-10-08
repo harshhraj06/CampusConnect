@@ -24200,3 +24200,833 @@ input[placeholder="Search student, USN or guardian"]:focus {
   }
 
 }
+
+/* === ASSIGNMENT DETAILS POPUP START === */
+
+.assignmentDetailsClickable {
+  cursor: pointer !important;
+}
+
+.assignmentDetailsClickable:focus-visible {
+  outline:
+    3px solid
+    rgba(53,84,66,.24) !important;
+
+  outline-offset:
+    3px !important;
+}
+
+.assignmentDetailsClickable:hover {
+  border-color:
+    #bfc9c1 !important;
+}
+
+
+/* ============================================================
+   BACKDROP
+   ============================================================ */
+
+.assignmentDetailsScrim {
+  position:
+    fixed;
+
+  z-index:
+    12000;
+
+  inset:
+    0;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  padding:
+    24px;
+
+  overflow-y:
+    auto;
+
+  background:
+    rgba(30,31,27,.62);
+
+  backdrop-filter:
+    blur(10px);
+
+  -webkit-backdrop-filter:
+    blur(10px);
+
+  animation:
+    assignmentDetailsBackdropIn
+    .2s ease both;
+}
+
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+.assignmentDetailsModal {
+  position:
+    relative;
+
+  width:
+    min(
+      680px,
+      100%
+    );
+
+  max-height:
+    calc(
+      100vh - 48px
+    );
+
+  overflow-y:
+    auto;
+
+  border:
+    1px solid
+    #d4d2ca;
+
+  border-radius:
+    20px;
+
+  background:
+    #fffefb;
+
+  box-shadow:
+    0 34px 100px
+    rgba(23,24,21,.28);
+
+  animation:
+    assignmentDetailsModalIn
+    .28s
+    cubic-bezier(
+      .22,
+      1,
+      .36,
+      1
+    )
+    both;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.assignmentDetailsHeader {
+  position:
+    relative;
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    24px;
+
+  padding:
+    27px 28px 24px;
+
+  overflow:
+    hidden;
+
+  border-bottom:
+    1px solid
+    #e5e1d8;
+
+  background:
+    radial-gradient(
+      circle at 88% 15%,
+      rgba(154,112,68,.13),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #fffdf7,
+      #f5efe5
+    );
+}
+
+
+.assignmentDetailsHeader::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  left:
+    0;
+
+  top:
+    22px;
+
+  bottom:
+    22px;
+
+  width:
+    4px;
+
+  border-radius:
+    0 5px 5px 0;
+
+  background:
+    #345442;
+}
+
+
+.assignmentDetailsHeader
+> div {
+  min-width:
+    0;
+}
+
+
+.assignmentDetailsKind {
+  display:
+    inline-flex;
+
+  min-height:
+    25px;
+
+  align-items:
+    center;
+
+  padding:
+    0 9px;
+
+  border:
+    1px solid
+    #cbdcd1;
+
+  border-radius:
+    999px;
+
+  background:
+    #edf5ef;
+
+  color:
+    #345442;
+
+  font-size:
+    7px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .09em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.assignmentDetailsKind.project {
+  border-color:
+    #ddd1c7;
+
+  background:
+    #f6eee7;
+
+  color:
+    #805c42;
+}
+
+
+.assignmentDetailsKind.placement {
+  border-color:
+    #ead7bd;
+
+  background:
+    #f8ecdc;
+
+  color:
+    #8a5e2e;
+}
+
+
+.assignmentDetailsHeader h2 {
+  margin:
+    13px 0 7px;
+
+  color:
+    #292722;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      25px,
+      4vw,
+      34px
+    );
+
+  font-weight:
+    500;
+
+  line-height:
+    1.1;
+
+  letter-spacing:
+    -.04em;
+}
+
+
+.assignmentDetailsHeader p {
+  margin:
+    0;
+
+  color:
+    #997043;
+
+  font-size:
+    9px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .06em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.assignmentDetailsHeader
+> button {
+  display:
+    grid;
+
+  width:
+    36px;
+
+  height:
+    36px;
+
+  flex:
+    0 0 36px;
+
+  place-items:
+    center;
+
+  border:
+    1px solid
+    #d6d1c7;
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(255,255,255,.72);
+
+  color:
+    #443e36;
+
+  font-size:
+    21px;
+
+  line-height:
+    1;
+
+  cursor:
+    pointer;
+}
+
+
+/* ============================================================
+   CONTENT
+   ============================================================ */
+
+.assignmentDetailsBody {
+  display:
+    grid;
+
+  gap:
+    22px;
+
+  padding:
+    26px 28px;
+}
+
+
+.assignmentDetailsDescription {
+  padding-bottom:
+    22px;
+
+  border-bottom:
+    1px solid
+    #e9e5dd;
+}
+
+
+.assignmentDetailsDescription
+> span,
+.assignmentDetailsAttachments
+> span {
+  display:
+    block;
+
+  margin-bottom:
+    10px;
+
+  color:
+    #9a7144;
+
+  font-size:
+    7px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .16em;
+}
+
+
+.assignmentDetailsDescription p {
+  margin:
+    0;
+
+  color:
+    #555850;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.8;
+
+  white-space:
+    pre-wrap;
+}
+
+
+/* ============================================================
+   META
+   ============================================================ */
+
+.assignmentDetailsMetaGrid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0,1fr)
+    );
+
+  gap:
+    10px;
+}
+
+
+.assignmentDetailsMetaGrid
+article {
+  min-width:
+    0;
+
+  padding:
+    14px;
+
+  border:
+    1px solid
+    #e0dfd8;
+
+  border-radius:
+    11px;
+
+  background:
+    #faf9f5;
+}
+
+
+.assignmentDetailsMetaGrid
+span {
+  display:
+    block;
+
+  margin-bottom:
+    6px;
+
+  color:
+    #94968e;
+
+  font-size:
+    6.5px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .12em;
+}
+
+
+.assignmentDetailsMetaGrid
+strong {
+  display:
+    block;
+
+  overflow-wrap:
+    anywhere;
+
+  color:
+    #343731;
+
+  font-size:
+    9px;
+
+  line-height:
+    1.5;
+}
+
+
+/* ============================================================
+   ATTACHMENTS
+   ============================================================ */
+
+.assignmentDetailsAttachments
+> div {
+  display:
+    grid;
+
+  gap:
+    8px;
+}
+
+
+.assignmentDetailsAttachments button {
+  display:
+    grid;
+
+  grid-template-columns:
+    42px
+    minmax(0,1fr)
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  width:
+    100%;
+
+  min-height:
+    52px;
+
+  padding:
+    8px 11px;
+
+  border:
+    1px solid
+    #dedfd8;
+
+  border-radius:
+    10px;
+
+  background:
+    #fff;
+
+  color:
+    #454b45;
+
+  text-align:
+    left;
+
+  cursor:
+    pointer;
+
+  transition:
+    border-color .16s ease,
+    background .16s ease,
+    transform .16s ease;
+}
+
+
+.assignmentDetailsAttachments
+button:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    #c7d2ca;
+
+  background:
+    #fafcf9;
+}
+
+
+.assignmentDetailsAttachments
+button i {
+  display:
+    grid;
+
+  width:
+    38px;
+
+  height:
+    34px;
+
+  place-items:
+    center;
+
+  border-radius:
+    8px;
+
+  background:
+    #edf5ef;
+
+  color:
+    #345442;
+
+  font-style:
+    normal;
+
+  font-size:
+    7px;
+
+  font-weight:
+    900;
+}
+
+
+.assignmentDetailsAttachments
+button span {
+  overflow:
+    hidden;
+
+  color:
+    #444942;
+
+  font-size:
+    9px;
+
+  font-weight:
+    700;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.assignmentDetailsAttachments
+button b {
+  color:
+    #345442;
+
+  font-size:
+    12px;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.assignmentDetailsFooter {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    15px;
+
+  padding:
+    15px 28px;
+
+  border-top:
+    1px solid
+    #e7e3da;
+
+  background:
+    #faf8f3;
+}
+
+
+.assignmentDetailsFooter span {
+  color:
+    #93938b;
+
+  font-size:
+    7px;
+
+  font-weight:
+    700;
+}
+
+
+.assignmentDetailsFooter button {
+  min-height:
+    37px;
+
+  padding:
+    0 15px;
+
+  border:
+    1px solid
+    #345442;
+
+  border-radius:
+    8px;
+
+  background:
+    #345442;
+
+  color:
+    #fff;
+
+  font:
+    inherit;
+
+  font-size:
+    8px;
+
+  font-weight:
+    850;
+
+  cursor:
+    pointer;
+}
+
+
+/* ============================================================
+   MOTION
+   ============================================================ */
+
+@keyframes assignmentDetailsBackdropIn {
+
+  from {
+    opacity:
+      0;
+  }
+
+  to {
+    opacity:
+      1;
+  }
+
+}
+
+
+@keyframes assignmentDetailsModalIn {
+
+  from {
+    opacity:
+      0;
+
+    transform:
+      translateY(18px)
+      scale(.975);
+  }
+
+  to {
+    opacity:
+      1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 620px) {
+
+  .assignmentDetailsScrim {
+    align-items:
+      end;
+
+    padding:
+      10px;
+  }
+
+
+  .assignmentDetailsModal {
+    width:
+      100%;
+
+    max-height:
+      calc(
+        100vh - 20px
+      );
+
+    border-radius:
+      17px;
+  }
+
+
+  .assignmentDetailsHeader {
+    padding:
+      22px 20px 19px;
+  }
+
+
+  .assignmentDetailsHeader h2 {
+    font-size:
+      25px;
+  }
+
+
+  .assignmentDetailsBody {
+    padding:
+      21px 20px;
+  }
+
+
+  .assignmentDetailsMetaGrid {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .assignmentDetailsFooter {
+    padding:
+      14px 20px;
+  }
+
+}
+
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .assignmentDetailsScrim,
+  .assignmentDetailsModal {
+    animation:
+      none;
+  }
+
+}
+
+
+/* === ASSIGNMENT DETAILS POPUP END === */

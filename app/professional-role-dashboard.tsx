@@ -1,5 +1,7 @@
 "use client";
 
+import { AdminBeamsBackground } from "./admin-beams-background";
+
 import {
   useEffect,
   useMemo,
@@ -1535,12 +1537,14 @@ export function ProfessionalRoleDashboard({
       `}</style>
 
       <section className="proDashboardHero proDashboardPhotoHero">
-        <img
+        {role === "Main Admin" ? <AdminBeamsBackground /> : (
+<img
           className="proDashboardHeroPhoto"
           src="/rnsit-campus-gate.png"
           alt=""
           aria-hidden="true"
         />
+)}
 
         <div
           className="proDashboardHeroPhotoOverlay"

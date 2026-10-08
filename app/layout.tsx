@@ -3,10 +3,12 @@ import type {
   Viewport,
 } from "next";
 
-import "./globals.css";
-import "./dashboard-parchment.css";
+import "./public-shell.css";
+import "./opening-animation.css";
+import "./auth-warm.css";
 
 import PwaRegister from "./pwa-register";
+import CookieConsent from "./cookie-consent";
 
 const campusConnectStructuredData = {
   "@context": "https://schema.org",
@@ -52,66 +54,141 @@ export const metadata: Metadata = {
       "https://campusconnect-pro.in"
     ),
 
-  title:
-    "CampusConnect Pro — Student Success Platform",
+  title: {
+    default:
+      "CampusConnect Pro — Campus Operating System",
+    template:
+      "%s | CampusConnect Pro",
+  },
 
   description:
-    "Academics, placements, campus networking and resume building in one verified student platform.",
+    "CampusConnect Pro brings academics, attendance, assignments, placements, events, campus networking, faculty workflows and AI assistance into one secure campus platform.",
 
   applicationName:
     "CampusConnect Pro",
 
+  authors: [
+    {
+      name:
+        "CampusConnect Pro",
+    },
+  ],
+
+  creator:
+    "CampusConnect Pro",
+
+  publisher:
+    "CampusConnect Pro",
+
   alternates: {
     canonical:
-      "https://campusconnect-pro.in/",
+      "/",
   },
 
   icons: {
     icon: [
       {
-        url: "/favicon.png",
-        type: "image/png",
-        sizes: "512x512",
+        url:
+          "/favicon.png",
+        type:
+          "image/png",
+        sizes:
+          "512x512",
+      },
+      {
+        url:
+          "/favicon.ico",
+        type:
+          "image/x-icon",
       },
     ],
+
     apple: [
       {
         url:
           "/icons/campusconnect-192-v2.png",
-        type: "image/png",
-        sizes: "192x192",
+        type:
+          "image/png",
+        sizes:
+          "192x192",
       },
     ],
   },
 
-  appleWebApp: {
-    capable: true,
-    title: "CampusConnect",
-    statusBarStyle: "default",
-  },
-
   openGraph: {
-    title: "CampusConnect Pro",
+    title:
+      "CampusConnect Pro — Campus Operating System",
+
     description:
-      "Learn. Connect. Get placed.",
-    type: "website",
+      "Academics, attendance, placements, campus life and AI assistance in one secure platform.",
+
+    url:
+      "https://campusconnect-pro.in/",
+
+    siteName:
+      "CampusConnect Pro",
+
+    type:
+      "website",
+
+    locale:
+      "en_IN",
+
     images: [
       {
-        url: "/og.png",
-        width: 1200,
-        height: 630,
+        url:
+          "/og.png",
+
+        width:
+          1200,
+
+        height:
+          630,
+
         alt:
-          "CampusConnect Pro — Learn. Connect. Get placed.",
+          "CampusConnect Pro — Campus Operating System",
       },
     ],
   },
 
   twitter: {
-    card: "summary_large_image",
-    title: "CampusConnect Pro",
+    card:
+      "summary_large_image",
+
+    title:
+      "CampusConnect Pro — Campus Operating System",
+
     description:
-      "Learn. Connect. Get placed.",
-    images: ["/og.png"],
+      "Academics, attendance, placements, campus life and AI assistance in one secure platform.",
+
+    images: [
+      "/og.png",
+    ],
+  },
+
+  robots: {
+    index:
+      true,
+
+    follow:
+      true,
+
+    googleBot: {
+      index:
+        true,
+
+      follow:
+        true,
+
+      "max-image-preview":
+        "large",
+
+      "max-snippet":
+        -1,
+
+      "max-video-preview":
+        -1,
+    },
   },
 };
 
@@ -140,6 +217,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <PwaRegister />
         {children}
+        <CookieConsent />
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type FormEvent,
 } from "react";
@@ -402,6 +403,12 @@ export function FacultyDirectory({
 
   const [status, setStatus] =
     useState("");
+
+
+  const branchRollRef =
+    useRef<HTMLElement | null>(
+      null
+    );
 
 
   /*
@@ -1006,6 +1013,360 @@ export function FacultyDirectory({
   }, [
     department,
   ]);
+
+
+  useEffect(
+    () => {
+
+      if (
+        department !== "All" ||
+        loading ||
+        !branchRollRef.current
+      ) {
+        return;
+      }
+
+
+      const prefersReducedMotion =
+        window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+
+      if (
+        prefersReducedMotion
+      ) {
+        return;
+      }
+
+
+      let cancelled =
+        false;
+
+
+      const animations:
+        any[] =
+        [];
+
+
+      const setupSplitRoll =
+        async () => {
+
+          const [
+            gsapModule,
+            scrollModule,
+          ] =
+            await Promise.all([
+              import("gsap"),
+              import(
+                "gsap/ScrollTrigger"
+              ),
+            ]);
+
+
+          if (
+            cancelled ||
+            !branchRollRef.current
+          ) {
+            return;
+          }
+
+
+          const gsap =
+            gsapModule.gsap ||
+            gsapModule.default;
+
+
+          const ScrollTrigger =
+            scrollModule.ScrollTrigger;
+
+
+          gsap.registerPlugin(
+            ScrollTrigger
+          );
+
+
+          const container =
+            branchRollRef.current;
+
+
+          const cards =
+            Array.from(
+              container.querySelectorAll<HTMLElement>(
+                ".facultyBranchCard"
+              )
+            );
+
+
+          cards.forEach(
+            (
+              card,
+              index
+            ) => {
+
+              const side =
+                index % 2 === 0
+                  ? -1
+                  : 1;
+
+
+              const depth =
+                Math.floor(
+                  index / 2
+                );
+
+
+              const visual =
+                card.querySelector<HTMLElement>(
+                  ".facultyBranchCardVisual"
+                );
+
+
+              const content =
+                card.querySelector<HTMLElement>(
+                  ".facultyBranchCardContent"
+                );
+
+
+              gsap.set(
+                card,
+                {
+                  transformOrigin:
+                    side < 0
+                      ? "100% 50%"
+                      : "0% 50%",
+
+                  transformStyle:
+                    "preserve-3d",
+                }
+              );
+
+
+              const cardTween =
+                gsap.fromTo(
+                  card,
+                  {
+                    x:
+                      side *
+                      (
+                        170 +
+                        depth *
+                        24
+                      ),
+
+                    y:
+                      64 +
+                      depth *
+                      13,
+
+                    rotateY:
+                      side *
+                      (
+                        -19 -
+                        depth *
+                        2.2
+                      ),
+
+                    rotateZ:
+                      side *
+                      (
+                        6.5 +
+                        depth *
+                        0.8
+                      ),
+
+                    scale:
+                      Math.max(
+                        0.78,
+                        0.9 -
+                        depth *
+                        0.025
+                      ),
+
+                    opacity:
+                      Math.max(
+                        0.18,
+                        0.42 -
+                        depth *
+                        0.04
+                      ),
+                  },
+                  {
+                    x: 0,
+                    y: 0,
+
+                    rotateY: 0,
+                    rotateZ: 0,
+
+                    scale: 1,
+                    opacity: 1,
+
+                    ease:
+                      "none",
+
+                    scrollTrigger: {
+                      trigger:
+                        card,
+
+                      start:
+                        "top 94%",
+
+                      end:
+                        "top 53%",
+
+                      scrub:
+                        1.05,
+
+                      invalidateOnRefresh:
+                        true,
+                    },
+                  }
+                );
+
+
+              animations.push(
+                cardTween
+              );
+
+
+              if (
+                visual
+              ) {
+
+                const visualTween =
+                  gsap.fromTo(
+                    visual,
+                    {
+                      x:
+                        side *
+                        22,
+
+                      scale:
+                        1.09,
+                    },
+                    {
+                      x: 0,
+
+                      scale:
+                        1,
+
+                      ease:
+                        "none",
+
+                      scrollTrigger: {
+                        trigger:
+                          card,
+
+                        start:
+                          "top 96%",
+
+                        end:
+                          "top 54%",
+
+                        scrub:
+                          1.15,
+
+                        invalidateOnRefresh:
+                          true,
+                      },
+                    }
+                  );
+
+
+                animations.push(
+                  visualTween
+                );
+              }
+
+
+              if (
+                content
+              ) {
+
+                const contentTween =
+                  gsap.fromTo(
+                    content,
+                    {
+                      x:
+                        side *
+                        -18,
+
+                      opacity:
+                        0.58,
+                    },
+                    {
+                      x: 0,
+
+                      opacity:
+                        1,
+
+                      ease:
+                        "none",
+
+                      scrollTrigger: {
+                        trigger:
+                          card,
+
+                        start:
+                          "top 92%",
+
+                        end:
+                          "top 58%",
+
+                        scrub:
+                          0.9,
+
+                        invalidateOnRefresh:
+                          true,
+                      },
+                    }
+                  );
+
+
+                animations.push(
+                  contentTween
+                );
+              }
+
+            }
+          );
+
+
+          ScrollTrigger.refresh();
+        };
+
+
+      void setupSplitRoll();
+
+
+      return () => {
+
+        cancelled =
+          true;
+
+
+        animations.forEach(
+          animation => {
+
+            animation
+              ?.scrollTrigger
+              ?.kill?.();
+
+
+            animation
+              ?.kill?.();
+
+          }
+        );
+      };
+
+    },
+    [
+      department,
+      loading,
+      faculty.length,
+    ]
+  );
 
 
   // =========================================================
@@ -2087,7 +2448,34 @@ is_featured:
           </section>
 
 
-          <section className="facultyBranchGrid">
+          <section
+            className="facultyBranchGrid facultyBranchSplitRoll"
+            ref={
+              branchRollRef
+            }
+          >
+
+            <div
+              className="facultySplitRollBackdrop"
+              aria-hidden="true"
+            >
+
+              <span className="facultySplitRollArc facultySplitRollArcOne"/>
+
+              <span className="facultySplitRollArc facultySplitRollArcTwo"/>
+
+              <span className="facultySplitRollAxis">
+
+                <i/>
+
+              </span>
+
+              <small>
+                EXPLORE
+              </small>
+
+            </div>
+
 
             {facultyBranchCards.map(
               ({

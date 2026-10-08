@@ -17,11 +17,10 @@ export type ClaimedAttendanceEmail = {
 };
 
 
-type ResendResponse = {
-  id?: string;
+type BrevoResponse = {
+  messageId?: string;
   message?: string;
-  name?: string;
-  statusCode?: number;
+  code?: string;
 };
 
 
@@ -46,9 +45,11 @@ type DeliverAttendanceEmailOptions = {
   claimed:
     ClaimedAttendanceEmail;
 
-  resendApiKey: string;
+  brevoApiKey: string;
 
   emailFrom: string;
+
+  emailFromName?: string;
 };
 
 
@@ -255,47 +256,54 @@ export async function deliverClaimedAttendanceEmail(
   const {
     admin,
     claimed,
-    resendApiKey,
+    brevoApiKey,
     emailFrom,
+    emailFromName,
   } = options;
-
-  const idempotencyKey =
-    `attendance-${claimed.id}`;
 
   try {
     const response =
       await fetch(
-        "https://api.resend.com/emails",
+        "https://api.brevo.com/v3/smtp/email",
         {
           method: "POST",
 
           headers: {
-            Authorization:
-              `Bearer ${resendApiKey}`,
+            "api-key":
+              brevoApiKey,
 
             "Content-Type":
               "application/json",
 
-            "Idempotency-Key":
-              idempotencyKey,
+            Accept:
+              "application/json",
           },
 
           body:
             JSON.stringify({
-              from:
-                emailFrom,
+              sender: {
+                email:
+                  emailFrom,
+
+                name:
+                  emailFromName ||
+                  "CampusConnect",
+              },
 
               to: [
-                claimed.recipient,
+                {
+                  email:
+                    claimed.recipient,
+                },
               ],
 
               subject:
                 claimed.subject,
 
-              text:
+              textContent:
                 claimed.message,
 
-              html:
+              htmlContent:
                 emailHtml(
                   claimed.subject,
                   claimed.message
@@ -305,24 +313,24 @@ export async function deliverClaimedAttendanceEmail(
       );
 
     let provider:
-      ResendResponse = {};
+      BrevoResponse = {};
 
     try {
       provider =
         (await response.json()) as
-          ResendResponse;
+          BrevoResponse;
     } catch {
       provider = {};
     }
 
     if (
       !response.ok ||
-      !provider.id
+      !provider.messageId
     ) {
       const providerError =
         String(
           provider.message ||
-          provider.name ||
+          provider.code ||
           `Email provider returned HTTP ${response.status}.`
         ).slice(
           0,
@@ -381,7 +389,7 @@ export async function deliverClaimedAttendanceEmail(
             claimed.id,
 
           target_provider_message_id:
-            provider.id,
+            provider.messageId,
         }
       );
 
@@ -410,7 +418,7 @@ export async function deliverClaimedAttendanceEmail(
           "Failed",
 
         providerMessageId:
-          provider.id,
+          provider.messageId,
 
         error:
           "Provider accepted the email, but CampusConnect could not finalize its delivery state.",
@@ -425,7 +433,7 @@ export async function deliverClaimedAttendanceEmail(
         "Sent",
 
       providerMessageId:
-        provider.id,
+        provider.messageId,
     };
   } catch (error) {
     const message =

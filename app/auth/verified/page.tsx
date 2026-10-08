@@ -18,45 +18,34 @@ type VerificationState =
   | "error";
 
 
-export default function
-CampusConnectVerifiedPage() {
-
+export default function CampusConnectVerifiedPage() {
   const [
     state,
     setState,
-  ] =
-    useState<
-      VerificationState
-    >("checking");
+  ] = useState<VerificationState>(
+    "checking"
+  );
 
   const [
     message,
     setMessage,
-  ] =
-    useState(
-      "Confirming your CampusConnect email address…"
-    );
+  ] = useState(
+    "Securely verifying your email address…"
+  );
 
 
   useEffect(
     () => {
-      let active =
-        true;
+      let active = true;
 
       const verify =
         async () => {
           const client =
             getSupabaseClient();
 
-          if (
-            !client
-          ) {
-            if (
-              active
-            ) {
-              setState(
-                "error"
-              );
+          if (!client) {
+            if (active) {
+              setState("error");
 
               setMessage(
                 "CampusConnect authentication is currently unavailable."
@@ -74,31 +63,25 @@ CampusConnectVerifiedPage() {
 
           const hash =
             new URLSearchParams(
-              window.location.hash
-                .replace(
-                  /^#/,
-                  ""
-                )
+              window.location.hash.replace(
+                /^#/,
+                ""
+              )
             );
 
+
           const providerError =
-            url.searchParams
-              .get(
-                "error_description"
-              ) ||
+            url.searchParams.get(
+              "error_description"
+            ) ||
             hash.get(
               "error_description"
             );
 
-          if (
-            providerError
-          ) {
-            if (
-              active
-            ) {
-              setState(
-                "error"
-              );
+
+          if (providerError) {
+            if (active) {
+              setState("error");
 
               setMessage(
                 decodeURIComponent(
@@ -113,14 +96,12 @@ CampusConnectVerifiedPage() {
 
           try {
             const code =
-              url.searchParams
-                .get(
-                  "code"
-                );
+              url.searchParams.get(
+                "code"
+              );
 
-            if (
-              code
-            ) {
+
+            if (code) {
               const {
                 error,
               } =
@@ -129,9 +110,7 @@ CampusConnectVerifiedPage() {
                     code
                   );
 
-              if (
-                error
-              ) {
+              if (error) {
                 throw error;
               }
             }
@@ -147,6 +126,7 @@ CampusConnectVerifiedPage() {
                 "refresh_token"
               );
 
+
             if (
               accessToken &&
               refreshToken
@@ -158,13 +138,12 @@ CampusConnectVerifiedPage() {
                   .setSession({
                     access_token:
                       accessToken,
+
                     refresh_token:
                       refreshToken,
                   });
 
-              if (
-                error
-              ) {
+              if (error) {
                 throw error;
               }
             }
@@ -185,17 +164,20 @@ CampusConnectVerifiedPage() {
               await client.auth
                 .getSession();
 
+
             const {
               data: userData,
             } =
               await client.auth
                 .getUser();
 
+
             const user =
               userData.user ||
               sessionData.session
                 ?.user ||
               null;
+
 
             const verified =
               Boolean(
@@ -211,71 +193,51 @@ CampusConnectVerifiedPage() {
               );
 
 
-            if (
-              !verified
-            ) {
+            if (!verified) {
               throw new Error(
-                "The verification link is missing, invalid or has expired. Open the latest verification email sent by CampusConnect."
+                "This verification link is invalid, incomplete, or has expired. Please use the latest verification email sent by CampusConnect."
               );
             }
 
 
-            /*
-             * Supabase may automatically create a session
-             * after email confirmation. The requested flow
-             * requires the student to sign in using their
-             * registered password, so only the local
-             * verification session is removed.
-             */
             await client.auth
-              .signOut({
-                scope:
-                  "local",
-              });
+              .signOut();
 
 
-            window.history
-              .replaceState(
-                {},
-                document.title,
-                "/auth/verified"
-              );
-
-
-            if (
-              active
-            ) {
-              setState(
-                "success"
-              );
-
-              setMessage(
-                "Your email address has been verified successfully."
-              );
-            }
-
-          } catch (
-            error
-          ) {
-            console.error(
-              "[CampusConnect verification]",
-              error
+            window.history.replaceState(
+              {},
+              document.title,
+              window.location.pathname
             );
 
-            if (
-              active
-            ) {
-              setState(
-                "error"
-              );
 
-              setMessage(
-                error instanceof
-                  Error
-                  ? error.message
-                  : "This verification link could not be confirmed."
-              );
+            if (!active) {
+              return;
             }
+
+
+            setState(
+              "success"
+            );
+
+            setMessage(
+              "Your email address has been verified successfully."
+            );
+
+          } catch (error) {
+            if (!active) {
+              return;
+            }
+
+            setState(
+              "error"
+            );
+
+            setMessage(
+              error instanceof Error
+                ? error.message
+                : "Unable to verify your email address."
+            );
           }
         };
 
@@ -284,8 +246,7 @@ CampusConnectVerifiedPage() {
 
 
       return () => {
-        active =
-          false;
+        active = false;
       };
     },
     []
@@ -293,154 +254,152 @@ CampusConnectVerifiedPage() {
 
 
   return (
-    <main className="campusVerifiedPage">
-      <div
-        className="campusVerifiedAmbient campusVerifiedAmbientOne"
-        aria-hidden="true"
-      />
+    <main className="verifiedPage">
 
-      <div
-        className="campusVerifiedAmbient campusVerifiedAmbientTwo"
-        aria-hidden="true"
-      />
+      <section className="verifiedCard">
 
-      <section className="campusVerifiedCard">
-        <header className="campusVerifiedBrand">
-          <img
-            src="/campusconnect-logo.png"
-            alt="CampusConnect"
-          />
+        <div className="verifiedBrand">
+          <div className="verifiedBrandMark">
+            C
+          </div>
 
-          <span>
-            RNS INSTITUTE OF TECHNOLOGY
-          </span>
-        </header>
+          <div>
+            <strong>
+              CampusConnect
+            </strong>
 
-        <div
-          className={
-            `campusVerifiedSymbol ${state}`
-          }
-          aria-hidden="true"
-        >
-          {state ===
-            "checking"
-            ? (
-              <i />
-            )
-            : state ===
-              "success"
-            ? "✓"
-            : "!"}
+            <span>
+              Secure account verification
+            </span>
+          </div>
         </div>
 
+
         {state ===
-          "checking" ? (
+          "checking" && (
           <>
-            <span className="campusVerifiedEyebrow">
+
+            <div
+              className="verifiedSpinner"
+              aria-hidden="true"
+            />
+
+            <span className="verifiedEyebrow">
               VERIFYING ACCOUNT
             </span>
 
             <h1>
-              Just a moment…
-            </h1>
-
-            <p>
-              {message}
-            </p>
-          </>
-        ) : state ===
-          "success" ? (
-          <>
-            <span className="campusVerifiedEyebrow success">
-              VERIFICATION SUCCESSFUL
-            </span>
-
-            <h1>
-              Welcome to
-              <br />
-              CampusConnect.
+              Confirming your email
             </h1>
 
             <p>
               {message}
             </p>
 
-            <div className="campusVerifiedInstruction">
-              <span>
-                01
-              </span>
-
-              <div>
-                <strong>
-                  Continue to sign in
-                </strong>
-
-                <p>
-                  Enter your registered college
-                  email address and the password
-                  you created during registration.
-                </p>
-              </div>
-            </div>
-
-            <a
-              className="campusVerifiedPrimary"
-              href="/"
-            >
-              Continue to CampusConnect
-              <span>
-                →
-              </span>
-            </a>
-
-            <small className="campusVerifiedSecurity">
-              <i />
-              Your verified CampusConnect account
-              is ready.
-            </small>
-          </>
-        ) : (
-          <>
-            <span className="campusVerifiedEyebrow error">
-              VERIFICATION INCOMPLETE
-            </span>
-
-            <h1>
-              We couldn&apos;t verify this link.
-            </h1>
-
-            <p>
-              {message}
+            <p className="verifiedMuted">
+              Please keep this page open
+              for a moment.
             </p>
 
-            <a
-              className="campusVerifiedPrimary"
-              href="/"
-            >
-              Return to CampusConnect
-              <span>
-                →
-              </span>
-            </a>
-
-            <small className="campusVerifiedSecurity">
-              Request a new verification email
-              from the registration screen if
-              this link has expired.
-            </small>
           </>
         )}
 
-        <footer className="campusVerifiedFooter">
-          <span>
-            CAMPUSCONNECT
-          </span>
 
-          <small>
-            Verified campus identity
-          </small>
+        {state ===
+          "success" && (
+          <>
+
+            <div
+              className="verifiedSuccessIcon"
+              aria-hidden="true"
+            >
+              ✓
+            </div>
+
+            <span className="verifiedEyebrow">
+              VERIFICATION COMPLETE
+            </span>
+
+            <h1>
+              Verification successful
+            </h1>
+
+            <p>
+              {message}
+            </p>
+
+
+            <div className="verifiedInstruction">
+
+              <strong>
+                Your CampusConnect account
+                is now active.
+              </strong>
+
+              <p>
+                Go to the CampusConnect
+                website and sign in using
+                the email address and
+                password you created during
+                registration.
+              </p>
+
+              <div className="verifiedWebsite">
+                campusconnect-pro.in
+              </div>
+
+            </div>
+
+
+            <p className="verifiedClose">
+              You may now close this page.
+            </p>
+
+          </>
+        )}
+
+
+        {state ===
+          "error" && (
+          <>
+
+            <div
+              className="verifiedErrorIcon"
+              aria-hidden="true"
+            >
+              !
+            </div>
+
+            <span className="verifiedEyebrow">
+              VERIFICATION ERROR
+            </span>
+
+            <h1>
+              Unable to verify email
+            </h1>
+
+            <p>
+              {message}
+            </p>
+
+            <div className="verifiedInstruction">
+              <p>
+                Request a new verification
+                email from CampusConnect and
+                use the latest link.
+              </p>
+            </div>
+
+          </>
+        )}
+
+
+        <footer className="verifiedFooter">
+          CAMPUSCONNECT · VERIFIED CAMPUS WORKSPACE
         </footer>
+
       </section>
+
     </main>
   );
 }

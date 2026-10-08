@@ -1,0 +1,449 @@
+.ccInteractiveHoverButton {
+  --cc-button-bg:
+    rgba(255,255,255,.96);
+
+  --cc-button-text:
+    #172238;
+
+  --cc-button-border:
+    rgba(23,34,56,.14);
+
+  --cc-button-fill:
+    #172742;
+
+  --cc-button-fill-text:
+    #ffffff;
+
+
+  position:
+    relative;
+
+  isolation:
+    isolate;
+
+  min-height:
+    42px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    10px;
+
+  overflow:
+    hidden;
+
+  padding:
+    0
+    17px;
+
+  border:
+    1px solid
+    var(--cc-button-border);
+
+  border-radius:
+    999px;
+
+  background:
+    var(--cc-button-bg);
+
+  color:
+    var(--cc-button-text);
+
+  cursor:
+    pointer;
+
+  font: inherit;
+
+  font-size:
+    8px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    .015em;
+
+  box-shadow:
+    0
+    5px
+    15px
+    rgba(22,35,58,.055);
+
+  transition:
+    border-color
+    240ms
+    ease,
+
+    box-shadow
+    240ms
+    ease,
+
+    transform
+    240ms
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    ),
+
+    color
+    240ms
+    ease;
+}
+
+
+.ccInteractiveHoverButton::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  z-index:
+    -1;
+
+  width:
+    12px;
+
+  height:
+    12px;
+
+  left:
+    14px;
+
+  top:
+    50%;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--cc-button-fill);
+
+  transform:
+    translateY(-50%)
+    scale(1);
+
+  transform-origin:
+    center;
+
+  transition:
+    transform
+    430ms
+    cubic-bezier(
+      .16,
+      1,
+      .3,
+      1
+    );
+}
+
+
+.ccInteractiveHoverButton:hover::before,
+.ccInteractiveHoverButton:focus-visible::before {
+  transform:
+    translateY(-50%)
+    scale(36);
+}
+
+
+.ccInteractiveHoverButton:hover,
+.ccInteractiveHoverButton:focus-visible {
+  color:
+    var(--cc-button-fill-text);
+
+  border-color:
+    rgba(23,39,66,.24);
+
+  box-shadow:
+    0
+    10px
+    24px
+    rgba(22,35,58,.13);
+
+  transform:
+    translateY(-1px);
+}
+
+
+.ccInteractiveHoverButton:active {
+  transform:
+    translateY(0)
+    scale(.985);
+}
+
+
+.ccInteractiveHoverDot {
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  width:
+    7px;
+
+  height:
+    7px;
+
+  flex:
+    0 0
+    7px;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--cc-button-fill);
+
+  transition:
+    background
+    220ms
+    ease,
+
+    transform
+    220ms
+    ease;
+}
+
+
+.ccInteractiveHoverButton:hover
+.ccInteractiveHoverDot,
+
+.ccInteractiveHoverButton:focus-visible
+.ccInteractiveHoverDot {
+  background:
+    rgba(255,255,255,.9);
+
+  transform:
+    scale(.72);
+}
+
+
+.ccInteractiveHoverText {
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  white-space:
+    nowrap;
+
+  transition:
+    transform
+    240ms
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    );
+}
+
+
+.ccInteractiveHoverButton:hover
+.ccInteractiveHoverText,
+
+.ccInteractiveHoverButton:focus-visible
+.ccInteractiveHoverText {
+  transform:
+    translateX(-1px);
+}
+
+
+.ccInteractiveHoverArrow {
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  width:
+    14px;
+
+  color:
+    currentColor;
+
+  opacity:
+    .5;
+
+  transform:
+    translateX(-4px);
+
+  transition:
+    opacity
+    240ms
+    ease,
+
+    transform
+    240ms
+    cubic-bezier(
+      .22,
+      .61,
+      .36,
+      1
+    );
+}
+
+
+.ccInteractiveHoverButton:hover
+.ccInteractiveHoverArrow,
+
+.ccInteractiveHoverButton:focus-visible
+.ccInteractiveHoverArrow {
+  opacity:
+    1;
+
+  transform:
+    translateX(2px);
+}
+
+
+.ccInteractiveHoverButtonWide {
+  min-width:
+    224px;
+}
+
+
+.ccInteractiveHoverButton:disabled {
+  opacity:
+    .48;
+
+  cursor:
+    not-allowed;
+
+  transform:
+    none !important;
+}
+
+
+.ccInteractiveHoverButton:disabled::before {
+  transform:
+    translateY(-50%)
+    scale(1) !important;
+}
+
+
+/*
+ * Primary CampusConnect actions
+ */
+
+.ccInteractiveHoverButton.primary,
+.ccInteractiveHoverButton.ccPrimaryButton,
+.ccInteractiveHoverButton.publishButton,
+.ccInteractiveHoverButton.facultyPrimaryAction {
+  --cc-button-bg:
+    #315ee8;
+
+  --cc-button-text:
+    #ffffff;
+
+  --cc-button-border:
+    rgba(49,94,232,.26);
+
+  --cc-button-fill:
+    #172742;
+
+  --cc-button-fill-text:
+    #ffffff;
+}
+
+
+/*
+ * Warm Campus Life / Chronicle actions
+ */
+
+.campusMagazine
+.ccInteractiveHoverButton,
+
+.campusLife
+.ccInteractiveHoverButton {
+  --cc-button-bg:
+    #fffdf9;
+
+  --cc-button-text:
+    #5d4938;
+
+  --cc-button-border:
+    #dacdbc;
+
+  --cc-button-fill:
+    #5d4938;
+
+  --cc-button-fill-text:
+    #fffaf4;
+}
+
+
+/*
+ * Dark mode
+ */
+
+@media (
+  prefers-color-scheme:
+  dark
+) {
+
+  .ccInteractiveHoverButton {
+    --cc-button-bg:
+      rgba(24,29,39,.95);
+
+    --cc-button-text:
+      #edf2f8;
+
+    --cc-button-border:
+      rgba(255,255,255,.13);
+
+    --cc-button-fill:
+      #e9edf4;
+
+    --cc-button-fill-text:
+      #192131;
+
+    box-shadow:
+      0
+      7px
+      20px
+      rgba(0,0,0,.14);
+  }
+
+}
+
+
+/*
+ * Reduced motion
+ */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .ccInteractiveHoverButton,
+  .ccInteractiveHoverButton::before,
+  .ccInteractiveHoverDot,
+  .ccInteractiveHoverText,
+  .ccInteractiveHoverArrow {
+    transition:
+      none !important;
+  }
+
+}

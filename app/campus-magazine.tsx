@@ -14,6 +14,11 @@ import {
 
 import "./campus-magazine.css";
 
+import {
+  CampusChronicleCircularGallery,
+} from "./campus-chronicle-circular-gallery";
+
+
 
 type Role =
   | "Student"
@@ -1889,7 +1894,32 @@ export function CampusMagazine({
           )}
 
           {activePage ? (
-            <div className="magazinePresentation">
+            <>
+              {!editingPage && activeMedia.length > 0 && (
+                <CampusChronicleCircularGallery
+                  items={activeMedia.map(
+                    (
+                      item,
+                      index
+                    ) => ({
+                      id: item.id,
+                      image: item.photo_url,
+                      text:
+                        item.caption ||
+                        activePage.headline ||
+                        `Campus Chronicle photograph ${index + 1}`,
+                    })
+                  )}
+                />
+              )}
+
+              <div
+                className={
+                  editingPage
+                    ? "magazinePresentation"
+                    : "magazinePresentation magazinePresentationReaderHidden"
+                }
+              >
               <button
                 className="magazineArrow"
                 onClick={() =>
@@ -2114,7 +2144,7 @@ export function CampusMagazine({
                     </section>
                   </form>
                 ) : (
-                  <article className="magazineSpread">
+                  <article className="magazineSpread magazineSpreadCircular">
                     <section className="magazineEditorialPage magazineLeftPage">
                       <header className="editorialRunningHeader">
                         <span>
@@ -2327,6 +2357,8 @@ export function CampusMagazine({
                 ›
               </button>
             </div>
+          
+            </>
           ) : (
             <div className="magazineEmpty">
               <i>

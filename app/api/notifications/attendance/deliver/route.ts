@@ -66,9 +66,13 @@ export async function POST(
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     "";
 
-  const resendApiKey =
-    process.env.RESEND_API_KEY ||
+  const brevoApiKey =
+    process.env.BREVO_API_KEY ||
     "";
+
+  const emailFromName =
+    process.env.BREVO_SENDER_NAME ||
+    "CampusConnect";
 
   const emailFrom =
     process.env.ATTENDANCE_EMAIL_FROM ||
@@ -547,7 +551,7 @@ export async function POST(
    * delivery. Read-only dry-run has already returned above.
    */
   if (
-    !resendApiKey ||
+    !brevoApiKey ||
     !emailFrom
   ) {
     return jsonError(
@@ -657,9 +661,11 @@ export async function POST(
           claimed as
             ClaimedAttendanceEmail,
 
-        resendApiKey,
+        brevoApiKey,
 
         emailFrom,
+
+        emailFromName,
       });
 
 

@@ -1,0 +1,315 @@
+.campusTeamReference {
+  --team-foreground: #2b2824;
+  --team-muted: #77716a;
+  --team-border: #ded9d0;
+  --team-card: #fffdf8;
+  --team-accent: #f0ece5;
+
+  width: 100%;
+  margin: 34px 0;
+  padding: 12px 0;
+}
+
+.campusTeamReference > div:first-child {
+  padding: 64px 0;
+}
+
+.campusTeamReference .max-w-7xl {
+  width: min(100%, 1180px);
+}
+
+.campusTeamReference h2 {
+  max-width: 760px;
+  margin: 0;
+  color: var(--team-foreground);
+  font-size: clamp(34px, 5vw, 58px);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -.045em;
+}
+
+.campusTeamReference .campusTeamGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.campusTeamReference .campusTeamCard {
+  position: relative;
+  min-width: 0;
+}
+
+.campusTeamReference .campusTeamImageWrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #eee9e0;
+}
+
+.campusTeamReference .campusTeamImageWrap img {
+  display: block;
+  width: 100%;
+  aspect-ratio: .82;
+  object-fit: cover;
+  transition:
+    filter .3s ease,
+    transform .3s ease;
+}
+
+.campusTeamReference .campusTeamCard:hover img {
+  filter: grayscale(1);
+  transform: scale(1.015);
+}
+
+.campusTeamReference h3 {
+  margin: 0;
+  color: var(--team-foreground);
+  font-size: 23px;
+  font-weight: 500;
+  letter-spacing: -.025em;
+  text-align: center;
+}
+
+.campusTeamReference .campusTeamCard p {
+  margin: 0;
+  color: var(--team-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.campusTeamReference .campusTeamCard a {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--team-foreground);
+  transition: background .2s ease;
+}
+
+.campusTeamReference .campusTeamCard a:hover {
+  background: var(--team-accent);
+}
+
+.campusTeamAdminBar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 16px;
+  border: 1px solid #ded8ce;
+  border-radius: 12px;
+  background: #faf7f1;
+}
+
+.campusTeamAdminBar div {
+  display: grid;
+  gap: 3px;
+}
+
+.campusTeamAdminBar span {
+  color: #90714a;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .13em;
+}
+
+.campusTeamAdminBar strong {
+  color: #3d342a;
+  font-size: 12px;
+}
+
+.campusTeamAdminBar button,
+.campusTeamEdit {
+  border: 1px solid #37332d;
+  border-radius: 8px;
+  background: #37332d;
+  color: white;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.campusTeamAdminBar button {
+  min-height: 38px;
+  padding: 0 13px;
+}
+
+.campusTeamEdit {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  right: 10px;
+  min-height: 31px;
+  padding: 0 11px;
+  background: rgba(34, 31, 27, .88);
+  backdrop-filter: blur(10px);
+}
+
+.campusTeamLoading {
+  color: #888178;
+  font-size: 10px;
+}
+
+.campusTeamEditorBackdrop {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(29, 27, 24, .56);
+  backdrop-filter: blur(7px);
+}
+
+.campusTeamEditor {
+  width: min(100%, 520px);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  display: grid;
+  gap: 15px;
+  padding: 24px;
+  border: 1px solid #ddd6ca;
+  border-radius: 18px;
+  background: #fffdf9;
+  box-shadow: 0 30px 90px rgba(24, 21, 17, .24);
+}
+
+.campusTeamEditor > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #ebe6de;
+}
+
+.campusTeamEditor header span {
+  color: #997649;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .14em;
+}
+
+.campusTeamEditor header h3 {
+  margin-top: 5px;
+  color: #292621;
+  text-align: left;
+  font-size: 22px;
+}
+
+.campusTeamEditor header > button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ded8cf;
+  border-radius: 50%;
+  background: white;
+  color: #55504a;
+  font-size: 18px;
+}
+
+.campusTeamEditor label {
+  display: grid;
+  gap: 7px;
+}
+
+.campusTeamEditor label > span {
+  color: #554f48;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.campusTeamEditor input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #dcd6cd;
+  border-radius: 8px;
+  background: white;
+  color: #292621;
+  padding: 0 11px;
+  font: inherit;
+  font-size: 11px;
+  outline: none;
+}
+
+.campusTeamEditor input[type="file"] {
+  padding: 9px;
+}
+
+.campusTeamEditor input:focus {
+  border-color: #9c815f;
+  box-shadow: 0 0 0 3px rgba(156, 129, 95, .12);
+}
+
+.campusTeamEditor label small {
+  color: #948d84;
+  font-size: 8px;
+}
+
+.campusTeamEditorStatus {
+  margin: 0;
+  padding: 9px 10px;
+  border-left: 3px solid #a66f4e;
+  background: #f8eee8;
+  color: #7d4931;
+  font-size: 9px;
+}
+
+.campusTeamEditor footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.campusTeamEditor footer button {
+  min-height: 39px;
+  padding: 0 14px;
+  border: 1px solid #d4cec5;
+  border-radius: 8px;
+  background: white;
+  color: #453f38;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.campusTeamEditor footer button[type="submit"] {
+  border-color: #332f2a;
+  background: #332f2a;
+  color: white;
+}
+
+.campusTeamEditor footer button:disabled {
+  opacity: .55;
+}
+
+@media (max-width: 960px) {
+  .campusTeamReference .campusTeamGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .campusTeamReference > div:first-child {
+    padding: 36px 0;
+  }
+
+  .campusTeamReference .campusTeamGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .campusTeamAdminBar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .campusTeamReference h2 {
+    font-size: 36px;
+  }
+}

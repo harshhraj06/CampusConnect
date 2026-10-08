@@ -1,3 +1,4 @@
+import { parseModuleSyllabus, sourceMetadata, type SyllabusSource } from "../../../../../lib/syllabus-document";
 import {
   NextRequest,
   NextResponse,
@@ -54,6 +55,7 @@ type DraftTopic = {
 
 
 type DraftUnit = {
+  hours: number | null;
   unitNumber: number;
   title: string;
   description: string;
@@ -62,6 +64,7 @@ type DraftUnit = {
 
 
 type SyllabusDraft = {
+  metadata?: SyllabusSource;
   documentTitle: string;
   detectedSubject: string;
   units: DraftUnit[];
@@ -518,6 +521,7 @@ function normalizeDraft(
 
 
         units.push({
+          hours: Number(unitRecord.hours) > 0 && Number(unitRecord.hours) <= 1000 ? Number(unitRecord.hours) : null,
           unitNumber:
             Number.isInteger(
               suppliedNumber
@@ -1190,6 +1194,8 @@ Rules:
 8. Keep descriptions short and source-grounded.
 9. Do NOT decide completion status.
 10. Do NOT write anything to a database.
+11. Extract the numeric hours printed for EACH module into hours. Use null if absent. Do not confuse credits, marks, weekly L:T:P values, or + SL/self-learning hours with module teaching hours.
+12. Read all pages, including module content that continues onto the next page. Preserve all distinct topics, not just module titles.
 
 Return one JSON object only:
 
@@ -1199,6 +1205,7 @@ Return one JSON object only:
   "units": [
     {
       "unitNumber": 1,
+      "hours": null,
       "title": "",
       "description": "",
       "topics": [
@@ -1854,17 +1861,12 @@ export async function POST(
         );
 
 
-      const draft =
-        await callSyllabusAI(
-          {
-            kind:
-              "text",
-
-            text:
-              aiText,
-          },
-          subject
-        );
+      const draft = parseModuleSyllabus(text) ?? await callSyllabusAI({ kind: "text", text: aiText }, subject);
+      draft.metadata = draft.metadata ?? sourceMetadata(text, draft.units);
+      draft.metadata.fileName = fileName;
+      if (draft.metadata.courseCode && draft.metadata.courseCode.toLowerCase() !== subject.subject_code.toLowerCase()) {
+        draft.warnings.push(`Document course ${draft.metadata.courseCode} differs from selected subject ${subject.subject_code}. Verify the selected subject before saving.`);
+      }
 
 
       const warnings = [
