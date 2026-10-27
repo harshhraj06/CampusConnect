@@ -22,6 +22,8 @@ type PlacementOperationsProps = {
 
 type Tab =
   | "Overview"
+  | "Drives"
+  | "Applicants"
   | "Recruiters"
   | "Files"
   | "Interviews"
@@ -82,6 +84,82 @@ type PlacementOffer = {
   notes: string;
   created_at: string;
 };
+
+
+type PlacementDriveRecord = {
+  id: string;
+  company?: string | null;
+  role_title?: string | null;
+  deadline?: string | null;
+  compensation?: string | null;
+  location?: string | null;
+  work_mode?: string | null;
+  employment_type?: string | null;
+  minimum_cgpa?: number | null;
+  branches?: string[] | null;
+  skills?: string[] | null;
+  about?: string | null;
+  rounds?: string[] | null;
+  created_at?: string | null;
+  created_by?: string | null;
+  match_score?: number | null;
+};
+
+type PlacementApplicationRecord = {
+  id: string;
+  student_id?: string | null;
+  student_name?: string | null;
+  company?: string | null;
+  role_title?: string | null;
+  status?: string | null;
+  applied_at?: string | null;
+  updated_at?: string | null;
+  next_step?: string | null;
+  placement_id?: string | null;
+  cgpa?: number | string | null;
+};
+
+type DriveFormValues = {
+  company: string;
+  role_title: string;
+  compensation: string;
+  deadline: string;
+  location: string;
+  work_mode: string;
+  employment_type: string;
+  minimum_cgpa: string;
+  branches: string;
+  skills: string;
+  about: string;
+  rounds: string;
+};
+
+const emptyDriveForm: DriveFormValues = {
+  company: "",
+  role_title: "",
+  compensation: "",
+  deadline: "",
+  location: "",
+  work_mode: "Hybrid",
+  employment_type: "Full-time",
+  minimum_cgpa: "7.0",
+  branches: "ECE,CSE",
+  skills: "",
+  about: "",
+  rounds: "",
+};
+
+const applicantStatusOptions = [
+  "Applied",
+  "Under Review",
+  "Shortlisted",
+  "Assessment",
+  "Interview",
+  "On Hold",
+  "Offered",
+  "Accepted",
+  "Rejected",
+];
 
 const FILE_CATEGORIES = [
   "Job Description",
@@ -163,6 +241,27 @@ export function PlacementOperations({
   const [offers, setOffers] =
     useState<PlacementOffer[]>([]);
 
+
+  const [drives, setDrives] =
+    useState<PlacementDriveRecord[]>([]);
+
+  const [applications, setApplications] =
+    useState<PlacementApplicationRecord[]>([]);
+
+  const [driveFormOpen, setDriveFormOpen] =
+    useState(false);
+
+  const [editingDrive, setEditingDrive] =
+    useState<PlacementDriveRecord | null>(null);
+
+  const [driveSaving, setDriveSaving] =
+    useState(false);
+
+  const [driveForm, setDriveForm] =
+    useState<DriveFormValues>({ ...emptyDriveForm });
+
+  const [applicantSearch, setApplicantSearch] =
+    useState("");
   const [loading, setLoading] =
     useState(true);
 
@@ -228,6 +327,60 @@ export function PlacementOperations({
       joining_date: "",
       notes: "",
     });
+
+
+  // Load live recruitment drives and student applications independently
+  // from the existing recruiter/files/interviews/offers workspace.
+  useEffect(() => {
+    let active = true;
+    const client = getSupabaseClient();
+    if (!client) return;
+
+    void Promise.all([
+      client
+        .from("placement_drives")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      client
+        .from("placement_applications")
+        .select("*")
+        .order("applied_at", { ascending: false }),
+    ])
+      .then(([driveResult, applicationResult]) => {
+        if (!active) return;
+
+        const issues: string[] = [];
+
+        if (driveResult.error) {
+          issues.push(`Drives: ${driveResult.error.message}`);
+        } else {
+          setDrives((driveResult.data || []) as PlacementDriveRecord[]);
+        }
+
+        if (applicationResult.error) {
+          issues.push(`Applicants: ${applicationResult.error.message}`);
+        } else {
+          setApplications(
+            (applicationResult.data || []) as PlacementApplicationRecord[],
+          );
+        }
+
+        if (issues.length) setStatus(issues.join(" · "));
+      })
+      .catch((error: unknown) => {
+        if (active) {
+          setStatus(
+            error instanceof Error
+              ? error.message
+              : "Unable to load recruitment data.",
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const loadAll = async () => {
     const client =
@@ -329,7 +482,10 @@ export function PlacementOperations({
   };
 
   useEffect(() => {
-    void loadAll();
+    const timer = window.setTimeout(() => {
+      void loadAll();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const upcomingInterviews =
@@ -369,6 +525,234 @@ export function PlacementOperations({
           offers.length
         ).toFixed(1)
       : "0.0";
+
+
+  const saveDrive = async (event: FormEvent) => {
+    event.preventDefault();
+
+    const client = getSupabaseClient();
+    if (!client) {
+      setStatus("Supabase is not configured.");
+      return;
+    }
+
+    if (
+      !driveForm.company.trim() ||
+      !driveForm.role_title.trim() ||
+      !driveForm.deadline
+    ) {
+      setStatus("Company, role and deadline are required.");
+      return;
+    }
+
+    const deadline = new Date(driveForm.deadline);
+    if (Number.isNaN(deadline.getTime())) {
+      setStatus("Enter a valid recruitment deadline.");
+      return;
+    }
+
+    setDriveSaving(true);
+    setStatus("");
+
+    try {
+      const { data: authData, error: authError } =
+        await client.auth.getUser();
+
+      if (authError || !authData.user) {
+        setStatus("Sign in again before managing recruitment drives.");
+        return;
+      }
+
+      const company = driveForm.company.trim();
+      const payload = {
+        company,
+        role_title: driveForm.role_title.trim(),
+        compensation: driveForm.compensation.trim(),
+        deadline: deadline.toISOString(),
+        match_score: Number(editingDrive?.match_score || 0),
+        logo_label: company.slice(0, 2).toUpperCase(),
+        location: driveForm.location.trim(),
+        work_mode: driveForm.work_mode,
+        employment_type: driveForm.employment_type,
+        minimum_cgpa: Number(driveForm.minimum_cgpa || 0),
+        branches: driveForm.branches.split(",").map(v => v.trim()).filter(Boolean),
+        skills: driveForm.skills.split(",").map(v => v.trim()).filter(Boolean),
+        about: driveForm.about.trim(),
+        rounds: driveForm.rounds.split(",").map(v => v.trim()).filter(Boolean),
+      };
+
+      let saved: PlacementDriveRecord | null = null;
+
+      if (editingDrive) {
+        const { data, error } = await client
+          .from("placement_drives")
+          .update(payload)
+          .eq("id", editingDrive.id)
+          .select("*")
+          .single();
+
+        if (error) {
+          setStatus(`Unable to update drive: ${error.message}`);
+          return;
+        }
+
+        saved = data as PlacementDriveRecord;
+      } else {
+        const { data, error } = await client
+          .from("placement_drives")
+          .insert({
+            ...payload,
+            created_by: authData.user.id,
+          })
+          .select("*")
+          .single();
+
+        if (error) {
+          setStatus(`Unable to create drive: ${error.message}`);
+          return;
+        }
+
+        saved = data as PlacementDriveRecord;
+      }
+
+      if (!saved) {
+        setStatus("The database did not return the saved drive.");
+        return;
+      }
+
+      setDrives(current =>
+        editingDrive
+          ? current.map(item => item.id === saved!.id ? saved! : item)
+          : [saved!, ...current],
+      );
+
+      setDriveForm({ ...emptyDriveForm });
+      setEditingDrive(null);
+      setDriveFormOpen(false);
+      setStatus(
+        editingDrive
+          ? "Recruitment drive updated successfully."
+          : "Recruitment drive created successfully.",
+      );
+    } catch (error) {
+      setStatus(
+        error instanceof Error ? error.message : "Unable to save drive.",
+      );
+    } finally {
+      setDriveSaving(false);
+    }
+  };
+
+  const startEditingDrive = (drive: PlacementDriveRecord) => {
+    let deadline = "";
+
+    if (drive.deadline) {
+      const date = new Date(drive.deadline);
+      if (!Number.isNaN(date.getTime())) {
+        deadline = date.toISOString().slice(0, 16);
+      }
+    }
+
+    setEditingDrive(drive);
+    setDriveForm({
+      company: drive.company || "",
+      role_title: drive.role_title || "",
+      compensation: drive.compensation || "",
+      deadline,
+      location: drive.location || "",
+      work_mode: drive.work_mode || "Hybrid",
+      employment_type: drive.employment_type || "Full-time",
+      minimum_cgpa: String(drive.minimum_cgpa ?? 7.0),
+      branches: (drive.branches || []).join(","),
+      skills: (drive.skills || []).join(","),
+      about: drive.about || "",
+      rounds: (drive.rounds || []).join(","),
+    });
+    setDriveFormOpen(true);
+    setStatus("");
+  };
+
+  const deleteDrive = async (drive: PlacementDriveRecord) => {
+    const company = drive.company || "this company";
+    const role = drive.role_title || "this role";
+
+    if (!window.confirm(
+      `Delete ${company} — ${role}?\n\nHistorical applications will remain, but they will be detached from this drive. The database's current relationship also deletes interviews linked to the drive. This cannot be undone.`
+    )) return;
+
+    const client = getSupabaseClient();
+    if (!client) {
+      setStatus("Supabase is not configured.");
+      return;
+    }
+
+    const { error } = await client
+      .from("placement_drives")
+      .delete()
+      .eq("id", drive.id);
+
+    if (error) {
+      setStatus(`Unable to delete drive: ${error.message}`);
+      return;
+    }
+
+    setDrives(current => current.filter(item => item.id !== drive.id));
+    setStatus(`Deleted ${company} — ${role}.`);
+  };
+
+  const updateApplicantStatus = async (
+    application: PlacementApplicationRecord,
+    nextStatus: string,
+  ) => {
+    const client = getSupabaseClient();
+    if (!client) {
+      setStatus("Supabase is not configured.");
+      return;
+    }
+
+    const nextSteps: Record<string, string> = {
+      "Applied": "Awaiting review",
+      "Under Review": "Application under review",
+      "Shortlisted": "Shortlisted for the next stage",
+      "Assessment": "Assessment stage",
+      "Interview": "Interview stage",
+      "On Hold": "Temporarily on hold",
+      "Offered": "Offer decision pending",
+      "Accepted": "Selected / accepted",
+      "Rejected": "Application closed",
+    };
+
+    const { error } = await client
+      .from("placement_applications")
+      .update({
+        status: nextStatus,
+        next_step: nextSteps[nextStatus] || nextStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", application.id);
+
+    if (error) {
+      setStatus(`Unable to update applicant: ${error.message}`);
+      return;
+    }
+
+    setApplications(current =>
+      current.map(item =>
+        item.id === application.id
+          ? {
+              ...item,
+              status: nextStatus,
+              next_step: nextSteps[nextStatus] || nextStatus,
+              updated_at: new Date().toISOString(),
+            }
+          : item,
+      ),
+    );
+
+    setStatus(
+      `${application.student_name || "Applicant"} moved to ${nextStatus}.`,
+    );
+  };
 
   const createContact =
     async (
@@ -1100,6 +1484,8 @@ export function PlacementOperations({
         {(
           [
             "Overview",
+            "Drives",
+            "Applicants",
             "Recruiters",
             "Files",
             "Interviews",
@@ -1126,6 +1512,295 @@ export function PlacementOperations({
         <div className="placementOpsStatus">
           {status}
         </div>
+      )}
+
+
+      {tab === "Drives" && (
+        <section className="placementOpsPanel placementOpsFull">
+          <header>
+            <div>
+              <span>RECRUITMENT MANAGEMENT</span>
+              <h2>Company drives</h2>
+              <p>Create, edit and manage live campus recruitment opportunities.</p>
+            </div>
+            <button
+              type="button"
+              className="placementOpsPrimary"
+              onClick={() => {
+                setEditingDrive(null);
+                setDriveForm({ ...emptyDriveForm });
+                setDriveFormOpen(current => !current);
+              }}
+            >
+              {driveFormOpen && !editingDrive ? "Close form" : "+ Add recruitment drive"}
+            </button>
+          </header>
+
+          {driveFormOpen && (
+            <form className="placementOpsForm" onSubmit={saveDrive}>
+              <div>
+                <label>
+                  Company *
+                  <input
+                    required
+                    value={driveForm.company}
+                    onChange={event => setDriveForm(current => ({ ...current, company: event.target.value }))}
+                  />
+                </label>
+                <label>
+                  Job role *
+                  <input
+                    required
+                    value={driveForm.role_title}
+                    onChange={event => setDriveForm(current => ({ ...current, role_title: event.target.value }))}
+                  />
+                </label>
+                <label>
+                  Application deadline *
+                  <input
+                    required
+                    type="datetime-local"
+                    value={driveForm.deadline}
+                    onChange={event => setDriveForm(current => ({ ...current, deadline: event.target.value }))}
+                  />
+                </label>
+                <label>
+                  Compensation
+                  <input
+                    value={driveForm.compensation}
+                    placeholder="e.g. ₹12 LPA"
+                    onChange={event => setDriveForm(current => ({ ...current, compensation: event.target.value }))}
+                  />
+                </label>
+                <label>
+                  Location
+                  <input
+                    value={driveForm.location}
+                    onChange={event => setDriveForm(current => ({ ...current, location: event.target.value }))}
+                  />
+                </label>
+                <label>
+                  Minimum CGPA
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    value={driveForm.minimum_cgpa}
+                    onChange={event => setDriveForm(current => ({ ...current, minimum_cgpa: event.target.value }))}
+                  />
+                </label>
+                <label>
+                  Work mode
+                  <select
+                    value={driveForm.work_mode}
+                    onChange={event => setDriveForm(current => ({ ...current, work_mode: event.target.value }))}
+                  >
+                    <option>On-site</option>
+                    <option>Hybrid</option>
+                    <option>Remote</option>
+                  </select>
+                </label>
+                <label>
+                  Employment type
+                  <select
+                    value={driveForm.employment_type}
+                    onChange={event => setDriveForm(current => ({ ...current, employment_type: event.target.value }))}
+                  >
+                    <option>Full-time</option>
+                    <option>Internship</option>
+                    <option>Internship to Full-time</option>
+                    <option>Contract</option>
+                  </select>
+                </label>
+                <label>
+                  Eligible branches (comma separated)
+                  <input
+                    value={driveForm.branches}
+                    placeholder="ECE, CSE, ISE"
+                    onChange={event => setDriveForm(current => ({ ...current, branches: event.target.value }))}
+                  />
+                </label>
+                <label>
+                  Skills (comma separated)
+                  <input
+                    value={driveForm.skills}
+                    placeholder="Java, DSA, SQL"
+                    onChange={event => setDriveForm(current => ({ ...current, skills: event.target.value }))}
+                  />
+                </label>
+                <label>
+                  Selection rounds (comma separated)
+                  <input
+                    value={driveForm.rounds}
+                    placeholder="Assessment, Technical, HR"
+                    onChange={event => setDriveForm(current => ({ ...current, rounds: event.target.value }))}
+                  />
+                </label>
+              </div>
+              <label>
+                Role description
+                <textarea
+                  value={driveForm.about}
+                  onChange={event => setDriveForm(current => ({ ...current, about: event.target.value }))}
+                />
+              </label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                <button className="placementOpsPrimary" type="submit" disabled={driveSaving}>
+                  {driveSaving ? "Saving…" : editingDrive ? "Save changes" : "Publish recruitment drive"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDriveFormOpen(false);
+                    setEditingDrive(null);
+                    setDriveForm({ ...emptyDriveForm });
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+
+          <div className="placementOpsDirectory">
+            {drives.map(drive => (
+              <article key={drive.id}>
+                <i>{initials(drive.company || "CC")}</i>
+                <div>
+                  <span>{drive.company || "Company not specified"}</span>
+                  <h3>{drive.role_title || "Role not specified"}</h3>
+                  <p>
+                    {[drive.location, drive.work_mode, drive.employment_type]
+                      .filter(Boolean).join(" · ") || "Location and work mode not specified"}
+                  </p>
+                  <small>
+                    Deadline: {formatDate(drive.deadline)}
+                    {" · "}Minimum CGPA: {drive.minimum_cgpa ?? "—"}
+                  </small>
+                  <p>
+                    {(drive.branches || []).join(", ") || "Eligible branches not specified"}
+                    {drive.compensation ? ` · ${drive.compensation}` : ""}
+                  </p>
+                </div>
+                <aside style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  <button type="button" onClick={() => startEditingDrive(drive)}>
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="danger"
+                    onClick={() => void deleteDrive(drive)}
+                  >
+                    Delete
+                  </button>
+                </aside>
+              </article>
+            ))}
+            {!drives.length && !loading && (
+              <div className="placementOpsEmpty">
+                No recruitment drives were returned. Create a drive or verify your database access.
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {tab === "Applicants" && (
+        <section className="placementOpsPanel placementOpsFull">
+          <header>
+            <div>
+              <span>CANDIDATE REVIEW & SELECTION</span>
+              <h2>Applicant pipeline</h2>
+              <p>Review student applications and save each candidate&apos;s selection status.</p>
+            </div>
+            <strong>{applications.length} applications</strong>
+          </header>
+
+          <div className="placementOpsForm">
+            <label>
+              Search by student, company, role or status
+              <input
+                value={applicantSearch}
+                onChange={event => setApplicantSearch(event.target.value)}
+                placeholder="Search applicants…"
+              />
+            </label>
+          </div>
+
+          <div className="placementOpsTable">
+            <div className="placementOpsTableHead">
+              <span>Student</span>
+              <span>Company / Role</span>
+              <span>Applied</span>
+              <span>Next step</span>
+              <span>Decision</span>
+            </div>
+
+            {applications
+              .filter(application => {
+                const text = [
+                  application.student_name,
+                  application.student_id,
+                  application.company,
+                  application.role_title,
+                  application.status,
+                ].filter(Boolean).join(" ").toLowerCase();
+                return text.includes(applicantSearch.trim().toLowerCase());
+              })
+              .map(application => {
+                const linkedDrive = drives.find(
+                  drive => drive.id === application.placement_id,
+                );
+                const company =
+                  linkedDrive?.company || application.company || "Company not specified";
+                const student =
+                  application.student_name ||
+                  (application.student_id
+                    ? `Student ${application.student_id.slice(0, 8)}`
+                    : "Student name unavailable");
+
+                return (
+                  <div className="placementOpsTableRow" key={application.id}>
+                    <div>
+                      <strong>{student}</strong>
+                      <small style={{ display: "block" }}>
+                        CGPA: {application.cgpa ?? "Not provided"}
+                      </small>
+                    </div>
+                    <div>
+                      <strong>{company}</strong>
+                      <small style={{ display: "block" }}>
+                        {linkedDrive?.role_title || application.role_title || "Role not specified"}
+                      </small>
+                    </div>
+                    <span>{formatDate(application.applied_at)}</span>
+                    <span>{application.next_step || "Awaiting review"}</span>
+                    <select
+                      aria-label={`Update status for ${student}`}
+                      value={application.status || "Applied"}
+                      onChange={event =>
+                        void updateApplicantStatus(application, event.target.value)
+                      }
+                    >
+                      {Array.from(new Set([
+                        application.status || "Applied",
+                        ...applicantStatusOptions,
+                      ])).map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })}
+
+            {!applications.length && !loading && (
+              <div className="placementOpsEmpty">
+                No student applications were returned. Check the application records and database permissions.
+              </div>
+            )}
+          </div>
+        </section>
       )}
 
       {tab === "Overview" && (
