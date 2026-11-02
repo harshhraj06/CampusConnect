@@ -5,6 +5,8 @@ import { isWorkspacePathname } from './lib/workspace-route-slugs'
 const PUBLIC_ROUTES = [
   '/',
   '/upcoming',
+  '/privacy',
+  '/terms',
   '/login',
   '/signup',
   '/auth/callback',
@@ -95,7 +97,7 @@ function secureHeaders(
 
   response.headers.set(
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()'
+    'camera=(self), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()'
   )
 
   response.headers.set(
@@ -188,6 +190,9 @@ export async function middleware(
   if (
     pathname.startsWith('/api/')
   ) {
+    /* api-no-store */
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0')
+
     return secureHeaders(
       response,
       csp
@@ -295,7 +300,7 @@ export async function middleware(
   ) {
     const login =
       new URL(
-        '/login',
+        '/',
         request.url
       )
 
@@ -322,7 +327,7 @@ export async function middleware(
     return secureHeaders(
       NextResponse.redirect(
         new URL(
-          '/dashboard',
+          '/',
           request.url
         )
       ),

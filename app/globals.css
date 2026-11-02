@@ -29007,7 +29007,6 @@ select {
 
 .dashboardFestivalBanner,
 .universalFestivalBanner,
-.festivalCelebrationBurst,
 .festivalWelcomeToast {
   display: none !important;
 }
@@ -76196,6 +76195,119 @@ small {
 }
 
 /* ==========================================================
+   STUDENT DATE OF BIRTH SECTION — ACADEMIC IDENTITY RECORD
+   ========================================================== */
+
+.profileGrid > .dobSectionCard {
+  grid-column: 1 !important;
+  grid-row: auto !important;
+}
+
+.dobSectionCard {
+  position: relative;
+  overflow: hidden;
+}
+
+.dobSectionCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+}
+
+.dobSectionIntro {
+  max-width: 680px;
+  margin: -5px 0 18px;
+  color: #748095;
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.dobEditButton {
+  padding: 5px 12px;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1px solid #d4def0;
+  background: #f8faff;
+  color: #2354c4;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.dobEditButton:hover {
+  background: #edf3ff;
+  border-color: #3159d9;
+}
+
+.dobDisplayGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.dobDisplayItem {
+  padding: 12px 14px;
+  border: 1px solid #edf1f7;
+  border-radius: 12px;
+  background: #fafbfe;
+}
+
+.dobDisplayItem small {
+  display: block;
+  color: #8895a7;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 750;
+  margin-bottom: 5px;
+}
+
+.dobDisplayItem b {
+  display: block;
+  font-size: 11px;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.dobVerifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.dobStatusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+@media(max-width:900px){
+  .profileGrid > .dobSectionCard {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+
+@media(max-width:600px){
+  .dobDisplayGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================
    ATTENDANCE — FACULTY GUARDIAN CONTACT MANAGER
    ========================================================== */
 
@@ -88767,7 +88879,11 @@ button.facultyAvailabilityCell:active:not(:disabled) {
   }
 
   .facultyDiaryPrintReport,
-  .facultyDiaryPrintReport * {
+  .facultyDiaryPrintReport *,
+  .dossierOfficialSheet,
+  .dossierOfficialSheet *,
+  #cc-dossier-print-host,
+  #cc-dossier-print-host * {
     visibility: visible !important;
   }
 
@@ -145012,3 +145128,3262 @@ span {
   }
 }
 
+
+
+/* CAMPUSCONNECT - PROFESSIONAL ACADEMIC OPERATIONS UI */
+.academicControlWorkspace {
+  gap: 22px;
+}
+
+.academicControlHero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(30, 58, 86, 0.22);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, #17304a 0%, #25445f 52%, #355f78 100%) !important;
+  box-shadow: 0 22px 55px rgba(23, 48, 74, 0.18);
+}
+
+.academicControlHero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.08), transparent 42%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,.05) 0,
+      rgba(255,255,255,.05) 1px,
+      transparent 1px,
+      transparent 76px
+    );
+  pointer-events: none;
+}
+
+.academicControlHeroCopy,
+.academicControlHeroPanel {
+  position: relative;
+  z-index: 1;
+}
+
+.academicControlHeroCopy > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  color: #e9f1f6 !important;
+  background: rgba(255,255,255,.08);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .14em;
+}
+
+.academicControlHeroCopy h1 {
+  max-width: 780px;
+  margin-top: 18px !important;
+  color: #ffffff !important;
+  font-size: clamp(34px, 5vw, 58px) !important;
+  letter-spacing: 0 !important;
+}
+
+.academicControlHeroCopy p {
+  max-width: 760px;
+  color: rgba(238, 246, 250, .86) !important;
+}
+
+.academicControlHeroActions .primary {
+  border-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #17304a !important;
+  box-shadow: 0 12px 24px rgba(10, 24, 38, .18);
+}
+
+.academicControlHeroActions .secondary {
+  border-color: rgba(255,255,255,.24) !important;
+  background: rgba(255,255,255,.10) !important;
+  color: #ffffff !important;
+}
+
+.academicControlHeroActions button:hover {
+  transform: translateY(-1px);
+}
+
+.academicControlHeroPanel {
+  border-color: rgba(255,255,255,.18) !important;
+  background: rgba(255,255,255,.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.academicControlHeroPanel > strong {
+  font-size: 42px !important;
+  letter-spacing: 0 !important;
+}
+
+.academicControlHeroPanel > div > span {
+  border-color: rgba(255,255,255,.14) !important;
+  background: rgba(255,255,255,.08) !important;
+}
+
+.academicControlModuleNav {
+  border: 1px solid #dfe8ee !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  box-shadow: 0 14px 38px rgba(24, 45, 62, .07) !important;
+}
+
+.academicControlModuleNav header span {
+  color: #647f54 !important;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .13em;
+}
+
+.academicControlModuleNav h2 {
+  color: #172f44 !important;
+  font-size: 26px !important;
+  letter-spacing: 0 !important;
+}
+
+.academicControlModuleGrid > button,
+.academicControlFutureCard {
+  min-height: 154px;
+  border: 1px solid #dce6ec !important;
+  border-radius: 16px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%) !important;
+  box-shadow: 0 8px 22px rgba(24, 45, 62, .045);
+}
+
+.academicControlModuleGrid > button:hover {
+  transform: translateY(-3px);
+  border-color: #b7cad8 !important;
+  box-shadow: 0 18px 34px rgba(24, 45, 62, .10) !important;
+}
+
+.academicControlModuleGrid i,
+.academicControlFutureCard > i {
+  border-radius: 12px !important;
+  background: #244f73 !important;
+  color: #ffffff !important;
+}
+
+.academicControlModuleGrid div > span {
+  color: #607484 !important;
+}
+
+.academicControlModuleGrid h3 {
+  color: #172f44 !important;
+  font-size: 17px !important;
+}
+
+.academicControlModuleGrid p {
+  color: #6b7e8d !important;
+  font-size: 12px !important;
+}
+
+.academicControlModuleGrid > button > strong {
+  color: #829b6f !important;
+}
+
+.academicControlAccess {
+  border-color: #dce6ec !important;
+  border-radius: 18px !important;
+  box-shadow: 0 12px 30px rgba(24, 45, 62, .07);
+}
+
+@media (max-width: 720px) {
+  .academicControlHero,
+  .academicControlModuleNav {
+    border-radius: 18px !important;
+  }
+}
+
+
+
+/* CAMPUSCONNECT ADMIN BEIGE SIDEBAR RESTORE */
+html body .shell:has(.adminWorkspace) > aside,
+html body .shell:has(.adminWorkspace) .sidebar {
+  color: #37332d !important;
+  border-right: 2px solid #cdb488 !important;
+  border-color: #cdb488 !important;
+  background-color: #f7edd9 !important;
+  background-image:
+    radial-gradient(
+      circle at 18% 4%,
+      rgba(255, 255, 255, .90),
+      transparent 29%
+    ),
+    linear-gradient(155deg, #fffaf0, #f0dfbf) !important;
+  box-shadow:
+    inset -12px 0 26px rgba(130, 99, 54, .08),
+    15px 0 38px rgba(74, 53, 24, .10) !important;
+}
+
+html body .shell:has(.adminWorkspace) > aside nav button,
+html body .shell:has(.adminWorkspace) .sidebar nav button {
+  color: #4e4941 !important;
+  border-color: transparent !important;
+  background: transparent !important;
+}
+
+html body .shell:has(.adminWorkspace) > aside nav button:hover,
+html body .shell:has(.adminWorkspace) .sidebar nav button:hover {
+  color: #332b20 !important;
+  border-color: #d2b17a !important;
+  background: #f5e6c8 !important;
+}
+
+html body .shell:has(.adminWorkspace) > aside nav button.active,
+html body .shell:has(.adminWorkspace) .sidebar nav button.active {
+  color: #33271b !important;
+  border: 1px solid #c69a56 !important;
+  background: linear-gradient(135deg, #fff4d8, #e9c77f) !important;
+  box-shadow:
+    inset 5px 0 0 #9d6428,
+    0 5px 14px rgba(103, 68, 25, .10) !important;
+}
+
+html body .shell:has(.adminWorkspace) > aside nav button i,
+html body .shell:has(.adminWorkspace) .sidebar nav button i {
+  color: #8e642e !important;
+}
+
+/* Student Centre: optional Student Directory panel */
+.adminStudentDirectoryToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid #d7c7aa;
+  border-radius: 12px;
+  background: #f7f4ed;
+  color: #26221d;
+}
+.adminStudentDirectoryToggle strong {
+  display: block;
+  font-weight: 700;
+}
+.adminStudentDirectoryToggle p {
+  margin: .3rem 0 0;
+  color: #62584d;
+  font-size: .9rem;
+}
+.adminStudentDirectoryToggleButton {
+  flex: 0 0 auto;
+  padding: .65rem 1rem;
+  border: 1px solid #8b6b3f;
+  border-radius: 8px;
+  background: #29241f;
+  color: #f7f0df;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.adminStudentDirectoryToggleButton:hover {
+  background: #453629;
+}
+.adminStudentDirectoryToggleButton:focus-visible {
+  outline: 3px solid #b08d57;
+  outline-offset: 3px;
+}
+@media (max-width: 560px) {
+  .adminStudentDirectoryToggle {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* =========================================================
+   MY CAMPUS AI — WARM EDITORIAL THEME
+   Scoped visual overrides only; preserve existing behavior.
+========================================================= */
+
+.myCampusAIOnly {
+  --my-ai-ink: #292522;
+  --my-ai-muted: #766d65;
+  --my-ai-border: #e7ded4;
+  --my-ai-paper: #fffdf9;
+  --my-ai-soft: #f7f1e9;
+  --my-ai-copper: #a96f49;
+  --my-ai-copper-soft: #efe1d3;
+}
+
+.myCampusAIOnlyHero {
+  border-color: var(--my-ai-border);
+  border-radius: 22px;
+  background:
+    radial-gradient(
+      circle at 92% 0,
+      rgba(169, 111, 73, 0.09),
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      #fffdf9 0%,
+      #fbf6ef 62%,
+      #f4e9dc 100%
+    );
+  box-shadow: 0 14px 38px rgba(54, 40, 29, 0.055);
+}
+
+.myCampusAIOnlyHero::after {
+  color: rgba(117, 76, 49, 0.045);
+}
+
+.myCampusAIOnlyMark {
+  border: 1px solid rgba(169, 111, 73, 0.24);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #3a302a, #695044);
+  color: #fffaf4;
+  box-shadow: 0 10px 24px rgba(54, 40, 29, 0.14);
+}
+
+.myCampusAIOnlyCopy > span {
+  color: var(--my-ai-copper);
+}
+
+.myCampusAIOnlyCopy h2 {
+  color: var(--my-ai-ink);
+}
+
+.myCampusAIOnlyCopy > p {
+  color: var(--my-ai-muted);
+}
+
+.myCampusAIOnlyIdentity span {
+  border-color: var(--my-ai-border);
+  background: rgba(255, 253, 249, 0.88);
+  color: #66584d;
+}
+
+.myCampusAIOnlyStatus {
+  border-color: var(--my-ai-border);
+  background: rgba(255, 253, 249, 0.9);
+}
+
+.myCampusAIOnlyStatus > i {
+  background: var(--my-ai-copper);
+  box-shadow: 0 0 0 5px rgba(169, 111, 73, 0.12);
+}
+
+.myCampusAIOnlyStatus b {
+  color: var(--my-ai-ink);
+}
+
+.myCampusAIOnlyStatus small {
+  color: var(--my-ai-muted);
+}
+
+.myCampusAIOnlyPanel {
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .myCampusAIOnlyHero,
+  .myCampusAIOnlyMark,
+  .myCampusAIOnlyStatus {
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .myCampusAIOnlyStatus:hover {
+    border-color: rgba(169, 111, 73, 0.4);
+    box-shadow: 0 8px 22px rgba(54, 40, 29, 0.055);
+  }
+}
+
+/* PLACEMENT CELL ENTERPRISE HERO — FINAL OVERRIDE */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr) !important;
+  align-items: center !important;
+  gap: clamp(28px, 4vw, 56px) !important;
+  min-height: 400px !important;
+  padding: clamp(28px, 4vw, 54px) !important;
+  overflow: hidden !important;
+  border: 1px solid #535956 !important;
+  border-radius: 20px !important;
+  background: #292f30 !important;
+  box-shadow: 0 16px 38px rgba(29, 34, 34, .14) !important;
+}
+
+/* Retain the actual campus image, with a calmer neutral treatment. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroPhotoOverlay {
+  background: linear-gradient(
+    90deg,
+    rgba(33, 39, 39, .63) 0%,
+    rgba(35, 40, 40, .79) 43%,
+    rgba(35, 40, 40, .93) 75%,
+    rgba(35, 40, 40, .97) 100%
+  ) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroPhoto {
+  filter: saturate(.58) contrast(1.04) brightness(.75) !important;
+  object-fit: cover !important;
+  object-position: center 50% !important;
+  animation: placementEnterpriseImageMove 28s ease-in-out infinite alternate;
+}
+
+/* Re-enable only the restrained orbital detail for this role. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero::before {
+  display: block !important;
+  content: "" !important;
+  position: absolute !important;
+  z-index: 1 !important;
+  top: -135px !important;
+  right: 9% !important;
+  width: clamp(230px, 29vw, 360px) !important;
+  aspect-ratio: 1 !important;
+  border: 1px solid rgba(207, 190, 158, .24) !important;
+  border-radius: 50% !important;
+  background: radial-gradient(
+    circle,
+    transparent 0 39%,
+    rgba(207, 190, 158, .10) 39.4% 39.8%,
+    transparent 40.2% 57%,
+    rgba(207, 190, 158, .13) 57.4% 57.8%,
+    transparent 58.2%
+  ) !important;
+  box-shadow: 0 0 0 28px rgba(207, 190, 158, .025) !important;
+  pointer-events: none !important;
+  animation: placementEnterpriseOrbit 38s linear infinite !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero::after {
+  display: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardOrb {
+  display: block !important;
+  border: 1px solid rgba(207, 190, 158, .15) !important;
+  background: rgba(207, 190, 158, .025) !important;
+  box-shadow: none !important;
+  animation: placementEnterpriseFloat 10s ease-in-out infinite !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent {
+  position: relative !important;
+  z-index: 3 !important;
+  min-width: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent :is(h1, h2, .proAdminHeroTitle) {
+  color: #f7f5ef !important;
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: clamp(36px, 4.1vw, 57px) !important;
+  font-weight: 650 !important;
+  line-height: 1.06 !important;
+  letter-spacing: -.045em !important;
+  text-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent > span {
+  color: #d8c29d !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent > p {
+  color: rgba(247, 245, 239, .81) !important;
+  max-width: 580px !important;
+  line-height: 1.8 !important;
+}
+
+/* Convert the floating card to integrated content. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside {
+  position: relative !important;
+  z-index: 4 !important;
+  align-self: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #f7f5ef !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside > header {
+  padding-bottom: 15px !important;
+  border-bottom: 1px solid rgba(247, 245, 239, .22) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside header small {
+  color: #c9c6bd !important;
+  letter-spacing: .12em !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside header strong {
+  color: #f7f5ef !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardRoleMark {
+  border: 1px solid rgba(207, 190, 158, .38) !important;
+  background: rgba(207, 190, 158, .09) !important;
+  color: #ddc9a5 !important;
+}
+
+/* Real metrics become one continuous row instead of three isolated cards. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  margin: 18px 0 20px !important;
+  border-block: 1px solid rgba(247, 245, 239, .22) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  min-height: 80px !important;
+  padding: 14px 11px !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(247, 245, 239, .18) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #f7f5ef !important;
+  text-align: left !important;
+  transition: background-color .2s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button:first-child {
+  padding-left: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button:last-child {
+  border-right: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button:hover {
+  transform: none !important;
+  background: rgba(255, 255, 255, .045) !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics small {
+  color: #c8c9c3 !important;
+  font-size: 9px !important;
+  letter-spacing: .08em !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics strong {
+  margin-top: 7px !important;
+  color: #fbf8f0 !important;
+  font-size: clamp(22px, 2.1vw, 29px) !important;
+  font-weight: 650 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* Muted brass is the sole accent; remove the unrelated blue button. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction {
+  border: 1px solid #d3bc93 !important;
+  border-radius: 9px !important;
+  background: #d8c19a !important;
+  color: #292f30 !important;
+  box-shadow: none !important;
+  transition: background-color .2s ease, transform .2s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction :is(strong, small, b, i) {
+  color: #292f30 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction:hover {
+  transform: translateY(-1px) !important;
+  background: #e3d0ad !important;
+  box-shadow: none !important;
+}
+
+@keyframes placementEnterpriseImageMove {
+  from { transform: scale(1.015); }
+  to { transform: scale(1.045); }
+}
+
+@keyframes placementEnterpriseOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes placementEnterpriseFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@media (max-width: 1050px) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 24px !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside {
+    max-width: 620px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero {
+    min-height: 0 !important;
+    padding: 23px 18px !important;
+    border-radius: 16px !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button {
+    min-height: 73px !important;
+    padding: 11px 7px !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics small {
+    font-size: 8px !important;
+    letter-spacing: .02em !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero,
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroPhoto,
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero::before,
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardOrb {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* PLACEMENT CELL — FINAL PANEL READABILITY FIX */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside {
+  background: #f7f5ee !important;
+  background-image: linear-gradient(145deg, #fffdf7 0%, #f1eee5 100%) !important;
+  border: 1px solid #d6d2c6 !important;
+  border-top: 3px solid #ae956b !important;
+  border-radius: 15px !important;
+  box-shadow: 0 18px 38px rgba(20, 27, 25, .20) !important;
+  color: #303735 !important;
+  opacity: 1 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside > header {
+  border-bottom: 1px solid #ddd8cc !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside header small {
+  color: #686c65 !important;
+  -webkit-text-fill-color: #686c65 !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside header strong {
+  color: #2b3330 !important;
+  -webkit-text-fill-color: #2b3330 !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardRoleMark {
+  color: #343b36 !important;
+  -webkit-text-fill-color: #343b36 !important;
+  background: #eee8da !important;
+  border: 1px solid #dcd1b9 !important;
+}
+
+/* Keep metrics integrated into one row, without individual card boxes. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics {
+  background: transparent !important;
+  border-top: 1px solid #ded8ca !important;
+  border-bottom: 1px solid #ded8ca !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button {
+  background: transparent !important;
+  border: 0 !important;
+  border-right: 1px solid #ded8ca !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #303735 !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button:last-child {
+  border-right: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics small {
+  color: #6a706a !important;
+  -webkit-text-fill-color: #6a706a !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics strong {
+  color: #272f2c !important;
+  -webkit-text-fill-color: #272f2c !important;
+  font-weight: 750 !important;
+  opacity: 1 !important;
+}
+
+/* Graphite Campus AI button with warm-white type and a fine brass edge. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction {
+  background: #303835 !important;
+  border: 1px solid #a99570 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 7px 17px rgba(25, 32, 29, .15) !important;
+  color: #fffdf7 !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction * {
+  color: #fffdf7 !important;
+  -webkit-text-fill-color: #fffdf7 !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction small {
+  color: #d9ddd6 !important;
+  -webkit-text-fill-color: #d9ddd6 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction:hover {
+  background: #414a45 !important;
+  border-color: #c5ad81 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(25, 32, 29, .20) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardLiveDot {
+  background: #9c865d !important;
+  box-shadow: 0 0 0 4px rgba(156, 134, 93, .14) !important;
+  animation: none !important;
+}
+
+@media (max-width: 640px) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside {
+    padding: 16px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction {
+    transition: none !important;
+  }
+}
+
+/* PLACEMENT CELL — ROYAL WINE PANEL REDESIGN */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  gap: 16px !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 25px !important;
+  overflow: hidden !important;
+  border: 1px solid #e4d8d0 !important;
+  border-top: 3px solid #76263c !important;
+  border-radius: 17px !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(118, 38, 60, .055), transparent 35%),
+    linear-gradient(145deg, #fffdf9 0%, #f5f0e8 100%) !important;
+  color: #302e2a !important;
+  box-shadow: 0 14px 32px rgba(28, 26, 25, .17) !important;
+  transform-origin: center;
+  animation: placementWinePanelIn .55s cubic-bezier(.2, .7, .2, 1) both !important;
+  transition: box-shadow .25s ease, border-color .25s ease, transform .25s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside:hover {
+  border-color: #d4c0b6 !important;
+  box-shadow: 0 18px 38px rgba(28, 26, 25, .20) !important;
+  transform: translateY(-2px);
+}
+
+/* Thin royal-wine-to-brass detail across the top edge. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  z-index: 2 !important;
+  top: 0 !important;
+  left: 22px !important;
+  right: 22px !important;
+  height: 3px !important;
+  border-radius: 0 0 3px 3px !important;
+  background: linear-gradient(90deg, #76263c 0%, #984c5c 54%, #b9a177 100%) !important;
+  pointer-events: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside > header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin: 0 !important;
+  padding: 0 0 16px !important;
+  border-bottom: 1px solid #e4d9cf !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardRoleMark {
+  flex: 0 0 auto !important;
+  display: grid !important;
+  place-items: center !important;
+  width: 54px !important;
+  height: 54px !important;
+  border: 1px solid #76263c !important;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, #76263c, #572031) !important;
+  color: #fffaf4 !important;
+  -webkit-text-fill-color: #fffaf4 !important;
+  box-shadow: 0 5px 12px rgba(118, 38, 60, .13) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside header small {
+  color: #81776e !important;
+  -webkit-text-fill-color: #81776e !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: .13em !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside header strong {
+  color: #332a2b !important;
+  -webkit-text-fill-color: #332a2b !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.015em !important;
+  opacity: 1 !important;
+}
+
+/* Status dot: muted wine instead of the unrelated bright green. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardLiveDot {
+  background: #8c3b50 !important;
+  border: 4px solid #f4e8e8 !important;
+  box-shadow: 0 0 0 1px #d5b8bd !important;
+  animation: placementWineStatusPulse 3.2s ease-in-out infinite !important;
+}
+
+/* Remove excess vertical gaps while keeping the existing live metric actions. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 12px 0 !important;
+  border-top: 1px solid #e4d9cf !important;
+  border-bottom: 1px solid #e4d9cf !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  min-height: 68px !important;
+  margin: 0 !important;
+  padding: 9px 12px !important;
+  border: 0 !important;
+  border-right: 1px solid #e4d9cf !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  transition: background-color .2s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button:first-child {
+  padding-left: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button:last-child {
+  border-right: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button:hover {
+  transform: none !important;
+  background: rgba(118, 38, 60, .035) !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics small {
+  color: #7c746d !important;
+  -webkit-text-fill-color: #7c746d !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: .055em !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics strong {
+  margin-top: 5px !important;
+  color: #76263c !important;
+  -webkit-text-fill-color: #76263c !important;
+  font-size: clamp(22px, 2vw, 29px) !important;
+  font-weight: 750 !important;
+  letter-spacing: -.03em !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* One clear primary action in royal wine, with ivory text. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 13px !important;
+  width: 100% !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+  padding: 13px 15px !important;
+  overflow: hidden !important;
+  border: 1px solid #76263c !important;
+  border-radius: 11px !important;
+  background: linear-gradient(112deg, #632036 0%, #82344a 52%, #632036 100%) !important;
+  background-size: 180% 100% !important;
+  color: #fffaf5 !important;
+  -webkit-text-fill-color: #fffaf5 !important;
+  box-shadow: 0 7px 17px rgba(99, 32, 54, .17) !important;
+  animation: placementWineButtonSheen 12s ease-in-out infinite !important;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction * {
+  color: #fffaf5 !important;
+  -webkit-text-fill-color: #fffaf5 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction small {
+  color: #eadfe0 !important;
+  -webkit-text-fill-color: #eadfe0 !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction > i,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction > b {
+  border-color: rgba(255, 250, 245, .24) !important;
+  background: rgba(255, 250, 245, .09) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction:hover {
+  transform: translateY(-1px) !important;
+  border-color: #a56a7a !important;
+  box-shadow: 0 11px 22px rgba(99, 32, 54, .22) !important;
+}
+
+@keyframes placementWinePanelIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes placementWineButtonSheen {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes placementWineStatusPulse {
+  0%, 100% { box-shadow: 0 0 0 1px #d5b8bd; }
+  50% { box-shadow: 0 0 0 5px rgba(140, 59, 80, .10); }
+}
+
+@media (max-width: 640px) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside {
+    gap: 13px !important;
+    padding: 17px !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardRoleMark {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics button {
+    min-height: 62px !important;
+    padding: 8px 7px !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics small {
+    font-size: 8px !important;
+    letter-spacing: .01em !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside,
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction,
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardLiveDot {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside:hover,
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction:hover {
+    transform: none !important;
+  }
+}
+
+/* PLACEMENT CELL — AURORA BACKGROUND MOTION */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero {
+  isolation: isolate !important;
+  overflow: hidden !important;
+}
+
+/* Soft aurora clouds use the same sky, rose and lime colors as the example. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  z-index: 2 !important;
+  inset: -12% !important;
+  width: auto !important;
+  height: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background:
+    radial-gradient(ellipse at 18% 28%, rgba(56, 189, 248, .16) 0%, transparent 37%),
+    radial-gradient(ellipse at 48% 75%, rgba(244, 63, 94, .14) 0%, transparent 40%),
+    radial-gradient(ellipse at 82% 24%, rgba(132, 204, 22, .10) 0%, transparent 35%) !important;
+  box-shadow: none !important;
+  filter: blur(24px) !important;
+  opacity: .85 !important;
+  mix-blend-mode: screen !important;
+  pointer-events: none !important;
+  animation: placementAuroraFlowOne 18s ease-in-out infinite alternate !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  z-index: 2 !important;
+  inset: -10% !important;
+  width: auto !important;
+  height: auto !important;
+  top: auto !important;
+  right: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background:
+    radial-gradient(ellipse at 76% 70%, rgba(244, 63, 94, .13) 0%, transparent 36%),
+    radial-gradient(ellipse at 34% 25%, rgba(56, 189, 248, .10) 0%, transparent 34%),
+    radial-gradient(ellipse at 60% 10%, rgba(132, 204, 22, .09) 0%, transparent 31%) !important;
+  box-shadow: none !important;
+  filter: blur(32px) !important;
+  opacity: .8 !important;
+  mix-blend-mode: screen !important;
+  pointer-events: none !important;
+  animation: placementAuroraFlowTwo 23s ease-in-out infinite alternate !important;
+}
+
+/* Keep the existing photograph and content above the decorative animation. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroPhoto {
+  z-index: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroPhotoOverlay {
+  z-index: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside {
+  position: relative !important;
+  z-index: 4 !important;
+}
+
+@keyframes placementAuroraFlowOne {
+  0% {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, 2%, 0) scale(1.05);
+  }
+  100% {
+    transform: translate3d(1%, -2%, 0) scale(1.02);
+  }
+}
+
+@keyframes placementAuroraFlowTwo {
+  0% {
+    transform: translate3d(2%, 1%, 0) scale(1.03);
+  }
+  50% {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(-1%, 2%, 0) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero::before,
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero::after {
+    animation: none !important;
+    filter: blur(26px) !important;
+  }
+}
+
+/* PLACEMENT CELL — HIGH-CONTRAST CAMPUS AI BUTTON */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  min-height: 68px !important;
+  padding: 14px 17px !important;
+  border: 1px solid #8e7956 !important;
+  border-radius: 11px !important;
+  background: linear-gradient(135deg, #292f2d 0%, #3c4540 100%) !important;
+  color: #fffdf7 !important;
+  -webkit-text-fill-color: #fffdf7 !important;
+  box-shadow: 0 5px 14px rgba(24, 31, 28, .17) !important;
+  text-shadow: none !important;
+  transition: background .22s ease, border-color .22s ease,
+              transform .22s ease, box-shadow .22s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction * {
+  color: #fffdf7 !important;
+  -webkit-text-fill-color: #fffdf7 !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction small {
+  color: #e0e2dc !important;
+  -webkit-text-fill-color: #e0e2dc !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction > i,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction > b {
+  background: rgba(255, 255, 255, .08) !important;
+  border: 1px solid rgba(255, 255, 255, .2) !important;
+  border-radius: 9px !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction:hover {
+  background: linear-gradient(135deg, #39423e 0%, #4a554e 100%) !important;
+  border-color: #c5ad81 !important;
+  box-shadow: 0 9px 20px rgba(24, 31, 28, .23) !important;
+  transform: translateY(-1px) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction {
+    transition: none !important;
+  }
+}
+
+/* PLACEMENT CELL — MUTED GREEN CAMPUS AI BUTTON */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction {
+  background: linear-gradient(135deg, #414d47 0%, #4e5b53 100%) !important;
+  background-image: linear-gradient(135deg, #414d47 0%, #4e5b53 100%) !important;
+  border-color: #a99570 !important;
+  color: #fffdf7 !important;
+  -webkit-text-fill-color: #fffdf7 !important;
+  animation: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction * {
+  color: #fffdf7 !important;
+  -webkit-text-fill-color: #fffdf7 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction small {
+  color: #e1e5df !important;
+  -webkit-text-fill-color: #e1e5df !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction:hover {
+  background: linear-gradient(135deg, #4b5951 0%, #5c695f 100%) !important;
+  background-image: linear-gradient(135deg, #4b5951 0%, #5c695f 100%) !important;
+  border-color: #c0ac84 !important;
+}
+
+/* PLACEMENT CELL - ROLE INTELLIGENCE PROFESSIONAL REDESIGN */
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 26px 0 30px;
+  padding: clamp(20px, 2.5vw, 32px);
+  border: 1px solid rgba(133, 104, 59, 0.22);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(192, 165, 117, 0.11), transparent 36%),
+    linear-gradient(145deg, #fffdf8 0%, #f9f6ef 58%, #f3eee4 100%);
+  color: #282b27;
+  box-shadow:
+    0 18px 42px rgba(42, 36, 26, 0.075),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  border-radius: 24px 24px 0 0;
+  background: linear-gradient(
+    90deg,
+    #80643c 0%,
+    #c0a477 32%,
+    #e1d2b6 64%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter > * {
+  position: relative;
+  z-index: 1;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 0 23px;
+  margin: 0 0 23px;
+  border-bottom: 1px solid rgba(91, 78, 57, 0.14);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader > div:first-child {
+  flex: 1 1 340px;
+  min-width: 0;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader > div:first-child > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 11px;
+  color: #886b41;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.19em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader > div:first-child > span::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 2px;
+  background: #a58756;
+  box-shadow: 0 0 0 3px rgba(165, 135, 86, 0.12);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader h3 {
+  margin: 0;
+  color: #252923;
+  font-size: clamp(25px, 2.6vw, 34px);
+  font-weight: 740;
+  line-height: 1.15;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader p {
+  max-width: 580px;
+  margin: 11px 0 0;
+  color: #696a62;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.75;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterDate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid rgba(125, 102, 67, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #625b4e;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 14px;
+  border: 1px solid rgba(64, 70, 59, 0.17);
+  border-radius: 10px;
+  background: #fffdf8;
+  color: #34382f;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  box-shadow: 0 2px 5px rgba(38, 34, 27, 0.035);
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions button:hover:not(:disabled) {
+  border-color: rgba(119, 94, 57, 0.38);
+  background: #f3ecdf;
+  color: #252923;
+  box-shadow: 0 5px 13px rgba(43, 36, 26, 0.08);
+  transform: translateY(-1px);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions button i {
+  font-size: 15px;
+  font-style: normal;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid rgba(125, 102, 67, 0.16);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker label {
+  color: #625e54;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker select {
+  min-height: 36px;
+  max-width: 210px;
+  padding: 7px 30px 7px 10px;
+  border: 1px solid rgba(80, 78, 68, 0.2);
+  border-radius: 9px;
+  background: #fffdf8;
+  color: #30342d;
+  font: inherit;
+  font-size: 12px;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker button {
+  border-color: #2e6548;
+  background: #2e6548;
+  color: #fffdf8;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker button:hover:not(:disabled) {
+  border-color: #214b35;
+  background: #214b35;
+  color: #ffffff;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 94px;
+  padding: 17px 18px;
+  border: 1px solid rgba(110, 95, 70, 0.14);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.69);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary strong {
+  color: #292d26;
+  font-size: clamp(25px, 2.4vw, 32px);
+  font-weight: 760;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > div > span {
+  color: #787263;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > p {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 11px 13px;
+  border-left: 2px solid #a98b5c;
+  border-radius: 0 8px 8px 0;
+  background: rgba(192, 165, 117, 0.09);
+  color: #69675e;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  align-items: stretch;
+  gap: 14px;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(100, 89, 67, 0.16);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow:
+    0 3px 10px rgba(42, 36, 26, 0.025),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard:hover {
+  border-color: rgba(139, 108, 65, 0.36);
+  background: #fffefa;
+  box-shadow: 0 10px 25px rgba(42, 36, 26, 0.075);
+  transform: translateY(-2px);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard.urgent {
+  border-color: rgba(157, 70, 54, 0.28);
+  background: linear-gradient(145deg, #fffaf6 0%, #fff7f1 100%);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 0 0 15px;
+  border: 0;
+  background: transparent;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionIcon {
+  display: grid;
+  flex: 0 0 42px;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(150, 122, 78, 0.2);
+  border-radius: 12px;
+  background: #f3ede1;
+  color: #725b39;
+  font-size: 17px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header > div > span {
+  display: block;
+  margin: 1px 0 5px;
+  color: #88704b;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header small {
+  display: block;
+  margin-top: 5px;
+  color: #77746a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border: 1px solid rgba(111, 102, 83, 0.15);
+  border-radius: 7px;
+  background: #f5f1e9;
+  color: #6d6557;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard.urgent header em {
+  border-color: rgba(157, 70, 54, 0.2);
+  background: #f8e9e3;
+  color: #914737;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard h4 {
+  margin: 0;
+  color: #292d27;
+  font-size: 16px;
+  font-weight: 730;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > p {
+  margin: 0 0 17px;
+  color: #696b63;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(100, 89, 67, 0.12);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer button,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 35px;
+  padding: 8px 11px;
+  border: 1px solid rgba(54, 91, 66, 0.24);
+  border-radius: 9px;
+  background: #edf3ed;
+  color: #34553c;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.4;
+  text-decoration: none;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer button:hover,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer a:hover {
+  border-color: #345d40;
+  background: #345d40;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterEmpty,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterLoading {
+  border: 1px dashed rgba(123, 101, 68, 0.25);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  color: #6c6a61;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterFootnote {
+  margin-top: 22px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(91, 78, 57, 0.13);
+  color: #777267;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterFootnote p {
+  color: inherit;
+  font-size: 11px;
+  line-height: 1.75;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter button:focus-visible,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter select:focus-visible,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter a:focus-visible {
+  outline: 3px solid rgba(135, 104, 59, 0.38);
+  outline-offset: 3px;
+}
+
+@keyframes placementRoleIntelligenceEnter {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionGrid {
+  animation: placementRoleIntelligenceEnter 420ms ease-out both;
+}
+
+@media (max-width: 760px) {
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter {
+    padding: 20px 16px;
+    border-radius: 19px;
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker {
+    width: 100%;
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker select {
+    flex: 1 1 145px;
+    max-width: 100%;
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions > * {
+    max-width: 100%;
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions button {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader,
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary,
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionGrid {
+    animation: none;
+  }
+
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter *,
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter *::before,
+  .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* END PLACEMENT CELL - ROLE INTELLIGENCE PROFESSIONAL REDESIGN */
+
+/* PLACEMENT CELL - ROLE INTELLIGENCE NEUTRAL REDESIGN */
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter {
+  color: #242a26;
+  background: linear-gradient(145deg, #ffffff 0%, #f7f9f7 100%);
+  border: 1px solid #dce3dd;
+  border-radius: 22px;
+  box-shadow: 0 12px 34px rgba(28, 40, 31, 0.07);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter::before {
+  height: 3px;
+  background: linear-gradient(90deg, #244e38 0%, #568166 48%, #dce7de 100%);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter::after {
+  display: none;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader {
+  border-bottom-color: #e3e8e4;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader > div:first-child > span {
+  color: #386348;
+  letter-spacing: 0.16em;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader > div:first-child > span::before {
+  background: #386348;
+  box-shadow: 0 0 0 3px rgba(56, 99, 72, 0.10);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader h3 {
+  color: #202722;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader p {
+  color: #68716b;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterDate {
+  border-color: #dfe5e0;
+  background: #f5f7f5;
+  color: #4f5b53;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions button {
+  border-color: #d8e0d9;
+  background: #ffffff;
+  color: #303a33;
+  box-shadow: 0 2px 5px rgba(25, 35, 28, 0.035);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions button:hover:not(:disabled) {
+  border-color: #8da995;
+  background: #f0f5f1;
+  color: #244e38;
+  box-shadow: 0 5px 14px rgba(31, 66, 44, 0.08);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker {
+  border-color: #e0e6e1;
+  background: #f6f8f6;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker label {
+  color: #59665d;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker select {
+  border-color: #d7e0d8;
+  background: #ffffff;
+  color: #28332b;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker button {
+  border-color: #2d6243;
+  background: #2d6243;
+  color: #ffffff;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionAiPicker button:hover:not(:disabled) {
+  border-color: #214b32;
+  background: #214b32;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > div {
+  border-color: #e0e6e1;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(26, 39, 29, 0.025);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary strong {
+  color: #202923;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > div > span {
+  color: #748078;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > p {
+  border-left-color: #477858;
+  background: #f0f5f1;
+  color: #56625a;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard {
+  border-color: #e0e6e1;
+  border-radius: 15px;
+  background: #ffffff;
+  box-shadow: 0 3px 12px rgba(28, 40, 31, 0.035);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard:hover {
+  border-color: #a4b9a8;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(28, 55, 36, 0.08);
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard.urgent {
+  border-color: #e7c7c0;
+  background: #fffaf9;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionIcon {
+  border-color: #dce6de;
+  border-radius: 11px;
+  background: #edf3ee;
+  color: #315d40;
+  box-shadow: none;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header > div > span {
+  color: #537260;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header small {
+  color: #778078;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header em {
+  border-color: #e0e6e1;
+  background: #f3f6f3;
+  color: #55645a;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard.urgent header em {
+  border-color: #eccfc8;
+  background: #f9eae7;
+  color: #934b3e;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard h4 {
+  color: #252d27;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > p {
+  color: #67716a;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer {
+  border-top-color: #e5eae6;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer button,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer a {
+  border-color: #d5e2d7;
+  background: #edf4ee;
+  color: #2d5b3b;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer button:hover,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer a:hover {
+  border-color: #2d6243;
+  background: #2d6243;
+  color: #ffffff;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterEmpty,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterLoading {
+  border-color: #d9e2db;
+  background: #f7f9f7;
+  color: #657169;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterFootnote {
+  border-top-color: #e0e6e1;
+  color: #737d75;
+}
+
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter button:focus-visible,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter select:focus-visible,
+.proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter a:focus-visible {
+  outline-color: rgba(56, 99, 72, 0.55);
+}
+
+/* END PLACEMENT CELL - ROLE INTELLIGENCE NEUTRAL REDESIGN */
+
+/* PLACEMENT CELL - ROLE INTELLIGENCE FORCE FIX */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #252d28 !important;
+  border: 1px solid #dce4de !important;
+  box-shadow: 0 12px 32px rgba(24, 39, 29, 0.07) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter::before {
+  background: linear-gradient(90deg, #244d36, #4f795d, #dce8df) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter::after {
+  display: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader {
+  background: transparent !important;
+  border-bottom-color: #e3e8e4 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader h3 {
+  color: #202722 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader p {
+  color: #68736b !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeader > div:first-child > span {
+  color: #326044 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterDate,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterHeaderActions button {
+  background: #f7f9f7 !important;
+  color: #303b33 !important;
+  border-color: #dce4de !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > div {
+  background: #f7f9f7 !important;
+  background-image: none !important;
+  border-color: #e0e6e1 !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary strong {
+  color: #202923 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > div > span {
+  color: #69766d !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenterSummary > p {
+  background: #f0f5f1 !important;
+  color: #4e6154 !important;
+  border-left-color: #3c704d !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard {
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid #dfe6e0 !important;
+  color: #29332c !important;
+  box-shadow: 0 3px 12px rgba(24, 39, 29, 0.035) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard:hover {
+  background: #ffffff !important;
+  border-color: #9ab4a0 !important;
+  box-shadow: 0 10px 24px rgba(31, 63, 40, 0.09) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard.urgent {
+  background: #fff9f8 !important;
+  border-color: #e6c9c3 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionIcon {
+  background: #edf3ee !important;
+  color: #2d6241 !important;
+  border-color: #dce7de !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard h4 {
+  color: #252e28 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard p,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header small {
+  color: #68736b !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard header em {
+  background: #f1f5f2 !important;
+  color: #4b6251 !important;
+  border-color: #dce5de !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard.urgent header em {
+  background: #f9eae7 !important;
+  color: #91483c !important;
+  border-color: #e9cbc5 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer {
+  border-top-color: #e3e9e4 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer button,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer a {
+  background: #edf4ee !important;
+  color: #2d5c3b !important;
+  border-color: #d4e2d7 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer button:hover,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCard > footer a:hover,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionAiPicker button {
+  background: #2d6243 !important;
+  color: #ffffff !important;
+  border-color: #2d6243 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionAiPicker,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionAiPicker select {
+  background: #f7f9f7 !important;
+  color: #303b33 !important;
+  border-color: #dce4de !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterEmpty,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterLoading {
+  background: #f7f9f7 !important;
+  color: #647168 !important;
+  border-color: #dce4de !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterFootnote,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .roleActionCenter .roleActionCenterFootnote p {
+  color: #68736b !important;
+  border-top-color: #e0e6e1 !important;
+}
+/* END PLACEMENT CELL - ROLE INTELLIGENCE FORCE FIX */
+
+/* CAMPUSCONNECT - PROFESSIONAL MOBILE UI REDESIGN */
+
+/* Keep the existing desktop layout; improve the shared shell on tablets and phones. */
+@media (max-width: 820px) {
+  html body .shell {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  html body .shell.sidebarCollapsed {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  html body .shell > aside {
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    z-index: 1200;
+    width: min(300px, 88vw) !important;
+    min-width: 0;
+    max-width: 88vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    border-right: 1px solid #dce4de;
+    background: #ffffff !important;
+    color: #28322b !important;
+    box-shadow: 14px 0 38px rgba(22, 34, 26, 0.14);
+    opacity: 1;
+    transform: translateX(0);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html body .shell.sidebarCollapsed > aside {
+    width: min(300px, 88vw) !important;
+    min-width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-right: 0;
+    opacity: 1;
+    pointer-events: none;
+    transform: translateX(-105%);
+  }
+
+  html body .shell > aside .brandLogo {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  html body .shell > aside nav {
+    min-width: 0;
+    max-width: 100%;
+    padding-bottom: 12px;
+  }
+
+  html body .shell > aside nav button {
+    min-height: 44px;
+    max-width: 100%;
+    border-radius: 10px;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  html body .shell > aside nav label {
+    color: #78837b !important;
+    letter-spacing: 0.12em;
+  }
+
+  html body .shell > aside nav button,
+  html body .shell > aside .me,
+  html body .shell > aside .me strong,
+  html body .shell > aside .me small {
+    color: #354139 !important;
+  }
+
+  html body .shell > aside nav button:hover,
+  html body .shell > aside nav button.active {
+    background: #edf3ee !important;
+    color: #28573a !important;
+    border-color: #dbe6dd !important;
+  }
+
+  html body .shell > .workspace {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  html body .shell .workspaceHeader {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    min-height: 64px !important;
+    height: auto;
+    padding: 10px 16px !important;
+    padding-top: max(10px, env(safe-area-inset-top)) !important;
+    border-bottom: 1px solid #e2e8e3 !important;
+    background: rgba(255, 255, 255, 0.97) !important;
+    box-shadow: 0 3px 12px rgba(27, 39, 30, 0.035) !important;
+  }
+
+  html body .shell .workspaceBrand {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  html body .shell .workspaceBrand > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  html body .shell .workspaceBrandLogo {
+    width: auto !important;
+    max-width: min(44vw, 175px) !important;
+    height: auto;
+    max-height: 40px;
+    object-fit: contain;
+    object-position: left center;
+    filter: none !important;
+  }
+
+  html body .shell .topSidebarToggle,
+  html body .shell .sidebarToggle {
+    display: inline-flex;
+    flex: 0 0 44px;
+    align-items: center;
+    justify-content: center;
+    width: 44px !important;
+    min-width: 44px;
+    height: 44px !important;
+    min-height: 44px;
+    padding: 0;
+    border: 1px solid #dce4de !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #2e4936 !important;
+    box-shadow: 0 2px 7px rgba(25, 39, 28, 0.05) !important;
+    touch-action: manipulation;
+  }
+
+  html body .shell .topSidebarToggle span,
+  html body .shell .sidebarToggle span {
+    background: #315c40 !important;
+  }
+
+  html body .shell .campusSearchTrigger {
+    flex: 1 1 180px;
+    width: auto !important;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 44px !important;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #dce4de !important;
+    border-radius: 12px !important;
+    background: #f7f9f7 !important;
+    color: #5b685e !important;
+    box-shadow: none !important;
+  }
+
+  html body .shell .campusSearchTrigger kbd {
+    display: none;
+  }
+
+  html body .shell .notificationBell,
+  html body .shell .headerProfileAvatar {
+    flex: 0 0 auto;
+    min-width: 42px;
+    min-height: 42px;
+    border-color: #dce4de !important;
+    border-radius: 12px !important;
+    background: #f1f5f1 !important;
+    color: #315c40 !important;
+    box-shadow: none !important;
+  }
+
+  html body .shell .headerProfileText strong {
+    color: #263129 !important;
+  }
+
+  html body .shell .headerProfileText small {
+    color: #717d74 !important;
+  }
+
+  /* All workspace content must be allowed to shrink with the viewport. */
+  html body .shell .content,
+  html body .shell .workspace > main,
+  html body .shell .workspace > section {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  html body .shell .content {
+    padding: 16px !important;
+    padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+  }
+
+  html body .shell .dashboardTopBar,
+  html body .shell .dashboardPageHeader,
+  html body .shell .dashboardPanelHeader {
+    min-width: 0;
+    max-width: 100%;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  html body .shell .dashboardPanel,
+  html body .shell .dashboardStatCard,
+  html body .shell .roleActionCenter,
+  html body .shell .proDashboardHero {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Common two-column dashboards stack instead of becoming cramped. */
+  html body .shell .studentDashboardMainGrid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px;
+  }
+
+  html body .shell .studentDashboardPrimaryColumn,
+  html body .shell .studentDashboardSideColumn {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  html body .shell .studentDashboardStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px;
+  }
+
+  html body .shell .studentDashboardStats > *,
+  html body .shell .studentDashboardMainGrid > * {
+    min-width: 0;
+  }
+
+  html body .shell .studentDashboardHero,
+  html body .shell .referenceCampusHero {
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 18px;
+  }
+
+  /* Data tables scroll within their own area instead of widening the page. */
+  html body .shell .tableWrap,
+  html body .shell .tableWrapper,
+  html body .shell .table-responsive,
+  html body .shell .adminTable,
+  html body .shell .attendanceTable,
+  html body .shell .csp-table-wrap,
+  html body .shell [class*="TableWrap"],
+  html body .shell [class*="tableWrap"] {
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html body .shell .adminTableHead,
+  html body .shell .adminUserRow {
+    min-width: 680px;
+  }
+
+  /* Inputs, selects and text areas stay inside cards and remain tappable. */
+  html body .shell input:not([type="checkbox"]):not([type="radio"]),
+  html body .shell select,
+  html body .shell textarea {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+
+  html body .shell button,
+  html body .shell [role="button"] {
+    touch-action: manipulation;
+  }
+
+  html body .shell .dashboardPanel button,
+  html body .shell .roleActionCenter button,
+  html body .shell .proDashboardHero button {
+    min-height: 40px;
+  }
+
+  html body .shell [role="dialog"],
+  html body .shell [aria-modal="true"],
+  html body .shell [class*="Modal"],
+  html body .shell [class*="modal"],
+  html body .shell [class*="Dialog"],
+  html body .shell [class*="dialog"] {
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 28px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  html body .shell :is(
+    .placementNavRail,
+    .campusSearchFilters,
+    .activityPromoNavigation
+  ) {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  html body .shell :is(
+    .placementNavRail,
+    .campusSearchFilters,
+    .activityPromoNavigation
+  )::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* A neutral student workspace replaces legacy parchment on mobile only. */
+  html body .shell:has(.studentDashboard) .workspace,
+  html body .shell:has(.studentDashboard) .content {
+    background: #f5f7f5 !important;
+  }
+
+  html body .shell:has(.studentDashboard) .workspaceHeader {
+    background: rgba(255, 255, 255, 0.97) !important;
+    border-bottom: 1px solid #e2e8e3 !important;
+    box-shadow: 0 3px 12px rgba(27, 39, 30, 0.035) !important;
+  }
+
+  html body .shell:has(.studentDashboard) .workspaceBrandLogo {
+    filter: none !important;
+  }
+
+  html body .shell:has(.studentDashboard) > aside {
+    background: #ffffff !important;
+    border-right: 1px solid #dce4de !important;
+    color: #28322b !important;
+  }
+
+  html body .shell:has(.studentDashboard) > aside nav button {
+    color: #354139 !important;
+    background: transparent !important;
+    border-color: transparent !important;
+  }
+
+  html body .shell:has(.studentDashboard) > aside nav button:hover,
+  html body .shell:has(.studentDashboard) > aside nav button.active {
+    color: #28573a !important;
+    background: #edf3ee !important;
+    border-color: #dbe6dd !important;
+  }
+
+  html body .shell:has(.studentDashboard) .importantNoticeRail {
+    border: 1px solid #dce4de !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    box-shadow: 0 3px 10px rgba(27, 39, 30, 0.035) !important;
+  }
+
+  html body .shell:has(.studentDashboard) .importantNoticeRailHead {
+    background: #edf3ee !important;
+  }
+
+  html body .shell:has(.studentDashboard) .importantNoticeRailHead strong,
+  html body .shell:has(.studentDashboard) .importantNoticeCopy strong,
+  html body .shell:has(.studentDashboard) .headerProfileText strong {
+    color: #27332a !important;
+  }
+
+  html body .shell:has(.studentDashboard) .importantNoticeCopy p,
+  html body .shell:has(.studentDashboard) .importantNoticeAuthor {
+    color: #6d786f !important;
+  }
+
+  html body .shell:has(.studentDashboard) .dashboardPanel,
+  html body .shell:has(.studentDashboard) .dashboardStatCard {
+    border-color: #e0e6e1 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 3px 12px rgba(27, 39, 30, 0.035) !important;
+  }
+
+  html body .shell:has(.studentDashboard) .dashboardPanel h2,
+  html body .shell:has(.studentDashboard) .dashboardPanel h3,
+  html body .shell:has(.studentDashboard) .dashboardStatCard strong {
+    color: #253029 !important;
+  }
+
+  html body .shell:has(.studentDashboard) .dashboardPanel p,
+  html body .shell:has(.studentDashboard) .dashboardStatCard small {
+    color: #6b766e !important;
+  }
+}
+
+@media (max-width: 600px) {
+  html body .shell .workspaceHeader {
+    gap: 8px;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  html body .shell .workspaceBrand {
+    gap: 8px;
+  }
+
+  html body .shell .workspaceBrandLogo {
+    max-width: 40vw !important;
+    max-height: 34px;
+  }
+
+  html body .shell .headerProfileText {
+    display: none !important;
+  }
+
+  html body .shell .content {
+    padding: 12px !important;
+    padding-bottom: max(22px, env(safe-area-inset-bottom)) !important;
+  }
+
+  html body .shell .dashboardGreeting {
+    font-size: clamp(22px, 6vw, 28px);
+    line-height: 1.18;
+    overflow-wrap: anywhere;
+  }
+
+  html body .shell .dashboardGreetingSub {
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  html body .shell .dashboardPanel,
+  html body .shell .dashboardStatCard,
+  html body .shell .roleActionCenter {
+    border-radius: 15px;
+  }
+
+  html body .shell .dashboardPanel {
+    padding: 16px !important;
+  }
+
+  html body .shell .dashboardPanelHeader {
+    align-items: flex-start;
+  }
+
+  html body .shell .dashboardPanelHeader > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  html body .shell .studentDashboardStats {
+    gap: 10px;
+  }
+
+  html body .shell .studentDashboardStats > * {
+    padding: 13px !important;
+  }
+
+  html body .shell .studentDashboardHero,
+  html body .shell .referenceCampusHero {
+    border-radius: 15px;
+  }
+
+  html body .shell .roleActionCenterHeaderActions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  html body .shell .roleActionCenterHeaderActions > * {
+    max-width: 100%;
+  }
+
+  html body .shell .roleActionCenterSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  html body .shell .campusSearchDialog {
+    width: 100%;
+    max-height: 86dvh;
+    border-radius: 16px;
+  }
+
+  html body .shell .campusSearchGroup > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 380px) {
+  html body .shell .workspaceBrandLogo {
+    max-width: 34vw !important;
+  }
+
+  html body .shell .studentDashboardStats {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  html body .shell .roleActionCenterSummary {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  html body .shell .workspaceHeader {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+
+  html body .shell .content {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .shell > aside,
+  html body .shell .workspaceHeader,
+  html body .shell button {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* END CAMPUSCONNECT - PROFESSIONAL MOBILE UI REDESIGN */
+
+/* MY BRANCH — polished department hub */
+.myBranchRoot{--mb-ink:#2e2825;--mb-muted:#796e65;--mb-paper:#f7f2ec;--mb-white:#fffdf9;--mb-wine:#702b3d;--mb-deep:#54212f;--mb-copper:#b77753;--mb-line:#e7ddd2;display:flex;flex-direction:column;gap:23px;min-width:0;color:var(--mb-ink);animation:mbRise .45s ease both}
+.myBranchRoot *,.myBranchRoot *:before,.myBranchRoot *:after{box-sizing:border-box}
+.myBranchRoot button,.myBranchRoot input,.myBranchRoot textarea,.myBranchRoot select{font:inherit}
+.myBranchRoot button:focus-visible,.myBranchRoot a:focus-visible,.myBranchRoot input:focus-visible,.myBranchRoot textarea:focus-visible,.myBranchRoot select:focus-visible{outline:3px solid #c99575;outline-offset:3px}
+.myBranchHero{position:relative;isolation:isolate;overflow:hidden;padding:clamp(23px,3.5vw,40px);border:1px solid #6e3441;border-radius:20px;color:#fff8f1;background:radial-gradient(ellipse at 85% 12%,#c28f6e3b,transparent 36%),linear-gradient(125deg,#54212f,#702b3d 60%,#814b4e);box-shadow:0 18px 42px #411d260e}
+.myBranchHeroOrnament{position:absolute;z-index:-1;top:-80px;right:9%;width:290px;height:290px;border:1px solid #fff3;border-radius:50%;animation:mbOrbit 40s linear infinite}
+.myBranchHeroOrnament span{position:absolute;inset:25px;border:1px solid #fff2;border-radius:50%}.myBranchHeroOrnament span:nth-child(2){inset:53px}.myBranchHeroOrnament span:nth-child(3){inset:82px}
+.myBranchHeroTop,.myBranchHeroMeta,.myBranchSectionHeading,.myBranchEntryTop,.myBranchEntryFooter,.myBranchEditorHeading,.myBranchEditorFooter,.myBranchToolbar,.myBranchHubFooter{display:flex;align-items:center;justify-content:space-between;gap:13px}
+.myBranchKicker,.myBranchOverline{font-size:9px;font-weight:850;letter-spacing:1.45px}.myBranchHeroTop .myBranchKicker{color:#ead6c5}
+.myBranchAccess{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #fff3;border-radius:999px;background:#fff1;font-size:9px;font-weight:750;letter-spacing:.8px}
+.myBranchAccess i{width:6px;height:6px;border-radius:50%;background:#e0ba94;box-shadow:0 0 0 4px #e0ba941e}
+.myBranchHeroContent{display:grid;grid-template-columns:minmax(0,1fr) 180px;align-items:center;gap:20px;margin-top:35px}
+.myBranchOverline{margin:0 0 10px;color:#dfb79b}.myBranchHero h1{margin:0;font-size:clamp(38px,5vw,59px);font-weight:790;line-height:1;letter-spacing:-2.5px}.myBranchHero h1 em{color:#e5b896;font-style:normal}
+.myBranchHeroCopy{max-width:560px;margin:17px 0 22px;color:#fff8f1c7;font-size:13px;line-height:1.8}
+.myBranchHeroMeta{justify-content:flex-start}.myBranchBranchSeal,.myBranchHubSeal{display:grid;flex:0 0 39px;width:39px;height:39px;place-items:center;border:1px solid #fff4;border-radius:13px 13px 13px 4px;color:#fff8f1;background:#fff2;font-size:11px;font-weight:850}
+.myBranchHeroMeta>span:last-child,.myBranchHubFooter>span:nth-child(2){display:flex;flex-direction:column;gap:5px}.myBranchHeroMeta strong{font-size:13px}.myBranchHeroMeta small{color:#fff9f1ad;font-size:10px}
+.myBranchEmblem{display:flex;flex-direction:column;align-items:center;gap:12px}.myBranchEmblemRing{display:grid;width:148px;height:148px;place-items:center;border:1px solid #fff5;border-radius:50%;box-shadow:inset 0 0 0 9px #fff1,inset 0 0 0 10px #fff2;animation:mbFloat 6s ease-in-out infinite}.myBranchEmblemRing svg{width:90px;height:90px}.myBranchEmblemRing svg path{stroke:#f5d9bd;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}.myBranchEmblem small{color:#ead6c5;font-size:8px;font-weight:800;letter-spacing:1.2px}
+.myBranchSelector{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:21px;padding-top:18px;border-top:1px solid #fff3}.myBranchSelector>span{color:#ead6c5;font-size:9px;font-weight:800;letter-spacing:1.1px}.myBranchSelector select{min-width:220px;max-width:100%;padding:10px;border:1px solid #fff4;border-radius:8px;color:#fff8f1;background:#54212f;font-size:12px}.myBranchSelector option{color:#2e2825;background:#fffdf9}
+.myBranchStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.myBranchStats article{display:flex;min-width:0;flex-direction:column;align-items:flex-start;padding:18px;border:1px solid var(--mb-line);border-radius:13px;background:var(--mb-white);box-shadow:0 6px 22px #33241c08;animation:mbRise .5s ease both}.myBranchStats article:nth-child(2){animation-delay:70ms}.myBranchStats article:nth-child(3){animation-delay:140ms}
+.myBranchStats article>span{display:grid;width:31px;height:31px;margin-bottom:12px;place-items:center;border-radius:9px;color:var(--mb-wine);background:#f1e5dc;font-size:16px}.myBranchStats small{color:var(--mb-muted);font-size:11px;font-weight:700}.myBranchStats strong{margin-top:5px;font-size:31px;font-weight:780;letter-spacing:-1px}.myBranchStats p{margin:5px 0 0;color:#94877b;font-size:10px}
+.myBranchSectionHeading{align-items:flex-end;flex-wrap:wrap}.myBranchSectionHeading .myBranchKicker{color:var(--mb-wine)}.myBranchSectionHeading h2{margin:7px 0 5px;font-size:24px;font-weight:780;letter-spacing:-.7px}.myBranchSectionHeading p{margin:0;color:var(--mb-muted);font-size:12px}.myBranchActions{display:flex;flex-wrap:wrap;gap:8px}
+.myBranchPrimaryButton,.myBranchQuietButton{display:inline-flex;min-height:39px;align-items:center;justify-content:center;gap:7px;padding:9px 13px;border:1px solid var(--mb-wine);border-radius:8px;color:#fffaf5;background:var(--mb-wine);font-size:11px;font-weight:760;cursor:pointer;transition:transform .16s,background .16s,box-shadow .16s}
+.myBranchPrimaryButton:hover:not(:disabled){transform:translateY(-1px);background:var(--mb-deep);box-shadow:0 7px 18px #54212f25}.myBranchPrimaryButton:disabled,.myBranchQuietButton:disabled{cursor:not-allowed;opacity:.6}.myBranchQuietButton{border-color:var(--mb-line);color:var(--mb-ink);background:var(--mb-white)}.myBranchQuietButton:hover:not(:disabled){background:#f8f0e9}
+.myBranchMessage{padding:12px 14px;border:1px solid #d5c0ab;border-radius:9px;color:#5c3e33;background:#f7eee5;font-size:12px;line-height:1.6}.myBranchError{border-color:#e5c5c7;color:#742d3a;background:#fbefef}
+.myBranchEditor{padding:clamp(17px,3vw,26px);border:1px solid var(--mb-line);border-radius:15px;background:var(--mb-white);box-shadow:0 12px 30px #33241c0c;animation:mbRise .25s ease both}.myBranchEditorHeading{align-items:flex-start;margin-bottom:20px}.myBranchEditorHeading .myBranchKicker{color:var(--mb-wine)}.myBranchEditorHeading h3{margin:7px 0 0;font-size:19px}.myBranchClose{width:34px;height:34px;border:1px solid var(--mb-line);border-radius:8px;color:var(--mb-ink);background:white;font-size:23px;cursor:pointer}
+.myBranchFormGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.myBranchFormGrid label{display:flex;min-width:0;flex-direction:column;gap:7px;color:#554940;font-size:11px;font-weight:740}.myBranchFormGrid input,.myBranchFormGrid select,.myBranchFormGrid textarea{width:100%;min-width:0;padding:11px 12px;border:1px solid #e0d5ca;border-radius:8px;color:var(--mb-ink);background:#fffdfa;font-size:12px;font-weight:450}.myBranchFormGrid textarea{resize:vertical;line-height:1.7}.myBranchWide{grid-column:1/-1}
+.myBranchEditorFooter{flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--mb-line)}.myBranchEditorFooter>span{flex:1 1 220px;color:var(--mb-muted);font-size:10px;line-height:1.6}.myBranchEditorFooter>span strong{color:var(--mb-ink)}
+.myBranchToolbar{flex-wrap:wrap}.myBranchFilters{display:flex;flex-wrap:wrap;gap:5px}.myBranchFilters button{min-height:34px;padding:8px 10px;border:1px solid transparent;border-radius:8px;color:#7a6f65;background:transparent;font-size:11px;font-weight:700;cursor:pointer}.myBranchFilters button.isActive{border-color:#e4d2c5;color:var(--mb-wine);background:#f5eae0}
+.myBranchSearch{display:flex;min-width:min(260px,100%);min-height:38px;align-items:center;gap:8px;padding:0 11px;border:1px solid var(--mb-line);border-radius:9px;color:var(--mb-copper);background:var(--mb-white)}.myBranchSearch>span{font-size:20px}.myBranchSearch input{width:100%;min-width:0;border:0;outline:0;color:var(--mb-ink);background:transparent;font-size:11px}
+.myBranchEntryGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.myBranchEntryCard{display:flex;min-width:0;flex-direction:column;align-items:flex-start;padding:19px;border:1px solid var(--mb-line);border-radius:13px;background:var(--mb-white);box-shadow:0 6px 20px #33241c08;animation:mbRise .4s ease both;transition:transform .17s,box-shadow .17s,border-color .17s}.myBranchEntryCard:hover{transform:translateY(-2px);border-color:#d8bbaa;box-shadow:0 13px 28px #33241c12}
+.myBranchEntryTop{width:100%;align-items:flex-start}.myBranchEntryTop>span{color:var(--mb-wine);font-size:9px;font-weight:850;letter-spacing:.8px;text-transform:uppercase}.myBranchEntryTop>small{padding:5px 7px;border-radius:5px;color:#78695d;background:#eee6dd;font-size:8px;font-weight:850}.myBranchEntryTop>small.published{color:#5e3b35;background:#f1e5dc}.myBranchEntryCard h3{margin:15px 0 7px;font-size:17px;font-weight:780;line-height:1.35;overflow-wrap:anywhere}.myBranchSummary{margin:0;color:var(--mb-muted);font-size:12px;line-height:1.7}.myBranchTrophy{display:grid;width:42px;height:42px;margin-top:13px;place-items:center;border:1px solid #ead5c4;border-radius:50%;color:#8c523e;background:#f8eee2;font-size:20px}
+.myBranchPerson{display:flex;width:100%;align-items:center;gap:10px;margin-top:16px;padding:11px;border:1px solid #eee5dc;border-radius:9px;background:#fcf8f2}.myBranchPerson>span{display:grid;flex:0 0 32px;width:32px;height:32px;place-items:center;border-radius:9px;color:#fff9f4;background:var(--mb-wine);font-size:12px;font-weight:850}.myBranchPerson>div{display:flex;min-width:0;flex-direction:column;gap:4px}.myBranchPerson strong{font-size:11px;overflow-wrap:anywhere}.myBranchPerson small{color:var(--mb-muted);font-size:10px}.myBranchDetails{margin:14px 0 0;color:#685d54;font-size:11px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.myBranchEventMeta{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:15px}.myBranchEventMeta small,.myBranchEventMeta a{color:#75685e;font-size:10px}.myBranchEventMeta a{color:var(--mb-wine);font-weight:750;text-decoration:none}.myBranchEventMeta a:hover{text-decoration:underline}.myBranchEventState{padding:6px 8px;border-radius:5px;color:#6d4938;background:#f6e9dd;font-size:8px;font-weight:850;letter-spacing:.4px}.myBranchDate{margin-top:13px;color:var(--mb-muted);font-size:10px}
+.myBranchEntryFooter{width:100%;flex-wrap:wrap;margin-top:auto;padding-top:15px}.myBranchEntryFooter>small{color:#94877b;font-size:9px}.myBranchEntryFooter>div{display:flex;gap:12px}.myBranchEntryFooter button{padding:4px 0;border:0;color:var(--mb-wine);background:transparent;font-size:10px;font-weight:760;cursor:pointer}.myBranchEntryFooter button:last-child{color:#837368}.myBranchEntryFooter button:hover{text-decoration:underline}
+.myBranchEmpty{display:flex;min-height:220px;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;border:1px dashed #ddcbbd;border-radius:14px;text-align:center;background:#fffdf9b3}.myBranchEmptyMark{display:grid;width:51px;height:51px;margin-bottom:15px;place-items:center;border:1px solid #e5d0c0;border-radius:16px 16px 16px 5px;color:var(--mb-wine);background:#f4e8de;font-size:12px;font-weight:850}.myBranchEmpty .myBranchKicker{color:var(--mb-wine)}.myBranchEmpty h3{margin:9px 0 6px;font-size:20px}.myBranchEmpty p{max-width:460px;margin:0 0 17px;color:var(--mb-muted);font-size:12px;line-height:1.8}.myBranchLoader{width:27px;height:27px;border:2px solid #e7d7ca;border-top-color:var(--mb-wine);border-radius:50%;animation:mbSpin .8s linear infinite}
+.myBranchHubFooter{justify-content:flex-start;padding:16px 0 4px;border-top:1px solid var(--mb-line)}.myBranchHubSeal{flex-basis:33px;width:33px;height:33px;border:0;color:white;background:var(--mb-wine);font-size:9px}.myBranchHubFooter>span:nth-child(2){flex:1}.myBranchHubFooter strong{font-size:10px}.myBranchHubFooter small{color:var(--mb-muted);font-size:9px}.myBranchHubFooter>small{color:var(--mb-wine);font-weight:800;text-transform:uppercase}
+@keyframes mbRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes mbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes mbOrbit{to{transform:rotate(360deg)}}@keyframes mbSpin{to{transform:rotate(360deg)}}
+@media(max-width:760px){.myBranchHeroContent{grid-template-columns:1fr;margin-top:27px}.myBranchEmblem{display:none}.myBranchHero h1{font-size:clamp(37px,8vw,50px)}.myBranchEntryGrid{grid-template-columns:1fr}.myBranchSectionHeading{align-items:flex-start;flex-direction:column}.myBranchActions{width:100%}.myBranchActions button{flex:1}.myBranchToolbar{align-items:stretch;flex-direction:column}.myBranchSearch{width:100%}}
+@media(max-width:480px){.myBranchRoot{gap:17px}.myBranchHero{padding:22px 17px;border-radius:16px}.myBranchHero h1{letter-spacing:-1.8px}.myBranchStats{gap:8px}.myBranchStats article{padding:11px;border-radius:10px}.myBranchStats article>span{width:27px;height:27px;margin-bottom:9px}.myBranchStats small{font-size:9px;line-height:1.5}.myBranchStats strong{font-size:24px}.myBranchStats p{font-size:9px;line-height:1.5}.myBranchFormGrid{grid-template-columns:1fr}.myBranchWide{grid-column:auto}.myBranchFilters{gap:2px}.myBranchFilters button{padding-inline:8px;font-size:10px}.myBranchEntryCard{padding:16px}}
+@media(prefers-reduced-motion:reduce){.myBranchRoot *,.myBranchRoot *:before,.myBranchRoot *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+
+
+/* MY BRANCH FEATURED BANNER AND GALLERY */
+.myBranchFeaturedWrap{margin:0 0 1.5rem;display:grid;gap:1rem}
+.myBranchFeatured{position:relative;isolation:isolate;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(220px,.9fr);min-height:230px;border:1px solid rgba(137,82,55,.28);border-radius:22px;background:linear-gradient(115deg,#2c1b19,#5c3028 65%,#8a5b42);color:#fffaf1;box-shadow:0 16px 38px rgba(53,31,24,.12)}
+.myBranchFeaturedImage{width:100%;height:100%;min-height:230px;max-height:340px;object-fit:cover;grid-column:2;grid-row:1;opacity:.94}
+.myBranchFeaturedContent{grid-column:1;grid-row:1;align-self:center;padding:clamp(1.25rem,3.5vw,2.6rem)}
+.myBranchFeaturedContent .myBranchKicker{color:#e7c6a1}
+.myBranchFeaturedContent h2{font-family:Georgia,serif;font-size:clamp(1.5rem,3vw,2.35rem);line-height:1.12;margin:.7rem 0}
+.myBranchFeaturedContent p{color:#f1e5d9;line-height:1.7;max-width:650px;white-space:pre-wrap}
+.myBranchFeaturedContent a{display:inline-flex;margin-top:1rem;color:#f3d3a7;text-decoration:none;font-weight:650}
+.myBranchFeatureManage{display:flex;gap:.6rem;flex-wrap:wrap}
+.myBranchExtrasForm{display:grid;gap:1rem}
+.myBranchExtrasForm>label{display:grid;gap:.45rem;font-size:.88rem;font-weight:650;color:var(--my-branch-text,#4b342b)}
+.myBranchExtrasForm input,.myBranchExtrasForm textarea,.myBranchExtrasForm select{width:100%;min-width:0;border:1px solid rgba(114,83,64,.24);border-radius:10px;padding:.75rem .85rem;background:rgba(255,252,247,.9);color:#352720;font:inherit}
+.myBranchGallerySection{margin:2rem 0}
+.myBranchGalleryGrid{height:clamp(580px,76vw,900px);min-height:580px;position:relative;overflow:hidden;border-radius:20px;background:#f3eee5;border:1px solid rgba(120,83,60,.18)}
+.myBranchGalleryGrid>div{height:100%}
+.myBranchGalleryCaption{color:white;text-shadow:0 1px 10px rgba(0,0,0,.25)}
+.myBranchGalleryCaptionTitle{font-size:clamp(1.1rem,2.2vw,2rem);font-weight:750;line-height:1.1;margin:0 0 .5rem}
+.myBranchGalleryCaptionDescription{font-size:.92rem;line-height:1.55;color:#f6eee7;white-space:pre-wrap}
+.myBranchGalleryDelete{margin-top:.75rem;border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:.35rem .65rem;color:#fff;background:rgba(45,26,22,.58);cursor:pointer}
+.myBranchGalleryRoleNote{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:.8rem .2rem;color:#80695b;font-size:.78rem}
+@media(max-width:700px){.myBranchFeatured{grid-template-columns:1fr;grid-template-rows:auto auto}.myBranchFeaturedImage{grid-column:1;grid-row:1;min-height:160px;max-height:230px}.myBranchFeaturedContent{grid-column:1;grid-row:2;padding:1.25rem}.myBranchGalleryGrid{height:680px;min-height:560px}.myBranchGallerySection .myBranchSectionHeading{align-items:flex-start;gap:1rem}}
+
+
+/* MY BRANCH ENTRY MEDIA ATTACHMENTS */
+.myBranchEntryCover{display:block;width:100%;max-height:340px;aspect-ratio:16/9;object-fit:cover;border-radius:13px;margin:.8rem 0 1rem;border:1px solid rgba(122,84,59,.18);background:#eee4d8}
+.myBranchUploadHint{font-size:.78rem;color:#856b59;overflow-wrap:anywhere}
+.myBranchExistingAttachments{display:grid;gap:.55rem;border:1px solid rgba(122,84,59,.18);border-radius:12px;padding:.85rem;background:rgba(255,252,247,.68)}
+.myBranchExistingAttachments>strong{font-size:.85rem;color:#53372b}
+.myBranchExistingAttachment{display:flex;align-items:center;justify-content:space-between;gap:.75rem;font-size:.82rem;overflow-wrap:anywhere}
+.myBranchExistingAttachment button{flex-shrink:0;background:transparent;border:1px solid rgba(130,70,57,.3);border-radius:7px;padding:.3rem .55rem;color:#854c3e;cursor:pointer}
+.myBranchAttachments{display:grid;gap:.5rem;margin:1rem 0;padding:.85rem;border-radius:12px;background:rgba(245,238,228,.78);border:1px solid rgba(122,84,59,.15)}
+.myBranchAttachments>strong{font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;color:#80624e}
+.myBranchAttachments a{display:flex;align-items:center;gap:.55rem;min-width:0;color:#713d31;text-decoration:none;font-size:.83rem;overflow-wrap:anywhere;word-break:break-word}
+.myBranchAttachments a:hover{text-decoration:underline}
+.myBranchAttachments a>span{flex-shrink:0;font-size:.65rem;font-weight:800;letter-spacing:.04em;border:1px solid rgba(122,84,59,.25);border-radius:5px;padding:.22rem .35rem;background:#fff9f1}
+.myBranchAttachments a.isUnavailable{opacity:.55;pointer-events:none}
+
+
+
+/* ADMIN GREETING SINGLE-LINE ALIGNMENT FIX */
+html body .heading.professionalHeading.dashboardTopBar[data-admin-greeting="true"] .dashboardGreeting {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  gap: 0.08em !important;
+}
+
+html body .heading.professionalHeading.dashboardTopBar[data-admin-greeting="true"] .appleDashboardHello {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+}
+
+html body .heading.professionalHeading.dashboardTopBar[data-admin-greeting="true"] .appleDashboardComma {
+  flex: 0 0 auto !important;
+  margin-left: 0 !important;
+}
+
+html body .heading.professionalHeading.dashboardTopBar[data-admin-greeting="true"] .dashboardGreeting > strong {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+html body .heading.professionalHeading.dashboardTopBar[data-admin-greeting="true"] .greetingWave {
+  flex: 0 0 auto !important;
+}
+
+@media (max-width: 760px) {
+  html body .heading.professionalHeading.dashboardTopBar[data-admin-greeting="true"] .dashboardGreeting {
+    flex-wrap: wrap !important;
+    white-space: normal !important;
+  }
+
+  html body .heading.professionalHeading.dashboardTopBar[data-admin-greeting="true"] .appleDashboardHello {
+    max-width: 100% !important;
+    white-space: nowrap !important;
+  }
+}
+
+
+/* STUDENT CORKBOARD NOTICE BOARD */
+.studentNoticeBoardPanel {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 !important;
+  border: 1px solid #dfcfb8 !important;
+  border-radius: 16px !important;
+  background: #fbf7ef !important;
+  box-shadow: 0 12px 32px #482b1b10 !important;
+}
+
+.studentNoticeBoardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 19px 14px;
+}
+
+.studentNoticeEyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: #8b5b36;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .16em;
+}
+
+.studentNoticeBoardHeader h3 {
+  margin: 0;
+  color: #38241d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.studentNoticeBoardHeader p {
+  margin: 7px 0 0;
+  color: #79695a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.studentNoticeViewAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  border: 1px solid #d8c3a9;
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #6e273b;
+  background: #fffaf1;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.studentNoticeViewAll:hover {
+  background: #f4e8d7;
+}
+
+.studentNoticeWoodFrame {
+  margin: 0 12px 12px;
+  padding: 9px;
+  border: 1px solid #b78352;
+  border-radius: 5px;
+  background:
+    repeating-linear-gradient(7deg, #0000 0 15px, #9b653a18 16px 18px),
+    linear-gradient(135deg, #efc08b, #c68b55 45%, #e5b57f 75%, #bf8150);
+  box-shadow:
+    inset 0 0 0 2px #ffdfa5a1,
+    0 5px 12px #5f351f24;
+}
+
+.studentNoticeCorkSurface {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 17px 12px;
+  min-height: 270px;
+  padding: 17px 12px;
+  background-color: #b88350;
+  background-image:
+    radial-gradient(ellipse at 14% 19%, #e6c08a38 0 1px, transparent 2px),
+    radial-gradient(ellipse at 73% 65%, #71462935 0 1px, transparent 2px),
+    radial-gradient(ellipse at 48% 42%, #f4d4a04a 0 1px, transparent 2px),
+    repeating-linear-gradient(35deg, #8b592d10 0 1px, #0000 1px 5px),
+    repeating-linear-gradient(125deg, #f6d19c12 0 1px, #0000 1px 7px);
+  border: 1px solid #986438;
+  box-shadow: inset 0 3px 14px #633d241e;
+}
+
+.studentNoticePaper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 146px;
+  padding: 23px 11px 11px;
+  border: 0;
+  border-radius: 2px;
+  color: #3c3028;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 8px #3824192e, inset 0 0 0 1px #00000005;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.studentNoticePaper:hover {
+  z-index: 2;
+  transform: translateY(-4px) rotate(0deg) !important;
+  box-shadow: 0 10px 18px #38241940;
+}
+
+.studentNoticePaper0 { background: #fff6d9; transform: rotate(-1.5deg); }
+.studentNoticePaper1 { background: #fffdf5; transform: rotate(1.7deg); }
+.studentNoticePaper2 { background: #f8e0dc; transform: rotate(-2deg); }
+.studentNoticePaper3 { background: #f2e7d5; transform: rotate(1.2deg); }
+.studentNoticePaper4 { background: #fff1c4; transform: rotate(-.7deg); }
+
+.studentNoticePin {
+  position: absolute;
+  top: 7px;
+  left: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  border: 1px solid #963b32;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #ffd4a8, #b84235 62%, #782820);
+  box-shadow: 0 2px 3px #3520125e;
+}
+
+.studentNoticePaperCategory {
+  display: block;
+  max-width: 100%;
+  margin-bottom: 7px;
+  color: #87543a;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.studentNoticePaper strong {
+  display: -webkit-box;
+  width: 100%;
+  overflow: hidden;
+  color: #392820;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.studentNoticePaper p {
+  display: -webkit-box;
+  width: 100%;
+  margin: 7px 0 9px;
+  overflow: hidden;
+  color: #6d5d50;
+  font-size: 10px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.studentNoticePaper small {
+  margin-top: auto;
+  max-width: 100%;
+  color: #765a45;
+  font-size: 9px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.studentNoticePaper time {
+  align-self: flex-end;
+  margin-top: 5px;
+  color: #896e58;
+  font-size: 9px;
+}
+
+.studentNoticeEmpty {
+  grid-column: 1 / -1;
+  align-self: center;
+  padding: 26px 12px;
+  color: #fff3df;
+  text-align: center;
+}
+
+.studentNoticeEmpty > span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.studentNoticeEmpty strong {
+  display: block;
+  color: #fff9ee;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+}
+
+.studentNoticeEmpty p {
+  max-width: 230px;
+  margin: 7px auto 0;
+  color: #f1d9bd;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.studentNoticeBoardFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 18px 16px;
+  color: #8a7969;
+  font-size: 9px;
+}
+
+.studentNoticeBoardFooter > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.studentNoticeBoardFooter i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #8b3046;
+}
+
+.studentNoticeModalBackdrop {
+  position: fixed;
+  z-index: 100000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 22px;
+  background: #211514a8;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: studentNoticeBackdropIn 150ms ease-out;
+}
+
+.studentNoticeModal {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: min(84vh, 820px);
+  overflow-y: auto;
+  padding: 27px;
+  border: 1px solid #dfcbb0;
+  border-top: 7px solid #70263d;
+  border-radius: 12px;
+  background:
+    linear-gradient(#fffdf8f5, #fffaf1f5),
+    repeating-linear-gradient(0deg, transparent 0 30px, #b8a58b18 31px);
+  box-shadow: 0 25px 80px #140b0b55;
+  animation: studentNoticeModalIn 190ms ease-out;
+}
+
+.studentNoticeModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #865a38;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.studentNoticeClose {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #e4d4c0;
+  border-radius: 50%;
+  background: #fffaf2;
+  color: #5e2739;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.studentNoticeModalPin {
+  width: 13px;
+  height: 13px;
+  margin-top: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #ffd5a2, #b84235 65%, #75281f);
+  box-shadow: 0 2px 4px #3820155c;
+}
+
+.studentNoticeModal h2 {
+  margin: 13px 0 12px;
+  color: #3a241e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(25px, 4vw, 35px);
+  font-weight: 600;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.studentNoticeModalMeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 15px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #e6d8c6;
+  color: #847363;
+  font-size: 11px;
+}
+
+.studentNoticeModalMeta strong {
+  color: #654332;
+}
+
+.studentNoticeDepartment {
+  margin: 14px 0 0;
+  color: #80553a;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.studentNoticeModalBody {
+  padding: 21px 0 24px;
+  color: #4f4035;
+  font-size: 14px;
+  line-height: 1.85;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.studentNoticeModalFooter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 17px;
+  border-top: 1px solid #e6d8c6;
+}
+
+.studentNoticeModalFooter button {
+  min-height: 40px;
+  padding: 10px 15px;
+  border: 1px solid #dbc8b0;
+  border-radius: 8px;
+  background: #fffaf2;
+  color: #62384a;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.studentNoticeModalFooter .studentNoticeModalPrimary {
+  border-color: #70263d;
+  background: #70263d;
+  color: #fff7ea;
+}
+
+.studentNoticeModal button:focus-visible,
+.studentNoticeBoardPanel button:focus-visible {
+  outline: 3px solid #bd8b4d;
+  outline-offset: 3px;
+}
+
+@keyframes studentNoticeBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes studentNoticeModalIn {
+  from { opacity: 0; transform: translateY(9px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+  .studentNoticeBoardHeader {
+    padding: 17px 13px 12px;
+  }
+
+  .studentNoticeWoodFrame {
+    margin: 0 8px 10px;
+    padding: 6px;
+  }
+
+  .studentNoticeCorkSurface {
+    gap: 14px 9px;
+    padding: 14px 8px;
+  }
+
+  .studentNoticePaper {
+    min-height: 138px;
+    padding: 22px 8px 9px;
+  }
+
+  .studentNoticePaper strong {
+    font-size: 12px;
+  }
+
+  .studentNoticeModal {
+    padding: 21px 17px;
+  }
+
+  .studentNoticeModalFooter {
+    justify-content: stretch;
+  }
+
+  .studentNoticeModalFooter button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studentNoticePaper,
+  .studentNoticeModal,
+  .studentNoticeModalBackdrop {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+
+/* CampusConnect festival media — responsive, uncropped poster */
+[data-all-role-festival="true"] {
+  min-width: 0;
+  grid-template-columns: minmax(0, 34%) minmax(0, 1fr) !important;
+}
+
+[data-all-role-festival="true"] > div:first-child:has(> img),
+[data-all-role-festival="true"] > div:first-child:has(> video) {
+  min-width: 0;
+  min-height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #211b18;
+}
+
+[data-all-role-festival="true"] > div:first-child > button {
+  display: flex;
+  width: 100%;
+  min-height: 230px;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-all-role-festival="true"] img {
+  display: block;
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 420px;
+  object-fit: contain !important;
+  object-position: center;
+}
+
+[data-all-role-festival="true"] video {
+  display: block;
+  width: 100%;
+  height: auto !important;
+  min-height: 230px;
+  max-height: 420px;
+  object-fit: contain !important;
+  object-position: center;
+  background: #211b18;
+}
+
+@media (max-width: 700px) {
+  [data-all-role-festival="true"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+    border-radius: 18px !important;
+  }
+
+  [data-all-role-festival="true"] > div:first-child:has(> img),
+  [data-all-role-festival="true"] > div:first-child:has(> video),
+  [data-all-role-festival="true"] > div:first-child > button {
+    min-height: 0;
+    max-height: none;
+  }
+
+  [data-all-role-festival="true"] img,
+  [data-all-role-festival="true"] video {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 55vh;
+    object-fit: contain !important;
+  }
+}

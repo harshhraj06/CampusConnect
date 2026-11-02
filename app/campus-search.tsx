@@ -481,7 +481,7 @@ export function CampusSearch({role, onNavigate}: {role: Role; onNavigate: (targe
         <header className="campusSearchInput">
           <i aria-hidden="true">⌕</i>
           <input ref={inputRef} value={query} onChange={event => {setQuery(event.target.value); setActiveIndex(0);}} onKeyDown={handleInputKey} placeholder={placeholders[role]} aria-controls={showingResults ? "campus-search-results" : undefined} aria-activedescendant={showingResults && filteredItems[activeIndex] ? `search-${filteredItems[activeIndex].id}` : undefined}/>
-          {query && <button onClick={() => {setQuery(""); setActiveIndex(0);}} aria-label="Clear search">×</button>}
+          <button type="button" onClick={() => { if (query) { setQuery(""); setActiveIndex(0); } else { closeSearch(); } }} aria-label={query ? "Clear search" : "Close search"}>×</button>
           <kbd>ESC</kbd>
         </header>
         <div className="campusSearchContext"><span><i/>Searching the <b>{role}</b> workspace</span><small>{roleItems.length} destinations</small></div>

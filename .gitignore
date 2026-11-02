@@ -92,3 +92,24 @@ service-account*.json
 .campusconnect-backups/
 *.tar
 *.tar.gz
+
+
+# Backups, dumps and AI scratch files
+.*-backups/
+*-backups/
+*.backup*
+*.bak*
+*.orig
+*.rej
+*.emergency*
+*.before-*
+*.lint-backup
+*.presence-backup
+*.camera-backup*
+*.notice-board-backup*
+*-source.txt
+*-audit.txt
+
+# Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
+

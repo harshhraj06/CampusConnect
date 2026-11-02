@@ -1,0 +1,60 @@
+.ccStoragePage { min-height: 100vh; background: #faf8f4; color: #302b24; font-family: Arial, Helvetica, sans-serif; }
+.ccStoragePage * { box-sizing: border-box; }
+.ccStorageHeader, .ccStorageMain, .ccStorageFooter { width: min(1080px, calc(100% - 48px)); margin-inline: auto; }
+.ccStorageHeader { display: flex; justify-content: space-between; align-items: center; gap: 24px; min-height: 88px; border-bottom: 1px solid #e5ded2; }
+.ccStorageBrand img { display: block; object-fit: contain; object-position: left; }
+.ccStorageBack { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: #625749; font-size: 13px; text-decoration: none; }
+.ccStorageMain { max-width: 840px; padding: 56px 0 72px; }
+.ccStorageIntro { margin-bottom: 32px; }
+.ccStorageEyebrow { color: #8a704b; font-size: 10px; font-weight: 700; letter-spacing: .14em; }
+.ccStorageIntro h1 { margin: 12px 0; color: #302b24; font-size: clamp(34px, 6vw, 52px); font-weight: 600; letter-spacing: -.045em; line-height: 1.12; }
+.ccStorageIntro p { max-width: 650px; margin: 0; color: #71685d; font-size: 15px; line-height: 1.8; }
+.ccStorageCard { margin-top: 18px; padding: 26px; border: 1px solid #e5ded2; border-radius: 16px; background: #fffdf9; box-shadow: 0 8px 32px rgb(58 45 26 / 4%); }
+.ccStorageCardHeading { display: flex; align-items: center; gap: 14px; }
+.ccStorageIcon { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; border: 1px solid #e5d9c4; border-radius: 13px; background: #f7f0e4; color: #80653c; }
+.ccStorageCardHeading h2 { margin: 0; color: #373128; font-size: 18px; font-weight: 600; line-height: 1.4; }
+.ccStorageCardHeading p { margin: 4px 0 0; color: #776e61; font-size: 12px; line-height: 1.7; }
+.ccStorageCurrent { display: flex; align-items: center; gap: 9px; margin: 22px 0; color: #625749; font-size: 13px; }
+.ccStorageDot { width: 8px; height: 8px; border-radius: 50%; background: #758b68; }
+.ccStorageChoices { display: grid; gap: 10px; margin: 0; padding: 0; border: 0; }
+.ccStorageChoices legend { margin-bottom: 10px; color: #51483d; font-size: 12px; font-weight: 700; }
+.ccStorageChoices label { display: flex; align-items: flex-start; gap: 12px; padding: 15px; border: 1px solid #e8e1d6; border-radius: 11px; cursor: pointer; }
+.ccStorageChoices label.selected { border-color: #ad966f; background: #faf6ee; }
+.ccStorageChoices input { margin: 3px 0 0; accent-color: #725c39; }
+.ccStorageChoices label span { display: grid; gap: 5px; }
+.ccStorageChoices label strong { color: #40382e; font-size: 13px; }
+.ccStorageChoices label small { color: #807668; font-size: 12px; line-height: 1.6; }
+.ccStorageActions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 18px; }
+.ccStorageActions > span { display: inline-flex; align-items: center; gap: 6px; color: #557052; font-size: 12px; }
+.ccStoragePage button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; padding: 9px 15px; border: 1px solid #ddd3c3; border-radius: 9px; background: #fff; color: #5a4931; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.ccStoragePage button:hover:not(:disabled) { border-color: #b9a17a; background: #f8f3ea; }
+.ccStoragePage button:disabled { opacity: .55; cursor: not-allowed; }
+.ccStoragePage .ccStoragePrimary { border-color: #324a5a; background: #324a5a; color: #fff; }
+.ccStoragePage .ccStoragePrimary:hover:not(:disabled) { border-color: #263b49; background: #263b49; }
+.ccStorageCardHeading .ccStorageRefresh { margin-left: auto; padding: 8px; border-color: transparent; }
+.ccStorageStats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 22px 0; }
+.ccStorageStats > div { display: grid; align-content: space-between; gap: 14px; min-height: 82px; padding: 14px; border: 1px solid #e9e3d9; border-radius: 10px; background: #fff; }
+.ccStorageStats span { color: #81786c; font-size: 11px; line-height: 1.5; }
+.ccStorageStats strong { color: #3a352e; font-size: 18px; font-weight: 600; }
+.ccStoragePage .ccStorageSecondary { color: #624b35; }
+.ccStorageNote { margin: 16px 0; color: #807668; font-size: 12px; line-height: 1.75; }
+.ccStorageStatus, .ccStorageError { margin: 18px 0 0; padding: 14px 16px; border: 1px solid #dbe7d8; border-radius: 10px; background: #f1f6ef; color: #466343; font-size: 13px; line-height: 1.6; }
+.ccStorageError { border-color: #ecd5d1; background: #fcf2f0; color: #873d34; }
+.ccStorageLegal { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 26px; }
+.ccStorageLegal a { display: inline-flex; align-items: center; min-height: 44px; color: #68512c; font-size: 12px; font-weight: 600; }
+.ccStorageFooter { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; padding: 22px 0 38px; border-top: 1px solid #e5ded2; color: #776e61; font-size: 11px; }
+.ccStoragePage a:focus-visible, .ccStoragePage button:focus-visible { outline: 2px solid #8b6b35; outline-offset: 3px; }
+@media (max-width: 640px) { .ccStorageHeader, .ccStorageMain, .ccStorageFooter { width: calc(100% - 32px); } .ccStorageHeader { min-height: 76px; } .ccStorageBrand img { width: 126px; } .ccStorageBack { font-size: 12px; } .ccStorageMain { padding: 40px 0 52px; } .ccStorageCard { padding: 20px; border-radius: 13px; } .ccStorageStats { grid-template-columns: 1fr 1fr; } .ccStorageStats > div:last-child { grid-column: 1 / -1; } .ccStorageFooter { align-items: flex-start; padding-bottom: 72px; } }
+
+.ccStorageUsage { margin: 0 0 18px; padding: 17px; border: 1px solid #e9e3d9; border-radius: 11px; background: #fff; }
+.ccStorageUsageHeading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px; color: #51483d; font-size: 12px; }
+.ccStorageUsageHeading span { color: #81786c; }
+.ccStorageUsageTrack { height: 8px; margin-top: 13px; overflow: hidden; border-radius: 99px; background: #eee9e0; }
+.ccStorageUsageTrack span { display: block; height: 100%; min-width: 0; border-radius: inherit; background: linear-gradient(90deg, #486474, #8ba18c); transition: width .3s ease; }
+.ccStorageUsage p { margin: 10px 0 0; color: #81786c; font-size: 11px; line-height: 1.65; }
+.ccStorageCacheStatus { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 16px; padding: 13px 15px; border-radius: 10px; background: #f5f3ef; }
+.ccStorageCacheStatus > span { flex: 0 0 8px; width: 8px; height: 8px; margin-top: 4px; border-radius: 50%; background: #a89d8c; }
+.ccStorageCacheStatus > span.hasCache { background: #6d8a68; }
+.ccStorageCacheStatus p { margin: 0; color: #6d655a; font-size: 12px; line-height: 1.65; }
+
+.ccStorageStats > div small { color: #81786c; font-size: 10px; }

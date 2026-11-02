@@ -1,4 +1,5 @@
 "use client";
+import { StudentDirectory } from "./student-directory";
 
 import "./assignments-professional-v3.css";
 
@@ -20,12 +21,16 @@ import CampusMessenger from "./campus-messenger";
 import {CommunityPosts} from "./community-posts";
 import {PlacementApplicantProfile} from "./placement-applicant-profile";
 import CampusWorkDelegation from "./campus-work-delegation";
+import AcademicPromotionModule from "./academic-promotion-module";
+import PersonalAnnouncementsModule from "./personal-announcements-module";
+import CampusDossierModule from "./campus-dossier-module";
 import TimetableCoordinatorAdmin from "./timetable-coordinator-admin";
 import CampusEventSecurePass from "./campus-event-secure-pass";
 import CampusMarketplace from "./campus-marketplace";
 import PersonalWorkspace from "./personal-workspace";
+import MyBranchHub from "./my-branch";
 
-export type CampusModuleView = "Announcements" | "Assignments" | "Attendance" | "Applications" | "Learning" | "Groups" | "Marketplace" | "Notes & Tasks" | "Profile" | "Admin" | "Analytics";
+export type CampusModuleView = "Announcements" | "Assignments" | "Attendance" | "Applications" | "Learning" | "Groups" | "Marketplace" | "Notes & Tasks" | "My Branch" | "Profile" | "Admin" | "Analytics";
 type Role = "Student" | "Faculty" | "Placement Cell" | "Coordinator" | "Volunteer" | "Main Admin";
 export type ModuleProfile = {
   name: string;
@@ -97,7 +102,7 @@ const canManageUsersRole = (role: Role) =>
   role === "Main Admin";
 
 
-export const campusModuleViews: CampusModuleView[] = ["Announcements", "Assignments", "Attendance", "Applications", "Learning", "Groups", "Marketplace", "Notes & Tasks", "Profile", "Admin", "Analytics"];
+export const campusModuleViews: CampusModuleView[] = ["Announcements", "Assignments", "Attendance", "Applications", "Learning", "Groups", "Marketplace", "Notes & Tasks", "My Branch", "Profile", "Admin", "Analytics"];
 
 export function isCampusModuleView(view: string): view is CampusModuleView {
   return campusModuleViews.includes(view as CampusModuleView);
@@ -113,6 +118,7 @@ export function campusModuleSubtitle(view: CampusModuleView, role: Role) {
     Groups: "Role-aware communities for classes, projects, placements and campus discussions.",
     Marketplace: "Buy and sell verified second-hand items safely within your campus community.",
     "Notes & Tasks": "Keep private notes, reminders and important work organized in one personal workspace.",
+    "My Branch": "Explore department achievements, toppers, events and opportunities.",
     Profile: "Keep your campus identity, skills and private documents up to date.",
     Admin: "Manage trusted roles and monitor access across CampusConnect.",
     Analytics: role === "Student" ? "A personal view of academic and career progress." : "Campus activity and outcome signals for better decisions.",
@@ -164,6 +170,7 @@ export function CampusModule({
   if (view === "Notes & Tasks") {
     return <PersonalWorkspace/>;
   }
+  if (view === "My Branch") return <MyBranchHub profile={profile} />;
   if (view === "Profile") return <ProfileModule profile={profile} onProfileChange={onProfileChange}/>;
   if (view === "Admin") return <AdminModule profile={profile}/>;
   return <AnalyticsModule profile={profile}/>;
@@ -657,7 +664,23 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
   const [events, setEvents] = useState<CampusEvent[]>([]);
 
   const [activeTab, setActiveTab] =
-    useState<"All" | "Announcements" | "Events">("All");
+    useState<"All" | "Announcements" | "Events" | "Private Messages">("All");
+
+  useEffect(() => {
+    try {
+      const stored = window.sessionStorage?.getItem("campusconnect-announcements-tab");
+      if (stored === "Private Messages") {
+        setActiveTab("Private Messages");
+        window.sessionStorage?.removeItem("campusconnect-announcements-tab");
+      }
+    } catch {}
+
+    const handleTabChange = (e: any) => {
+      if (e?.detail) setActiveTab(e.detail);
+    };
+    window.addEventListener("campus-announcements-tab", handleTabChange);
+    return () => window.removeEventListener("campus-announcements-tab", handleTabChange);
+  }, []);
 
   const [showForm, setShowForm] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
@@ -784,14 +807,57 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
       banner_cta_url: "",
       banner_dismissible: true,
       burst_colors: [
-        "#F59E0B",
-        "#EF4444",
-        "#8B5CF6",
-        "#22C55E",
-        "#3B82F6",
+        "#D9A441",
+        "#C75B43",
+        "#E9C878",
+        "#F8E7B3",
+        "#A94442",
       ],
     });
 
+
+  const defaultFestivalTheme = {
+    template: "diwali-royal",
+    background_start: "#6B2637",
+    background_end: "#281920",
+    accent: "#E8B967",
+    text: "#FFF4DF",
+    border: "#BA8750",
+    intensity: 65,
+    reference_url: "",
+    decorations: {
+      toran: true,
+      ladi_lights: true,
+      diyas: true,
+      rangoli: true,
+      marigold: true,
+      fireworks: true,
+      confetti: true,
+      header_garland: "lari",
+      rocket_enabled: true,
+    },
+  };
+
+  const [festivalThemeSettings, setFestivalThemeSettings] =
+    useState(defaultFestivalTheme);
+
+  useEffect(() => {
+    const saved = (editingAnnouncement as any)?.festival_theme;
+    setFestivalThemeSettings({
+      ...defaultFestivalTheme,
+      ...(saved && typeof saved === "object" ? saved : {}),
+      reference_url:
+        typeof saved?.reference_url === "string"
+          ? saved.reference_url
+          : "",
+      decorations: {
+        ...defaultFestivalTheme.decorations,
+        ...(saved?.decorations && typeof saved.decorations === "object"
+          ? saved.decorations
+          : {}),
+      },
+    });
+  }, [editingAnnouncement?.id]);
 
   const [eventForm, setEventForm] = useState({
     title: "",
@@ -2045,6 +2111,9 @@ function AnnouncementsModule({profile}: {profile: ModuleProfile}) {
         updates.burst_colors =
           festivalEditSettings
             .burst_colors;
+
+        updates.festival_theme =
+          festivalThemeSettings;
       }
 
 
@@ -4377,7 +4446,7 @@ const registrationClosed =
         role="tablist"
         aria-label="Campus update type"
       >
-        {(["All", "Announcements", "Events"] as const).map(tab => (
+        {(["All", "Announcements", "Events", "Private Messages"] as const).map(tab => (
           <button
             key={tab}
             className={activeTab === tab ? "active" : ""}
@@ -4396,7 +4465,14 @@ const registrationClosed =
         ))}
       </div>
 
-      <section className="campusUpdatesToolbar card">
+      {activeTab === "Private Messages" && (
+        <div style={{ marginTop: 20 }}>
+          <PersonalAnnouncementsModule />
+        </div>
+      )}
+
+      {activeTab !== "Private Messages" && (
+        <section className="campusUpdatesToolbar card">
         <div className="campusUpdatesSearch">
           <span>⌕</span>
 
@@ -4460,6 +4536,7 @@ const registrationClosed =
           </select>
         )}
       </section>
+      )}
 
       {status && (
         <StatusLine text={status}/>
@@ -6757,7 +6834,470 @@ const registrationClosed =
                   </div>
 
 
-                  <section className="festivalBurstPalette">
+                                    <section
+                    className="festivalThemeStudio"
+                    style={{
+                      margin: "18px 0",
+                      padding: "20px",
+                      border: "1px solid #D9C5A6",
+                      borderRadius: "18px",
+                      background: "linear-gradient(145deg,#FFF9F0,#F5E9D8)",
+                      color: "#39252A",
+                    }}
+                  >
+                    <span style={{
+                      fontSize: "10px",
+                      fontWeight: 800,
+                      letterSpacing: ".16em",
+                      color: "#92513F",
+                    }}>
+                      FESTIVAL THEME STUDIO
+                    </span>
+
+                    <h4 style={{ margin: "7px 0", fontSize: "20px" }}>
+                      Templates, colours and decorations
+                    </h4>
+                    <p style={{ fontSize: "12px", lineHeight: 1.6 }}>
+                      Choose a starting design, then personalise your dashboard
+                      festival before saving.
+                    </p>
+
+                    <label style={{
+                      display: "grid",
+                      gap: "7px",
+                      marginBottom: "18px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                    }}>
+                      Built-in template
+                      <select
+                        value={festivalThemeSettings.template}
+                        onChange={event => {
+                          const presets = {
+                            "diwali-royal": {
+                              background_start: "#6B2637",
+                              background_end: "#281920",
+                              accent: "#E8B967",
+                              text: "#FFF4DF",
+                              border: "#BA8750",
+                              intensity: 75,
+                              decorations: {
+                                toran: true, ladi_lights: true, diyas: true,
+                                rangoli: true, marigold: true, fireworks: true,
+                                confetti: true,
+                              },
+                            },
+                            "celebration-lights": {
+                              background_start: "#7A352C",
+                              background_end: "#39201E",
+                              accent: "#F4C56B",
+                              text: "#FFF7E8",
+                              border: "#D19A56",
+                              intensity: 60,
+                              decorations: {
+                                toran: true, ladi_lights: true, diyas: true,
+                                rangoli: false, marigold: true, fireworks: true,
+                                confetti: true,
+                              },
+                            },
+                            "retail-celebration": {
+                              background_start: "#FFF0D4",
+                              background_end: "#E8B58A",
+                              accent: "#A84430",
+                              text: "#48251E",
+                              border: "#C7894D",
+                              intensity: 55,
+                              decorations: {
+                                toran: false, ladi_lights: true, diyas: false,
+                                rangoli: true, marigold: true, fireworks: false,
+                                confetti: true,
+                              },
+                            },
+                            "holi-colours": {
+                              background_start: "#A94F45",
+                              background_end: "#5E292C",
+                              accent: "#F0C86B",
+                              text: "#FFF4E5",
+                              border: "#DDAA67",
+                              intensity: 85,
+                              decorations: {
+                                toran: false, ladi_lights: true, diyas: false,
+                                rangoli: true, marigold: true, fireworks: false,
+                                confetti: true,
+                              },
+                            },
+                            "eid-elegance": {
+                              background_start: "#3A2A2B",
+                              background_end: "#21191B",
+                              accent: "#E8C986",
+                              text: "#FFF6E4",
+                              border: "#B69A67",
+                              intensity: 40,
+                              decorations: {
+                                toran: false, ladi_lights: true, diyas: true,
+                                rangoli: true, marigold: false, fireworks: false,
+                                confetti: false,
+                              },
+                            },
+                            "christmas-gold": {
+                              background_start: "#682B35",
+                              background_end: "#321C22",
+                              accent: "#E7C581",
+                              text: "#FFF4E7",
+                              border: "#BB955B",
+                              intensity: 60,
+                              decorations: {
+                                toran: false, ladi_lights: true, diyas: true,
+                                rangoli: false, marigold: false, fireworks: true,
+                                confetti: true,
+                              },
+                            },
+                            "custom-warm": {
+                              background_start: "#5A3530",
+                              background_end: "#261D1B",
+                              accent: "#DDB477",
+                              text: "#FFF4E3",
+                              border: "#B98D60",
+                              intensity: 50,
+                              decorations: {
+                                toran: false, ladi_lights: false, diyas: false,
+                                rangoli: false, marigold: false, fireworks: false,
+                                confetti: false,
+                              },
+                            },
+                          };
+                          const key = event.target.value as keyof typeof presets;
+                          const preset = presets[key];
+                          if (preset) {
+                            setFestivalThemeSettings(current => ({
+                              ...current,
+                              ...preset,
+                              decorations: {
+                                ...current.decorations,
+                                ...preset.decorations,
+                              },
+                              template: key,
+                            }));
+                          }
+                        }}
+                        style={{
+                          minHeight: "42px",
+                          padding: "9px 12px",
+                          border: "1px solid #D4BFA1",
+                          borderRadius: "10px",
+                          background: "#FFFCF6",
+                          color: "#39252A",
+                        }}
+                      >
+                        <option value="diwali-royal">Diwali Royal</option>
+                        <option value="celebration-lights">Celebration Lights</option>
+                        <option value="retail-celebration">Celebration Storefront</option>
+                        <option value="holi-colours">Holi Celebration</option>
+                        <option value="eid-elegance">Eid Elegance</option>
+                        <option value="christmas-gold">Christmas Gold</option>
+                        <option value="custom-warm">Warm Custom</option>
+                      </select>
+                    </label>
+
+                    <div style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit,minmax(125px,1fr))",
+                      gap: "12px",
+                      marginBottom: "18px",
+                    }}>
+                      {([
+                        { key: "background_start", label: "Background start" },
+                        { key: "background_end", label: "Background end" },
+                        { key: "accent", label: "Accent colour" },
+                        { key: "text", label: "Text colour" },
+                        { key: "border", label: "Border colour" },
+                      ] as const).map(item => (
+                        <label key={item.key} style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr auto",
+                          gap: "8px",
+                          alignItems: "center",
+                          padding: "10px",
+                          border: "1px solid #E3D1B8",
+                          borderRadius: "10px",
+                          background: "#FFFCF7",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                        }}>
+                          {item.label}
+                          <input
+                            type="color"
+                            aria-label={item.label}
+                            value={festivalThemeSettings[item.key]}
+                            onChange={event =>
+                              setFestivalThemeSettings(current => ({
+                                ...current,
+                                [item.key]: event.target.value,
+                              }))
+                            }
+                            style={{ width: "35px", height: "30px", border: 0 }}
+                          />
+                          <small style={{
+                            gridColumn: "1 / -1",
+                            color: "#80685A",
+                            fontWeight: 500,
+                          }}>
+                            {festivalThemeSettings[item.key]}
+                          </small>
+                        </label>
+                      ))}
+                    </div>
+
+                                        <section style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+                      gap: "12px",
+                      margin: "0 0 18px",
+                      padding: "14px",
+                      border: "1px solid #D9C5A6",
+                      borderRadius: "12px",
+                      background: "#FFFCF7",
+                    }}>
+                      <label style={{
+                        display: "grid",
+                        gap: "7px",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                      }}>
+                        Dashboard header decoration
+                        <select
+                          value={String(festivalThemeSettings.decorations.header_garland || "lari")}
+                          onChange={event => setFestivalThemeSettings(current => ({
+                            ...current,
+                            decorations: {
+                              ...current.decorations,
+                              header_garland: event.target.value,
+                            },
+                          }))}
+                          style={{
+                            minHeight: "40px",
+                            padding: "8px 10px",
+                            border: "1px solid #D4BFA1",
+                            borderRadius: "9px",
+                            background: "#FFF",
+                            color: "#39252A",
+                          }}
+                        >
+                          <option value="lari">Blinking lari lights</option>
+                          <option value="toran">Aam ka patta toran</option>
+                          <option value="none">No header decoration</option>
+                        </select>
+                        <small style={{ color: "#80685A", fontWeight: 500 }}>
+                          Select the decoration along the top of the dashboard.
+                        </small>
+                      </label>
+
+                      <label style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "10px",
+                        fontSize: "12px",
+                        lineHeight: 1.5,
+                        fontWeight: 700,
+                      }}>
+                        <input
+                          type="checkbox"
+                          checked={festivalThemeSettings.decorations.rocket_enabled === true}
+                          onChange={event => setFestivalThemeSettings(current => ({
+                            ...current,
+                            decorations: {
+                              ...current.decorations,
+                              rocket_enabled: event.target.checked,
+                            },
+                          }))}
+                        />
+                        <span>
+                          Launch one festive rocket
+                          <small style={{
+                            display: "block",
+                            marginTop: "5px",
+                            color: "#80685A",
+                            fontWeight: 500,
+                          }}>
+                            Launch from the bottom and burst near the top when
+                            the dashboard loads.
+                          </small>
+                        </span>
+                      </label>
+                    </section>
+
+<h5 style={{ margin: "0 0 10px", fontSize: "13px" }}>
+                      Decorations and effects
+                    </h5>
+                    <div style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))",
+                      gap: "9px",
+                      marginBottom: "18px",
+                    }}>
+                      {([
+                        { key: "toran", label: "Aam ke patte ki mala" },
+                        { key: "ladi_lights", label: "Ladi / string lights" },
+                        { key: "diyas", label: "Diya decorations" },
+                        { key: "rangoli", label: "Rangoli ornaments" },
+                        { key: "marigold", label: "Marigold garlands" },
+                        { key: "fireworks", label: "Cracker / fireworks symbols" },
+                        { key: "confetti", label: "Falling celebration particles" },
+                      ] as const).map(item => (
+                        <label key={item.key} style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "9px",
+                          padding: "10px",
+                          border: "1px solid #E3D1B8",
+                          borderRadius: "10px",
+                          background: "#FFFCF7",
+                          fontSize: "12px",
+                        }}>
+                          <input
+                            type="checkbox"
+                            checked={festivalThemeSettings.decorations[item.key]}
+                            onChange={event =>
+                              setFestivalThemeSettings(current => ({
+                                ...current,
+                                decorations: {
+                                  ...current.decorations,
+                                  [item.key]: event.target.checked,
+                                },
+                              }))
+                            }
+                          />
+                          {item.label}
+                        </label>
+                      ))}
+                    </div>
+
+                    <label style={{
+                      display: "grid",
+                      gap: "8px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                    }}>
+                      Celebration intensity
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        step={5}
+                        value={festivalThemeSettings.intensity}
+                        onChange={event =>
+                          setFestivalThemeSettings(current => ({
+                            ...current,
+                            intensity: Number(event.target.value),
+                          }))
+                        }
+                      />
+                      <small style={{ color: "#80685A", fontWeight: 500 }}>
+                        {festivalThemeSettings.intensity}% intensity
+                      </small>
+                    </label>
+
+                    <div style={{
+                      marginTop: "18px",
+                      padding: "16px",
+                      borderRadius: "14px",
+                      border: `1px solid ${festivalThemeSettings.border}`,
+                      background: `linear-gradient(135deg,${festivalThemeSettings.background_start},${festivalThemeSettings.background_end})`,
+                      color: festivalThemeSettings.text,
+                      boxShadow: `0 12px 26px ${festivalThemeSettings.background_end}55`,
+                      overflow: "hidden",
+                    }}>
+                      <div aria-hidden="true" style={{
+                        color: festivalThemeSettings.accent,
+                        fontSize: "15px",
+                        letterSpacing: ".13em",
+                        marginBottom: "10px",
+                        opacity: Math.max(0.25, festivalThemeSettings.intensity / 100),
+                      }}>
+                        {festivalThemeSettings.decorations.toran && "🍃 🌼 🍃 🌼 🍃"}
+                        {festivalThemeSettings.decorations.ladi_lights && "　✦ ● ✦ ● ✦"}
+                        {festivalThemeSettings.decorations.fireworks && "　✧ ✨ ✧"}
+                      </div>
+                      <strong style={{ display: "block", fontSize: "19px" }}>
+                        Festival preview
+                      </strong>
+                      <p style={{ margin: "6px 0 12px", fontSize: "12px", opacity: 0.85 }}>
+                        CampusConnect dashboard celebration
+                      </p>
+                      <div aria-hidden="true" style={{ fontSize: "19px" }}>
+                        {festivalThemeSettings.decorations.diyas && "🪔 🪔 🪔"}
+                        {festivalThemeSettings.decorations.rangoli && "　✺ ❋ ✺"}
+                        {festivalThemeSettings.decorations.marigold && "　🌼 🌼"}
+                      </div>
+                    </div>
+
+                    <label style={{
+                      display: "grid",
+                      gap: "8px",
+                      marginTop: "18px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                    }}>
+                      Website design reference (optional)
+                      <input
+                        type="url"
+                        value={festivalThemeSettings.reference_url}
+                        placeholder="https://example.com/festival-page"
+                        onChange={event =>
+                          setFestivalThemeSettings(current => ({
+                            ...current,
+                            reference_url: event.target.value,
+                          }))
+                        }
+                        style={{
+                          boxSizing: "border-box",
+                          width: "100%",
+                          padding: "11px",
+                          border: "1px solid #D4BFA1",
+                          borderRadius: "10px",
+                          background: "#FFFCF6",
+                        }}
+                      />
+                    </label>
+                    <small style={{
+                      display: "block",
+                      marginTop: "7px",
+                      color: "#80685A",
+                      lineHeight: 1.6,
+                    }}>
+                      Open a website as a visual reference. External scripts are
+                      not imported or executed.
+                    </small>
+                    <button
+                      type="button"
+                      disabled={!festivalThemeSettings.reference_url.trim()}
+                      onClick={() => {
+                        try {
+                          const url = new URL(festivalThemeSettings.reference_url);
+                          if (!["http:", "https:"].includes(url.protocol)) {
+                            setStatus("Use a valid HTTP or HTTPS reference URL.");
+                            return;
+                          }
+                          window.open(url.href, "_blank", "noopener,noreferrer");
+                        } catch {
+                          setStatus("Enter a valid website reference URL first.");
+                        }
+                      }}
+                      style={{
+                        marginTop: "10px",
+                        padding: "9px 12px",
+                        border: "1px solid #B98D60",
+                        borderRadius: "9px",
+                        background: "#FFF9EF",
+                        color: "#63332D",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Open design reference ↗
+                    </button>
+                  </section>
+
+<section className="festivalBurstPalette">
 
                     <header>
 
@@ -33814,6 +34354,7 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
     useState<AdminProfile[]>(emptyAdminProfiles);
 
   const [adminSection, setAdminSection] = useState("faculty");
+  const [showStudentDirectory, setShowStudentDirectory] = useState(false);
   const [accountsLoading, setAccountsLoading] = useState(true);
   const [accountsLoaded, setAccountsLoaded] = useState(false);
   const [accountsError, setAccountsError] = useState("");
@@ -34423,9 +34964,11 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
       )}
       <nav className="adminSectionNav" aria-label="Administration sections">
         {[
-          
           ["faculty", "Faculty Centre", "Staff & departments"],
           ["students", "Student Centre", "Accounts & identity"],
+          ["dossier", "Campus Dossier & Records", "Lookup, modify USN, results & faculty hours"],
+          ["promotion", "Academic Promotion", "Credit rules & progression"],
+          ["announcements", "Personal Announcements", "Direct student messages"],
           ["accounts", "Accounts & roles", "All campus accounts"],
           ["delegations", "Delegations", "Temporary access"],
         ].map(([id, label, description]) => (
@@ -34646,7 +35189,36 @@ function AdminModule({profile}: {profile: ModuleProfile}) {
       </div>
 
       <div id="admin-panel-students" className="adminSectionPanel" hidden={adminSection !== "students"}>
+        <section className="adminStudentDirectoryToggle">
+          <div>
+            <strong>Student Directory</strong>
+            <p>Search and view student directory records.</p>
+          </div>
+          <button
+            type="button"
+            className="adminStudentDirectoryToggleButton"
+            aria-expanded={showStudentDirectory}
+            aria-controls="admin-student-directory-content"
+            onClick={() => setShowStudentDirectory(current => !current)}
+          >
+            {showStudentDirectory ? "Hide directory" : "Show directory"}
+          </button>
+        </section>
+        {showStudentDirectory && (
+          <div id="admin-student-directory-content" className="adminStudentDirectoryEmbed">
+            <StudentDirectory />
+          </div>
+        )}
         <StudentIdentityManagement />
+      </div>
+      <div id="admin-panel-dossier" className="adminSectionPanel" hidden={adminSection !== "dossier"}>
+        <CampusDossierModule />
+      </div>
+      <div id="admin-panel-promotion" className="adminSectionPanel" hidden={adminSection !== "promotion"}>
+        <AcademicPromotionModule />
+      </div>
+      <div id="admin-panel-announcements" className="adminSectionPanel" hidden={adminSection !== "announcements"}>
+        <PersonalAnnouncementsModule />
       </div>
       <div id="admin-panel-delegations" className="adminSectionPanel" hidden={adminSection !== "delegations"}>
         <CampusWorkDelegation />

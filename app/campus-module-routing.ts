@@ -9,6 +9,7 @@ export type CampusModuleView =
   | "Groups"
   | "Marketplace"
   | "Notes & Tasks"
+  | "My Branch"
   | "Profile"
   | "Admin"
   | "Analytics";
@@ -31,6 +32,7 @@ export const campusModuleViews:
     "Groups",
     "Marketplace",
     "Notes & Tasks",
+    "My Branch",
     "Profile",
     "Admin",
     "Analytics",
@@ -81,6 +83,7 @@ export function campusModuleSubtitle(
 
       "Notes & Tasks":
         "Keep private notes, reminders and important work organized in one personal workspace.",
+      "My Branch": "Explore your department achievements, toppers, events and opportunities.",
 
       Profile:
         "Keep your campus identity, skills and private documents up to date.",

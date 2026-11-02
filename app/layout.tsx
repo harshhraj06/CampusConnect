@@ -6,6 +6,7 @@ import type {
 import "./public-shell.css";
 import "./opening-animation.css";
 import "./auth-warm.css";
+import "./mobile-compat.css";
 
 import PwaRegister from "./pwa-register";
 import CookieConsent from "./cookie-consent";
@@ -22,6 +23,13 @@ const campusConnectStructuredData = {
       publisher: {
         "@id": "https://campusconnect-pro.in/#organization",
       },
+      creator: {
+        "@type": "Person",
+        "@id": "https://campusconnect-pro.in/#creator-harsh-raj",
+        name: "Harsh Raj",
+        url: "https://github.com/harshhraj06",
+        sameAs: ["https://github.com/harshhraj06"],
+      },
     },
     {
       "@type": "Organization",
@@ -32,8 +40,7 @@ const campusConnectStructuredData = {
       logo: {
         "@type": "ImageObject",
         url: "https://campusconnect-pro.in/campusconnect-logo.png",
-        contentUrl:
-          "https://campusconnect-pro.in/campusconnect-logo.png",
+        contentUrl: "https://campusconnect-pro.in/campusconnect-logo.png",
         width: 2120,
         height: 742,
       },
@@ -56,26 +63,20 @@ export const metadata: Metadata = {
 
   title: {
     default:
-      "CampusConnect Pro — Campus Operating System",
+      "CampusConnect Pro | College Campus Platform",
     template:
       "%s | CampusConnect Pro",
   },
 
   description:
-    "CampusConnect Pro brings academics, attendance, assignments, placements, events, campus networking, faculty workflows and AI assistance into one secure campus platform.",
+    "CampusConnect Pro is a college campus platform for academics, attendance, assignments, student collaboration, campus events and placement preparation. Built by Harsh Raj.",
 
   applicationName:
     "CampusConnect Pro",
 
-  authors: [
-    {
-      name:
-        "CampusConnect Pro",
-    },
-  ],
+  authors: [{ name: "Harsh Raj", url: "https://github.com/harshhraj06" }],
 
-  creator:
-    "CampusConnect Pro",
+  creator: "Harsh Raj",
 
   publisher:
     "CampusConnect Pro",
@@ -88,39 +89,26 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url:
-          "/favicon.png",
-        type:
-          "image/png",
-        sizes:
-          "512x512",
-      },
-      {
-        url:
-          "/favicon.ico",
-        type:
-          "image/x-icon",
+        url: "/icons/campusconnect-512-v2.png",
+        type: "image/png",
+        sizes: "512x512",
       },
     ],
-
     apple: [
       {
-        url:
-          "/icons/campusconnect-192-v2.png",
-        type:
-          "image/png",
-        sizes:
-          "192x192",
+        url: "/icons/campusconnect-192-v2.png",
+        type: "image/png",
+        sizes: "192x192",
       },
     ],
   },
 
   openGraph: {
     title:
-      "CampusConnect Pro — Campus Operating System",
+      "CampusConnect Pro | College Campus Platform",
 
     description:
-      "Academics, attendance, placements, campus life and AI assistance in one secure platform.",
+      "CampusConnect Pro is a college campus platform for academics, attendance, assignments, student collaboration, campus events and placement preparation. Built by Harsh Raj.",
 
     url:
       "https://campusconnect-pro.in/",
@@ -146,7 +134,7 @@ export const metadata: Metadata = {
           630,
 
         alt:
-          "CampusConnect Pro — Campus Operating System",
+          "CampusConnect Pro | College Campus Platform",
       },
     ],
   },
@@ -156,10 +144,10 @@ export const metadata: Metadata = {
       "summary_large_image",
 
     title:
-      "CampusConnect Pro — Campus Operating System",
+      "CampusConnect Pro | College Campus Platform",
 
     description:
-      "Academics, attendance, placements, campus life and AI assistance in one secure platform.",
+      "CampusConnect Pro is a college campus platform for academics, attendance, assignments, student collaboration, campus events and placement preparation. Built by Harsh Raj.",
 
     images: [
       "/og.png",

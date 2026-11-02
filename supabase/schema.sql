@@ -208,7 +208,7 @@ create table if not exists public.placement_applications (
   student_name text not null,
   company text not null,
   role_title text not null,
-  status text not null default 'Applied' check (status in ('Applied', 'Shortlisted', 'Assessment', 'Interview', 'Offered', 'Rejected')),
+  status text not null default 'Applied' check (status in ('Applied', 'Under Review', 'Shortlisted', 'Assessment', 'Interview', 'On Hold', 'Offered', 'Accepted', 'Rejected')),
   next_step text not null default 'Awaiting review',
   applied_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),

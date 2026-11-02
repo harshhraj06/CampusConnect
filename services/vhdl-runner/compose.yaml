@@ -1,0 +1,49 @@
+services:
+  vhdl-runner:
+    build:
+      context: .
+    environment:
+      VHDL_RUNNER_HOST: "0.0.0.0"
+    user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m,mode=700,uid=10001,gid=10001
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    cpus: "0.50"
+    pids_limit: 64
+    init: true
+    networks:
+      - runner_internal
+
+  vhdl-gateway:
+    build:
+      context: .
+      dockerfile: gateway.Dockerfile
+    depends_on:
+      - vhdl-runner
+    ports:
+      - "127.0.0.1:2001:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=4m,mode=700,uid=101,gid=101
+      - /var/cache/nginx:rw,noexec,nosuid,size=4m,mode=700,uid=101,gid=101
+      - /var/run:rw,noexec,nosuid,size=1m,mode=700,uid=101,gid=101
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 64m
+    cpus: "0.10"
+    pids_limit: 32
+    networks:
+      - runner_internal
+      - gateway_public
+
+networks:
+  runner_internal:
+    internal: true
+  gateway_public:

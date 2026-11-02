@@ -2,19 +2,21 @@
 
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
+import Link from "next/link";
 
 import "./cookie-consent.css";
-
-type ConsentChoice =
-  | "essential"
-  | "all";
-
-const STORAGE_KEY =
-  "campusconnect-cookie-consent-v1";
+import {
+  COOKIE_CONSENT_CHANGED_EVENT,
+  COOKIE_CONSENT_STORAGE_KEY,
+  saveCookieConsentChoice,
+  type CookieConsentChoice,
+} from "./cookie-preferences";
 
 export default function CookieConsent() {
+  const panelRef = useRef<HTMLElement>(null);
   const [
     visible,
     setVisible,
@@ -28,7 +30,7 @@ export default function CookieConsent() {
   useEffect(() => {
     const saved =
       window.localStorage.getItem(
-        STORAGE_KEY
+        COOKIE_CONSENT_STORAGE_KEY
       );
 
     if (
@@ -43,18 +45,71 @@ export default function CookieConsent() {
       setDetailsOpen(true);
     };
 
+    const onPreferenceSaved = () => {
+      setVisible(false);
+      setDetailsOpen(false);
+    };
+
     window.addEventListener(
       "campusconnect-open-cookie-settings",
       reopen
     );
+    window.addEventListener(COOKIE_CONSENT_CHANGED_EVENT, onPreferenceSaved);
 
     return () => {
       window.removeEventListener(
         "campusconnect-open-cookie-settings",
         reopen
       );
+      window.removeEventListener(COOKIE_CONSENT_CHANGED_EVENT, onPreferenceSaved);
     };
   }, []);
+
+  useEffect(() => {
+    if (!visible) return;
+    const previousFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const panel = panelRef.current;
+    panel?.focus();
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setVisible(false);
+        setDetailsOpen(false);
+      }
+      if (event.key !== "Tab" || !panel) return;
+
+      const controls = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'button, a[href], [tabindex="0"]'
+        )
+      );
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+
+      if (
+        event.shiftKey &&
+        (document.activeElement === first || document.activeElement === panel)
+      ) {
+        event.preventDefault();
+        last?.focus();
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last || document.activeElement === panel)
+      ) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [visible]);
 
   function closePanel() {
     setVisible(false);
@@ -62,23 +117,9 @@ export default function CookieConsent() {
   }
 
   function saveChoice(
-    choice: ConsentChoice
+    choice: CookieConsentChoice
   ) {
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      choice
-    );
-
-    window.dispatchEvent(
-      new CustomEvent(
-        "campusconnect-cookie-consent-changed",
-        {
-          detail: {
-            choice,
-          },
-        }
-      )
-    );
+    saveCookieConsentChoice(choice);
 
     setVisible(false);
     setDetailsOpen(false);
@@ -108,6 +149,8 @@ export default function CookieConsent() {
       />
 
       <section
+        ref={panelRef}
+        tabIndex={-1}
         className="ccCookieBanner"
         role="dialog"
         aria-modal="true"
@@ -131,7 +174,7 @@ export default function CookieConsent() {
             </span>
 
             <h2 id="cc-cookie-title">
-              Your privacy choices
+              Your privacy, your choice
             </h2>
           </div>
 
@@ -146,12 +189,10 @@ export default function CookieConsent() {
           id="cc-cookie-description"
           className="ccCookieDescription"
         >
-          CampusConnect uses essential
-          authentication and security storage
-          needed for the platform to work.
-          Optional analytics are currently not
-          loaded unless they are added in the
-          future and you choose to allow them.
+          Essential storage keeps your account secure and
+          your campus workspace working. Optional analytics
+          are not currently enabled. Choose the preference
+          you are comfortable with.
         </p>
 
         <button
@@ -197,16 +238,13 @@ export default function CookieConsent() {
                 </strong>
 
                 <p>
-                  Optional performance and
-                  usage measurement. No
-                  analytics provider is
-                  currently loaded by this
-                  consent component.
+                  Your preference for optional usage measurement.
+                  This panel does not currently load an analytics service.
                 </p>
               </div>
 
               <span>
-                Optional
+                Not active
               </span>
             </div>
           </div>
@@ -234,14 +272,18 @@ export default function CookieConsent() {
               )
             }
           >
-            Allow optional
+            Allow optional analytics
           </button>
         </div>
 
         <small>
-          You can change this choice later
-          using the Privacy button.
+          Your preference is saved on this device. Change it
+          anytime from Privacy preferences in the footer.
         </small>
+        <nav className="ccCookiePolicyLinks" aria-label="Privacy information">
+          <Link href="/privacy" onClick={closePanel}>Read privacy policy</Link>
+          <Link href="/terms" onClick={closePanel}>Terms of use</Link>
+        </nav>
       </section>
     </>
   );

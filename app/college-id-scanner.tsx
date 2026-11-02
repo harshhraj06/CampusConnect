@@ -213,29 +213,14 @@ export default function CollegeIdScanner() {
         scannerRef.current =
           scanner;
 
-        const cameras =
-          await Html5Qrcode
-            .getCameras();
-
-        if (
-          !cameras.length
-        ) {
+        if (!navigator.mediaDevices?.getUserMedia) {
           throw new Error(
-            "No camera was found on this device."
+            "Camera access requires HTTPS or localhost and a supported browser."
           );
         }
 
-        const preferredCamera =
-          cameras.find(
-            camera =>
-              /back|rear|environment/i.test(
-                camera.label
-              )
-          ) ||
-          cameras[0];
-
         await scanner.start(
-          preferredCamera.id,
+          { facingMode: "environment" },
           {
             fps: 12,
             qrbox: {

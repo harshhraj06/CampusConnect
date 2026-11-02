@@ -1,5 +1,5 @@
 const CACHE_VERSION =
-  "campusconnect-shell-v4";
+  "campusconnect-shell-v5";
 
 const STATIC_CACHE =
   CACHE_VERSION;
@@ -7,7 +7,7 @@ const STATIC_CACHE =
 const APP_SHELL_URL = "/";
 
 const OFFLINE_URL =
-  "/offline";
+  "/offline.html";
 
 /*
  * The offline document is required.
@@ -165,7 +165,8 @@ async function handleNavigation(
     if (
       response &&
       response.ok &&
-      response.type === "basic"
+      response.type === "basic" &&
+      new URL(request.url).pathname === APP_SHELL_URL
     ) {
       await cache.put(
         APP_SHELL_URL,

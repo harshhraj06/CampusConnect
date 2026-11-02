@@ -1,0 +1,273 @@
+
+.studentDashboard .ccWorkspaceSetup {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #e5ded2;
+  border-radius: 20px;
+  background: #fffdf9;
+  color: #302b24;
+  box-shadow: 0 8px 32px rgb(58 45 26 / 4%);
+}
+.ccWorkspaceSetup * { box-sizing: border-box; }
+.ccSetupHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 28px 30px 18px;
+}
+.ccSetupHeading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+}
+.ccSetupEmblem {
+  display: grid;
+  place-items: center;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid #e5d9c4;
+  border-radius: 14px;
+  background: #f7f0e4;
+  color: #80653c;
+}
+.ccSetupEyebrow {
+  color: #8a704b;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+}
+.ccSetupHeading h2 {
+  margin: 8px 0;
+  color: #302b24;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -.035em;
+}
+.ccSetupHeading p {
+  margin: 0;
+  color: #776e61;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.ccWorkspaceSetup button,
+.ccSetupRestore button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #e5ded2;
+  border-radius: 9px;
+  background: #fff;
+  color: #594832;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ccWorkspaceSetup button:hover,
+.ccSetupRestore button:hover {
+  background: #f5efe5;
+  border-color: #cfc0a8;
+}
+.ccWorkspaceSetup button:focus-visible,
+.ccSetupRestore button:focus-visible {
+  outline: 2px solid #8b6b35;
+  outline-offset: 3px;
+}
+.ccWorkspaceSetup .ccSetupDismiss {
+  flex: 0 0 44px;
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  color: #8a8072;
+}
+.ccSetupProgressRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+  padding: 0 30px 24px;
+  color: #81786c;
+  font-size: 12px;
+}
+.ccSetupProgressRow strong {
+  color: #5b4c37;
+  font-weight: 600;
+}
+.ccSetupProgress {
+  flex: 1;
+  min-width: 80px;
+  max-width: 240px;
+  height: 5px;
+  border-radius: 10px;
+  background: #ede7dd;
+  overflow: hidden;
+}
+.ccSetupProgress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #8b754f;
+}
+.ccWorkspaceSetup .ccSetupToggle {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+}
+.ccSetupSteps {
+  margin: 0;
+  padding: 0 30px;
+  list-style: none;
+}
+.ccSetupSteps[hidden] { display: none; }
+.ccSetupSteps li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 16px;
+  padding: 22px 0;
+  border-top: 1px solid #eee8de;
+}
+.ccSetupStepNumber {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e4ddd0;
+  border-radius: 50%;
+  color: #9b886a;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.isComplete .ccSetupStepNumber {
+  background: #edf3ec;
+  color: #597255;
+  border-color: #d8e3d4;
+}
+.ccSetupStepCopy h3 {
+  margin: 0 0 7px;
+  color: #40382e;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.ccSetupStepCopy p {
+  margin: 0;
+  color: #807668;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.ccSetupStepStatus {
+  display: inline-block;
+  margin-top: 8px;
+  color: #907e61;
+  font-size: 10px;
+  font-weight: 600;
+}
+.isComplete .ccSetupStepStatus { color: #597255; }
+.ccSetupStepActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.ccWorkspaceSetup .ccSetupMark {
+  border: 0;
+  background: transparent;
+  font-size: 11px;
+  color: #85745c;
+}
+.ccSetupFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 16px 30px;
+  border-top: 1px solid #eee8de;
+  background: #faf7f1;
+  color: #847b6e;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.ccSetupFooter > span { flex: 1; min-width: 180px; }
+.ccWorkspaceSetup .ccSetupFooter button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 11px;
+}
+.ccSetupRestore {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 20px;
+  border: 1px dashed #ded4c3;
+  border-radius: 12px;
+  color: #8a7b66;
+  font-size: 12px;
+}
+.ccSetupRestore button { border: 0; background: transparent; }
+
+.studentDashboard .studentPriorityCenter.ccTodayPanel {
+  border-radius: 20px !important;
+  border-color: #e5ded2 !important;
+  box-shadow: 0 8px 32px rgb(58 45 26 / 4%) !important;
+}
+.studentDashboard .ccTodayPanel .studentPriorityHeader {
+  padding: 26px 30px !important;
+  background: #fffdf9 !important;
+}
+.studentDashboard .ccTodayPanel .studentPriorityHeader h2 {
+  font-size: clamp(24px, 3vw, 30px) !important;
+  font-weight: 600 !important;
+  letter-spacing: -.035em !important;
+}
+.studentDashboard .ccTodayPanel .studentPriorityHeader p {
+  font-size: 13px !important;
+  line-height: 1.8 !important;
+}
+.studentDashboard .ccTodayPanel .studentPriorityEyebrow > span {
+  font-size: 10px !important;
+  letter-spacing: .12em !important;
+}
+.studentDashboard .ccTodayPanel .studentPriorityItem:focus-visible {
+  outline: 2px solid #8b6b35 !important;
+  outline-offset: -4px !important;
+}
+.studentDashboard .ccTodayPanel .studentPriorityFooter {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .ccSetupHeader { padding: 22px 20px 16px; gap: 8px; }
+  .ccSetupHeading { gap: 12px; }
+  .ccSetupEmblem { display: none; }
+  .ccSetupProgressRow { padding: 0 20px 20px; }
+  .ccSetupSteps { padding: 0 20px; }
+  .ccSetupSteps li {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .ccSetupStepActions {
+    grid-column: 2;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .ccSetupFooter { padding: 14px 20px; }
+  .studentDashboard .ccTodayPanel .studentPriorityHeader {
+    grid-template-columns: 1fr !important;
+    padding: 22px 20px !important;
+    gap: 20px !important;
+  }
+}

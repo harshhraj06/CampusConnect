@@ -25,6 +25,7 @@ export const workspaceRouteSlugs = [
   "activity-center",
   "faculty-directory",
   "about-campusconnect",
+  "branding",
   "seva-kendra",
   "college-id",
   "announcements",

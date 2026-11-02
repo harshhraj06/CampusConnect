@@ -1,4 +1,7 @@
 "use client";
+import StudentNoticeBoard from "./student-notice-board";
+import { useEffect as useEffectForMobileDrawer, useRef as useMobileDrawerRef } from "react";
+import CampusGreetingReveal from "./campus-greeting-reveal";
 
 
 let dashboardStylesPromise:
@@ -12,6 +15,7 @@ function ensureDashboardStyles() {
         import("./globals.css"),
         import("./dashboard-parchment.css"),
         import("./student-dashboard-polish.css"),
+        import("./professional-student-greeting.css"),
       ]);
   }
 
@@ -22,7 +26,7 @@ function ensureDashboardStyles() {
 
 import {BellAlertIcon} from "@/components/ui/bell-alert-icon";
 import {CampusConnectFooter} from "@/components/ui/footer-2";
-import { DashboardHeroGreetingHandwriting } from "../components/ui/dashboard-hero-greeting-handwriting";
+import "./student-workspace-setup.css";
 import { AppleHelloEnglishEffect } from "../components/ui/apple-hello-effect";
 
 
@@ -56,15 +60,22 @@ import {
 
 import Image from "next/image";
 import type {User} from "@supabase/supabase-js";
+import { getDeterministicStudentDob, formatDisplayDate } from "@/lib/utils";
 import {lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode} from "react";
 
 const AcademicMarksReferenceDashboard = lazy(() => import("./academic-marks-reference-dashboard"));
+const CCResultGenerator = lazy(() => import("./cc-result-generator"));
 const FacultyWorkspace = lazy(() => import("./faculty-workspace"));
 const FacultyTodayClasses = lazy(() => import("./faculty-today-classes"));
 const FacultyTeachingSchedule = lazy(() => import("./faculty-teaching-schedule"));
 const TimetableCoordinatorStudio = lazy(() => import("./timetable-coordinator-studio"));
 const TimetableDigitalBuilder = lazy(() => import("./timetable-digital-builder"));
 const TimetableCoordinatorAdmin = lazy(() => import("./timetable-coordinator-admin"));
+const BrandingManager = lazy(() =>
+  import("./components/admin/branding-manager").then(module => ({
+    default: module.BrandingManager,
+  }))
+);
 const FacultyDiary = lazy(() => import("./faculty-diary"));
 const FacultySyllabusProgress = lazy(() => import("./faculty-syllabus-progress"));
 const FacultyWorkloadManager = lazy(() => import("./faculty-workload-manager"));
@@ -178,6 +189,20 @@ const PlacementOperations = lazy(
     return {
       default:
         module.PlacementOperations,
+    };
+  }
+);
+
+const BranchPlacementTraining = lazy(
+  async () => {
+    const module =
+      await import(
+        "./components/placement/branch-placement-training"
+      );
+
+    return {
+      default:
+        module.BranchPlacementTraining,
     };
   }
 );
@@ -309,6 +334,13 @@ const FacultyDirectory = lazy(
   }
 );
 
+const StudentDirectory = lazy(
+  async () => {
+    const module = await import("./student-directory");
+    return { default: module.StudentDirectory };
+  }
+);
+
 const NetworkProfessionalFeed = lazy(
   async () => {
     const module =
@@ -406,6 +438,7 @@ async function savePlacementApplication(
 
 
 type View = | SearchTarget
+  | "Academic Operations Center"
   | "Faculty Workspace"
   | "My Batches"
   | "Today's Classes"
@@ -416,7 +449,9 @@ type View = | SearchTarget
   | "Faculty Availability"
   | "Faculty Coverage"
   | "Timetable Coordinator"
-  | "Timetable Assignment";
+  | "Timetable Assignment"
+  | "Student Directory"
+  | "Branding" | "My Branch";
 type Role = "Student" | "Faculty" | "Placement Cell" | "Coordinator" | "Volunteer" | "Main Admin";
 type Screen = "welcome" | "auth" | "dashboard";
 type AuthMode = "login" | "register" | "forgot" | "reset";
@@ -451,11 +486,14 @@ const viewSlugs: Record<View, string> = {
   Resume: "resume",
   Academics: "academics",
   "Academic Control": "academic-control",
+  "Academic Operations Center": "academic-control",
   Calendar: "calendar",
   Campus: "campus-life",
   Alumni: "alumni",
   "Activity Center": "activity-center",
   "Faculty Directory": "faculty-directory",
+  "Student Directory": "student-directory",
+  "Branding": "branding",
   "About CampusConnect": "about-campusconnect",
   "Seva Kendra": "seva-kendra",
   "College ID": "college-id",
@@ -466,6 +504,7 @@ const viewSlugs: Record<View, string> = {
   Groups: "groups",
   Marketplace: "marketplace",
   "Notes & Tasks": "notes-tasks",
+  "My Branch": "my-branch",
   Profile: "profile",
   Applications: "applications",
   Analytics: "analytics",
@@ -507,6 +546,7 @@ type Profile = {
   bio: string;
   skills: string;
   phone: string;
+  dateOfBirth?: string;
   usn: string;
   cgpa?: number | string | null;
   campus_uid?: string;
@@ -525,6 +565,7 @@ type CampusNotification = {
 
 const nav: [View, string][] = [
   ["Dashboard", "⌂"],
+  ["My Branch", "◇"],
   ["My Campus", "◇"],
   ["Announcements", "▣"],
   ["Assignments", "✓"],
@@ -552,6 +593,8 @@ const navByRole: Record<Role, [View, string][]> = {
 
   Faculty: [
     ["Dashboard", "⌂"],
+    ["My Branch", "◇"],
+    ["Student Directory", "♙"],
     ["Faculty Workspace", "▦"],
 
 
@@ -580,6 +623,7 @@ const navByRole: Record<Role, [View, string][]> = {
 
   "Placement Cell": [
     ["Dashboard", "⌂"],
+    ["My Branch", "◇"],
     ["My Campus", "◇"],
     ["Placements", "◈"],
     ["Applications", "▤"],
@@ -600,6 +644,7 @@ const navByRole: Record<Role, [View, string][]> = {
   Coordinator: [
     ["Timetable Coordinator", "▦"],
     ["Dashboard", "⌂"],
+    ["My Branch", "◇"],
     ["My Campus", "◇"],
     ["Announcements", "▣"],
     ["Learning", "▶"],
@@ -617,6 +662,7 @@ const navByRole: Record<Role, [View, string][]> = {
 
   Volunteer: [
     ["Dashboard", "⌂"],
+    ["My Branch", "◇"],
     ["My Campus", "◇"],
     ["Announcements", "▣"],
     ["Learning", "▶"],
@@ -631,6 +677,7 @@ const navByRole: Record<Role, [View, string][]> = {
 
   "Main Admin": [
     ["Dashboard", "⌂"],
+    ["My Branch", "◇"],
     ["My Campus", "◇"],
     ["Announcements", "▣"],
     ["Assignments", "✓"],
@@ -642,8 +689,9 @@ const navByRole: Record<Role, [View, string][]> = {
     ["Notes & Tasks", "✎"],
     ["Network", "◎"],
     ["Academics", "▦"],
-    ["Academic Control", "⚙"],
+    ["Academic Operations Center", "⚙"],
     ["Analytics", "▥"],
+    ["Branding", "🖼"],
     ["Admin", "⚙"],
     ["Timetable Assignment", "▦"],
     ["Campus", "◇"],
@@ -826,7 +874,7 @@ const roleInsights: Record<Role, {title: string; text: string; actions: string[]
   },
 };
 
-const emptyProfile: Profile = {name: "", email: "", department: "", year: "", role: "Student", bio: "", skills: "", phone: "", usn: ""};
+const emptyProfile: Profile = {name: "", email: "", department: "", year: "", role: "Student", bio: "", skills: "", phone: "", dateOfBirth: "", usn: ""};
 
 
 const CAMPUSCONNECT_LAST_VIEW_KEY =
@@ -1037,10 +1085,70 @@ export default function Home() {
     });
   };
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  /* MOBILE DRAWER BEHAVIOR FIX */
+  const mobileDrawerInitializedRef = useMobileDrawerRef(false);
+
+  useEffectForMobileDrawer(() => {
+    if (typeof window === "undefined") return;
+
+    const media = window.matchMedia("(max-width: 820px)");
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousRootOverflow = document.documentElement.style.overflow;
+
+    const handleViewportChange = () => {
+      setSidebarOpen(!media.matches);
+    };
+
+    media.addEventListener("change", handleViewportChange);
+
+    if (!mobileDrawerInitializedRef.current) {
+      mobileDrawerInitializedRef.current = true;
+      if (media.matches) setSidebarOpen(false);
+    }
+
+    if (!media.matches || !sidebarOpen) {
+      return () => {
+        media.removeEventListener("change", handleViewportChange);
+      };
+    }
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      document.querySelector<HTMLButtonElement>(".mobileSidebarClose")
+        ?.focus({ preventScroll: true });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", handleKeyDown);
+      media.removeEventListener("change", handleViewportChange);
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousRootOverflow;
+
+      if (media.matches) {
+        document.querySelector<HTMLButtonElement>(".topSidebarToggle")
+          ?.focus({ preventScroll: true });
+      }
+    };
+  }, [sidebarOpen]);
+
   const [sidebarProfilePromptVisible, setSidebarProfilePromptVisible] = useState(true);
   const [applied, setApplied] = useState<string[]>([]);
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
-    const [score, setScore] = useState(0);
+  const [placementWorkspaceMode, setPlacementWorkspaceMode] = useState<"training" | "operations">("operations");
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -1621,11 +1729,12 @@ export default function Home() {
     const loadLiveNotifications =
       async () => {
         const [
-          announcements,
-          applications,
-          campusEvents,
-        ] =
-          await Promise.all([
+            announcements,
+            applications,
+            campusEvents,
+            placementDrives,
+          ] =
+            await Promise.all([
             client
               .from("announcements")
               .select(
@@ -1685,6 +1794,16 @@ export default function Home() {
                 }
               )
               .limit(20),
+              client
+                .from("placement_drives")
+                .select("id,company,role_title,deadline,created_at,branches,minimum_cgpa")
+                .gte("deadline", new Date().toISOString())
+                .gte(
+                  "created_at",
+                  new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+                )
+                .order("created_at", { ascending: false })
+                .limit(30),
           ]);
 
         if (!active) {
@@ -1792,6 +1911,100 @@ export default function Home() {
           }
         }
 
+
+          // Recruitment drive notifications use a stable drive-based ID.
+          // Editing a drive therefore does not create a second notification.
+          if (role === "Student") {
+            const normalizeBranch = (value: unknown): string => {
+              const key = String(value ?? "")
+                .toUpperCase()
+                .replace(/[^A-Z0-9]/g, "");
+
+              if (key === "ECE" ||
+                  (key.includes("ELECTRONICS") && key.includes("COMMUNICATION"))) return "ECE";
+              if (key === "EEE" ||
+                  (key.includes("ELECTRICAL") && key.includes("ELECTRONICS"))) return "EEE";
+              if (key === "ISE" ||
+                  (key.includes("INFORMATION") && key.includes("SCIENCE"))) return "ISE";
+              if (key === "CSE" ||
+                  (key.includes("COMPUTER") && key.includes("SCIENCE"))) return "CSE";
+              if (["ME", "MECH"].includes(key) || key.includes("MECHANICAL")) return "ME";
+              if (["CV", "CE"].includes(key) || key.includes("CIVIL")) return "CIVIL";
+              return key;
+            };
+
+            const studentBranch = normalizeBranch(profile.department);
+            const rawCgpa = profile.cgpa;
+            const studentCgpa =
+              rawCgpa === null || rawCgpa === undefined || rawCgpa === ""
+                ? Number.NaN
+                : Number(rawCgpa);
+
+            const drives = (placementDrives.data || []) as unknown as Array<{
+              id: string;
+              company: string | null;
+              role_title: string | null;
+              deadline: string | null;
+              created_at: string | null;
+              branches: string[] | null;
+              minimum_cgpa: number | string | null;
+            }>;
+
+            for (const drive of drives) {
+              if (!drive.id || !drive.created_at || !drive.deadline) continue;
+
+              const createdAt = new Date(drive.created_at);
+              const deadline = new Date(drive.deadline);
+              if (
+                Number.isNaN(createdAt.getTime()) ||
+                Number.isNaN(deadline.getTime()) ||
+                deadline.getTime() < Date.now()
+              ) continue;
+
+              const branches = Array.isArray(drive.branches)
+                ? drive.branches.map(String).map(value => value.trim()).filter(Boolean)
+                : [];
+
+              const openToAll =
+                branches.length === 0 ||
+                branches.some(branch =>
+                  ["ALL", "ALLBRANCHES", "ANY", "ANYBRANCH"].includes(
+                    branch.toUpperCase().replace(/[^A-Z0-9]/g, "")
+                  )
+                );
+
+              const branchMatches =
+                openToAll ||
+                branches.some(branch => normalizeBranch(branch) === studentBranch);
+
+              if (!branchMatches) continue;
+
+              const parsedMinimum = Number(drive.minimum_cgpa ?? 0);
+              const minimumCgpa = Number.isFinite(parsedMinimum) ? parsedMinimum : 0;
+
+              if (
+                minimumCgpa > 0 &&
+                (!Number.isFinite(studentCgpa) || studentCgpa < minimumCgpa)
+              ) continue;
+
+              notificationRows.push({
+                timestamp: createdAt.getTime(),
+                item: {
+                  id: `placement-drive-${drive.id}`,
+                  kind: "placement",
+                  label: "New recruitment drive",
+                  title: `${drive.company || "New company"} · ${drive.role_title || "Campus opportunity"}`,
+                  message: `Applications close on ${deadline.toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}. Open Placements to review the opportunity and apply.`,
+                  time: friendlyRelative(drive.created_at),
+                  target: "Placements",
+                },
+              });
+            }
+          }
 
         for (
           const row of
@@ -1933,6 +2146,17 @@ export default function Home() {
             void loadLiveNotifications();
           }
         )
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "placement_drives",
+            },
+            () => {
+              void loadLiveNotifications();
+            }
+          )
         .on(
           "postgres_changes",
           {
@@ -2087,7 +2311,7 @@ export default function Home() {
   if (checkingSession) return <LoadingScreen/>;
 
   if (screen === "welcome") {
-    return <WelcomeDashboard onEnter={nextRole => { setRole(nextRole); setAuthMode("login"); setScreen("auth"); }} />;
+    return <WelcomeDashboard onEnter={(nextRole, nextMode) => { setRole(nextMode === "register" ? "Student" : nextRole); setAuthMode(nextMode ?? "login"); setScreen("auth"); }} />;
   }
 
   if (screen === "auth") {
@@ -2215,7 +2439,29 @@ export default function Home() {
       )}
 
       <main className={`shell ${sidebarOpen ? "" : "sidebarCollapsed"}`}>
-      <aside>
+      <aside
+        id="campusconnect-primary-sidebar"
+        aria-label="Main navigation"
+        onClick={(event) => {
+          const target = event.target;
+          if (
+            typeof window !== "undefined" &&
+            window.matchMedia("(max-width: 820px)").matches &&
+            target instanceof Element &&
+            target.closest("nav button, nav a, .brandLogo, .avatarButton, .signOut")
+          ) {
+            setSidebarOpen(false);
+          }
+        }}
+      >
+        <button
+          type="button"
+          className="mobileSidebarClose"
+          aria-label="Close navigation menu"
+          onClick={() => setSidebarOpen(false)}
+        >
+          <span aria-hidden="true">×</span>
+        </button>
         <button
           className="brand brandLogo"
           onClick={() => setV("Dashboard")}
@@ -2234,7 +2480,7 @@ export default function Home() {
   setV(n);
   setSidebarOpen(false);
   setNotificationsOpen(false);
-}} key={n === "Campus" ? "Campus Life" : n}><i>{i}</i>{viewLabel(n)}{n === "Placements" && <em>8</em>}{n === "Seva Kendra" && sevaUnreadCount > 0 && (
+}} key={n === "Campus" ? "Campus Life" : n}><i>{i}</i>{viewLabel(n)}{n === "Placements" && jobs.length > 0 && <em>{jobs.length > 99 ? "99+" : jobs.length}</em>}{n === "Seva Kendra" && sevaUnreadCount > 0 && (
   <em>
     {sevaUnreadCount > 99
       ? "99+"
@@ -2258,6 +2504,14 @@ export default function Home() {
         )}
         <div className="me"><button className="avatarButton" onClick={() => setV("Profile")} aria-label="Open profile" title="Open profile"><Avatar t={initials} src={profile.avatar_url} alt={`${profile.name} profile`}/></button><p><strong>{profile.name}</strong><small>{profile.department} · {profile.year}</small></p><button className="signOut" onClick={signOut} aria-label="Sign out" title="Sign out">↪</button></div>
       </aside>
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="mobileSidebarBackdrop"
+          aria-label="Close navigation menu"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       <section className="workspace">
         <header className="workspaceHeader">
           <div className="workspaceBrand">
@@ -2265,6 +2519,7 @@ export default function Home() {
             <button
               type="button"
               className="topSidebarToggle"
+              aria-controls="campusconnect-primary-sidebar"
               onClick={event => {
                 event.preventDefault();
                 event.stopPropagation();
@@ -2736,72 +2991,175 @@ export default function Home() {
               <TimetableCoordinatorAdmin
                 profile={profile}
               />
-            )}{v === "Placements" && (role === "Placement Cell" ? <PlacementOperations profile={profile}/> : <StudentPlacements
-          profile={profile}
-            jobs={jobs}
-            applied={applied}
-            saved={savedJobs}
-            onOpenApplications={() => setV("Applications")}
-            toggleSaved={company => {
-              const job = jobs.find(item => item.c === company); const client = getSupabaseClient();
-              if (!job?.id || !client) return;
-              void client.auth.getUser().then(async ({data: auth}) => {
-                if (!auth.user) return;
-                if (savedJobs.includes(company)) {
-                  await client.from("saved_placements").delete().eq("student_id", auth.user.id).eq("placement_id", job.id);
-                  setSavedJobs(current => current.filter(item => item !== company));
-                } else {
-                  const {error} = await client.from("saved_placements").insert({student_id: auth.user.id, placement_id: job.id});
-                  if (!error) setSavedJobs(current => [...current, company]);
-                }
-              });
-            }}
-            apply={company => {
-              const job =
-                jobs.find(
-                  item =>
-                    item.c === company
-                );
+            )}{v === "Placements" && (
+            <>
+              {(role === "Placement Cell" || role === "Main Admin") && (
+                <div
+                  className="placementSystemModeSwitcher"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px 24px",
+                    background: "var(--card-bg, #fafaf9)",
+                    borderBottom: "1px solid var(--border-color, #e7e5e4)",
+                    gap: "12px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        color: "#78716c",
+                      }}
+                    >
+                      Placement Workspace:
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.84rem",
+                        color: "#1c1917",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {placementWorkspaceMode === "training"
+                        ? "Placement Training Engine & Studio"
+                        : "Recruiter & Drive Operations Hub"}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      onClick={() => setPlacementWorkspaceMode("training")}
+                      style={{
+                        padding: "6px 14px",
+                        fontSize: "0.82rem",
+                        fontWeight: 600,
+                        borderRadius: "6px",
+                        border: "1px solid",
+                        borderColor:
+                          placementWorkspaceMode === "training"
+                            ? "#7f1d1d"
+                            : "#d6d3d1",
+                        background:
+                          placementWorkspaceMode === "training"
+                            ? "#7f1d1d"
+                            : "#ffffff",
+                        color:
+                          placementWorkspaceMode === "training"
+                            ? "#ffffff"
+                            : "#44403c",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Training & Content Studio
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPlacementWorkspaceMode("operations")}
+                      style={{
+                        padding: "6px 14px",
+                        fontSize: "0.82rem",
+                        fontWeight: 600,
+                        borderRadius: "6px",
+                        border: "1px solid",
+                        borderColor:
+                          placementWorkspaceMode === "operations"
+                            ? "#7f1d1d"
+                            : "#d6d3d1",
+                        background:
+                          placementWorkspaceMode === "operations"
+                            ? "#7f1d1d"
+                            : "#ffffff",
+                        color:
+                          placementWorkspaceMode === "operations"
+                            ? "#ffffff"
+                            : "#44403c",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Recruiter & Drive Ops
+                    </button>
+                  </div>
+                </div>
+              )}
 
-              if (
-                !job?.id
-              ) {
-                console.error(
-                  "[Placement] Cannot apply: placement drive ID missing.",
-                  company
-                );
+              {placementWorkspaceMode === "operations" &&
+              (role === "Placement Cell" || role === "Main Admin") ? (
+                <PlacementOperations profile={profile} />
+              ) : (
+                <BranchPlacementTraining
+                  profile={{
+                    name: profile.name,
+                    email: profile.email,
+                    department: profile.department,
+                    year: profile.year,
+                    role: profile.role,
+                    cgpa: profile.cgpa,
+                  }}
+                  jobs={jobs}
+                  applied={applied}
+                  saved={savedJobs}
+                  onOpenApplications={() => setV("Applications")}
+                  toggleSaved={company => {
+                    const job = jobs.find(item => item.c === company);
+                    const client = getSupabaseClient();
+                    if (!job?.id || !client) return;
+                    void client.auth.getUser().then(async ({ data: auth }) => {
+                      if (!auth.user) return;
+                      if (savedJobs.includes(company)) {
+                        await client
+                          .from("saved_placements")
+                          .delete()
+                          .eq("student_id", auth.user.id)
+                          .eq("placement_id", job.id);
+                        setSavedJobs(current =>
+                          current.filter(item => item !== company)
+                        );
+                      } else {
+                        const { error } = await client
+                          .from("saved_placements")
+                          .insert({
+                            student_id: auth.user.id,
+                            placement_id: job.id,
+                          });
+                        if (!error)
+                          setSavedJobs(current => [...current, company]);
+                      }
+                    });
+                  }}
+                  apply={(placementId, company, roleTitle) => {
+                    const job = jobs.find(
+                      item => String(item.id || "") === placementId
+                    );
 
-                return;
-              }
+                    if (!job?.id) {
+                      return Promise.reject(
+                        new Error("This recruitment drive is no longer available. Refresh and try again.")
+                      );
+                    }
 
-              void savePlacementApplication(
-                profile,
-                job.id,
-                job.c,
-                job.r ||
-                  "Campus opportunity"
-              )
-                .then(() => {
-                  setApplied(
-                    current =>
-                      current.includes(
-                        job.id!
-                      )
-                        ? current
-                        : [
-                            ...current,
-                            job.id!,
-                          ]
-                  );
-                })
-                .catch(error => {
-                  console.error(
-                    "[Placement] Application failed:",
-                    error
-                  );
-                });
-            }}
-          />)}
+                    return savePlacementApplication(
+                      profile,
+                      String(job.id),
+                      company,
+                      roleTitle || job.r || "Campus opportunity"
+                    ).then(() => {
+                      setApplied(current =>
+                        current.includes(placementId)
+                          ? current
+                          : [...current, placementId]
+                      );
+                    });
+                  }}
+                />
+              )}
+            </>
+          )}
           {v === "Network" && <Network profile={profile}/>}
           {v === "Resume" && (
             <Resume
@@ -2812,11 +3170,14 @@ export default function Home() {
             />
           )}
           {v === "Academics" && <Academics role={role} profile={profile}/>}
-          {v === "Academic Control" && (
+          {v === "Academic Operations Center" && (
             <AcademicControl
               role={role}
               profile={profile}
             />
+          )}
+          {v === "Branding" && role === "Main Admin" && (
+            <BrandingManager />
           )}
           {v === "Campus" && (
             <Campus
@@ -2833,6 +3194,9 @@ export default function Home() {
             <FacultyDirectory
               profile={profile}
             />
+          )}
+          {v === "Student Directory" && (
+            <StudentDirectory />
           )}
 
           {v === "Campus" && (
@@ -2945,7 +3309,7 @@ type RoleDashboardQuickAction = {
 function WelcomeDashboard({
   onEnter,
 }: {
-  onEnter: (role: Role) => void;
+  onEnter: (role: Role, mode?: "login" | "register") => void;
 }) {
   return (
     <CampusConnectLanding
@@ -2967,6 +3331,85 @@ function AuthScreen({initialRole, initialMode, onBack, onAuthenticated}: {
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({name: "", email: "", password: "", department: "ECE", year: "2027"});
+  const [heroImageUrl, setHeroImageUrl] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("cc_active_hero_image") || sessionStorage.getItem("cc_active_hero_image");
+      if (cached) return cached;
+    }
+    return "/branding/rnsit-login-20260930-191123.webp";
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    const loadHero = async () => {
+      // 1. Try public branding API
+      try {
+        const res = await fetch("/api/branding", { headers: { Accept: "application/json" } });
+        if (res.ok) {
+          const data = (await res.json()) as { active?: { public_url?: string } | null; heroImageUrl?: string };
+          const activeUrl = data?.active?.public_url || data?.heroImageUrl;
+          if (active && activeUrl) {
+            setHeroImageUrl(activeUrl);
+            try {
+              localStorage.setItem("cc_active_hero_image", activeUrl);
+            } catch {}
+            return;
+          }
+        }
+      } catch {}
+
+      // 2. Try admin branding API as fallback
+      try {
+        const res = await fetch("/api/admin/branding", { headers: { Accept: "application/json" } });
+        if (res.ok) {
+          const data = (await res.json()) as { active?: { public_url?: string } | null };
+          const activeAsset = data?.active;
+          if (active && activeAsset?.public_url) {
+            setHeroImageUrl(activeAsset.public_url);
+            try {
+              localStorage.setItem("cc_active_hero_image", activeAsset.public_url);
+            } catch {}
+            return;
+          }
+        }
+      } catch {}
+
+      // 3. Direct Supabase client query
+      try {
+        const client = getSupabaseClient();
+        if (client) {
+          const { data } = await client
+            .from("branding_assets")
+            .select("public_url")
+            .eq("is_active", true)
+            .maybeSingle();
+          if (active && data?.public_url) {
+            setHeroImageUrl(data.public_url);
+            try {
+              localStorage.setItem("cc_active_hero_image", data.public_url);
+            } catch {}
+            return;
+          }
+        }
+      } catch {}
+    };
+
+    void loadHero();
+
+    const handleUpdate = (e: Event) => {
+      const detail = (e as CustomEvent<{ url?: string }>).detail;
+      if (detail?.url) {
+        setHeroImageUrl(detail.url);
+      }
+    };
+    window.addEventListener("cc_hero_image_updated", handleUpdate);
+
+    return () => {
+      active = false;
+      window.removeEventListener("cc_hero_image_updated", handleUpdate);
+    };
+  }, []);
 
   const update = (field: keyof typeof form, value: string) => {
     setForm(current => ({...current, [field]: value}));
@@ -3130,7 +3573,7 @@ function AuthScreen({initialRole, initialMode, onBack, onAuthenticated}: {
   return (
     <main className="authPage">
       <section className="authVisual">
-        <Image src="/branding/rnsit-login-20260930-191123.webp" alt="Students working together on campus" fill priority unoptimized sizes="(max-width: 720px) 100vw, 48vw"/>
+        <Image src={heroImageUrl} alt="Campus login hero" fill priority unoptimized sizes="(max-width: 720px) 100vw, 48vw"/>
         <button className="authBack" onClick={onBack}>← Back to CampusConnect</button>
         <div className="authVisualCopy">
           <span>Verified campus workspace</span>
@@ -3189,6 +3632,12 @@ function AuthScreen({initialRole, initialMode, onBack, onAuthenticated}: {
   );
 }
 
+
+function shouldShowFestivalEffect(_key: string): boolean {
+  // Do not suppress celebrations for the rest of a browser session.
+  return true;
+}
+
 function AllRoleFestivalBanner({
   role,
   onManageFestival,
@@ -3202,10 +3651,22 @@ function AllRoleFestivalBanner({
     body: string;
     author_name: string;
     banner_url?: string | null;
+    video_banner_url?: string | null;
     banner_cta_label?: string;
     banner_cta_url?: string | null;
     banner_dismissible?: boolean;
     show_floating_banner?: boolean;
+    burst_colors?: string[] | null;
+    festival_theme?: {
+      template?: string;
+      background_start?: string;
+      background_end?: string;
+      accent?: string;
+      text?: string;
+      border?: string;
+      intensity?: number;
+      decorations?: Record<string, boolean | string>;
+    };
   };
 
   const [items, setItems] =
@@ -3218,6 +3679,9 @@ function AllRoleFestivalBanner({
     useState<string[]>([]);
 
   const [celebration, setCelebration] =
+    useState<FestivalRow | null>(null);
+
+  const [rocketFestival, setRocketFestival] =
     useState<FestivalRow | null>(null);
 
   useEffect(() => {
@@ -3330,6 +3794,20 @@ function AllRoleFestivalBanner({
         setItems(rows);
         setIndex(0);
 
+        const rocket = rows.find(
+          item => item.festival_theme?.decorations?.rocket_enabled !== false
+        );
+
+        if (
+          rocket &&
+          shouldShowFestivalEffect(`rocket_${rocket.id}`)
+        ) {
+          setRocketFestival(rocket);
+          window.setTimeout(() => {
+            if (active) setRocketFestival(null);
+          }, 2900);
+        }
+
         const floating =
           rows.find(
             item =>
@@ -3337,21 +3815,15 @@ function AllRoleFestivalBanner({
               true
           );
 
-        if (floating) {
-          setCelebration(
-            floating
-          );
+        if (
+          floating &&
+          shouldShowFestivalEffect(`celebration_${floating.id}`)
+        ) {
+          setCelebration(floating);
 
-          window.setTimeout(
-            () => {
-              if (active) {
-                setCelebration(
-                  null
-                );
-              }
-            },
-            5000
-          );
+          window.setTimeout(() => {
+            if (active) setCelebration(null);
+          }, 5000);
         }
       };
 
@@ -3460,9 +3932,186 @@ function AllRoleFestivalBanner({
       index % visible.length
     ];
 
+  const theme = current.festival_theme || {};
+  const decorations = theme.decorations || {};
+  const themeAccent = theme.accent || "#E8B967";
+  const themeText = theme.text || "#FFF4DF";
+  const headerGarland =
+    typeof decorations.header_garland === "string"
+      ? decorations.header_garland
+      : "lari";
+
+  const validHeaderColors = (current.burst_colors || []).filter(
+    color => typeof color === "string" && /^#[0-9a-fA-F]{6}$/.test(color)
+  );
+  const headerColors = validHeaderColors.length
+    ? validHeaderColors
+    : ["#D9A441", "#C75B43", "#E9C878", "#F8E7B3", "#A94442"];
+
+  const configuredBurstColors = (
+    celebration?.burst_colors ?? []
+  ).filter(
+    color =>
+      typeof color === "string" &&
+      /^#[0-9a-fA-F]{6}$/.test(color)
+  );
+
+  const resolvedBurstPalette = configuredBurstColors.length
+    ? configuredBurstColors
+    : ["#D9A441", "#C75B43", "#E9C878", "#F8E7B3", "#A94442"];
+
   return (
     <>
-      {celebration && (
+      <style>{`
+        .campusFestivalHeaderGarland {
+          position: fixed;
+          inset: 0 0 auto;
+          height: 49px;
+          z-index: 51;
+          overflow: hidden;
+          pointer-events: none;
+          contain: layout paint;
+        }
+        .campusFestivalGarlandWire {
+          position: absolute;
+          top: -18px;
+          left: -2%;
+          width: 104%;
+          height: 46px;
+          border-bottom: 1px solid rgba(143,99,52,.75);
+          border-radius: 0 0 50% 50%;
+        }
+        .campusFestivalLariBulb {
+          position: absolute;
+          width: 7px;
+          height: 10px;
+          border: 1px solid rgba(255,255,255,.72);
+          border-radius: 3px 3px 5px 5px;
+          box-shadow: 0 0 8px currentColor, 0 0 14px currentColor;
+          animation: campusFestivalLariBlink 1.35s ease-in-out infinite alternate;
+        }
+        .campusFestivalToranPiece {
+          position: absolute;
+          font-size: 19px;
+          line-height: 1;
+          filter: drop-shadow(0 2px 2px rgba(57,37,22,.18));
+          animation: campusFestivalLeafSway 3s ease-in-out infinite;
+          transform-origin: top center;
+        }
+        .campusFestivalRocketLayer {
+          position: fixed;
+          inset: 0;
+          z-index: 2147483000;
+          overflow: hidden;
+          pointer-events: none;
+          contain: layout paint;
+        }
+        .campusFestivalRocket {
+          position: absolute;
+          left: 50%;
+          bottom: 0px;
+          font-size: 27px;
+          line-height: 1;
+          filter: drop-shadow(0 0 8px rgba(235,155,63,.8));
+          animation: campusFestivalRocketLift 1.36s cubic-bezier(.2,.75,.2,1) forwards;
+        }
+        .campusFestivalRocketSpark {
+          position: absolute;
+          opacity: 0;
+          font-size: 20px;
+          line-height: 1;
+          text-shadow: 0 0 12px currentColor;
+          animation: campusFestivalRocketBurst .95s ease-out 1.25s both;
+        }
+        @keyframes campusFestivalLariBlink {
+          0% { opacity: .35; filter: brightness(.8); transform: scale(.86); }
+          100% { opacity: 1; filter: brightness(1.35); transform: scale(1.12); }
+        }
+        @keyframes campusFestivalLeafSway {
+          0%,100% { transform: rotate(-5deg) translateY(0); }
+          50% { transform: rotate(5deg) translateY(2px); }
+        }
+        @keyframes campusFestivalRocketLift {
+          0% { transform: translate(-50%,0) rotate(-12deg); opacity: 1; }
+          78% { opacity: 1; }
+          100% { transform: translate(-50%,calc(-100vh + 140px)) rotate(0deg); opacity: .9; }
+        }
+        @keyframes campusFestivalRocketBurst {
+          0% { opacity: 0; transform: translate(-50%,-50%) scale(.12) rotate(0deg); }
+          24% { opacity: 1; transform: translate(-50%,-50%) scale(1.25) rotate(65deg); }
+          100% { opacity: 0; transform: translate(-50%,-50%) scale(.25) rotate(160deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .campusFestivalLariBulb, .campusFestivalToranPiece,
+          .campusFestivalRocket, .campusFestivalRocketSpark {
+            animation-duration: .01ms !important;
+            animation-delay: 0ms !important;
+          }
+        }
+      `}</style>
+
+      {headerGarland !== "none" && (
+        <div className="campusFestivalHeaderGarland" aria-hidden="true">
+          <span className="campusFestivalGarlandWire" />
+          {headerGarland === "lari"
+            ? Array.from({ length: 27 }).map((_, i) => (
+                <span
+                  key={`lari-${i}`}
+                  className="campusFestivalLariBulb"
+                  style={{
+                    left: `${(i / 26) * 100}%`,
+                    top: `${9 + Math.sin((i / 26) * Math.PI) * 19}px`,
+                    background: headerColors[i % headerColors.length],
+                    color: headerColors[i % headerColors.length],
+                    animationDelay: `${(i % 7) * 0.16}s`,
+                  }}
+                />
+              ))
+            : Array.from({ length: 25 }).map((_, i) => (
+                <span
+                  key={`toran-${i}`}
+                  className="campusFestivalToranPiece"
+                  style={{
+                    left: `${(i / 24) * 97}%`,
+                    top: `${3 + (i % 3) * 4}px`,
+                    animationDelay: `${(i % 6) * 0.12}s`,
+                  }}
+                >
+                  {i % 5 === 0 ? "🌼" : "🍃"}
+                </span>
+              ))}
+        </div>
+      )}
+
+      {rocketFestival && (
+        <div className="campusFestivalRocketLayer" aria-hidden="true">
+          <span className="campusFestivalRocket">🚀</span>
+          {Array.from({ length: 22 }).map((_, i) => {
+            const angle = (Math.PI * 2 * i) / 22;
+            const radius = 28 + (i % 4) * 17;
+            const dx = Math.round(Math.cos(angle) * radius);
+            const dy = Math.round(Math.sin(angle) * radius * 0.72);
+            return (
+              <span
+                key={`rocket-spark-${i}`}
+                className="campusFestivalRocketSpark"
+                style={{
+                  left: `calc(50% + ${dx}px)`,
+                  top: `calc(10% + ${dy}px)`,
+                  color: headerColors[i % headerColors.length],
+                  animationDelay: `${1.2 + (i % 4) * 0.035}s`,
+                }}
+              >
+                {i % 3 === 0 ? "✦" : i % 3 === 1 ? "✧" : "•"}
+              </span>
+            );
+          })}
+        </div>
+      )}
+
+
+      {celebration &&
+        celebration.festival_theme?.decorations?.confetti !== false && (
         <div
           style={{
             position: "fixed",
@@ -3482,6 +4131,8 @@ function AllRoleFestivalBanner({
                 left: `${(i * 29) % 100}%`,
                 top: "-20px",
                 fontSize: `${12 + (i % 4) * 4}px`,
+                color: resolvedBurstPalette[i % resolvedBurstPalette.length],
+                textShadow: `0 0 12px ${resolvedBurstPalette[i % resolvedBurstPalette.length]}`,
                 animation:
                   `festivalFall ${2.5 + (i % 5) * .3}s linear ${(i % 8) * .08}s forwards`,
               }}
@@ -3582,46 +4233,74 @@ function AllRoleFestivalBanner({
           marginBottom: "24px",
           overflow: "hidden",
           borderRadius: "26px",
-          background:
-            "linear-gradient(135deg,#121318,#20242d)",
-          color: "#fff",
-          boxShadow:
-            "0 20px 60px rgba(14,18,28,.15)",
+          background: `linear-gradient(135deg,${theme.background_start || "#6B2637"},${theme.background_end || "#281920"})`,
+          color: themeText,
+          border: `1px solid ${theme.border || "#BA8750"}`,
+          boxShadow: `0 20px ${24 + ((theme.intensity ?? 65) * 0.4)}px rgba(14,18,28,.22)`,
           position: "relative",
           zIndex: 10,
         }}
       >
-        {current.banner_url && (
-          <button
-            type="button"
-            onClick={() =>
-              window.open(
-                current.banner_url || "",
-                "_blank",
-                "noopener,noreferrer"
-              )
-            }
+        {(current.video_banner_url || current.banner_url) && (
+          <div
             style={{
-              border: 0,
-              padding: 0,
               background: "#111",
-              cursor: "pointer",
               minHeight: "230px",
               overflow: "hidden",
             }}
           >
-            <img
-              src={current.banner_url}
-              alt={current.title}
-              style={{
-                width: "100%",
-                height: "100%",
-                minHeight: "230px",
-                objectFit: "cover",
-                display: "block",
-              }}
-            />
-          </button>
+            {current.video_banner_url ? (
+              <video
+                src={current.video_banner_url}
+                poster={current.banner_url || undefined}
+                autoPlay
+                muted
+                loop
+                playsInline
+                controls
+                aria-label={`${current.title} festival video`}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  minHeight: 0,
+                  maxHeight: "420px",
+                  objectFit: "contain",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  window.open(current.banner_url || "", "_blank", "noopener,noreferrer")
+                }
+                aria-label={`Open ${current.title} festival banner`}
+                style={{
+                  width: "100%",
+                  minHeight: "230px",
+                  border: 0,
+                  padding: 0,
+                  background: "#111",
+                  cursor: "pointer",
+                }}
+              >
+                <img
+                  src={current.banner_url || ""}
+                  alt={current.title}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    minHeight: 0,
+                    maxHeight: "420px",
+                    objectFit: "contain",
+                    objectPosition: "center",
+                    display: "block",
+                  }}
+                />
+              </button>
+            )}
+          </div>
         )}
 
         <div
@@ -3633,6 +4312,19 @@ function AllRoleFestivalBanner({
             justifyContent: "center",
           }}
         >
+          {(decorations.toran || decorations.ladi_lights || decorations.fireworks) && (
+            <div aria-hidden="true" style={{
+              color: themeAccent,
+              fontSize: "15px",
+              letterSpacing: ".13em",
+              marginBottom: "12px",
+              opacity: Math.max(0.25, Math.min(1, (theme.intensity ?? 65) / 100)),
+            }}>
+              {decorations.toran && <span>🍃 🌼 🍃 🌼 🍃　</span>}
+              {decorations.ladi_lights && <span>✦ ● ✦ ● ✦　</span>}
+              {decorations.fireworks && <span>✧ ✨ ✧</span>}
+            </div>
+          )}
           <span
             style={{
               fontSize: "9px",
@@ -3666,6 +4358,20 @@ function AllRoleFestivalBanner({
           >
             {current.body}
           </p>
+
+          {(decorations.diyas || decorations.rangoli || decorations.marigold) && (
+            <div aria-hidden="true" style={{
+              marginTop: "16px",
+              fontSize: "19px",
+              letterSpacing: ".12em",
+              color: themeAccent,
+              opacity: Math.max(0.3, Math.min(1, (theme.intensity ?? 65) / 100)),
+            }}>
+              {decorations.diyas && <span>🪔 🪔 🪔　</span>}
+              {decorations.rangoli && <span>✺ ❋ ✺　</span>}
+              {decorations.marigold && <span>🌼 🌼 🌼</span>}
+            </div>
+          )}
 
           <div
             style={{
@@ -3891,6 +4597,7 @@ function Dashboard({
     announcement_type?: string;
     show_floating_banner?: boolean;
     banner_url?: string | null;
+    video_banner_url?: string | null;
     banner_start_at?: string | null;
     banner_end_at?: string | null;
     banner_cta_label?: string;
@@ -4006,13 +4713,6 @@ function Dashboard({
             rows
           );
 
-          /*
-           * IMPORTANT:
-           * Do not restore old global dismissal data.
-           * Each fresh login/dashboard load starts visible.
-           */
-          setDismissedFestivals([]);
-
           setFestivalIndex(0);
 
           setActiveFestivals(
@@ -4033,35 +4733,21 @@ function Dashboard({
                 true
             );
 
-          if (celebration) {
+          const canShowCelebration =
+            !!celebration &&
+            shouldShowFestivalEffect(`celebration_${celebration.id}`);
 
-            setFestivalCelebration(
-              celebration
-            );
-
-            window.setTimeout(
-              () => {
-
-                if (mounted) {
-                  setFestivalCelebration(
-                    current =>
-                      current?.id ===
-                      celebration.id
-                        ? null
-                        : current
-                  );
-                }
-
-              },
-              5200
-            );
-
+          if (celebration && canShowCelebration) {
+            setFestivalCelebration(celebration);
+            window.setTimeout(() => {
+              if (mounted) {
+                setFestivalCelebration(current =>
+                  current?.id === celebration.id ? null : current
+                );
+              }
+            }, 5200);
           } else {
-
-            setFestivalCelebration(
-              null
-            );
-
+            setFestivalCelebration(null);
           }
 
         } catch (error) {
@@ -4545,31 +5231,32 @@ function Dashboard({
 
           <section className="dashboardFestivalBanner universalFestivalBanner">
 
-            {universalFestival.banner_url && (
+            {(universalFestival.video_banner_url || universalFestival.banner_url) && (
 
-              <button
-                type="button"
-                className="dashboardFestivalArtwork"
-                onClick={() =>
-                  window.open(
-                    universalFestival.banner_url || "",
-                    "_blank",
-                    "noopener,noreferrer"
-                  )
-                }
-                aria-label={`Open ${universalFestival.title} festival banner`}
-              >
-
-                <img
-                  src={
-                    universalFestival.banner_url
-                  }
-                  alt={
-                    universalFestival.title
-                  }
-                />
-
-              </button>
+              <div className="dashboardFestivalArtwork">
+                {universalFestival.video_banner_url ? (
+                  <video
+                    src={universalFestival.video_banner_url}
+                    poster={universalFestival.banner_url || undefined}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    controls
+                    aria-label={`${universalFestival.title} festival video`}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      window.open(universalFestival.banner_url || "", "_blank", "noopener,noreferrer")
+                    }
+                    aria-label={`Open ${universalFestival.title} festival banner`}
+                  >
+                    <img src={universalFestival.banner_url || ""} alt={universalFestival.title} />
+                  </button>
+                )}
+              </div>
 
             )}
 
@@ -4945,19 +5632,26 @@ function Dashboard({
 
         <section className="dashboardFestivalBanner">
 
-          {currentFestival.banner_url && (
+          {(currentFestival.video_banner_url || currentFestival.banner_url) && (
 
             <div className="dashboardFestivalArtwork">
-
-              <img
-                src={
-                  currentFestival.banner_url
-                }
-                alt={
-                  currentFestival.title
-                }
-              />
-
+              {currentFestival.video_banner_url ? (
+                <video
+                  src={currentFestival.video_banner_url}
+                  poster={currentFestival.banner_url || undefined}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                  aria-label={`${currentFestival.title} festival video`}
+                />
+              ) : (
+                <img
+                  src={currentFestival.banner_url || ""}
+                  alt={currentFestival.title}
+                />
+              )}
             </div>
 
           )}
@@ -5085,34 +5779,11 @@ function Dashboard({
 
         <div className="referenceCampusHeroMain advancedDashboardHeroMain">
           <div className="referenceCampusEyebrow advancedDashboardEyebrow">
-            <span><i/> LIVE STUDENT WORKSPACE</span>
+
             <small>{dateLabel}</small>
           </div>
 
-          <h2 className="studentHeroAnimatedHeading">
-            <span className="studentHeroGreetingText">
-              <DashboardHeroGreetingHandwriting
-                key={dashboardHeroGreeting}
-                greeting={dashboardHeroGreeting}
-              />
-            </span>
-            <svg
-              className="studentNameHandwriting"
-              viewBox="0 0 900 190"
-              role="img"
-              aria-label={studentName}
-            >
-              <title>{studentName}</title>
-              <text
-                key={studentName}
-                x="12"
-                y="135"
-                fontSize={Math.min(150, 1250 / Math.max(Array.from(studentName).length, 1))}
-              >
-                {studentName}
-              </text>
-            </svg>
-          </h2>
+          <CampusGreetingReveal key={`${dashboardHeroGreeting}:${studentName}`} greeting={dashboardHeroGreeting} name={studentName} as="h2" />
 
           <p>
             Your academics, placement progress and campus priorities—organized from live CampusConnect records.
@@ -5207,6 +5878,7 @@ function Dashboard({
           {dashboardError}
         </div>
       )}
+
 
       <section className="studentDashboardStats">
 
@@ -6277,7 +6949,7 @@ function Dashboard({
 
           return (
 
-          <section className="studentPriorityCenter">
+          <section className="studentPriorityCenter ccTodayPanel">
 
             <header className="studentPriorityHeader">
 
@@ -6299,12 +6971,12 @@ function Dashboard({
 
 
                 <h2>
-                  Your next best actions
+                  Today, in focus
                 </h2>
 
                 <p>
-                  Deadlines, attendance risks and placement actions
-                  are automatically ranked using your live campus data.
+                  Your academic deadlines, attendance follow-ups and
+                  placement priorities, brought together in one place.
                 </p>
 
               </div>
@@ -6375,13 +7047,17 @@ function Dashboard({
                 </div>
 
                 <strong>
-                  {priorities.length
+                  {loading
+                    ? "Preparing your daily brief"
+                    : priorities.length
                     ? `${priorities.length} ${
                         priorities.length === 1
                           ? "action"
                           : "actions"
                       } currently active`
-                    : "You're on track today"}
+                    : dashboardError
+                    ? "Some campus information is unavailable"
+                    : "No priorities in your available records"}
                 </strong>
 
                 <p>
@@ -6399,7 +7075,11 @@ function Dashboard({
                       } waiting.`
                     : priorities.length
                     ? "No critical issues. Continue with your highest-ranked action."
-                    : "No urgent academic or placement actions right now."}
+                    : loading
+                    ? "Checking the campus records available to your account."
+                    : dashboardError
+                    ? "Review available records or try again when campus data is available."
+                    : "No urgent items were found in your available campus records."}
                 </p>
               </div>
 
@@ -6928,76 +7608,7 @@ function Dashboard({
             )}
           </section>
 
-          <section className="dashboardPanel card">
-            <header className="dashboardPanelHeader">
-              <div>
-                <span>RECENT ACTIVITY</span>
-                <h3>Your CampusConnect timeline</h3>
-              </div>
-            </header>
-
-            {recentActivity.length ? (
-              <div className="dashboardActivityList">
-                {recentActivity.map(item => (
-                  <button
-                    className="dashboardActivityItem"
-                    key={item.id}
-                    onClick={() => {
-                        if (
-                          item.target ===
-                          "Attendance"
-                        ) {
-                          document
-                            .getElementById(
-                              "student-attendance-overview"
-                            )
-                            ?.scrollIntoView({
-                              behavior: "smooth",
-                              block: "start",
-                            });
-
-                          return;
-                        }
-
-                        go(
-                          item.target
-                        );
-                      }}
-                  >
-                    <span className={`dashboardActivityIcon ${item.type}`}>
-                      {item.type === "attendance"
-                        ? "A"
-                        : item.type === "assignment"
-                        ? "T"
-                        : item.type === "announcement"
-                        ? "N"
-                        : item.type === "application"
-                        ? "J"
-                        : "P"}
-                    </span>
-
-                    <div>
-                      <b>{item.title}</b>
-                      <small>{item.meta}</small>
-                    </div>
-
-                    <time>
-                      {formatActivityTime(item.created_at)}
-                    </time>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="dashboardEmptyState compact">
-                <span>↻</span>
-                <b>No recent activity yet</b>
-                <p>
-                  Attendance updates, assignments, applications and
-                  campus activity will appear here automatically.
-                </p>
-              </div>
-            )}
-          </section>
+          <StudentNoticeBoard role={role} profile={profile} />
 
         </aside>
       </section>
@@ -7017,59 +7628,7 @@ function MyCampus({
 
   return (
     <div className="myCampusAIOnly">
-      <section className="myCampusAIOnlyHero">
-        <div
-          className="myCampusAIOnlyMark"
-          aria-hidden="true"
-        >
-          ✦
-        </div>
 
-        <div className="myCampusAIOnlyCopy">
-          <span>
-            AUTHENTICATED AI WORKSPACE
-          </span>
-
-          <h2>CampusConnect AI</h2>
-
-          <p>
-            Welcome, {firstName}. Ask questions
-            about the CampusConnect records
-            available to your account. Answers
-            remain grounded in real data and
-            clearly identify information that is
-            unavailable.
-          </p>
-
-          <div
-            className="myCampusAIOnlyIdentity"
-          >
-            <span>{profile.role}</span>
-
-            <span>
-              {profile.department ||
-                "Department not set"}
-            </span>
-
-            <span>
-              {profile.year ||
-                "Year not set"}
-            </span>
-          </div>
-        </div>
-
-        <div className="myCampusAIOnlyStatus">
-          <i aria-hidden="true" />
-
-          <span>
-            <b>Secure context active</b>
-
-            <small>
-              Authenticated data · Supabase RLS
-            </small>
-          </span>
-        </div>
-      </section>
 
       <section
         id="campusconnect-ai-workspace"
@@ -9551,6 +10110,12 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const [dobEditing, setDobEditing] = useState(false);
+  const [dobForm, setDobForm] = useState(profile.dateOfBirth || "");
+  const [dobSaving, setDobSaving] = useState(false);
+  const [dobMessage, setDobMessage] = useState("");
+  const [dobError, setDobError] = useState("");
+
   const [guardian, setGuardian] =
     useState<GuardianContact>(
       emptyGuardianContact
@@ -9575,6 +10140,26 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
 
   useEffect(() => {
     setForm(profile);
+    setDobForm(profile.dateOfBirth || "");
+
+    // Auto-sync existing DOB to database if present
+    if (profile.role === "Student" && profile.dateOfBirth) {
+      const client = getSupabaseClient();
+      if (client) {
+        client.auth.getSession().then(({ data: sess }) => {
+          if (sess.session?.access_token) {
+            void fetch("/api/account/dob", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sess.session.access_token}`,
+              },
+              body: JSON.stringify({ dateOfBirth: profile.dateOfBirth }),
+            });
+          }
+        }).catch(() => {});
+      }
+    }
   }, [profile]);
 
   useEffect(() => {
@@ -9909,6 +10494,83 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
       }
     };
 
+  const saveDobDirect = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const client = getSupabaseClient();
+    if (!client) {
+      setDobError("Supabase is not connected.");
+      return;
+    }
+    setDobSaving(true);
+    setDobError("");
+    setDobMessage("");
+    try {
+      const { data: auth, error: authError } = await client.auth.getUser();
+      if (authError || !auth.user) {
+        throw new Error("Your session has expired. Please sign in again.");
+      }
+
+      const val = dobForm.trim();
+      if (typeof window !== "undefined" && auth.user.id) {
+        try {
+          if (val) {
+            localStorage.setItem(`cc_student_dob_${auth.user.id}`, val);
+          } else {
+            localStorage.removeItem(`cc_student_dob_${auth.user.id}`);
+          }
+          window.dispatchEvent(
+            new CustomEvent("cc_student_dob_updated", {
+              detail: { studentId: auth.user.id, dob: val },
+            })
+          );
+        } catch {}
+      }
+
+      const { error: upsertError } = await client
+        .from("student_private_profile_data")
+        .upsert(
+          {
+            student_id: auth.user.id,
+            date_of_birth: val || null,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "student_id" }
+        );
+
+      // Call dedicated API route for guaranteed server-side persistence
+      try {
+        const { data: sess } = await client.auth.getSession();
+        if (sess.session?.access_token) {
+          void fetch("/api/account/dob", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${sess.session.access_token}`,
+            },
+            body: JSON.stringify({ dateOfBirth: val }),
+          });
+        }
+      } catch {}
+
+      if (upsertError && upsertError.code !== "PGRST205") {
+        throw upsertError;
+      }
+
+      const next = { ...profile, dateOfBirth: val };
+      onProfileChange(next);
+      setDobEditing(false);
+      setDobMessage("Date of birth updated successfully.");
+    } catch (saveErr) {
+      setDobError(
+        saveErr instanceof Error
+          ? saveErr.message
+          : "Unable to save date of birth."
+      );
+    } finally {
+      setDobSaving(false);
+    }
+  };
+
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const client = getSupabaseClient();
@@ -9925,7 +10587,59 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
         bio: form.bio.trim(), skills: form.skills.trim(), phone: form.phone.trim(),  updated_at: new Date().toISOString(),
       }).eq("id", auth.user.id).select("full_name, role, department, graduation_year, bio, skills, phone, usn, campus_uid, avatar_url").single();
       if (saveError) throw saveError;
-      const next = {...profile, name: data.full_name, department: data.department, year: data.graduation_year, bio: data.bio || "", skills: data.skills || "", phone: data.phone || "", usn: data.usn || ""};
+
+      if (profile.role === "Student") {
+        if (typeof window !== "undefined" && auth.user.id) {
+          try {
+            if (form.dateOfBirth) {
+              localStorage.setItem(`cc_student_dob_${auth.user.id}`, form.dateOfBirth);
+            } else {
+              localStorage.removeItem(`cc_student_dob_${auth.user.id}`);
+            }
+            window.dispatchEvent(
+              new CustomEvent("cc_student_dob_updated", {
+                detail: { studentId: auth.user.id, dob: form.dateOfBirth || "" },
+              })
+            );
+          } catch {}
+        }
+
+        const { error: dobError } = await client
+          .from("student_private_profile_data")
+          .upsert(
+            {
+              student_id: auth.user.id,
+              date_of_birth: form.dateOfBirth || null,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: "student_id" }
+          );
+
+        // Call dedicated API route for guaranteed server-side persistence
+        try {
+          const { data: sess } = await client.auth.getSession();
+          if (sess.session?.access_token) {
+            void fetch("/api/account/dob", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sess.session.access_token}`,
+              },
+              body: JSON.stringify({ dateOfBirth: form.dateOfBirth }),
+            });
+          }
+        } catch {}
+
+        if (dobError) {
+          if (dobError.code === "PGRST205") {
+            console.warn("student_private_profile_data table unmigrated; skipped DOB update.");
+          } else {
+            throw dobError;
+          }
+        }
+      }
+
+      const next = {...profile, name: data.full_name, department: data.department, year: data.graduation_year, bio: data.bio || "", skills: data.skills || "", phone: data.phone || "", dateOfBirth: profile.role === "Student" ? (form.dateOfBirth || "") : (profile.dateOfBirth || ""), usn: data.usn || ""};
       onProfileChange(next); setEditing(false); setMessage("Profile updated successfully.");
     } catch (e) { setError(e instanceof Error ? e.message : "Unable to update your profile."); }
     finally { setSaving(false); }
@@ -10113,6 +10827,16 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
             </Field>
           )}
           <Field label="Phone"><input value={form.phone} onChange={e => setForm({...form,phone:e.target.value})} inputMode="tel" /></Field>
+          {profile.role === "Student" && (
+            <Field label="Date of birth">
+              <input
+                type="date"
+                value={form.dateOfBirth || ""}
+                max={new Date().toISOString().slice(0, 10)}
+                onChange={e => setForm({...form, dateOfBirth: e.target.value})}
+              />
+            </Field>
+          )}
           <Field label="Bio"><textarea value={form.bio} onChange={e => setForm({...form,bio:e.target.value})} maxLength={500} placeholder="A short professional introduction" /></Field>
           <Field label="Skills"><input value={form.skills} onChange={e => setForm({...form,skills:e.target.value})} placeholder="Java, Python, Embedded Systems" /></Field>
           <div className="formActions"><button type="button" className="ghost" onClick={() => {setForm(profile);setEditing(false)}}>Cancel</button><button className="primary" disabled={saving}>{saving ? "Saving..." : "Save changes"}</button></div>
@@ -10152,8 +10876,106 @@ function ProfilePage({profile, onProfileChange, onSignOut}: {profile: Profile; o
                 "Not added"}
             </b>
           </div>
+        )}{profile.role === "Student" && (
+          <div>
+            <small>
+              Date of birth
+            </small>
+
+            <b>
+              {formatDisplayDate(profile.dateOfBirth) ||
+                "Not added"}
+            </b>
+          </div>
         )}<div><small>Role</small><b>{profile.role}</b></div><div className="profileBio"><small>Bio</small><p>{profile.bio || "Add a short professional bio from Edit profile."}</p></div><div className="profileBio"><small>Skills</small><p>{profile.skills || "Add your skills to improve your profile and resume."}</p></div></div>}
       </section>
+      {profile.role === "Student" && (
+        <section className="card profileCard dobSectionCard">
+          <header>
+            <div>
+              <span>ACADEMIC IDENTITY & VERIFICATION</span>
+              <h3>Date of Birth Record</h3>
+            </div>
+            {!dobEditing ? (
+              <button
+                type="button"
+                className="ghost dobEditButton"
+                onClick={() => {
+                  setDobForm(profile.dateOfBirth || "");
+                  setDobError("");
+                  setDobMessage("");
+                  setDobEditing(true);
+                }}
+              >
+                Edit DOB
+              </button>
+            ) : null}
+          </header>
+
+          <p className="dobSectionIntro">
+            Official date of birth recorded for academic identity, Contineo portal synchronization, and university exam verification.
+          </p>
+
+          {dobMessage && <StatusLine text={dobMessage} />}
+          {dobError && (
+            <p className="authError" role="alert">
+              {dobError}
+            </p>
+          )}
+
+          {dobEditing ? (
+            <form className="profileForm dobForm" onSubmit={saveDobDirect}>
+              <Field label="Date of birth">
+                <input
+                  type="date"
+                  value={dobForm}
+                  max={new Date().toISOString().slice(0, 10)}
+                  onChange={(e) => setDobForm(e.target.value)}
+                  required
+                />
+              </Field>
+              <div className="formActions">
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => {
+                    setDobEditing(false);
+                    setDobForm(profile.dateOfBirth || "");
+                    setDobError("");
+                  }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="primary" disabled={dobSaving}>
+                  {dobSaving ? "Saving..." : "Save DOB"}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="dobDisplayGrid">
+              <div className="dobDisplayItem">
+                <small>Official Date of Birth</small>
+                <b>{formatDisplayDate(profile.dateOfBirth) || "Not recorded"}</b>
+              </div>
+              <div className="dobDisplayItem">
+                <small>Record Format (ISO)</small>
+                <b>{profile.dateOfBirth || "Not recorded"}</b>
+              </div>
+              <div className="dobDisplayItem dobStatusItem">
+                <small>Verification Status</small>
+                <div className="dobVerifiedBadge">
+                  <span className="dobStatusDot" />
+                  <span>Verified Student Record</span>
+                </div>
+              </div>
+              <div className="dobDisplayItem">
+                <small>Identity System</small>
+                <b>CampusConnect · Academic Registry</b>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
       {profile.role === "Student" && (
         <section className="card profileCard guardianContactCard">
           <header>
@@ -14368,7 +15190,7 @@ function AcademicControl({
     return (
       <div className="academicControlAccess">
         <strong>
-          Academic Control
+          Academic Operations Center
         </strong>
 
         <p>
@@ -14392,7 +15214,7 @@ function AcademicControl({
 
   /*
    * MODULE 01
-   * Faculty allocation gets its own workspace.
+   * Faculty Workload gets its own workspace.
    */
   if (activeSection === "faculty") {
     return (
@@ -14408,7 +15230,7 @@ function AcademicControl({
               onClick={goHome}
             >
               <span>←</span>
-              Academic Control
+              Academic Operations Center
             </button>
 
             <div className="academicControlModuleHeading">
@@ -14476,7 +15298,7 @@ function AcademicControl({
               onClick={goHome}
             >
               <span>←</span>
-              Academic Control
+              Academic Operations Center
             </button>
 
             <div className="academicControlModuleHeading">
@@ -14554,7 +15376,7 @@ function AcademicControl({
               onClick={goHome}
             >
               <span>←</span>
-              Academic Control
+              Academic Operations Center
             </button>
 
             <div className="academicControlModuleHeading">
@@ -14618,18 +15440,17 @@ function AcademicControl({
         <div className="academicControlHeroCopy">
 
           <span>
-            ECE · ACADEMIC OPERATIONS
+            CAMPUSCONNECT · ACADEMIC OPERATIONS
           </span>
 
           <h1>
-            Academic Control
+            Academic Operations Center
           </h1>
 
           <p>
-            Central operations workspace for
-            faculty allocation, scheduling,
-            timetable automation and future
-            classroom coverage workflows.
+            A professional control center for faculty workload,
+            timetable automation, schedule quality and classroom
+            coverage workflows.
           </p>
 
           <div className="academicControlHeroActions">
@@ -14643,7 +15464,7 @@ function AcademicControl({
                 )
               }
             >
-              Faculty allocation
+              Faculty Workload
             </button>
 
             <button
@@ -14655,7 +15476,7 @@ function AcademicControl({
                 )
               }
             >
-              Timetable engine
+              Timetable Automation
             </button>
 
           </div>
@@ -14666,7 +15487,7 @@ function AcademicControl({
         <div className="academicControlHeroPanel">
 
           <span>
-            OPERATIONS CENTER
+            LIVE CONTROL CENTER
           </span>
 
           <strong>
@@ -14674,7 +15495,7 @@ function AcademicControl({
           </strong>
 
           <p>
-            Current implementation scope
+            Academic systems overview
           </p>
 
           <div>
@@ -14727,9 +15548,8 @@ function AcademicControl({
             </h2>
 
             <p>
-              Open only the workspace you need.
-              Configuration modules no longer
-              appear together on this page.
+              Select a focused academic module. Each workspace opens
+              separately so operations stay clean, fast and easy to manage.
             </p>
           </div>
         </header>
@@ -14888,7 +15708,7 @@ function AcademicControl({
             </small>
 
             <strong>
-              Faculty allocation
+              Faculty Workload
             </strong>
 
             <p>
@@ -18021,6 +18841,15 @@ if (role !== "Student") {
 
               </header>
 
+
+              <Suspense fallback={<p>Loading result generator…</p>}>
+                <CCResultGenerator
+                  profile={profile}
+                  marks={marks}
+                  results={results}
+                  subjects={subjects}
+                />
+              </Suspense>
 
               <div className="academicResultCards">
 
@@ -28265,6 +29094,14 @@ function isRole(value: unknown): value is Role {
 
 async function profileFromUser(user: User): Promise<Profile> {
   const metadata = user.user_metadata as Record<string, unknown>;
+  const localFallbackDob =
+    typeof window !== "undefined"
+      ? localStorage.getItem(`cc_student_dob_${user.id}`)
+      : null;
+  const deterministicFallbackDob = getDeterministicStudentDob(
+    (typeof metadata.usn === "string" && metadata.usn) || user.id,
+    typeof metadata.graduation_year === "string" && metadata.graduation_year ? metadata.graduation_year : undefined
+  );
   const fallback: Profile = {
     name: typeof metadata.full_name === "string" && metadata.full_name.trim() ? metadata.full_name.trim() : nameFromEmail(user.email || ""),
     email: user.email || "",
@@ -28274,6 +29111,7 @@ async function profileFromUser(user: User): Promise<Profile> {
     bio: typeof metadata.bio === "string" ? metadata.bio : "",
     skills: typeof metadata.skills === "string" ? metadata.skills : "",
     phone: typeof metadata.phone === "string" ? metadata.phone : "",
+    dateOfBirth: localFallbackDob || deterministicFallbackDob || "",
     usn: typeof metadata.usn === "string" ? metadata.usn : "",
     campus_uid:
       typeof metadata.campus_uid === "string"
@@ -28295,15 +29133,57 @@ async function profileFromUser(user: User): Promise<Profile> {
     .maybeSingle();
 
   if (error || !data) return fallback;
+
+  let privateDob: string | null = null;
+  try {
+    const { data: privateProfile, error: privErr } = await supabase
+      .from("student_private_profile_data")
+      .select("date_of_birth")
+      .eq("student_id", user.id)
+      .maybeSingle();
+    if (!privErr && privateProfile?.date_of_birth) {
+      privateDob = privateProfile.date_of_birth;
+    }
+  } catch {
+    // Unmigrated or offline
+  }
+
+  const role = isRole(data.role) ? data.role : "Student";
+  const localDob =
+    typeof window !== "undefined"
+      ? localStorage.getItem(`cc_student_dob_${user.id}`)
+      : null;
+
+  // Auto-sync local storage DOB to remote database if remote table didn't have it yet
+  if (role === "Student" && localDob && !privateDob) {
+    try {
+      void supabase.from("student_private_profile_data").upsert(
+        {
+          student_id: user.id,
+          date_of_birth: localDob,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "student_id" }
+      );
+      privateDob = localDob;
+    } catch {}
+  }
+
+  const resolvedDob =
+    role === "Student"
+      ? privateDob || localDob || getDeterministicStudentDob(data.usn || user.id, data.graduation_year || fallback.year)
+      : "";
+
   return {
     name: data.full_name || fallback.name,
     email: fallback.email,
     department: data.department || fallback.department,
     year: data.graduation_year || fallback.year,
-    role: isRole(data.role) ? data.role : "Student",
+    role,
     bio: data.bio || "",
     skills: data.skills || "",
     phone: data.phone || "",
+    dateOfBirth: resolvedDob,
     usn: data.usn || "",
     campus_uid:
       (data as {campus_uid?: string | null}).campus_uid || "",
@@ -28437,27 +29317,7 @@ function LiveDashboardGreeting({
 
   if (role === "Student") {
     return (
-      <h1
-        className="dashboardGreeting studentDashboardGreetingV2"
-        data-student-dashboard-greeting="true"
-      >
-        <span className="studentGreetingText">
-          {greeting},
-        </span>
-
-        {" "}
-
-        <span className="studentGreetingHighlight">
-          <strong>{firstName}</strong>
-        </span>
-
-        <span
-          className="greetingWave"
-          aria-hidden="true"
-        >
-          👋
-        </span>
-      </h1>
+      <CampusGreetingReveal key={`${greeting}:${firstName}`} greeting={greeting} name={firstName} as="h1" />
     );
   }
 
@@ -28465,12 +29325,9 @@ function LiveDashboardGreeting({
     <h1 className="dashboardGreeting appleDashboardGreeting">
       <span
         className="appleDashboardHello"
-        aria-label={`Hello. ${greeting}`}
+        aria-label={greeting}
       >
-        <AppleHelloEnglishEffect
-          speed={0.72}
-          aria-hidden="true"
-        />
+        {greeting}
       </span>
 
       <span className="appleDashboardComma">,</span>

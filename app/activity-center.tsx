@@ -1,6 +1,8 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Activity Center renders runtime-loaded media URLs with existing inline sizing. */
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -9,6 +11,8 @@ import {
 } from "react";
 
 import {getSupabaseClient} from "../lib/supabase";
+import "./activity-event-promotions.css";
+import ActivityEventSponsors from "./components/ui/activity-event-sponsors";
 
 
 type ActivityRole =
@@ -106,6 +110,70 @@ type Sport = {
   is_featured: boolean;
 };
 
+type PromotionTheme = "copper" | "coral" | "gold" | "rose";
+type PromotionAnimation = "confetti" | "spotlight" | "orbit" | "shimmer";
+
+type ActivityPromotionEvent = {
+  id: string;
+  title: string;
+  short_description: string;
+  description: string;
+  category: string;
+  venue: string;
+  organizer: string;
+  event_date: string;
+  end_date: string | null;
+  banner_url: string | null;
+  registration_url: string | null;
+  status: string;
+};
+
+type ActivityEventPromotion = {
+  id: string;
+  event_id: string;
+  club_id: string;
+  headline: string;
+  message: string;
+  cta_label: string;
+  theme: PromotionTheme;
+  animation_style: PromotionAnimation;
+  starts_at: string;
+  ends_at: string | null;
+  is_active: boolean;
+  display_priority: number;
+  created_by?: string | null;
+  updated_by?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type ActiveActivityEventPromotion = ActivityEventPromotion & {
+  event: ActivityPromotionEvent;
+  club: Club;
+};
+
+const toLocalDateTimeInput = (value: string | Date = new Date()) => {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
+    .toISOString()
+    .slice(0, 16);
+};
+
+const blankPromotionForm = () => ({
+  event_id: "",
+  club_id: "",
+  headline: "",
+  message: "",
+  cta_label: "Explore event",
+  theme: "copper" as PromotionTheme,
+  animation_style: "confetti" as PromotionAnimation,
+  starts_at: toLocalDateTimeInput(),
+  ends_at: "",
+  is_active: true,
+  display_priority: "0",
+});
+
 
 const blankClubForm = {
   name: "",
@@ -195,6 +263,39 @@ export function ActivityCenter({
   const [gallery, setGallery] =
     useState<ClubGalleryItem[]>([]);
 
+  const [promotionEvents, setPromotionEvents] =
+    useState<ActivityPromotionEvent[]>([]);
+
+  const [promotionRecords, setPromotionRecords] =
+    useState<ActivityEventPromotion[]>([]);
+
+  const [promotionLoading, setPromotionLoading] =
+    useState(false);
+
+  const [promotionError, setPromotionError] =
+    useState("");
+
+  const [promotionIndex, setPromotionIndex] =
+    useState(0);
+
+  const [showPromotionManager, setShowPromotionManager] =
+    useState(false);
+
+  const [showPromotionForm, setShowPromotionForm] =
+    useState(false);
+
+  const [editingPromotion, setEditingPromotion] =
+    useState<ActivityEventPromotion | null>(null);
+
+  const [promotionForm, setPromotionForm] =
+    useState(blankPromotionForm);
+
+  const [promotionSaving, setPromotionSaving] =
+    useState(false);
+
+  const [promotionActionMessage, setPromotionActionMessage] =
+    useState("");
+
   const [selectedClubId, setSelectedClubId] =
     useState("");
 
@@ -249,14 +350,11 @@ export function ActivityCenter({
   const [bannerFile, setBannerFile] =
     useState<File | null>(null);
 
-  const [sportLogoFile, setSportLogoFile] =
-    useState<File | null>(null);
+  const [, setSportLogoFile] = useState<File | null>(null);
 
-  const [sportBannerFile, setSportBannerFile] =
-    useState<File | null>(null);
+  const [, setSportBannerFile] = useState<File | null>(null);
 
-  const [sportPosterFile, setSportPosterFile] =
-    useState<File | null>(null);
+  const [, setSportPosterFile] = useState<File | null>(null);
 
   const [posterFile, setPosterFile] =
     useState<File | null>(null);
@@ -318,121 +416,327 @@ export function ActivityCenter({
         club.id === selectedClubId
     ) || null;
 
+  const loadEventPromotions = async () => {
+    const client = getSupabaseClient();
+    if (!client) return;
+
+    setPromotionLoading(true);
+    setPromotionError("");
+
+    try {
+      const [eventsResult, promotionsResult] = await Promise.all([
+        client
+          .from("campus_events")
+          .select("id,title,short_description,description,category,venue,organizer,event_date,end_date,banner_url,registration_url,status")
+          .eq("status", "Published")
+          .order("event_date", { ascending: true })
+          .limit(100),
+        // This table is not present in the project’s generated Supabase types yet.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (client as any)
+          .from("activity_event_promotions")
+          .select("*")
+          .order("display_priority", { ascending: true })
+          .order("updated_at", { ascending: false })
+          .limit(100),
+      ]);
+
+      if (eventsResult.error) throw eventsResult.error;
+      setPromotionEvents((eventsResult.data || []) as ActivityPromotionEvent[]);
+
+      if (promotionsResult.error) {
+        console.error("[Activity Center] event promotions load failed", promotionsResult.error);
+        setPromotionRecords([]);
+        setPromotionError(
+          "Event promotion storage is not ready. Apply the Activity Center event promotions migration to enable the promotion studio."
+        );
+        return;
+      }
+
+      setPromotionRecords((promotionsResult.data || []) as ActivityEventPromotion[]);
+    } catch (error) {
+      console.error("[Activity Center] event promotions load failed", error);
+      setPromotionError(
+        error instanceof Error
+          ? error.message
+          : "Unable to load event promotions."
+      );
+    } finally {
+      setPromotionLoading(false);
+    }
+  };
+
+  const [activityCenterNow, setActivityCenterNow] = useState(0);
+
+  const visibleEventPromotions = useMemo<ActiveActivityEventPromotion[]>(() => {
+    const now = activityCenterNow;
+
+    return promotionRecords
+      .filter(record =>
+        record.is_active &&
+        Date.parse(record.starts_at) <= now &&
+        (!record.ends_at || Date.parse(record.ends_at) > now)
+      )
+      .map(record => {
+        const event = promotionEvents.find(item => item.id === record.event_id);
+        const club = clubs.find(item => item.id === record.club_id);
+        if (!event || !club || event.status !== "Published") return null;
+
+        const eventDate = Date.parse(event.event_date);
+        const endDate = event.end_date ? Date.parse(event.end_date) : Number.NaN;
+        const eventStillCurrent = eventDate >= now || (!Number.isNaN(endDate) && endDate >= now);
+        if (!eventStillCurrent) return null;
+
+        return { ...record, event, club };
+      })
+      .filter((item): item is ActiveActivityEventPromotion => item !== null)
+      .sort((a, b) =>
+        a.display_priority - b.display_priority ||
+        Date.parse(a.event.event_date) - Date.parse(b.event.event_date)
+      );
+  }, [promotionRecords, promotionEvents, clubs, activityCenterNow]);
+
+  const currentEventPromotion =
+    visibleEventPromotions.length > 0
+      ? visibleEventPromotions[promotionIndex % visibleEventPromotions.length]
+      : null;
+  const visiblePromotionCount = visibleEventPromotions.length;
+
+  const availablePromotionEvents = useMemo(() => {
+    const now = activityCenterNow;
+    return promotionEvents.filter(event => {
+      if (event.status !== "Published") return false;
+      const eventDate = Date.parse(event.event_date);
+      const endDate = event.end_date ? Date.parse(event.end_date) : Number.NaN;
+      return eventDate >= now || (!Number.isNaN(endDate) && endDate >= now);
+    });
+  }, [promotionEvents, activityCenterNow]);
+
+  const startPromotionCreate = () => {
+    if (!canManage) return;
+    setEditingPromotion(null);
+    setPromotionForm(blankPromotionForm());
+    setPromotionError("");
+    setPromotionActionMessage("");
+    setShowPromotionForm(true);
+  };
+
+  const startPromotionEdit = (record: ActivityEventPromotion) => {
+    if (!canManage) return;
+    setEditingPromotion(record);
+    setPromotionForm({
+      event_id: record.event_id,
+      club_id: record.club_id,
+      headline: record.headline,
+      message: record.message,
+      cta_label: record.cta_label,
+      theme: record.theme,
+      animation_style: record.animation_style,
+      starts_at: toLocalDateTimeInput(record.starts_at),
+      ends_at: record.ends_at ? toLocalDateTimeInput(record.ends_at) : "",
+      is_active: record.is_active,
+      display_priority: String(record.display_priority ?? 0),
+    });
+    setPromotionError("");
+    setPromotionActionMessage("");
+    setShowPromotionForm(true);
+  };
+
+  const saveEventPromotion = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!canManage || promotionSaving) return;
+
+    const client = getSupabaseClient();
+    if (!client) {
+      setPromotionError("CampusConnect is not connected to Supabase.");
+      return;
+    }
+
+    const chosenEvent = promotionEvents.find(item => item.id === promotionForm.event_id);
+    const chosenClub = clubs.find(item => item.id === promotionForm.club_id);
+    const now = Date.now();
+    const chosenEventEnd = chosenEvent?.end_date ? Date.parse(chosenEvent.end_date) : Number.NaN;
+    const chosenEventIsCurrent = Boolean(
+      chosenEvent &&
+      chosenEvent.status === "Published" &&
+      (Date.parse(chosenEvent.event_date) >= now || (!Number.isNaN(chosenEventEnd) && chosenEventEnd >= now))
+    );
+
+    if (!chosenEvent || !chosenEventIsCurrent) {
+      setPromotionError("Choose a published event that has not ended.");
+      return;
+    }
+    if (!editingPromotion && promotionRecords.some(record => record.event_id === chosenEvent.id)) {
+      setPromotionError("This event already has a promotion. Edit its existing campaign instead.");
+      return;
+    }
+    if (!chosenClub) {
+      setPromotionError("Choose the club organizing this event.");
+      return;
+    }
+    if (!promotionForm.headline.trim()) {
+      setPromotionError("Add a headline for this promotion.");
+      return;
+    }
+
+    const startsAt = new Date(promotionForm.starts_at);
+    const endsAt = promotionForm.ends_at ? new Date(promotionForm.ends_at) : null;
+    if (Number.isNaN(startsAt.getTime()) || (endsAt && Number.isNaN(endsAt.getTime()))) {
+      setPromotionError("Enter valid promotion dates.");
+      return;
+    }
+    if (endsAt && endsAt.getTime() <= startsAt.getTime()) {
+      setPromotionError("The promotion end time must be after its start time.");
+      return;
+    }
+    if (promotionForm.headline.trim().length > 120 || promotionForm.message.trim().length > 420) {
+      setPromotionError("Keep the headline under 120 characters and message under 420 characters.");
+      return;
+    }
+
+    setPromotionSaving(true);
+    setPromotionError("");
+    setPromotionActionMessage("");
+
+    try {
+      const { data: authData, error: authError } = await client.auth.getUser();
+      if (authError || !authData.user) throw new Error("Please sign in again to manage event promotions.");
+
+      const updatedAt = new Date().toISOString();
+      const payload = {
+        event_id: chosenEvent.id,
+        club_id: chosenClub.id,
+        headline: promotionForm.headline.trim(),
+        message: promotionForm.message.trim(),
+        cta_label: promotionForm.cta_label.trim().slice(0, 32) || "Explore event",
+        theme: promotionForm.theme,
+        animation_style: promotionForm.animation_style,
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt ? endsAt.toISOString() : null,
+        is_active: promotionForm.is_active,
+        display_priority: Math.max(0, Math.min(999, Number.parseInt(promotionForm.display_priority, 10) || 0)),
+        updated_by: authData.user.id,
+        updated_at: updatedAt,
+      };
+
+      const result = editingPromotion
+        ? await (
+            // This table is not present in the project’s generated Supabase types yet.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            client as any
+          )
+            .from("activity_event_promotions")
+            .update(payload)
+            .eq("id", editingPromotion.id)
+            .select("*")
+            .single()
+        : await (
+            // This table is not present in the project’s generated Supabase types yet.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            client as any
+          )
+            .from("activity_event_promotions")
+            .insert({ ...payload, created_by: authData.user.id })
+            .select("*")
+            .single();
+
+      if (result.error) throw result.error;
+      const saved = result.data as ActivityEventPromotion;
+
+      setPromotionRecords(current => {
+        const next = editingPromotion
+          ? current.map(item => item.id === saved.id ? saved : item)
+          : [saved, ...current];
+        return next.sort((a, b) => a.display_priority - b.display_priority);
+      });
+      setPromotionIndex(0);
+      setShowPromotionForm(false);
+      setEditingPromotion(null);
+      setPromotionActionMessage(editingPromotion ? "Event promotion updated." : "Event promotion published.");
+    } catch (error) {
+      console.error("[Activity Center] save event promotion failed", error);
+      setPromotionError(
+        error instanceof Error
+          ? error.message
+          : "Unable to save event promotion."
+      );
+    } finally {
+      setPromotionSaving(false);
+    }
+  };
+
+  const toggleEventPromotion = async (record: ActivityEventPromotion) => {
+    if (!canManage) return;
+    const client = getSupabaseClient();
+    if (!client) return setPromotionError("CampusConnect is not connected to Supabase.");
+
+    try {
+      const { data: authData, error: authError } = await client.auth.getUser();
+      if (authError || !authData.user) throw new Error("Please sign in again to manage event promotions.");
+      const { data, error } = await (
+        // This table is not present in the project’s generated Supabase types yet.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client as any
+      )
+        .from("activity_event_promotions")
+        .update({
+          is_active: !record.is_active,
+          updated_by: authData.user.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", record.id)
+        .select("*")
+        .single();
+      if (error) throw error;
+      const updated = data as ActivityEventPromotion;
+      setPromotionRecords(current => current.map(item => item.id === updated.id ? updated : item));
+      setPromotionActionMessage(updated.is_active ? "Promotion activated." : "Promotion paused.");
+    } catch (error) {
+      setPromotionError(error instanceof Error ? error.message : "Unable to update event promotion.");
+    }
+  };
+
+  const deleteEventPromotion = async (record: ActivityEventPromotion) => {
+    if (!canManage) return;
+    const event = promotionEvents.find(item => item.id === record.event_id);
+    if (!window.confirm(`Remove the promotion for “${event?.title || record.headline}”? The campus event itself will not be deleted.`)) return;
+    const client = getSupabaseClient();
+    if (!client) return setPromotionError("CampusConnect is not connected to Supabase.");
+
+    const { error } = await (
+      // This table is not present in the project’s generated Supabase types yet.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      client as any
+    )
+      .from("activity_event_promotions")
+      .delete()
+      .eq("id", record.id);
+    if (error) {
+      setPromotionError(error.message);
+      return;
+    }
+    setPromotionRecords(current => current.filter(item => item.id !== record.id));
+    setPromotionActionMessage("Promotion removed. The event itself is unchanged.");
+  };
+
+  const openPromotion = (promotion: ActiveActivityEventPromotion) => {
+    const registrationUrl = promotion.event.registration_url?.trim();
+    if (registrationUrl && /^https?:\/\//i.test(registrationUrl)) {
+      window.open(registrationUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    setSelectedClubId(promotion.club_id);
+    window.requestAnimationFrame(() => {
+      const workspace = document.querySelector(".workspace") as HTMLElement | null;
+      workspace?.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  };
+
 
   // =========================================================
   // PRIVATE ACTIVITY CENTER MEDIA
   // =========================================================
-
-  const getActivityStoragePath =
-    (
-      value:
-        string |
-        null |
-        undefined
-    ) => {
-
-      if (!value) {
-        return null;
-      }
-
-      /*
-       * New records may already contain only the object path.
-       */
-      if (
-        !value.startsWith(
-          "http://"
-        ) &&
-        !value.startsWith(
-          "https://"
-        )
-      ) {
-        return value
-          .replace(
-            /^\/+/,
-            ""
-          );
-      }
-
-
-      /*
-       * Existing records currently contain URLs such as:
-       *
-       * /storage/v1/object/public/activity-center/<path>
-       *
-       * or
-       *
-       * /storage/v1/object/sign/activity-center/<path>
-       */
-
-      const publicMarker =
-        "/storage/v1/object/public/activity-center/";
-
-      const signedMarker =
-        "/storage/v1/object/sign/activity-center/";
-
-      const authenticatedMarker =
-        "/storage/v1/object/authenticated/activity-center/";
-
-      let pathValue =
-        "";
-
-
-      if (
-        value.includes(
-          publicMarker
-        )
-      ) {
-        pathValue =
-          value.split(
-            publicMarker
-          )[1] || "";
-
-      } else if (
-        value.includes(
-          signedMarker
-        )
-      ) {
-        pathValue =
-          value.split(
-            signedMarker
-          )[1] || "";
-
-      } else if (
-        value.includes(
-          authenticatedMarker
-        )
-      ) {
-        pathValue =
-          value.split(
-            authenticatedMarker
-          )[1] || "";
-
-      } else {
-
-        return null;
-
-      }
-
-
-      /*
-       * Remove signed URL query parameters.
-       */
-      pathValue =
-        pathValue.split(
-          "?"
-        )[0];
-
-
-      try {
-        return decodeURIComponent(
-          pathValue
-        );
-      } catch {
-        return pathValue;
-      }
-    };
-
-
   /*
    * =========================================================
    * ACTIVITY CENTER MEDIA RESOLVER
@@ -452,6 +756,7 @@ export function ActivityCenter({
    */
 
   const createActivitySignedUrl =
+    useCallback(
     async (
       value: string | null | undefined
     ): Promise<string | null> => {
@@ -553,9 +858,10 @@ export function ActivityCenter({
         data?.signedUrl ||
         null
       );
-    };
+    }, []);
 
   const signClubMedia =
+    useCallback(
     async (
       club: Club
     ): Promise<Club> => {
@@ -600,10 +906,10 @@ export function ActivityCenter({
         poster_url:
           posterUrl,
       };
-    };
-
+    }, [createActivitySignedUrl]);
 
   const signSportMedia =
+    useCallback(
     async (
       sport: Sport
     ): Promise<Sport> => {
@@ -640,8 +946,7 @@ export function ActivityCenter({
         poster_url:
           posterUrl,
       };
-    };
-
+    }, [createActivitySignedUrl]);
 
   const signMemberMedia =
     async (
@@ -679,7 +984,7 @@ export function ActivityCenter({
     };
 
 
-  const loadActivityCenter =
+  const loadActivityCenter = useCallback(
     async () => {
       const client =
         getSupabaseClient();
@@ -1041,8 +1346,7 @@ export function ActivityCenter({
        * Keep the independent sports task alive.
        */
       void sportTask;
-    };
-
+     }, [signClubMedia, signSportMedia]);
 
   const loadClubDetail =
     async (
@@ -1171,17 +1475,45 @@ export function ActivityCenter({
 
 
   useEffect(() => {
-    void loadActivityCenter();
+    const updateClock = () => setActivityCenterNow(Date.now());
+    updateClock();
+    const clockTimer = window.setInterval(updateClock, 60_000);
+    return () => window.clearInterval(clockTimer);
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadActivityCenter();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadActivityCenter]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadEventPromotions();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (visiblePromotionCount <= 1) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timer = window.setInterval(() => {
+      setPromotionIndex(current => (current + 1) % visiblePromotionCount);
+    }, 6500);
+
+    return () => window.clearInterval(timer);
+  }, [visiblePromotionCount]);
 
 
   useEffect(() => {
-    void loadClubDetail(
-      selectedClubId
-    );
-  }, [
-    selectedClubId,
-  ]);
+    const timer = window.setTimeout(() => {
+      void loadClubDetail(selectedClubId);
+    }, 0);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Reload when the selected club changes.
+  }, [selectedClubId]);
 
 
   // =========================================================
@@ -1446,7 +1778,7 @@ export function ActivityCenter({
 
         `${folder}/` +
 
-        `${Date.now()}-` +
+        `${crypto.randomUUID()}-` +
 
         `${crypto.randomUUID()}-` +
 
@@ -2938,6 +3270,144 @@ export function ActivityCenter({
       </section>
 
 
+      {currentEventPromotion ? (
+        <section
+          className={`activityPromoShowcase activityPromoShowcase--${currentEventPromotion.theme} activityPromoAnimation--${currentEventPromotion.animation_style}`}
+          aria-label="Featured campus event"
+          aria-live="polite"
+        >
+          {currentEventPromotion.event.banner_url && (
+            <img
+              className="activityPromoBackgroundImage"
+              src={currentEventPromotion.event.banner_url}
+              alt=""
+              aria-hidden="true"
+            />
+          )}
+          <div className="activityPromoDecoration activityPromoDecorationOne" aria-hidden="true" />
+          <div className="activityPromoDecoration activityPromoDecorationTwo" aria-hidden="true" />
+
+          <div className="activityPromoMain">
+            <div className="activityPromoTopline">
+              <span className="activityPromoKicker">
+                <span className="activityPromoPulse" aria-hidden="true" />
+                CAMPUS EVENT SPOTLIGHT
+              </span>
+              <span className="activityPromoCategory">
+                {currentEventPromotion.event.category || "Campus event"}
+              </span>
+            </div>
+
+            <p className="activityPromoHostedBy">
+              Presented by {currentEventPromotion.club.name}
+            </p>
+            <h2>{currentEventPromotion.headline || currentEventPromotion.event.title}</h2>
+            <p className="activityPromoMessage">
+              {currentEventPromotion.message ||
+                currentEventPromotion.event.short_description ||
+                currentEventPromotion.event.description ||
+                currentEventPromotion.event.title}
+            </p>
+
+            <div className="activityPromoMeta">
+              <span>
+                <strong aria-hidden="true">◷</strong>
+                {new Date(currentEventPromotion.event.event_date).toLocaleDateString(undefined, {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+              {currentEventPromotion.event.venue && (
+                <span>
+                  <strong aria-hidden="true">⌖</strong>
+                  {currentEventPromotion.event.venue}
+                </span>
+              )}
+            </div>
+
+            <div className="activityPromoActions">
+              <button
+                type="button"
+                className="activityPromoCta"
+                onClick={() => openPromotion(currentEventPromotion)}
+              >
+                {currentEventPromotion.cta_label || "Explore event"}
+                <span aria-hidden="true">↗</span>
+              </button>
+              {visibleEventPromotions.length > 1 && (
+                <div className="activityPromoNavigation" aria-label="Browse promoted events">
+                  <button
+                    type="button"
+                    aria-label="Previous promoted event"
+                    onClick={() => setPromotionIndex(index => (index - 1 + visibleEventPromotions.length) % visibleEventPromotions.length)}
+                  >
+                    ‹
+                  </button>
+                  <span>{(promotionIndex % visibleEventPromotions.length) + 1} / {visibleEventPromotions.length}</span>
+                  <button
+                    type="button"
+                    aria-label="Next promoted event"
+                    onClick={() => setPromotionIndex(index => (index + 1) % visibleEventPromotions.length)}
+                  >
+                    ›
+                  </button>
+                </div>
+              )}
+              {canManage && (
+                <button
+                  type="button"
+                  className="activityPromoManageLink"
+                  onClick={() => {
+                    setShowPromotionManager(true);
+                    setShowPromotionForm(false);
+                    setPromotionActionMessage("");
+                    void loadEventPromotions();
+                  }}
+                >
+                  Edit promotions
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="activityPromoArt" aria-hidden="true">
+            <span className="activityPromoArtOrb activityPromoArtOrbOne" />
+            <span className="activityPromoArtOrb activityPromoArtOrbTwo" />
+            <span className="activityPromoArtRibbon" />
+            <span className="activityPromoArtStar">✦</span>
+            <span className="activityPromoArtTitle">EVENT<br />MODE</span>
+          </div>
+
+          <ActivityEventSponsors showEmptyState={canManage} />
+        </section>
+      ) : canManage ? (
+        <section className="activityPromoEmpty">
+          <div className="activityPromoEmptyMark" aria-hidden="true">✦</div>
+          <div>
+            <span className="activityPromoEmptyKicker">CAMPUS EVENT SPOTLIGHT</span>
+            <h2>Give your next event its moment.</h2>
+            <p>Promote a published campus event with a colorful animated feature across Activity Center and its organizing club card.</p>
+            {promotionError && <p className="activityPromoErrorInline">{promotionError}</p>}
+          </div>
+          <button
+            type="button"
+            className="activityPromoCta"
+            onClick={() => {
+              setShowPromotionManager(true);
+              setShowPromotionForm(false);
+              setPromotionActionMessage("");
+              void loadEventPromotions();
+            }}
+          >
+            Open promotion studio <span aria-hidden="true">↗</span>
+          </button>
+        </section>
+      ) : null}
+
+
+
+
       <div className="activityTabs">
 
         <button
@@ -3082,15 +3552,17 @@ export function ActivityCenter({
             <section className="activityClubGrid">
 
               {visibleClubs.map(
-                club => (
+                club => {
+                  const clubPromotion = visibleEventPromotions.find(
+                    promotion => promotion.club_id === club.id
+                  );
+
+                  return (
                   <button
                     type="button"
                     key={club.id}
                     className={
-                      club.id ===
-                      selectedClubId
-                        ? "activityClubCard active"
-                        : "activityClubCard"
+                      `${club.id === selectedClubId ? "activityClubCard active" : "activityClubCard"}${clubPromotion ? " activityClubCard--promoting" : ""}`
                     }
                     onClick={() => {
 
@@ -3151,6 +3623,17 @@ export function ActivityCenter({
                         <span className="activityFeaturedBadge">
                           Featured
                         </span>
+                      )}
+
+                      {clubPromotion && (
+                        <div className={`activityClubEventPromo activityClubEventPromo--${clubPromotion.theme}`} aria-label={`Promoted event: ${clubPromotion.event.title}`}>
+                          <span className="activityClubEventPromoSpark" aria-hidden="true">✦</span>
+                          <span>
+                            <small>UPCOMING EVENT</small>
+                            <strong>{clubPromotion.event.title}</strong>
+                          </span>
+                          <span className="activityClubEventPromoArrow" aria-hidden="true">↗</span>
+                        </div>
                       )}
 
                     </div>
@@ -3218,7 +3701,8 @@ export function ActivityCenter({
                     </div>
 
                   </button>
-                )
+                  );
+                }
               )}
 
 
@@ -6006,6 +6490,263 @@ export function ActivityCenter({
 
           </form>
 
+        </div>
+      )}
+
+
+      {showPromotionManager && canManage && (
+        <div
+          className="activityPromoManagerScrim"
+          onClick={() => {
+            setShowPromotionManager(false);
+            setShowPromotionForm(false);
+          }}
+        >
+          <section
+            className="activityPromoManagerDialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="activity-promo-manager-title"
+            onClick={event => event.stopPropagation()}
+          >
+            <header className="activityPromoManagerHeader">
+              <div>
+                <span>ACTIVITY CENTER · ADMIN STUDIO</span>
+                <h2 id="activity-promo-manager-title">
+                  {showPromotionForm ? (editingPromotion ? "Edit event promotion" : "Create event promotion") : "Event promotion studio"}
+                </h2>
+                <p>Promotions appear automatically on Activity Center and on the organizing club card.</p>
+              </div>
+              <button
+                type="button"
+                className="activityPromoCloseButton"
+                aria-label="Close event promotion studio"
+                onClick={() => {
+                  setShowPromotionManager(false);
+                  setShowPromotionForm(false);
+                }}
+              >
+                ×
+              </button>
+            </header>
+
+            {promotionActionMessage && (
+              <div className="activityPromoNotice" role="status">{promotionActionMessage}</div>
+            )}
+
+            {promotionError && (
+              <div className="activityPromoFormError" role="alert">{promotionError}</div>
+            )}
+
+            {showPromotionForm ? (
+              <form className="activityPromoForm" onSubmit={saveEventPromotion}>
+                <div className="activityPromoFormGrid">
+                  <label>
+                    <span>Published event</span>
+                    <select
+                      required
+                      value={promotionForm.event_id}
+                      onChange={event => setPromotionForm(current => ({ ...current, event_id: event.target.value }))}
+                    >
+                      <option value="">Choose an event</option>
+                      {promotionEvents
+                        .filter(event => availablePromotionEvents.some(item => item.id === event.id) || event.id === promotionForm.event_id)
+                        .map(event => (
+                          <option key={event.id} value={event.id}>
+                            {event.title} · {new Date(event.event_date).toLocaleDateString()}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Organizing club</span>
+                    <select
+                      required
+                      value={promotionForm.club_id}
+                      onChange={event => setPromotionForm(current => ({ ...current, club_id: event.target.value }))}
+                    >
+                      <option value="">Choose a club</option>
+                      {clubs.map(club => <option key={club.id} value={club.id}>{club.name}</option>)}
+                    </select>
+                  </label>
+
+                  <label className="activityPromoWideField">
+                    <span>Promotion headline</span>
+                    <input
+                      required
+                      maxLength={120}
+                      value={promotionForm.headline}
+                      onChange={event => setPromotionForm(current => ({ ...current, headline: event.target.value }))}
+                      placeholder="Make your moment count"
+                    />
+                  </label>
+
+                  <label className="activityPromoWideField">
+                    <span>Supporting message</span>
+                    <textarea
+                      rows={3}
+                      maxLength={420}
+                      value={promotionForm.message}
+                      onChange={event => setPromotionForm(current => ({ ...current, message: event.target.value }))}
+                      placeholder="Tell students why they should join."
+                    />
+                  </label>
+
+                  <label>
+                    <span>Button label</span>
+                    <input
+                      maxLength={32}
+                      value={promotionForm.cta_label}
+                      onChange={event => setPromotionForm(current => ({ ...current, cta_label: event.target.value }))}
+                      placeholder="Explore event"
+                    />
+                  </label>
+
+                  <label>
+                    <span>Color palette</span>
+                    <select
+                      value={promotionForm.theme}
+                      onChange={event => setPromotionForm(current => ({ ...current, theme: event.target.value as PromotionTheme }))}
+                    >
+                      <option value="copper">Copper + champagne</option>
+                      <option value="coral">Coral + warm gold</option>
+                      <option value="gold">Golden hour</option>
+                      <option value="rose">Rose + copper</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Animation</span>
+                    <select
+                      value={promotionForm.animation_style}
+                      onChange={event => setPromotionForm(current => ({ ...current, animation_style: event.target.value as PromotionAnimation }))}
+                    >
+                      <option value="confetti">Celebration confetti</option>
+                      <option value="spotlight">Moving spotlight</option>
+                      <option value="orbit">Orbiting accents</option>
+                      <option value="shimmer">Soft shimmer</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Start showing</span>
+                    <input
+                      required
+                      type="datetime-local"
+                      value={promotionForm.starts_at}
+                      onChange={event => setPromotionForm(current => ({ ...current, starts_at: event.target.value }))}
+                    />
+                  </label>
+
+                  <label>
+                    <span>Stop showing (optional)</span>
+                    <input
+                      type="datetime-local"
+                      value={promotionForm.ends_at}
+                      onChange={event => setPromotionForm(current => ({ ...current, ends_at: event.target.value }))}
+                    />
+                  </label>
+
+                  <label>
+                    <span>Priority (lower appears first)</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="999"
+                      value={promotionForm.display_priority}
+                      onChange={event => setPromotionForm(current => ({ ...current, display_priority: event.target.value }))}
+                    />
+                  </label>
+
+                  <label className="activityPromoToggleField">
+                    <input
+                      type="checkbox"
+                      checked={promotionForm.is_active}
+                      onChange={event => setPromotionForm(current => ({ ...current, is_active: event.target.checked }))}
+                    />
+                    <span>Activate promotion when its start time arrives</span>
+                  </label>
+                </div>
+
+                {promotionForm.event_id && promotionForm.club_id && (
+                  <div className={`activityPromoFormPreview activityPromoShowcase--${promotionForm.theme}`}>
+                    <span className="activityPromoEmptyKicker">LIVE STYLE PREVIEW</span>
+                    <strong>{promotionForm.headline || promotionEvents.find(event => event.id === promotionForm.event_id)?.title || "Event headline"}</strong>
+                    <p>{promotionForm.message || "Your event message will appear here."}</p>
+                    <small>{clubs.find(club => club.id === promotionForm.club_id)?.name}</small>
+                  </div>
+                )}
+
+                <footer className="activityPromoFormActions">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPromotionForm(false);
+                      setEditingPromotion(null);
+                      setPromotionError("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="activityPromoCta" disabled={promotionSaving}>
+                    {promotionSaving ? "Saving…" : editingPromotion ? "Save changes" : "Publish promotion"}
+                  </button>
+                </footer>
+              </form>
+            ) : (
+              <div className="activityPromoManagerBody">
+                <div className="activityPromoManagerToolbar">
+                  <div>
+                    <strong>{promotionRecords.length} saved {promotionRecords.length === 1 ? "promotion" : "promotions"}</strong>
+                    <span>Only Main Admins and Coordinators can edit these campaigns.</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="activityPromoCta"
+                    onClick={startPromotionCreate}
+                    disabled={!availablePromotionEvents.length || !clubs.length}
+                  >
+                    + Create promotion
+                  </button>
+                </div>
+
+                {!availablePromotionEvents.length && (
+                  <p className="activityPromoManagerEmpty">No published, upcoming campus events are available to promote yet. Publish an event first.</p>
+                )}
+
+                {promotionLoading ? (
+                  <p className="activityPromoManagerEmpty">Loading promotions…</p>
+                ) : promotionRecords.length ? (
+                  <div className="activityPromoManagerList">
+                    {promotionRecords.map(record => {
+                      const event = promotionEvents.find(item => item.id === record.event_id);
+                      const club = clubs.find(item => item.id === record.club_id);
+                      return (
+                        <article className="activityPromoManagerItem" key={record.id}>
+                          <div className={`activityPromoManagerSwatch activityPromoManagerSwatch--${record.theme}`} aria-hidden="true">✦</div>
+                          <div className="activityPromoManagerItemCopy">
+                            <strong>{record.headline || event?.title || "Untitled promotion"}</strong>
+                            <span>{event?.title || "Event unavailable"} · {club?.name || "Club unavailable"}</span>
+                            <small className={record.is_active ? "activityPromoState activityPromoState--active" : "activityPromoState"}>
+                              {record.is_active ? "Active / scheduled" : "Paused"}
+                            </small>
+                          </div>
+                          <div className="activityPromoManagerItemActions">
+                            <button type="button" onClick={() => startPromotionEdit(record)}>Edit</button>
+                            <button type="button" onClick={() => void toggleEventPromotion(record)}>{record.is_active ? "Pause" : "Activate"}</button>
+                            <button type="button" className="activityPromoRemoveButton" onClick={() => void deleteEventPromotion(record)}>Remove</button>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="activityPromoManagerEmpty">No promotions yet. Create one to feature a published event on Activity Center and its organizing club card.</p>
+                )}
+              </div>
+            )}
+          </section>
         </div>
       )}
 

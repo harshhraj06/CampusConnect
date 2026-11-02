@@ -1,0 +1,1701 @@
+/* ==========================================================================
+   CampusConnect — Official Administrative Dossier & Record Hub
+   Design Aesthetics: State-of-the-art institutional elegance, glassmorphism,
+   crisp typography, vibrant badges, and official print certification layout.
+   ========================================================================== */
+
+.dossierRoot {
+  width: 100%;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   Top Action & Header Strip
+   -------------------------------------------------------------------------- */
+.dossierTopNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: linear-gradient(135deg, #0c1e33 0%, #173b70 100%);
+  color: #ffffff;
+  padding: 20px 28px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+  margin-bottom: 24px;
+}
+
+.dossierBrandCluster {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dossierBrandLogos {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dossierLogoRnsit {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.dossierLogoDivider {
+  width: 1px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.dossierLogoCc {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.dossierTopTitles h2 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+  color: #ffffff;
+}
+
+.dossierTopTitles p {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.dossierTopActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dossierPrintBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f28c28;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(242, 140, 40, 0.4);
+}
+
+.dossierPrintBtn:hover {
+  background: #e07c1a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(242, 140, 40, 0.5);
+}
+
+.dossierReloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dossierReloadBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* --------------------------------------------------------------------------
+   Search & Filter Hub
+   -------------------------------------------------------------------------- */
+.dossierSearchCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  margin-bottom: 24px;
+}
+
+.dossierSearchHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.dossierSearchHeader h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #172033;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dossierSearchBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #e0e7ff;
+  color: #3730a3;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dossierInputWrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.dossierInputIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.dossierSearchInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px 14px 44px;
+  font-size: 15px;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  outline: none;
+  color: #0f172a;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.dossierSearchInput:focus {
+  border-color: #173b70;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(23, 59, 112, 0.12);
+}
+
+.dossierQuickFilters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dossierFilterChip {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dossierFilterChip:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.dossierFilterChip.active {
+  background: #173b70;
+  border-color: #173b70;
+  color: #ffffff;
+}
+
+/* Candidate Results Grid */
+.dossierCandidateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.dossierCandidateCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dossierCandidateCard:hover {
+  border-color: #f28c28;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.dossierCandidateCard.selected {
+  border-color: #173b70;
+  background: #f0f7ff;
+  box-shadow: 0 0 0 2px #173b70;
+}
+
+.dossierCandidateMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.dossierAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #173b70, #2563eb);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  overflow: hidden;
+}
+
+.dossierAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.dossierAvatar.faculty {
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+}
+
+.dossierCandidateInfo {
+  overflow: hidden;
+}
+
+.dossierCandidateName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.dossierCandidateTags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.dossierRoleBadge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.dossierRoleBadge.student {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.dossierRoleBadge.faculty {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.dossierRoleBadge.admin {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.dossierRoleBadge.other {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* --------------------------------------------------------------------------
+   Official Printable Institutional Dossier Sheet
+   -------------------------------------------------------------------------- */
+.dossierOfficialSheet {
+  background: #ffffff;
+  border: 2px solid #173b70;
+  border-top: 6px solid #f28c28;
+  border-radius: 16px;
+  padding: 36px 40px;
+  box-shadow: 0 15px 35px -5px rgba(15, 23, 42, 0.1);
+  position: relative;
+  margin-bottom: 32px;
+}
+
+/* Institutional Crest & Watermark Header */
+.dossierOfficialHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2.5px solid #173b70;
+  padding-bottom: 20px;
+  margin-bottom: 26px;
+  position: relative;
+}
+
+.dossierHeaderLogoLeft {
+  height: 64px;
+  width: auto;
+  object-fit: contain;
+}
+
+.dossierHeaderLogoRight {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+}
+
+.dossierHeaderTitleBlock {
+  text-align: center;
+  flex: 1;
+  padding: 0 20px;
+}
+
+.dossierCollegeTitle {
+  font-size: 20px;
+  font-weight: 900;
+  color: #173b70;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+
+.dossierCollegeSubtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1.4;
+  margin: 0 0 4px;
+}
+
+.dossierReportSubject {
+  display: inline-block;
+  background: #173b70;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+/* Meta Bar */
+.dossierMetaBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 20px;
+}
+
+/* --------------------------------------------------------------------------
+   Certified Candidate Identity & Photograph Banner (Print-Ready)
+   -------------------------------------------------------------------------- */
+.dossierCandidateIdentityBanner {
+  display: flex;
+  align-items: stretch;
+  gap: 22px;
+  background: linear-gradient(to right, #f8fafc, #ffffff);
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.dossierCandidatePhotoFrame {
+  position: relative;
+  width: 120px;
+  min-width: 120px;
+  height: 148px;
+  background: #e2e8f0;
+  border: 2px solid #173b70;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+}
+
+.dossierPassportPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.dossierPassportPhotoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
+  color: #173b70;
+}
+
+.dossierPhotoInitials {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.dossierNoPhotoLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.dossierPhotoSealBadge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(23, 59, 112, 0.92);
+  color: #ffffff;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-align: center;
+  padding: 3px 0;
+  text-transform: uppercase;
+}
+
+.dossierCandidateDetailsBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dossierCandidateTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.dossierCandidateNameTitle {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+}
+
+.dossierCandidateRoleSub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dossierDeptBadge {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.dossierStatusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.dossierStatusBadge.active {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.dossierCandidateIdentifiersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: auto;
+}
+
+.dossierIdBox {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dossierIdBox.highlight {
+  background: #173b70;
+  border-color: #173b70;
+  color: #ffffff;
+}
+
+.dossierIdBox.highlight .dossierIdLabel {
+  color: #93c5fd;
+}
+
+.dossierIdBox.highlight .dossierIdValue {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.dossierIdLabel {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.dossierIdValue {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.dossierIdValue.accent {
+  color: #15803d;
+}
+
+/* --------------------------------------------------------------------------
+   Photo Management Control Inside Edit Form
+   -------------------------------------------------------------------------- */
+.dossierPhotoEditorCard {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.dossierPhotoEditorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.dossierRemovePhotoBtn {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dossierRemovePhotoBtn:hover {
+  background: #fecaca;
+}
+
+.dossierPhotoEditorBody {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dossierPhotoEditorPreview {
+  width: 72px;
+  height: 88px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f1f5f9;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dossierPhotoThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dossierPhotoThumbPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 20px;
+}
+
+.dossierPhotoThumbPlaceholder small {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.dossierPhotoEditorInputs {
+  flex: 1;
+}
+
+.dossierPhotoUploadRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dossierUploadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #173b70;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dossierUploadBtn:hover {
+  background: #1e40af;
+}
+
+/* --------------------------------------------------------------------------
+   Editable Profile & USN Form Panel
+   -------------------------------------------------------------------------- */
+.dossierProfileSection {
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-left: 5px solid #173b70;
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 28px;
+}
+
+.dossierSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.dossierSectionHeader h4 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dossierFormGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.dossierField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dossierField label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dossierInput {
+  padding: 10px 14px;
+  font-size: 13.5px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: #0f172a;
+  transition: all 0.15s ease;
+}
+
+.dossierInput:focus {
+  border-color: #173b70;
+  box-shadow: 0 0 0 3px rgba(23, 59, 112, 0.15);
+}
+
+.dossierInput.highlight {
+  border-color: #f28c28;
+  background: #fffbf7;
+  font-weight: 700;
+  color: #c2410c;
+}
+
+.dossierInput:disabled {
+  background: #e2e8f0;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.dossierFormActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.dossierSaveBtn {
+  background: #173b70;
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  padding: 10px 22px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(23, 59, 112, 0.25);
+}
+
+.dossierSaveBtn:hover:not(:disabled) {
+  background: #0f274c;
+  transform: translateY(-1px);
+}
+
+.dossierSaveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Student Result History Section
+   -------------------------------------------------------------------------- */
+.dossierResultsContainer {
+  margin-bottom: 28px;
+}
+
+.dossierMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.dossierMetricCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.dossierMetricValue {
+  font-size: 24px;
+  font-weight: 900;
+  color: #173b70;
+  margin-bottom: 4px;
+}
+
+.dossierMetricValue.success {
+  color: #15803d;
+}
+
+.dossierMetricLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+/* Semester Result Cards */
+.dossierSemCard {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+}
+
+.dossierSemHeader {
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dossierSemTitle {
+  font-size: 14px;
+  font-weight: 800;
+  color: #173b70;
+}
+
+.dossierSemStats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dossierTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.dossierTable th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.dossierTable td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.dossierTable tr:last-child td {
+  border-bottom: none;
+}
+
+.dossierTable tr:hover {
+  background: #f8fafc;
+}
+
+.dossierGradeBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 11px;
+}
+
+.dossierGradeBadge.pass {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.dossierGradeBadge.fail {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* --------------------------------------------------------------------------
+   Faculty Working Hours & Teaching Ledger Section
+   -------------------------------------------------------------------------- */
+.dossierFacultyContainer {
+  margin-bottom: 28px;
+}
+
+.dossierWorkloadGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.dossierWorkloadCard {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+
+.dossierWorkloadHours {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0f766e;
+  margin-bottom: 2px;
+}
+
+.dossierWorkloadTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+/* --------------------------------------------------------------------------
+   Official Institutional Certification & Signatures Block
+   -------------------------------------------------------------------------- */
+.dossierSignatureBlock {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-top: 2px solid #cbd5e1;
+  padding-top: 28px;
+  margin-top: 36px;
+  page-break-inside: avoid;
+}
+
+.dossierSignatureItem {
+  text-align: center;
+  width: 200px;
+}
+
+.dossierSignatureLine {
+  border-bottom: 1.5px solid #64748b;
+  margin-bottom: 8px;
+  height: 36px;
+}
+
+.dossierSignatureRole {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #172033;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dossierSignatureSub {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.dossierOfficialSeal {
+  width: 90px;
+  height: 90px;
+  border: 2px dashed #173b70;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #173b70;
+  text-align: center;
+  padding: 6px;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.dossierDisclaimer {
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 10px;
+  color: #94a3b8;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Student Attendance Ledger Styles
+   -------------------------------------------------------------------------- */
+.dossierAttendanceContainer {
+  margin-bottom: 28px;
+}
+
+.dossierProgressBar {
+  width: 90px;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.dossierProgressFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.dossierProgressFill.safe {
+  background: #16a34a;
+}
+
+.dossierProgressFill.warning {
+  background: #f59e0b;
+}
+
+.dossierProgressFill.danger {
+  background: #dc2626;
+}
+
+.dossierAttendanceBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 14px;
+}
+
+.dossierAttendanceBadge.safe {
+  background: #ecfdf5;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.dossierAttendanceBadge.eligible {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.dossierAttendanceBadge.warning {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.dossierAttendanceBadge.danger {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* --------------------------------------------------------------------------
+   Feedback / Status Alerts
+   -------------------------------------------------------------------------- */
+.dossierAlert {
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dossierAlert.success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.dossierAlert.error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.dossierPrintDualGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dossierTableFoot tr {
+  background: #f8fafc;
+  border-top: 2px solid #cbd5e1;
+  font-weight: 700;
+}
+
+.dossierTableFoot td {
+  padding: 10px 14px;
+  border-top: 1.5px solid #cbd5e1;
+  color: #0f172a;
+}
+
+/* --------------------------------------------------------------------------
+   EXECUTIVE 1-PAGE A4 PRINT STYLES (@media print)
+   Strictly engineered to format all institutional credentials, photo, USN,
+   attendance ledger, grade progression, and signatures onto a SINGLE PAGE.
+   -------------------------------------------------------------------------- */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 4mm 6mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 6.5pt !important;
+    line-height: 1.1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 289mm !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Purge exterior document flow when isolated print host is mounted */
+  body.cc-printing-dossier-active > *:not(#cc-dossier-print-host) {
+    display: none !important;
+  }
+
+  #cc-dossier-print-host {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  /* Force visibility on dossier sheet and print host */
+  .dossierOfficialSheet,
+  .dossierOfficialSheet * {
+    visibility: visible !important;
+  }
+
+  #cc-dossier-print-host,
+  #cc-dossier-print-host * {
+    visibility: visible !important;
+  }
+
+  /* Single-page absolute container — allow natural height but cap at page bounds */
+  .dossierOfficialSheet {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 280mm !important;
+    overflow: hidden !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: avoid !important;
+    break-before: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #cc-dossier-print-host .dossierOfficialSheet {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  /* Hide screen chrome & controls */
+  .dossierTopNav,
+  .dossierSearchCard,
+  .dossierFormActions,
+  .dossierPhotoEditorCard,
+  .dossierProfileSection,
+  .dossierQuickFilters,
+  .dossierInputIcon,
+  .dossierAlert,
+  .dossierCandidateGrid,
+  .dossierReloadBtn,
+  .dossierPrintBtn,
+  .dossierMetricsGrid,
+  .dossierDetailedBreakdownCards,
+  .dossierCieMarksSection,
+  .shell > aside,
+  .workspace > header,
+  .workspace > footer,
+  nav,
+  header,
+  footer,
+  aside,
+  button {
+    display: none !important;
+  }
+
+  /* Ultra-compact official letterhead */
+  .dossierOfficialHeader {
+    border-bottom: 1.5pt solid #173b70 !important;
+    margin-bottom: 3pt !important;
+    padding-bottom: 2pt !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .dossierHeaderLogoLeft,
+  .dossierHeaderLogoRight {
+    height: 30px !important;
+    width: auto !important;
+  }
+
+  .dossierHeaderTitleBlock {
+    text-align: center !important;
+    padding: 0 8px !important;
+  }
+
+  .dossierCollegeTitle {
+    font-size: 12pt !important;
+    font-weight: 900 !important;
+    color: #173b70 !important;
+    margin: 0 0 0.5px !important;
+    letter-spacing: -0.01em !important;
+    text-transform: uppercase !important;
+  }
+
+  .dossierCollegeSubtitle {
+    font-size: 5.5pt !important;
+    line-height: 1.1 !important;
+    margin: 0 0 1px !important;
+    color: #334155 !important;
+  }
+
+  .dossierReportSubject {
+    font-size: 6.5pt !important;
+    font-weight: 800 !important;
+    padding: 1px 6px !important;
+    margin-top: 0.5px !important;
+    background: #173b70 !important;
+    color: #ffffff !important;
+    border-radius: 2px !important;
+    display: inline-block !important;
+  }
+
+  /* Single-line metadata strip */
+  .dossierMetaBar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 2px 5px !important;
+    font-size: 5.5pt !important;
+    font-weight: 600 !important;
+    margin-bottom: 3pt !important;
+    border-radius: 2px !important;
+    background: #f8fafc !important;
+    border: 0.5pt solid #e2e8f0 !important;
+    color: #475569 !important;
+  }
+
+  /* Compact Candidate Identity Strip */
+  .dossierCandidateIdentityBanner {
+    display: flex !important;
+    align-items: stretch !important;
+    border: 1.2pt solid #173b70 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    padding: 5px 8px !important;
+    gap: 8px !important;
+    margin-bottom: 5pt !important;
+    border-radius: 5px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .dossierCandidatePhotoFrame {
+    width: 60px !important;
+    min-width: 60px !important;
+    height: 74px !important;
+    border: 1.5pt solid #173b70 !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    background: #f1f5f9 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .dossierPassportPhoto {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .dossierPhotoInitials {
+    font-size: 18px !important;
+  }
+
+  .dossierPhotoSealBadge {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: #173b70 !important;
+    color: #ffffff !important;
+    font-size: 5.5pt !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em !important;
+    text-align: center !important;
+    padding: 1.5px 0 !important;
+  }
+
+  .dossierCandidateDetailsBlock {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+
+  .dossierCandidateTitleRow {
+    margin-bottom: 3px !important;
+  }
+
+  .dossierCandidateNameTitle {
+    font-size: 12pt !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin: 0 0 2px !important;
+  }
+
+  .dossierCandidateRoleSub {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .dossierDeptBadge,
+  .dossierStatusBadge,
+  .dossierRoleBadge {
+    font-size: 6.5pt !important;
+    font-weight: 700 !important;
+    padding: 1px 5px !important;
+    border-radius: 3px !important;
+  }
+
+  .dossierCandidateIdentifiersGrid {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 4px !important;
+    margin-top: 2px !important;
+  }
+
+  .dossierIdBox {
+    padding: 3px 5px !important;
+    border-radius: 4px !important;
+    border: 1pt solid #cbd5e1 !important;
+    background: #f8fafc !important;
+  }
+
+  .dossierIdLabel {
+    font-size: 5.8pt !important;
+    font-weight: 800 !important;
+    margin-bottom: 1px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #64748b !important;
+    display: block !important;
+  }
+
+  .dossierIdValue {
+    font-size: 7.5pt !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+  }
+
+  .dossierIdBox.highlight {
+    background: #173b70 !important;
+    color: #ffffff !important;
+    border-color: #173b70 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .dossierIdBox.highlight .dossierIdLabel {
+    color: #93c5fd !important;
+  }
+
+  .dossierIdBox.highlight .dossierIdValue {
+    font-size: 8.5pt !important;
+    color: #ffffff !important;
+  }
+
+  /* Two-column side-by-side print grid */
+  .dossierPrintDualGrid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6pt !important;
+    margin-bottom: 4pt !important;
+    align-items: start !important;
+    page-break-inside: avoid !important;
+  }
+
+  .dossierAttendanceContainer,
+  .dossierResultsContainer {
+    margin-bottom: 0 !important;
+    page-break-inside: avoid !important;
+  }
+
+  .dossierSectionHeader {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 2pt !important;
+    padding-bottom: 1.5pt !important;
+    border-bottom: 1pt solid #cbd5e1 !important;
+  }
+
+  .dossierSectionHeader h4 {
+    font-size: 7.5pt !important;
+    font-weight: 800 !important;
+    color: #173b70 !important;
+    margin: 0 !important;
+  }
+
+  .dossierSemCard {
+    margin-bottom: 0 !important;
+    border-radius: 4px !important;
+    border: 1pt solid #cbd5e1 !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+    page-break-inside: avoid !important;
+  }
+
+  .dossierSemHeader {
+    padding: 2.5pt 5pt !important;
+    font-size: 7pt !important;
+    background: #f8fafc !important;
+    border-bottom: 1pt solid #cbd5e1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  .dossierSemTitle {
+    font-size: 7pt !important;
+    font-weight: 800 !important;
+    color: #173b70 !important;
+  }
+
+  .dossierTable {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 6.5pt !important;
+    page-break-inside: avoid !important;
+  }
+
+  .dossierTable th {
+    background: #f8fafc !important;
+    color: #334155 !important;
+    font-size: 6.2pt !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    padding: 2pt 4pt !important;
+    border-bottom: 1pt solid #cbd5e1 !important;
+    text-align: left !important;
+  }
+
+  .dossierTable td {
+    padding: 2pt 4pt !important;
+    border-bottom: 0.5pt solid #f1f5f9 !important;
+    color: #1e293b !important;
+    font-size: 6.5pt !important;
+    line-height: 1.15 !important;
+  }
+
+  .dossierTable tr:last-child td {
+    border-bottom: none !important;
+  }
+
+  .dossierTableFoot tr {
+    background: #f8fafc !important;
+    border-top: 1pt solid #cbd5e1 !important;
+  }
+
+  .dossierTableFoot td {
+    padding: 2pt 4pt !important;
+    border-top: 1pt solid #cbd5e1 !important;
+    font-size: 6.5pt !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+  }
+
+  .dossierProgressBar {
+    width: 36px !important;
+    height: 4px !important;
+    background: #e2e8f0 !important;
+    border-radius: 99px !important;
+    overflow: hidden !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+  }
+
+  .dossierProgressFill {
+    height: 100% !important;
+  }
+
+  .dossierProgressFill.safe { background: #16a34a !important; }
+  .dossierProgressFill.warning { background: #f59e0b !important; }
+  .dossierProgressFill.danger { background: #dc2626 !important; }
+
+  .dossierAttendanceBadge,
+  .dossierGradeBadge {
+    font-size: 5.8pt !important;
+    font-weight: 800 !important;
+    padding: 1px 4px !important;
+    border-radius: 3px !important;
+  }
+
+  /* Faculty Container Single-Page Optimization */
+  .dossierFacultyContainer {
+    margin-bottom: 0 !important;
+    page-break-inside: avoid !important;
+  }
+
+  .dossierWorkloadGrid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 4pt !important;
+    margin-bottom: 4pt !important;
+  }
+
+  .dossierWorkloadCard {
+    padding: 4pt 6pt !important;
+    border-radius: 4px !important;
+  }
+
+  .dossierWorkloadHours {
+    font-size: 11pt !important;
+    font-weight: 900 !important;
+    margin-bottom: 1px !important;
+  }
+
+  .dossierWorkloadTitle {
+    font-size: 5.8pt !important;
+  }
+
+  /* Compact Signature Block */
+  .dossierSignatureBlock {
+    margin-top: 6pt !important;
+    padding-top: 4pt !important;
+    border-top: 1.2pt solid #173b70 !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .dossierSignatureItem {
+    width: 110px !important;
+    text-align: center !important;
+  }
+
+  .dossierSignatureLine {
+    height: 20px !important;
+    border-bottom: 1pt solid #475569 !important;
+    margin-bottom: 3px !important;
+  }
+
+  .dossierSignatureRole {
+    font-size: 6.5pt !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+  }
+
+  .dossierSignatureSub {
+    font-size: 5.5pt !important;
+    color: #64748b !important;
+  }
+
+  .dossierOfficialSeal {
+    width: 46px !important;
+    height: 46px !important;
+    border: 1.5pt dashed #173b70 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 5pt !important;
+    font-weight: 800 !important;
+    color: #173b70 !important;
+    padding: 1px !important;
+    line-height: 1.15 !important;
+    text-transform: uppercase !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .dossierDisclaimer {
+    margin-top: 3pt !important;
+    padding-top: 2pt !important;
+    border-top: 0.5pt solid #cbd5e1 !important;
+    font-size: 5.5pt !important;
+    color: #64748b !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+  }
+}

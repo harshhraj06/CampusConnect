@@ -1,6 +1,7 @@
 "use client";
 
 import { InteractiveFooterGrid } from "./interactive-footer-grid";
+import { LegalLinks } from "./legal-links";
 
 import {
   PencilIcon,
@@ -1370,9 +1371,8 @@ export function CampusConnectFooter({
                 .copyright_text}
             </span>
 
-            <span>
-              RNSIT · CampusConnect
-            </span>
+            <span>RNSIT · CampusConnect</span>
+            <LegalLinks />
           </section>
 
         </div>

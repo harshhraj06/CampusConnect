@@ -158,14 +158,21 @@ export interface ApiHandlerOptions {
 
 export type ApiHandler = (
   request: NextRequest,
-  context: { session: ValidatedSession; body: unknown }
+  context: {
+    session: ValidatedSession;
+    body: unknown;
+    params: Record<string, string>;
+  }
 ) => Promise<NextResponse>
 
 export function withSecurity(
   handler: ApiHandler,
   options: ApiHandlerOptions = {}
 ) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+  return async (
+    request: NextRequest,
+    routeContext?: { params?: Promise<Record<string, string>> | Record<string, string> }
+  ): Promise<NextResponse> => {
     // Rate limiting
     if (options.rateLimit) {
       const rateLimitResponse = applyRateLimit(request, options.rateLimit)
@@ -207,7 +214,10 @@ export function withSecurity(
     }
 
     try {
-      return await handler(request, { session: session!, body })
+      const params = routeContext?.params
+        ? await routeContext.params
+        : {}
+      return await handler(request, { session: session!, body, params })
     } catch (error) {
       console.error('[API Error]', error)
       return createErrorResponse(

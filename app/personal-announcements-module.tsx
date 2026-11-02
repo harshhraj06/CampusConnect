@@ -105,18 +105,20 @@ export default function PersonalAnnouncementsModule() {
     setLoading(true);
     try {
       const data = await request();
-      setMode(data.mode);
-      setRole(data.actor?.role || "Student");
-      setCurrentActor(data.actor || null);
-      const userList = (data.users || data.students || []) as CampusUser[];
+      const rawMode = data.mode === "inbox" || data.mode === "sender" ? data.mode : "";
+      const actor = (data.actor && typeof data.actor === "object" ? data.actor : null) as CampusUser | null;
+      setMode(rawMode);
+      setRole(actor?.role || "Student");
+      setCurrentActor(actor);
+      const userList = (Array.isArray(data.users) ? data.users : Array.isArray(data.students) ? data.students : []) as CampusUser[];
       setUsers(userList);
 
-      if (data.mode === "inbox") {
-        setInboxMessages(data.announcements || []);
+      if (rawMode === "inbox") {
+        setInboxMessages((Array.isArray(data.announcements) ? data.announcements : []) as PersonalAnnouncement[]);
         setActiveView("inbox");
       } else {
-        setSentMessages(data.announcements || []);
-        setInboxMessages(data.inboxAnnouncements || []);
+        setSentMessages((Array.isArray(data.announcements) ? data.announcements : []) as PersonalAnnouncement[]);
+        setInboxMessages((Array.isArray(data.inboxAnnouncements) ? data.inboxAnnouncements : []) as PersonalAnnouncement[]);
         setActiveView("compose");
       }
       setStatus("");
@@ -198,10 +200,10 @@ export default function PersonalAnnouncementsModule() {
       if (!res.ok) throw new Error(typeof result.error === "string" ? result.error : "Could not upload file.");
 
       const attachedData = {
-        url: result.url,
-        name: result.name || file.name,
-        type: result.type || file.type || "application/octet-stream",
-        size: result.size || file.size,
+        url: typeof result.url === "string" ? result.url : "",
+        name: typeof result.name === "string" ? result.name : file.name,
+        type: typeof result.type === "string" ? result.type : (file.type || "application/octet-stream"),
+        size: typeof result.size === "number" ? result.size : file.size,
       };
 
       if (isEdit) {

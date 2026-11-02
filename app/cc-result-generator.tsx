@@ -1,0 +1,433 @@
+"use client";
+
+import {
+  Document,
+  Image,
+  Page,
+  PDFDownloadLink,
+  StyleSheet,
+  Text,
+  View,
+} from "@react-pdf/renderer";
+
+type Row = Record<string, any>;
+
+type Props = {
+  profile: Row;
+  marks: Row[];
+  results: Row[];
+  subjects: Row[];
+};
+
+const styles = StyleSheet.create({
+  page: {
+    paddingTop: 26,
+    paddingBottom: 34,
+    paddingHorizontal: 30,
+    borderWidth: 2,
+    borderColor: "#173b70",
+    borderTopWidth: 5,
+    borderTopColor: "#f28c28",
+    fontSize: 9,
+    color: "#172033",
+    fontFamily: "Helvetica",
+  },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 15,
+    paddingBottom: 11,
+    borderBottomWidth: 2,
+    borderBottomColor: "#f28c28",
+  },
+  logo: {
+    width: 76,
+    height: 42,
+    objectFit: "contain",
+  },
+  institutionName: {
+    flexGrow: 1,
+    textAlign: "center",
+    fontSize: 12,
+    lineHeight: 1.35,
+    fontFamily: "Helvetica-Bold",
+    color: "#173b70",
+    paddingHorizontal: 8,
+  },
+  title: {
+    fontSize: 19,
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 4,
+    color: "#152d54",
+  },
+  subtitle: {
+    fontSize: 9,
+    color: "#5b6474",
+    marginBottom: 15,
+  },
+  profile: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#b9cbe2",
+    borderLeftWidth: 4,
+    borderLeftColor: "#f28c28",
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  avatar: {
+    width: 58,
+    height: 58,
+    objectFit: "cover",
+    borderRadius: 29,
+    marginRight: 13,
+  },
+  profileDetails: {
+    flexGrow: 1,
+  },
+  studentName: {
+    fontSize: 14,
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 5,
+  },
+  muted: {
+    fontSize: 8,
+    color: "#5b6474",
+    marginBottom: 3,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontFamily: "Helvetica-Bold",
+    marginBottom: 8,
+    marginTop: 8,
+    color: "#152d54",
+  },
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#173b70",
+    color: "#ffffff",
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    fontFamily: "Helvetica-Bold",
+  },
+  tableRow: {
+    flexDirection: "row",
+    paddingVertical: 7,
+    paddingHorizontal: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e0e5ec",
+  },
+  cellSubject: {
+    width: "37%",
+    paddingRight: 5,
+  },
+  cellAssessment: {
+    width: "29%",
+    paddingRight: 5,
+  },
+  cellMarks: {
+    width: "17%",
+    textAlign: "right",
+    paddingRight: 5,
+  },
+  cellGrade: {
+    width: "17%",
+    textAlign: "right",
+  },
+  resultCard: {
+    borderWidth: 1,
+    borderColor: "#cbd8e8",
+    borderLeftWidth: 3,
+    borderLeftColor: "#f28c28",
+    borderRadius: 4,
+    padding: 10,
+    marginBottom: 7,
+  },
+  resultHeading: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 10,
+    marginBottom: 5,
+  },
+  resultLine: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 4,
+  },
+  empty: {
+    color: "#667085",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#e0e5ec",
+    marginBottom: 10,
+  },
+  disclaimer: {
+    marginTop: 18,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#dbe3ef",
+    fontSize: 7,
+    lineHeight: 1.5,
+    color: "#5b6474",
+  },
+  footer: {
+    position: "absolute",
+    bottom: 16,
+    left: 34,
+    right: 34,
+    fontSize: 7,
+    color: "#667085",
+    textAlign: "center",
+  },
+});
+
+function display(value: unknown): string {
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+  return String(value);
+}
+
+function CCResultDocument({
+  profile,
+  marks,
+  results,
+  subjects,
+}: Props) {
+  const origin =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "";
+
+  const campusLogo = `${origin}/branding/campusconnect-logo.png`;
+  const collegeLogo = `${origin}/branding/rnsit-logo.png`;
+
+  const sortedResults = [...results].sort((a, b) => {
+    const first = Number(a.semester);
+    const second = Number(b.semester);
+    if (Number.isFinite(first) && Number.isFinite(second)) {
+      return first - second;
+    }
+    return String(a.semester ?? "").localeCompare(
+      String(b.semester ?? ""),
+    );
+  });
+
+  return (
+    <Document
+      title={`CampusConnect Academic Result - ${profile.name || "Student"}`}
+      author="CampusConnect"
+      subject="Consolidated academic report based on synced records"
+    >
+      <Page size="A4" style={styles.page} wrap>
+        <View style={styles.brandRow}>
+          <Image src={campusLogo} style={styles.logo} />
+          <Text style={styles.institutionName}>RNS INSTITUTE OF TECHNOLOGY</Text>
+          <Image src={collegeLogo} style={styles.logo} />
+        </View>
+
+        <Text style={styles.title}>Academic Result Report</Text>
+        <Text style={styles.subtitle}>
+          Consolidated academic records · Generated by CampusConnect
+        </Text>
+
+        <View style={styles.profile}>
+          {profile.avatar_url ? (
+            <Image src={profile.avatar_url} style={styles.avatar} />
+          ) : null}
+          <View style={styles.profileDetails}>
+            <Text style={styles.studentName}>
+              {display(profile.name || profile.full_name)}
+            </Text>
+            <Text style={styles.muted}>
+              CC ID: {display(profile.campus_uid)}
+            </Text>
+            <Text style={styles.muted}>
+              USN: {display(profile.usn)}
+            </Text>
+            <Text style={styles.muted}>
+              Department: {display(profile.department)}
+            </Text>
+            <Text style={styles.muted}>
+              Academic year / class: {display(profile.year)}
+            </Text>
+            <Text style={styles.muted}>
+              Email: {display(profile.email)}
+            </Text>
+          </View>
+        </View>
+
+        <Text style={styles.sectionTitle}>Semester performance</Text>
+
+        {sortedResults.length ? (
+          sortedResults.map((result, index) => (
+            <View
+              key={String(result.id || `${result.semester}-${index}`)}
+              style={styles.resultCard}
+              wrap={false}
+            >
+              <Text style={styles.resultHeading}>
+                Semester {display(result.semester)}
+              </Text>
+              <View style={styles.resultLine}>
+                <Text>SGPA: {display(result.sgpa)}</Text>
+                <Text>CGPA: {display(result.cgpa)}</Text>
+                <Text>Grade: {display(result.grade)}</Text>
+              </View>
+              <View style={styles.resultLine}>
+                <Text>Status: {display(result.result_status)}</Text>
+                <Text>Credits: {display(result.credits_earned)}</Text>
+              </View>
+              {result.academic_year ? (
+                <Text style={styles.muted}>
+                  Academic year: {display(result.academic_year)}
+                </Text>
+              ) : null}
+            </View>
+          ))
+        ) : (
+          <Text style={styles.empty}>
+            No semester result records are currently available.
+          </Text>
+        )}
+
+        <Text style={styles.sectionTitle}>Subject-wise assessment marks</Text>
+
+        <View style={styles.tableHeader} fixed>
+          <Text style={styles.cellSubject}>Subject</Text>
+          <Text style={styles.cellAssessment}>Assessment</Text>
+          <Text style={styles.cellMarks}>Marks</Text>
+          <Text style={styles.cellGrade}>Grade</Text>
+        </View>
+
+        {marks.length ? (
+          marks.map((mark, index) => (
+            <View
+              key={String(mark.id || `${mark.subject_code}-${mark.assessment}-${index}`)}
+              style={styles.tableRow}
+              wrap={false}
+            >
+              <Text style={styles.cellSubject}>
+                {display(mark.subject_name)}
+                {mark.subject_code
+                  ? ` (${mark.subject_code})`
+                  : ""}
+              </Text>
+              <Text style={styles.cellAssessment}>
+                {display(mark.assessment)}
+              </Text>
+              <Text style={styles.cellMarks}>
+                {display(mark.marks)}
+                {mark.max_marks !== null &&
+                mark.max_marks !== undefined
+                  ? ` / ${mark.max_marks}`
+                  : ""}
+              </Text>
+              <Text style={styles.cellGrade}>
+                {display(mark.grade)}
+              </Text>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.empty}>
+            No subject assessment marks are currently available.
+          </Text>
+        )}
+
+        {subjects.length ? (
+          <>
+            <Text style={styles.sectionTitle}>
+              Registered subjects
+            </Text>
+            {subjects.map((subject, index) => (
+              <Text
+                key={String(subject.id || `${subject.subject_code}-${index}`)}
+                style={styles.muted}
+              >
+                {display(subject.subject_code)} —{" "}
+                {display(subject.subject_name)}
+                {subject.credits !== undefined &&
+                subject.credits !== null
+                  ? ` · Credits: ${subject.credits}`
+                  : ""}
+              </Text>
+            ))}
+          </>
+        ) : null}
+
+        <Text style={styles.disclaimer}>
+          This document is a CampusConnect-generated report based on records
+          available in the application at the time of generation. It is not
+          an official college-issued marksheet or transcript. Values absent
+          from synced records are shown as unavailable and have not been
+          inferred. Please refer to the official college result portal for
+          authoritative results.
+        </Text>
+
+        <Text
+          style={styles.footer}
+          fixed
+          render={({ pageNumber, totalPages }) =>
+            `CampusConnect · Generated ${new Date().toLocaleDateString()} · Page ${pageNumber} of ${totalPages}`
+          }
+        />
+      </Page>
+    </Document>
+  );
+}
+
+export default function CCResultGenerator(props: Props) {
+  const fileName = `CampusConnect-Result-${String(
+    props.profile.usn || props.profile.campus_uid || "student",
+  ).replace(/[^a-zA-Z0-9_-]/g, "_")}.pdf`;
+
+  return (
+    <section
+      style={{
+        margin: "12px 0 20px",
+        padding: "16px",
+        border: "1px solid #b9cbe2",
+        borderTop: "4px solid #f28c28",
+        borderRadius: "12px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: "12px",
+      }}
+    >
+      <div>
+        <strong style={{ display: "block", marginBottom: "5px" }}>
+          Generate CC Result
+        </strong>
+        <span style={{ fontSize: "13px", color: "#64748b" }}>
+          Download your available semester results and assessment marks as a PDF.
+        </span>
+      </div>
+
+      <PDFDownloadLink
+        document={<CCResultDocument {...props} />}
+        fileName={fileName}
+        style={{
+          display: "inline-block",
+          background: "#173b70",
+          color: "#ffffff",
+          padding: "11px 16px",
+          borderRadius: "8px",
+          fontSize: "13px",
+          fontWeight: 600,
+          textDecoration: "none",
+        }}
+      >
+        {({ loading, error }) =>
+          loading
+            ? "Preparing PDF…"
+            : error
+              ? "Try generating again"
+              : "↓ Generate CC Result PDF"
+        }
+      </PDFDownloadLink>
+    </section>
+  );
+}

@@ -1,0 +1,32 @@
+.ccLegalLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+.ccLegalLinks a,
+.ccLegalLinks button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.ccLegalLinks a:hover,
+.ccLegalLinks button:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.ccLegalLinks a:focus-visible,
+.ccLegalLinks button:focus-visible {
+  outline: 2px solid #8b6b35;
+  outline-offset: 4px;
+  border-radius: 2px;
+}

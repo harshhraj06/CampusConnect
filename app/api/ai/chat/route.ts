@@ -92,7 +92,8 @@ export const POST = withSecurity(
       const accessToken = session.accessToken
       const user = session.user
 
-      if (!AI_URL || !AI_API_KEY || !AI_MODEL) {
+      const { hasConfiguredAiProvider } = await import('@/lib/ai-provider-failover')
+      if (!hasConfiguredAiProvider()) {
         return NextResponse.json({ error: 'AI is temporarily unavailable. Your CampusConnect data is still available normally.' }, { status: 503 })
       }
 
@@ -123,7 +124,7 @@ export const POST = withSecurity(
       const authenticatedRole = String(roleProfileRows?.[0]?.role || 'Student')
       const isProfessionalRole = authenticatedRole !== 'Student'
 
-      const claim = await database<ClaimRow[]>(`rpc/ai_claim_request`, accessToken, { method: 'POST', body: JSON.stringify({ p_request_type: 'chat', p_model: AI_MODEL, p_hourly_limit: 20, p_daily_limit: 100 }) })
+      const claim = await database<ClaimRow[]>(`rpc/ai_claim_request`, accessToken, { method: 'POST', body: JSON.stringify({ p_request_type: 'chat', p_model: AI_MODEL || process.env.GROQ_MODEL?.trim() || process.env.GEMINI_MODEL?.trim() || process.env.OPENROUTER_MODEL?.trim() || process.env.CLOUDFLARE_MODEL?.trim() || 'provider-chain', p_hourly_limit: 20, p_daily_limit: 100 }) })
       const claimRow = claim?.[0]
       if (!claimRow?.allowed) {
         return NextResponse.json({ error: "You've reached your current CampusConnect AI usage limit. Please try again later.", hourlyUsed: claimRow?.hourly_used ?? 20, dailyUsed: claimRow?.daily_used ?? 100 }, { status: 429 })
@@ -170,7 +171,10 @@ export const POST = withSecurity(
         sources.push(...notesContext.sources)
       }
 
-      const providerResponse = await fetch(AI_URL, { method: 'POST', headers: { Authorization: `Bearer ${AI_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: AI_MODEL, max_completion_tokens: assistantModeValue === 'notes_ai' ? 700 : 1200, include_reasoning: false, messages: [
+      const providerPayload = {
+        model: AI_MODEL || process.env.GROQ_MODEL?.trim() || process.env.GEMINI_MODEL?.trim() || process.env.OPENROUTER_MODEL?.trim() || process.env.CLOUDFLARE_MODEL?.trim() || '',
+        max_completion_tokens: assistantModeValue === 'notes_ai' ? 700 : 1200,
+        messages: [
         { role: 'system', content: assistantModeValue === 'general' ? GENERAL_ASSISTANT_PROMPT : SYSTEM_PROMPT },
         ...(assistantModeValue === 'academic_advisor' ? [{ role: 'system', content: ACADEMIC_ADVISOR_PROMPT }] : []),
         ...(assistantModeValue === 'attendance_advisor' ? [{ role: 'system', content: ATTENDANCE_ADVISOR_PROMPT }] : []),
@@ -184,16 +188,10 @@ export const POST = withSecurity(
         ...(assistantModeValue === 'notes_ai' ? history.slice(-2).map(item => ({ ...item, content: item.content.slice(0, 1200) })) : history),
         { role: 'system', content: ['AUTHORIZED CAMPUSCONNECT DATA:', `AUTHENTICATED ROLE: ${authenticatedRole}`, context, '', 'AVAILABLE SOURCE GROUPS:', JSON.stringify(sources), '', `CLIENT TIME ZONE: ${cleanTimeZone || 'not supplied'}`, `CURRENT SERVER TIME: ${new Date().toISOString()}`].join('\n') },
         { role: 'user', content: message }
-      ] }) })
-
-      if (!providerResponse.ok) {
-        const detail = await providerResponse.text()
-        console.error('[CampusConnect AI] provider error:', providerResponse.status, detail.slice(0, 500))
-        if (providerResponse.status === 413 || providerResponse.status === 429) throw new Error('AI_PROVIDER_RATE_LIMIT')
-        throw new Error('AI_PROVIDER_ERROR')
+      ]
       }
-
-      const providerData = await providerResponse.json() as ProviderResponse
+      const { requestWithProviderFailover } = await import('@/lib/ai-provider-failover')
+      const { data: providerData, model: providerModel } = await requestWithProviderFailover(providerPayload)
       const answer = String(providerData.choices?.[0]?.message?.content ?? '').trim()
       if (!answer) throw new Error('AI_EMPTY_RESPONSE')
 
@@ -201,10 +199,10 @@ export const POST = withSecurity(
       const outputTokens = Number(providerData.usage?.completion_tokens ?? providerData.usage?.output_tokens ?? 0) || 0
       const estimatedCost = calculateCost(inputTokens, outputTokens)
 
-      await database<DbRow[]>(`ai_messages`, accessToken, { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ conversation_id: conversationIdValue, user_id: user.id, role: 'assistant', content: answer, sources, model: AI_MODEL, input_tokens: inputTokens, output_tokens: outputTokens }) })
+      await database<DbRow[]>(`ai_messages`, accessToken, { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ conversation_id: conversationIdValue, user_id: user.id, role: 'assistant', content: answer, sources, model: providerModel, input_tokens: inputTokens, output_tokens: outputTokens }) })
 
       if (usageId) {
-        await database<DbRow[]>(`ai_usage?id=eq.${encodeURIComponent(usageId)}`, accessToken, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ conversation_id: conversationIdValue, status: 'completed', model: AI_MODEL, input_tokens: inputTokens, output_tokens: outputTokens, estimated_cost: estimatedCost }) })
+        await database<DbRow[]>(`ai_usage?id=eq.${encodeURIComponent(usageId)}`, accessToken, { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ conversation_id: conversationIdValue, status: 'completed', model: providerModel, input_tokens: inputTokens, output_tokens: outputTokens, estimated_cost: estimatedCost }) })
       }
 
       auditLog({ event_type: 'ai.chat', user_id: user.id, success: true, metadata: { assistantMode: assistantModeValue, tokens: inputTokens + outputTokens } })

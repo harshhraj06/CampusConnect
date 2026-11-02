@@ -1085,6 +1085,58 @@ export function CampusAI({
   }
 
 
+  async function clearAllChats() {
+    if (!conversations.length) {
+      setStatus("There are no saved conversations to clear.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Delete all your saved Campus AI conversations and their messages? This action cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    const client = getSupabaseClient();
+
+    if (!client) {
+      setStatus("CampusConnect database is unavailable.");
+      return;
+    }
+
+    try {
+      const { data, error: authError } = await client.auth.getUser();
+      const user = data?.user;
+
+      if (authError || !user) {
+        setStatus("Please sign in again before clearing chat history.");
+        return;
+      }
+
+      const { error } = await client
+        .from("ai_conversations")
+        .delete()
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      setConversations([]);
+      setActiveConversationId(null);
+      setMessages([]);
+      setQuery("");
+      setStatus("All saved chats cleared.");
+    } catch (error) {
+      console.error("[Campus AI] clear all chats:", error);
+      setStatus(
+        error instanceof Error
+          ? error.message
+          : "Unable to clear all chats. Please try again."
+      );
+      await loadConversations();
+    }
+  }
+
+
   function downloadChat() {
 
     if (
@@ -1817,9 +1869,22 @@ export function CampusAI({
 
           <div className="campusAiHistory">
 
-            <p className="campusAiHistoryLabel">
-              RECENT
-            </p>
+            <div className="campusAiHistoryToolbar">
+              <p className="campusAiHistoryLabel">
+                RECENT
+              </p>
+
+              {conversations.length > 0 && (
+                <button
+                  type="button"
+                  className="campusAiClearAllButton"
+                  onClick={() => void clearAllChats()}
+                  title="Delete all saved Campus AI conversations"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
 
 
             {conversations.length ? (

@@ -1,0 +1,664 @@
+/* ==========================================================================
+   CampusConnect Pro — global phone / mobile compatibility layer
+   Imported once from app/layout.tsx, so every route inherits it:
+   the main workspace, all [...slug] workspace modules, /upcoming,
+   /auth/verify, /auth/verify-otp, /auth/verified and /events/*.
+   Every rule lives inside a phone/tablet media query (or hover:none),
+   so desktop and print layouts are left untouched.
+   ========================================================================== */
+
+/* --- 1. Page-level overflow + iOS text scaling guards --------------------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+/* Flex/grid children shrink instead of forcing the page wider than the phone.
+   :where() keeps this at zero specificity, so any deliberate min-width in the
+   existing stylesheets still wins. */
+:where(
+  .shell,
+  .workspace,
+  .content,
+  .authPage,
+  .authPanel,
+  .card,
+  .panel,
+  .stat,
+  .jobcard,
+  .moduleHero,
+  .moduleForm,
+  .profileCard,
+  .profileEditor,
+  .documentVault,
+  .adminUsers
+) * {
+  min-width: 0;
+}
+
+img,
+video,
+canvas,
+iframe,
+embed,
+object {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+/* Long AI answers, CSV previews, code blocks and URLs scroll, never stretch */
+pre,
+code {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- 2. Tablet: collapse layout columns before the phone breakpoint ------- */
+@media (max-width: 860px) {
+  .shell,
+  .workspace,
+  .sessionLoading,
+  .authPage,
+  .authVisual,
+  .welcome {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .content {
+    max-width: 100%;
+  }
+
+  /* page-level two-column module layouts stack on one column */
+  .grid,
+  .split,
+  .network,
+  .resume,
+  .profileGrid,
+  .roleManagement,
+  .academicDataGrid,
+  .analyticsGrid,
+  .adminUsers,
+  .documentVault,
+  .moduleForm {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* summary / card rows drop to two columns, then one on small phones */
+  .stats,
+  .resources,
+  .jobcards,
+  .driveNumbers,
+  .academicSummaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --- 3. Phone (<= 640px) ------------------------------------------------- */
+@media (max-width: 640px) {
+  /* The base sheet styles body copy at 7–9px, which is unreadable on a phone.
+     Only non-heading, non-stat text is lifted; big numbers keep their size. */
+  .workspace .content p,
+  .workspace .content li,
+  .workspace .content small,
+  .workspace .content time,
+  .workspace .content td,
+  .workspace .content th,
+  .workspace .content label,
+  .workspace .content .muted,
+  .authBox small,
+  .setupNote {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .workspace .content h1 {
+    font-size: 22px;
+  }
+
+  .workspace .content h2 {
+    font-size: 17px;
+  }
+
+  .workspace .content h3 {
+    font-size: 15px;
+  }
+
+  /* Nothing inside a module may be wider than the phone */
+  .workspace .content > * {
+    max-width: 100%;
+  }
+
+  .card,
+  .panel,
+  .stat,
+  .jobcard,
+  .moduleHero,
+  .moduleForm,
+  .profileCard,
+  .profileEditor,
+  .documentVault,
+  .adminUsers,
+  .networkDirectory {
+    max-width: 100%;
+  }
+
+  /* Notch / home-indicator safe areas for the app shell */
+  .workspace {
+    padding-bottom: calc(58px + env(safe-area-inset-bottom));
+  }
+
+  .workspace > header {
+    height: auto;
+    min-height: 56px;
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+
+  .workspace > footer {
+    height: auto;
+    min-height: 58px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .workspace > footer button {
+    min-height: 52px;
+  }
+
+  .content {
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+
+  /* 16px form controls stop iOS Safari from zooming the page on focus */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+    max-width: 100%;
+  }
+
+  textarea {
+    min-height: 96px;
+  }
+
+  /* thumb-sized primary actions */
+  .primary,
+  .ghost,
+  .authSubmit,
+  .demoAccess,
+  .filters button,
+  .notificationControls button,
+  .securityAction {
+    min-height: 42px;
+  }
+
+  /* filter / toolbar strips wrap instead of pushing the page sideways */
+  .filters,
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Overlays: full width and never taller than the visible screen */
+  .modalScrim {
+    align-items: flex-start;
+    padding: max(12px, env(safe-area-inset-top)) 12px
+      max(12px, env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .integrationModal,
+  [role="dialog"] {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+  }
+
+  /* The resume / document "paper" is a fixed 780px sheet on desktop */
+  .paper {
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    padding: 20px 16px;
+  }
+
+  .rhead h2 {
+    font-size: 20px;
+  }
+
+  /* Dense admin tables scroll inside their card rather than break the page */
+  table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Emails, roll numbers and links wrap instead of overflowing the card */
+  .workspace .content
+    :is(p, li, b, strong, small, time, span, td, th, h1, h2, h3, a, label, code) {
+    overflow-wrap: anywhere;
+  }
+
+  .moduleHero,
+  .hero {
+    padding: 22px 18px;
+    min-height: auto;
+  }
+
+  .hero h2,
+  .moduleHero h2 {
+    font-size: 22px;
+  }
+
+  .stat {
+    min-height: auto;
+  }
+}
+
+/* --- 4. Small phones (<= 480px) ----------------------------------------- */
+@media (max-width: 480px) {
+  .stats,
+  .resources,
+  .jobcards,
+  .driveNumbers,
+  .academicSummaryGrid,
+  .academicDataGrid,
+  .roleChooser,
+  .proofStrip,
+  .profileTwo,
+  .profileDetails,
+  .driveActions,
+  .authRoles,
+  .profileForm {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* Any remaining multi-column module grid stacks on a small phone */
+  .workspace .content [class*="Grid"],
+  .workspace .content [class*="grid"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .workspace .content h1 {
+    font-size: 20px;
+  }
+
+  .authSubmit,
+  .demoAccess {
+    height: auto;
+    min-height: 46px;
+  }
+}
+
+/* --- 5. Touch devices: no sticky hover states ---------------------------- */
+@media (hover: none) {
+  .card:hover,
+  .stat:hover,
+  .jobcard:hover,
+  .roleChooser button:hover,
+  .whyGrid article:hover,
+  .primary:hover {
+    transform: none;
+  }
+}
+
+/* --- 6. Login / register (auth) screens ---------------------------------- */
+/* auth-warm.css forces this on .authPage:
+     display: grid !important;
+     grid-template-columns: minmax(420px,.88fr) minmax(520px,1.12fr) !important;
+   That needs 940px of viewport, and its only mobile override touches
+   .authVisual / .authPanel, so the login page stayed a 940px-wide grid on a
+   phone and scrolled sideways. The .authPage{display:block} rules elsewhere
+   have no !important and therefore lost. These counters are !important too,
+   with html-prefixed selectors so they win on specificity no matter which
+   stylesheet the bundler emits last. */
+@media (max-width: 860px) {
+  html .authPage {
+    display: block !important;
+    grid-template-columns: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+
+  html .authPage .authVisual,
+  html .authPage .authPanel,
+  html .authPage .authBox {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  html .authPage .authPanel {
+    min-width: 0 !important;
+    overflow-x: clip;
+  }
+}
+
+@media (max-width: 640px) {
+  html .authPage .authPanel {
+    padding: 28px 16px 36px !important;
+  }
+
+  html .authPage .authBox {
+    padding: 22px 18px !important;
+    border-radius: 16px;
+  }
+
+  /* Decorative 420px gold circle is positioned with negative offsets, so it
+     hangs past the right edge of a small screen. */
+  html .authPage .authPanel::before {
+    width: min(420px, 100%) !important;
+    right: 0 !important;
+  }
+
+  /* A 580px hero pushes the actual form below the fold on a phone. */
+  html .authPage .authVisual {
+    min-height: 300px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  html .authPage .authVisual {
+    min-height: 230px !important;
+  }
+}
+
+/* --- 7. Mobile app bar + campus search ----------------------------------- */
+/* The newest mobile header block turns the search into a compact icon button
+   that opens a full-screen sheet. Two things were wrong on a phone: the sheet
+   sat underneath the z-index 9000 app bar (its padding-top of 56px against a
+   62px bar) and its input stayed at 13px, which makes iOS Safari zoom the
+   whole page when the field takes focus. */
+@media (max-width: 768px) {
+  html .workspaceHeader > .campusSearchTrigger,
+  html .campusSearchTrigger {
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    border: 1px solid #ded5ca !important;
+    border-radius: 13px !important;
+    background: #fffdf9 !important;
+    box-shadow: 0 4px 14px rgba(45, 32, 20, .055);
+    transition: border-color .18s ease, background .18s ease, transform .12s ease;
+  }
+
+  html .workspaceHeader .campusSearchTrigger i {
+    font-size: 20px !important;
+    color: #51483f !important;
+  }
+
+  html .workspaceHeader > .campusSearchTrigger:active,
+  html .campusSearchTrigger:active {
+    transform: scale(.96);
+  }
+
+  html .workspaceHeader > .campusSearchTrigger:focus-visible {
+    outline: 2px solid #3159d9;
+    outline-offset: 2px;
+  }
+
+  /* The sheet now covers the app bar, so it can start at the top of the screen */
+  html .campusSearchLayer {
+    z-index: 9600 !important;
+    place-items: start center;
+    padding: max(12px, env(safe-area-inset-top)) 10px
+      calc(12px + env(safe-area-inset-bottom)) !important;
+  }
+
+  html .campusSearchDialog {
+    width: 100% !important;
+    max-height: calc(100dvh - 24px) !important;
+    border-radius: 18px !important;
+  }
+
+  html .campusSearchInput {
+    min-height: 58px !important;
+    padding: 0 14px !important;
+  }
+
+  html .campusSearchInput input {
+    font-size: 16px !important;
+  }
+
+  html .campusSearchInput > button {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  html .campusSearchFilters button,
+  html .campusSearchGroup > div > button {
+    min-height: 46px;
+  }
+
+  html .campusSearchResults > button {
+    min-height: 64px;
+  }
+}
+
+/* --- 8. Controls mobile CSS switched off (dead buttons on a phone) ------- */
+/* Each of these is a real interactive control in the JSX that an older mobile
+   block hid. Restored with a thumb-sized target and the same look as its
+   desktop rule. */
+@media (max-width: 720px) {
+  html .magazineArrow {
+    display: grid !important;
+    place-items: center;
+    width: 42px;
+    height: 54px;
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 650px) {
+  html .campusGlobalAiOpen {
+    display: inline-flex !important;
+    align-items: center;
+    min-height: 36px;
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  html .importantNoticeRemove {
+    display: grid !important;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+  }
+
+  html .importantNoticeActions .importantNoticeLink {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 34px !important;
+    min-width: 34px;
+    min-height: 34px !important;
+    padding: 0 !important;
+  }
+}
+
+/* --- 9. Touch targets for the dense card controls ------------------------ */
+/* The legacy dashboard cards use 24–25px round icon buttons and tiny text
+   buttons, well under a thumb. This only touches the small controls; the
+   primary/ghost buttons are already sized in section 3. */
+@media (max-width: 768px) {
+  html .shell .jobrow button,
+  html .shell .event button,
+  html .shell .person button,
+  html .shell .notice button,
+  html .shell .deadline button,
+  html .shell .panel > header button,
+  html .shell .tip button,
+  html .shell .resources button,
+  html .shell .filters button,
+  html .shell .groupRow,
+  html .shell .studentPriorityList > button {
+    min-width: 38px;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (hover: none) {
+  html .shell button,
+  html .shell a,
+  html .shell summary {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* --- 10. Cookie controls no longer cover the bottom navigation ------------ */
+/* .ccCookieSettingsButton is position: fixed at z-index 9990 with bottom
+   10-14px, while the phone bottom nav is a 58px bar at z-index 30, so the pill
+   sat on the first tab and swallowed its taps. The consent banner had the same
+   overlap. Both are lifted clear only on pages that actually show the nav. */
+@media (max-width: 740px) {
+  body:has(.workspace > footer) .ccCookieSettingsButton,
+  body:has(.workspace > footer) .ccCookieBanner {
+    bottom: calc(70px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* --- 11. A reachable way out of the mobile search sheet ------------------- */
+/* On a phone there is no ESC key, and the fixed mobile dialog (top/right/
+   bottom/left 10px) covers the backdrop, so the only hit area left was a 10px
+   ring: the sheet looked stuck. app/campus-search.tsx now always renders its
+   × action (clear when there is a query, close when there is none); this gives
+   it a thumb-sized target. */
+@media (max-width: 768px) {
+  html .campusSearchInput > button {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 12px !important;
+    background: #f2f4f8 !important;
+    color: #4d5a6d !important;
+    font-size: 19px !important;
+  }
+
+  html .campusSearchInput > button:active {
+    background: #e8edf6 !important;
+  }
+}
+
+/* --- 11. A reachable way out of the mobile search sheet ------------------- */
+/* On a phone there is no ESC key, and the fixed mobile dialog (top/right/
+   bottom/left 10px) covers the backdrop, so the only hit area left was a 10px
+   ring: the sheet looked stuck. app/campus-search.tsx now always renders its
+   × action (clear when there is a query, close when there is none); this gives
+   it a thumb-sized target. */
+@media (max-width: 768px) {
+  html .campusSearchInput > button {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 12px !important;
+    background: #f2f4f8 !important;
+    color: #4d5a6d !important;
+    font-size: 19px !important;
+  }
+
+  html .campusSearchInput > button:active {
+    background: #e8edf6 !important;
+  }
+}
+
+/* --- 12. Phones: the notification panel could not open ------------------- */
+/* The phone app bar is styled with backdrop-filter: blur(20px) (globals.css,
+   the last <=768 .workspaceHeader block). Per the Filter Effects spec a
+   backdrop-filter other than none also makes that element the containing block
+   for position: fixed descendants, and the notification panel is rendered
+   inside the header (page.tsx: .notificationDock). Its mobile rule pins it with
+   top: 72px / bottom: 82px, so those insets resolved against a 62px-tall bar:
+   the height came out negative and was clamped to 0, leaving a zero-height
+   panel with overflow: hidden. The bell toggled state, the scrim dimmed the
+   bar, and nothing was ever painted - exactly "the notification does not open
+   on a phone".
+   The bar's own background is 97% opaque, so its blur is imperceptible; the
+   solid equivalent keeps the look and hands header overlays back to the
+   viewport. */
+@media (max-width: 768px) {
+  html .workspaceHeader {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #fffbf4 !important;
+  }
+
+  /* Belt and braces: even if an ancestor ever creates a containing block
+     again, the panel keeps real geometry (72px under the bar, 84px clear of
+     the 58px bottom navigation) instead of collapsing to nothing. */
+  html .unifiedNotificationCenter {
+    position: fixed !important;
+    top: 72px !important;
+    bottom: auto !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+    height: calc(100vh - 156px) !important;
+    height: calc(100dvh - 156px) !important;
+    max-height: calc(100dvh - 156px) !important;
+    min-height: min(420px, calc(100dvh - 156px)) !important;
+    border-radius: 20px !important;
+  }
+
+  /* Section 7 gave the search sheet width: 100%, but the mobile rules already
+     pin it with left: 10px + right: 10px. All three cannot hold, so the right
+     inset was dropped and the sheet ran past the screen edge; let the insets
+     own the width, as they did originally. */
+  html .campusSearchDialog {
+    width: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+}
+
+/* --- 13. Phone geometry that can no longer collapse ---------------------- */
+/* Section 12 stops the app bar being a containing block for these overlays.
+   Two details still need pinning down: on the student (parchment) theme the
+   phone bar is taller than 62px (92px, 74px at <=620), so the panel is
+   anchored below that rather than under it; and the search sheet gets a floor
+   height, so no ancestor can ever squash it into a 0px strip again. In the
+   normal case the sheet is already stretched to the viewport by its own
+   top/bottom insets, so the floor is a no-op. */
+@media (max-width: 768px) {
+  html body .shell:has(.studentDashboard) .unifiedNotificationCenter {
+    top: 102px !important;
+  }
+
+  html .campusSearchDialog {
+    min-height: min(420px, calc(100dvh - 20px)) !important;
+  }
+}
+
+@media (max-width: 620px) {
+  html body .shell:has(.studentDashboard) .unifiedNotificationCenter {
+    top: 84px !important;
+  }
+}

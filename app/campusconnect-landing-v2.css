@@ -4395,3 +4395,120 @@ button:focus-visible {
   }
 
 }
+
+/* Policy navigation and readable footer hierarchy. */
+.ccLandingV2Footer .ccLandingV2FooterTop strong {
+  color: #302b24;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.ccLandingV2Footer .ccLandingV2FooterTop button,
+.ccLandingV2Footer .ccLandingV2FooterTop a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #665d52;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  text-decoration: none;
+  text-align: left;
+}
+.ccLandingV2Footer .ccLandingV2FooterBrand p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.ccLandingV2Footer .ccLandingV2FooterBottom {
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 20px 0;
+  font-size: 12px;
+}
+.ccLandingV2Footer .ccLandingV2FooterTop a:hover,
+.ccLandingV2Footer .ccLandingV2FooterTop button:hover {
+  color: #302b24;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.ccLandingV2Footer a:focus-visible,
+.ccLandingV2Footer button:focus-visible {
+  outline: 2px solid #8b6b35;
+  outline-offset: 4px;
+}
+@media (max-width: 760px) {
+  .ccLandingV2Footer .ccLandingV2FooterTop { gap: 28px; }
+  .ccLandingV2Footer .ccLandingV2FooterBottom {
+    align-items: flex-start;
+    padding-bottom: 64px;
+  }
+}
+
+
+/* MOBILE LOGIN + REGISTER VISIBILITY FIX */
+.ccLandingV2 .ccLandingV2LoginButton {
+  background: #4b202a !important;
+  border: 1px solid #4b202a !important;
+  color: #fffaf2 !important;
+  box-shadow: 0 12px 26px rgba(75, 32, 42, 0.18) !important;
+}
+
+.ccLandingV2 .ccLandingV2LoginButton:hover {
+  background: #35161d !important;
+  border-color: #35161d !important;
+}
+
+.ccLandingV2 .ccLandingV2RegisterButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 18px;
+  border: 1px solid #b79a78;
+  border-radius: 12px;
+  background: #fffaf2;
+  color: #4b202a;
+  font-size: 13px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.ccLandingV2 .ccLandingV2RegisterButton:hover {
+  background: #f3e8d8;
+  transform: translateY(-1px);
+}
+
+.ccLandingV2 .ccLandingV2RegisterButton:focus-visible,
+.ccLandingV2 .ccLandingV2LoginButton:focus-visible {
+  outline: 3px solid #a47b45;
+  outline-offset: 3px;
+}
+
+@media (max-width: 680px) {
+  .ccLandingV2 .ccLandingV2HeroActions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .ccLandingV2 .ccLandingV2HeroActions > button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    padding: 11px 8px !important;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    white-space: normal !important;
+  }
+
+  .ccLandingV2 .ccLandingV2HeroActions > .ccLandingV2SecondaryButton {
+    grid-column: 1 / -1;
+  }
+}

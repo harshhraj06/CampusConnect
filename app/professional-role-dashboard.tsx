@@ -1,4 +1,5 @@
 "use client";
+import "./placement-command-dashboard.css";
 
 import { AdminBeamsBackground } from "./admin-beams-background";
 
@@ -14,6 +15,7 @@ import {getSupabaseClient} from "../lib/supabase";
 import {RoleActionCenter} from "./role-action-center";
 import {StaffOperationsBoard} from "./staff-operations-board";
 import {FacultyDashboardPremium} from "./faculty-dashboard-premium";
+import StudentNoticeBoard from "./student-notice-board";
 
 export type DashboardRole =
   | "Student"
@@ -1324,13 +1326,16 @@ export function ProfessionalRoleDashboard({
 
   if (role === "Faculty") {
     return (
-      <FacultyDashboardPremium
-        department={profile.department?.trim() || ""}
-        counts={counts}
-        loading={loading}
-        go={go}
-        onOpenCalculator={onOpenCalculator}
-      />
+      <>
+        <FacultyDashboardPremium
+          department={profile.department?.trim() || ""}
+          counts={counts}
+          loading={loading}
+          go={go}
+          onOpenCalculator={onOpenCalculator}
+        />
+        <StudentNoticeBoard role={role} profile={profile} />
+      </>
     );
   }
 
@@ -1534,6 +1539,702 @@ export function ProfessionalRoleDashboard({
               ) !important;
           }
         }
+
+/* MAIN PLACEMENT HERO — GRAPHITE, IVORY, MUTED BRASS */
+.proRoleDashboard-placement-cell {
+  --prd-accent: #a98a5b !important;
+  --prd-accent-soft: #eee6d8 !important;
+  --prd-accent-rgb: 169, 138, 91 !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero {
+  position: relative !important;
+  isolation: isolate !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr) !important;
+  align-items: center !important;
+  gap: clamp(28px, 4vw, 58px) !important;
+  min-height: 405px !important;
+  padding: clamp(30px, 4vw, 55px) !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(210, 197, 175, .42) !important;
+  border-radius: 20px !important;
+  background: #292f30 !important;
+  box-shadow: 0 16px 38px rgba(30, 35, 35, .13) !important;
+  animation: placementEnterpriseIn .55s ease-out both;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroPhoto {
+  object-fit: cover !important;
+  object-position: center 50% !important;
+  filter: saturate(.58) contrast(1.04) brightness(.74) !important;
+  transform: scale(1.015);
+  animation: placementCampusImageDrift 32s ease-in-out infinite alternate;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroPhotoOverlay {
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    90deg,
+    rgba(36, 41, 41, .68) 0%,
+    rgba(36, 41, 41, .81) 43%,
+    rgba(36, 41, 41, .94) 73%,
+    rgba(36, 41, 41, .98) 100%
+  ) !important;
+  pointer-events: none !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: -145px;
+  right: 13%;
+  width: clamp(240px, 29vw, 370px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(218, 197, 159, .23);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    transparent 0 38%,
+    rgba(218, 197, 159, .10) 38.4% 38.8%,
+    transparent 39.2% 57%,
+    rgba(218, 197, 159, .14) 57.4% 57.8%,
+    transparent 58.2%
+  );
+  box-shadow:
+    0 0 0 25px rgba(218, 197, 159, .025),
+    0 0 0 52px rgba(218, 197, 159, .018);
+  pointer-events: none;
+  animation: placementOrbitalMotion 40s linear infinite;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent {
+  position: relative !important;
+  z-index: 3 !important;
+  min-width: 0 !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent :is(h1, h2, h3, .proDashboardHeroTitle, .proAdminHeroTitle) {
+  max-width: 720px;
+  margin-block: 10px 16px !important;
+  color: #f7f5ef !important;
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif !important;
+  font-size: clamp(36px, 4.2vw, 58px) !important;
+  font-weight: 650 !important;
+  line-height: 1.06 !important;
+  letter-spacing: -.045em !important;
+  text-wrap: balance;
+  text-shadow: none !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent :is(p, .proDashboardHeroDescription) {
+  max-width: 570px;
+  color: rgba(247, 245, 239, .79) !important;
+  font-size: 14px !important;
+  line-height: 1.8 !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent :is(small, .proDashboardHeroEyebrow) {
+  color: #d9c39e !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: .15em !important;
+}
+
+/* Remove the floating-card appearance; retain the same content and actions. */
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside {
+  position: relative !important;
+  z-index: 4 !important;
+  align-self: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #f7f5ef !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  animation: placementHeroContentIn .6s .08s ease-out both;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside > header {
+  padding-bottom: 15px !important;
+  border-bottom: 1px solid rgba(247, 245, 239, .20) !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside header small {
+  color: #cfc5b4 !important;
+  font-size: 9px !important;
+  font-weight: 750 !important;
+  letter-spacing: .13em !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside header strong {
+  color: #f7f5ef !important;
+  font-size: 17px !important;
+  font-weight: 650 !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardRoleMark {
+  border: 1px solid rgba(218, 197, 159, .38) !important;
+  border-radius: 8px !important;
+  background: rgba(218, 197, 159, .09) !important;
+  color: #ddc79f !important;
+}
+
+/* Existing live metrics: one clean row with separators, not separate cards. */
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  margin: 18px 0 20px !important;
+  border-block: 1px solid rgba(247, 245, 239, .22) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  min-height: 79px !important;
+  padding: 14px 12px !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(247, 245, 239, .17) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #f7f5ef !important;
+  text-align: left !important;
+  transition: background-color .2s ease !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button:first-child {
+  padding-left: 0 !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button:last-child {
+  border-right: 0 !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button:hover {
+  transform: none !important;
+  background: rgba(255, 255, 255, .045) !important;
+  box-shadow: none !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button:focus-visible {
+  outline: 2px solid #d9c39e !important;
+  outline-offset: -3px !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics small {
+  color: #c8c9c3 !important;
+  font-size: 9px !important;
+  font-weight: 750 !important;
+  letter-spacing: .07em !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics strong {
+  margin-top: 7px !important;
+  color: #fbf8f0 !important;
+  font-size: clamp(21px, 2.15vw, 30px) !important;
+  font-weight: 650 !important;
+  letter-spacing: -.025em !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A single calm primary action, using the same restrained accent. */
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction {
+  border: 1px solid #d3bc93 !important;
+  border-radius: 9px !important;
+  background: #d8c19a !important;
+  color: #2c3231 !important;
+  box-shadow: none !important;
+  transition: background-color .2s ease, transform .2s ease !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction:hover {
+  transform: translateY(-1px) !important;
+  background: #e3d0ad !important;
+  box-shadow: none !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction :is(strong, b, i) {
+  color: #2c3231 !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction small {
+  color: #55554e !important;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardOrb {
+  border-color: rgba(218, 197, 159, .18) !important;
+  background: rgba(218, 197, 159, .025) !important;
+  box-shadow: none !important;
+  animation: placementAmbientFloat 10s ease-in-out infinite;
+}
+
+.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardOrbTwo {
+  animation-delay: -5s;
+}
+
+@keyframes placementEnterpriseIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes placementHeroContentIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes placementOrbitalMotion {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes placementCampusImageDrift {
+  from { transform: scale(1.015); }
+  to { transform: scale(1.045); }
+}
+
+@keyframes placementAmbientFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@media (max-width: 1050px) {
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 25px !important;
+  }
+
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside {
+    max-width: 620px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero {
+    min-height: 0 !important;
+    padding: 24px 19px !important;
+    border-radius: 16px !important;
+  }
+
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroPhotoOverlay {
+    background: linear-gradient(180deg, rgba(36, 41, 41, .62), rgba(36, 41, 41, .95)) !important;
+  }
+
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent :is(h1, h2, h3, .proDashboardHeroTitle, .proAdminHeroTitle) {
+    font-size: clamp(34px, 9vw, 45px) !important;
+  }
+
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button {
+    min-height: 73px !important;
+    padding: 12px 8px !important;
+  }
+
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics small {
+    font-size: 8px !important;
+    letter-spacing: .025em !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero,
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroPhoto,
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside,
+  .proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardOrb {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* PLACEMENT HERO — VISIBILITY AND CONTRAST CORRECTION */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero {
+  background-color: #303635 !important;
+  border-color: #c7c6bb !important;
+  box-shadow: 0 16px 36px rgba(26, 31, 30, .12) !important;
+}
+
+/* Make the actual campus photograph visible again. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroPhoto {
+  opacity: 1 !important;
+  filter: saturate(.78) contrast(1.025) brightness(.99) !important;
+  object-fit: cover !important;
+  object-position: center 48% !important;
+  animation: placementPhotoClarityDrift 30s ease-in-out infinite alternate !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroPhotoOverlay {
+  background: linear-gradient(
+    90deg,
+    rgba(34, 39, 37, .40) 0%,
+    rgba(34, 39, 37, .49) 38%,
+    rgba(34, 39, 37, .66) 68%,
+    rgba(34, 39, 37, .78) 100%
+  ) !important;
+  opacity: 1 !important;
+}
+
+/* Explicitly override the blue eyebrow, heading, and paragraph styles. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent > span {
+  color: #ddc69c !important;
+  text-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent > span::before {
+  background: #b59a6d !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent h1,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent h1 *,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent .proAdminHeroTitle {
+  color: #fffdf7 !important;
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif !important;
+  font-weight: 650 !important;
+  letter-spacing: -.04em !important;
+  line-height: 1.06 !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .18) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroContent > p {
+  color: rgba(255, 253, 247, .88) !important;
+  max-width: 600px !important;
+  font-size: 14px !important;
+  line-height: 1.8 !important;
+}
+
+/* Remove the blue top line and green live status from the panel. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside::before,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardLiveDot {
+  background: #b59a6d !important;
+  border-color: rgba(181, 154, 109, .35) !important;
+  box-shadow: 0 0 0 4px rgba(181, 154, 109, .12) !important;
+  animation: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside > header {
+  border-bottom-color: rgba(52, 55, 50, .16) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside header small {
+  color: #77786f !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroAside header strong {
+  color: #303532 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardRoleMark {
+  color: #765c35 !important;
+  background: #f0e8da !important;
+  border-color: #ded0b6 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics small {
+  color: #d9d7ce !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroMetrics strong {
+  color: #fffdf7 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction {
+  color: #282e2c !important;
+  background: #d7c29d !important;
+  border-color: #d7c29d !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardAiAction * {
+  color: #282e2c !important;
+}
+
+@keyframes placementPhotoClarityDrift {
+  from { transform: scale(1.01); }
+  to { transform: scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero .proDashboardHeroPhoto {
+    animation: none !important;
+  }
+}
+
+/* PLACEMENT HERO — FINAL READABILITY AND PANEL FIX */
+
+/* Make the existing campus photograph visible without losing text contrast. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroPhoto {
+  opacity: 1 !important;
+  filter: saturate(.82) contrast(1.02) brightness(1.04) !important;
+  object-fit: cover !important;
+  object-position: center 48% !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroPhotoOverlay {
+  background: linear-gradient(
+    90deg,
+    rgba(28, 35, 33, .55) 0%,
+    rgba(28, 35, 33, .43) 42%,
+    rgba(28, 35, 33, .20) 72%,
+    rgba(28, 35, 33, .12) 100%
+  ) !important;
+  opacity: 1 !important;
+}
+
+/* Explicitly set the text and its nested elements, including text fill. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent > span,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent > span * {
+  color: #ead5ad !important;
+  -webkit-text-fill-color: #ead5ad !important;
+  text-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent > span::before {
+  background: #bda477 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent h1,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent h1 *,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent .proAdminHeroTitle,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent .proAdminHeroTitle * {
+  color: #fffdf7 !important;
+  -webkit-text-fill-color: #fffdf7 !important;
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif !important;
+  font-weight: 650 !important;
+  letter-spacing: -.04em !important;
+  line-height: 1.06 !important;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, .16) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent > p,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroContent > p * {
+  color: rgba(255, 253, 247, .94) !important;
+  -webkit-text-fill-color: rgba(255, 253, 247, .94) !important;
+  max-width: 590px !important;
+  line-height: 1.8 !important;
+}
+
+/* Reintroduce one clear, understated workspace panel—not floating mini-cards. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside {
+  position: relative !important;
+  z-index: 4 !important;
+  padding: clamp(19px, 2.2vw, 27px) !important;
+  border: 1px solid #ded8cd !important;
+  border-top: 3px solid #b29b72 !important;
+  border-radius: 15px !important;
+  background: linear-gradient(145deg, #fffdf8 0%, #f3eee5 100%) !important;
+  box-shadow: 0 16px 36px rgba(17, 23, 22, .15) !important;
+  color: #343a37 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Remove the old blue decorative strip and other panel pseudo decorations. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside::before,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside > header {
+  border-bottom: 1px solid #e1d9cc !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside header small,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside header small * {
+  color: #777970 !important;
+  -webkit-text-fill-color: #777970 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside header strong,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside header strong * {
+  color: #303633 !important;
+  -webkit-text-fill-color: #303633 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardRoleMark {
+  border: 1px solid #dfd3bd !important;
+  border-radius: 9px !important;
+  background: #eee7d9 !important;
+  color: #343a37 !important;
+  -webkit-text-fill-color: #343a37 !important;
+}
+
+/* Keep one continuous metrics row with readable labels and values. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  border-block: 1px solid #e1d9cc !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button {
+  min-width: 0 !important;
+  min-height: 80px !important;
+  padding: 13px 10px !important;
+  border: 0 !important;
+  border-right: 1px solid #e1d9cc !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #343a37 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  transition: background-color .2s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button:first-child {
+  padding-left: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button:last-child {
+  border-right: 0 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHeroMetrics button:hover {
+  transform: none !important;
+  background: rgba(169, 150, 115, .08) !important;
+  box-shadow: none !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics small,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics small * {
+  color: #74766f !important;
+  -webkit-text-fill-color: #74766f !important;
+  font-size: 9px !important;
+  font-weight: 750 !important;
+  letter-spacing: .055em !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics strong,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics strong * {
+  color: #303633 !important;
+  -webkit-text-fill-color: #303633 !important;
+  font-size: clamp(22px, 2.1vw, 29px) !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* Campus AI: graphite with warm-white text and a restrained brass outline. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction {
+  border: 1px solid #b7a077 !important;
+  border-radius: 10px !important;
+  background: #343b38 !important;
+  color: #fffdf7 !important;
+  box-shadow: 0 7px 17px rgba(30, 37, 34, .14) !important;
+  transition: background-color .2s ease, transform .2s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction * {
+  color: #fffdf7 !important;
+  -webkit-text-fill-color: #fffdf7 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction small {
+  color: #e2ded3 !important;
+  -webkit-text-fill-color: #e2ded3 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction > i,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction > b {
+  border-color: rgba(215, 194, 153, .42) !important;
+  background: rgba(255, 255, 255, .07) !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardAiAction:hover {
+  transform: translateY(-1px) !important;
+  background: #414945 !important;
+  box-shadow: 0 10px 22px rgba(30, 37, 34, .18) !important;
+}
+
+/* Replace the green status accent with a muted brass tone. */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardLiveDot {
+  background: #a78c5e !important;
+  border-color: rgba(167, 140, 94, .32) !important;
+  box-shadow: 0 0 0 4px rgba(167, 140, 94, .12) !important;
+  animation: none !important;
+}
+
+@media (max-width: 640px) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroAside {
+    padding: 17px !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics button {
+    padding: 11px 7px !important;
+  }
+
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroMetrics small {
+    font-size: 8px !important;
+    letter-spacing: .015em !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardPhotoHero .proDashboardHeroPhoto {
+    animation: none !important;
+  }
+}
+            /* PLACEMENT AI BUTTON — CLEAR FOREST GREEN */
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero button.proDashboardAiAction {
+  background: linear-gradient(110deg, #24583f 0%, #2f704e 100%) !important;
+  background-image: linear-gradient(110deg, #24583f 0%, #2f704e 100%) !important;
+  border: 1px solid #7da88d !important;
+  border-radius: 11px !important;
+  color: #fffdf8 !important;
+  -webkit-text-fill-color: #fffdf8 !important;
+  box-shadow: 0 7px 18px rgba(36, 88, 63, .22) !important;
+  animation: none !important;
+  transition: background .2s ease, border-color .2s ease,
+              transform .2s ease, box-shadow .2s ease !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero button.proDashboardAiAction,
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero button.proDashboardAiAction * {
+  color: #fffdf8 !important;
+  -webkit-text-fill-color: #fffdf8 !important;
+  opacity: 1 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero button.proDashboardAiAction small {
+  color: #e6f0e8 !important;
+  -webkit-text-fill-color: #e6f0e8 !important;
+}
+
+html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero button.proDashboardAiAction:hover {
+  background: linear-gradient(110deg, #2d6949 0%, #3b8058 100%) !important;
+  background-image: linear-gradient(110deg, #2d6949 0%, #3b8058 100%) !important;
+  border-color: #a4c5af !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 22px rgba(36, 88, 63, .27) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body .proRoleDashboard.proRoleDashboard-placement-cell .proDashboardHero.proDashboardPhotoHero button.proDashboardAiAction {
+    transition: none !important;
+  }
+}
       `}</style>
 
       <section className="proDashboardHero proDashboardPhotoHero">
@@ -1820,6 +2521,9 @@ export function ProfessionalRoleDashboard({
         className="proDashboardBody"
         id="pro-dashboard-overview"
       >
+        {(role === "Coordinator" || role === "Main Admin") && (
+          <StudentNoticeBoard role={role} profile={profile} />
+        )}
         {role !== "Student" && (
         <RoleActionCenter
           role={role}

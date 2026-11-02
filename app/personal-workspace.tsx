@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type FormEvent,
 } from "react";
@@ -162,6 +163,8 @@ export default function PersonalWorkspace() {
 
   const [reminders, setReminders] =
     useState<PersonalReminder[]>([]);
+
+  const reminderProcessingRef = useRef<Set<string>>(new Set());
 
   const [subtasks, setSubtasks] =
     useState<PersonalSubtask[]>([]);
@@ -328,6 +331,182 @@ export default function PersonalWorkspace() {
   useEffect(() => {
     void loadWorkspace();
   }, [loadWorkspace]);
+
+  // Check due reminders while this workspace is open.
+  useEffect(() => {
+    if (typeof window === "undefined" || reminders.length === 0) {
+      return;
+    }
+
+    let stopped = false;
+
+    const checkDueReminders = async () => {
+      const now = Date.now();
+
+      const dueReminders = reminders.filter((reminder) => {
+        if (reminder.status !== "Pending") return false;
+
+        const dueAt = Date.parse(reminder.remind_at);
+        const lastTriggeredAt = reminder.last_triggered_at
+          ? Date.parse(reminder.last_triggered_at)
+          : Number.NEGATIVE_INFINITY;
+
+        return (
+          Number.isFinite(dueAt) &&
+          dueAt <= now &&
+          lastTriggeredAt < dueAt
+        );
+      });
+
+      for (const reminder of dueReminders) {
+        if (stopped) return;
+
+        const scheduledAt = reminder.remind_at;
+        const key = `${reminder.id}:${scheduledAt}`;
+
+        if (reminderProcessingRef.current.has(key)) continue;
+        reminderProcessingRef.current.add(key);
+
+        try {
+          const client = getSupabaseClient();
+          if (!client) continue;
+
+          const triggeredAt = new Date();
+          const triggeredAtIso = triggeredAt.toISOString();
+          let nextRemindAt: string | null = null;
+
+          if (reminder.repeat_rule !== "None") {
+            const nextDate = new Date(scheduledAt);
+            let iterations = 0;
+
+            while (
+              nextDate.getTime() <= triggeredAt.getTime() &&
+              iterations < 10000
+            ) {
+              if (reminder.repeat_rule === "Daily") {
+                nextDate.setDate(nextDate.getDate() + 1);
+              } else if (reminder.repeat_rule === "Weekly") {
+                nextDate.setDate(nextDate.getDate() + 7);
+              } else if (reminder.repeat_rule === "Monthly") {
+                const originalDay = nextDate.getDate();
+                nextDate.setDate(1);
+                nextDate.setMonth(nextDate.getMonth() + 1);
+                const finalDay = new Date(
+                  nextDate.getFullYear(),
+                  nextDate.getMonth() + 1,
+                  0
+                ).getDate();
+                nextDate.setDate(Math.min(originalDay, finalDay));
+              }
+
+              iterations += 1;
+            }
+
+            if (
+              Number.isFinite(nextDate.getTime()) &&
+              nextDate.getTime() > triggeredAt.getTime()
+            ) {
+              nextRemindAt = nextDate.toISOString();
+            }
+          }
+
+          const updatePayload = nextRemindAt
+            ? {
+                last_triggered_at: triggeredAtIso,
+                remind_at: nextRemindAt,
+              }
+            : {
+                last_triggered_at: triggeredAtIso,
+              };
+
+          // Claim this occurrence using its original time and trigger marker,
+          // so a second open tab does not alert for the same occurrence.
+          const baseQuery = client
+            .from("personal_reminders")
+            .update(updatePayload)
+            .eq("id", reminder.id)
+            .eq("status", "Pending")
+            .eq("remind_at", scheduledAt);
+
+          const claimQuery = reminder.last_triggered_at
+            ? baseQuery.eq(
+                "last_triggered_at",
+                reminder.last_triggered_at
+              )
+            : baseQuery.is("last_triggered_at", null);
+
+          const { data: claimed, error } = await claimQuery
+            .select("id")
+            .maybeSingle();
+
+          if (error) throw error;
+          if (!claimed) continue;
+
+          setReminders((current) =>
+            current.map((item) =>
+              item.id === reminder.id
+                ? {
+                    ...item,
+                    last_triggered_at: triggeredAtIso,
+                    ...(nextRemindAt
+                      ? { remind_at: nextRemindAt }
+                      : {}),
+                  }
+                : item
+            )
+          );
+
+          const message = `Reminder due: ${reminder.title}`;
+
+          let notificationStatus = message;
+
+          if (
+            "Notification" in window &&
+            window.Notification.permission === "granted"
+          ) {
+            try {
+              new window.Notification(reminder.title, {
+                body:
+                  reminder.description ||
+                  "Your CampusConnect reminder is due.",
+                tag: key,
+                icon: "/rnsit-logo.png",
+              });
+            } catch {
+              notificationStatus =
+                `${message}. The browser could not show a notification.`;
+            }
+          } else {
+            notificationStatus =
+              `${message}. Allow browser notifications in your browser settings to receive alerts.`;
+          }
+
+          setStatus(notificationStatus);
+        } catch (error) {
+          console.error(
+            "Notes & Tasks reminder trigger failed:",
+            error
+          );
+          setStatus(
+            `Could not trigger reminder: ${reminder.title}. Check your connection.`
+          );
+        } finally {
+          reminderProcessingRef.current.delete(key);
+        }
+      }
+    };
+
+    void checkDueReminders();
+    const timer = window.setInterval(() => {
+      void checkDueReminders();
+    }, 15000);
+
+    return () => {
+      stopped = true;
+      window.clearInterval(timer);
+    };
+  }, [reminders]);
+
 
   function resetNoteForm() {
     setEditingNote(null);
@@ -544,6 +723,19 @@ export default function PersonalWorkspace() {
         "Enter a reminder title and time."
       );
       return;
+    }
+
+    // Ask for browser notification permission during the user's save action.
+    if (
+      typeof window !== "undefined" &&
+      "Notification" in window &&
+      window.Notification.permission === "default"
+    ) {
+      try {
+        await window.Notification.requestPermission();
+      } catch {
+        // Reminder saving must still work if permission is unavailable.
+      }
     }
 
     const remindAt =

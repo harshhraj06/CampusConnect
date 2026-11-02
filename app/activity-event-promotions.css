@@ -1,0 +1,1172 @@
+/* Activity Center event promotion spotlight. Scoped to its component only. */
+.activityPromoShowcase,
+.activityPromoEmpty {
+  --promo-ink: #461c21;
+  --promo-primary: #be6b45;
+  --promo-highlight: #f4d38b;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(20px, 4vw, 52px);
+  width: 100%;
+  min-height: 286px;
+  margin: 22px 0 28px;
+  padding: clamp(24px, 4vw, 44px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 237, 202, .24);
+  border-radius: 26px;
+  color: #fff8ed;
+  background:
+    radial-gradient(circle at 79% 19%, rgba(255, 216, 145, .23), transparent 25%),
+    radial-gradient(circle at 15% 115%, rgba(218, 113, 88, .2), transparent 36%),
+    linear-gradient(118deg, var(--promo-ink) 0%, #71332d 54%, var(--promo-primary) 130%);
+  box-shadow: 0 18px 46px rgba(74, 31, 31, .17);
+}
+
+.activityPromoShowcase--coral,
+.activityPromoFormPreview.activityPromoShowcase--coral {
+  --promo-ink: #641e2c;
+  --promo-primary: #d96c54;
+  --promo-highlight: #ffd18a;
+}
+
+.activityPromoShowcase--gold,
+.activityPromoFormPreview.activityPromoShowcase--gold {
+  --promo-ink: #4b2d12;
+  --promo-primary: #b9862b;
+  --promo-highlight: #ffe7a7;
+}
+
+.activityPromoShowcase--rose,
+.activityPromoFormPreview.activityPromoShowcase--rose {
+  --promo-ink: #55222f;
+  --promo-primary: #bf6072;
+  --promo-highlight: #ffc5bd;
+}
+
+.activityPromoBackgroundImage {
+  position: absolute;
+  z-index: -2;
+  inset: 0 0 0 auto;
+  width: 54%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: .23;
+  mask-image: linear-gradient(90deg, transparent, rgba(0, 0, 0, .5) 28%, #000 100%);
+}
+
+.activityPromoShowcase::before,
+.activityPromoShowcase::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.activityPromoShowcase::before {
+  inset: -45% auto auto 43%;
+  width: 390px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 230, 177, .26);
+  border-radius: 50%;
+  box-shadow: 0 0 0 28px rgba(255, 230, 177, .035), 0 0 0 61px rgba(255, 230, 177, .035), 0 0 0 96px rgba(255, 230, 177, .025);
+  animation: activityPromoRingFloat 12s ease-in-out infinite alternate;
+}
+
+.activityPromoShowcase::after {
+  inset: 0;
+  background-image: radial-gradient(var(--promo-highlight) 1px, transparent 1.6px);
+  background-size: 37px 37px;
+  opacity: .14;
+  mask-image: linear-gradient(110deg, transparent 12%, #000 100%);
+}
+
+.activityPromoShowcase.activityPromoAnimation--spotlight::after {
+  background: linear-gradient(112deg, transparent 20%, rgba(255, 239, 192, .21) 49%, transparent 72%);
+  background-size: 220% 100%;
+  animation: activityPromoSpotlight 8s ease-in-out infinite;
+  opacity: .75;
+}
+
+.activityPromoShowcase.activityPromoAnimation--shimmer::after {
+  background: linear-gradient(108deg, transparent 24%, rgba(255, 243, 212, .22) 48%, transparent 67%);
+  background-size: 220% 100%;
+  animation: activityPromoSpotlight 6s ease-in-out infinite;
+  opacity: .8;
+}
+
+.activityPromoShowcase.activityPromoAnimation--orbit .activityPromoArtOrb {
+  animation-duration: 8s;
+}
+
+.activityPromoDecoration {
+  position: absolute;
+  z-index: -1;
+  width: 9px;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--promo-highlight);
+  opacity: .8;
+  animation: activityPromoConfetti 5.7s ease-in-out infinite;
+}
+
+.activityPromoDecorationOne {
+  right: 32%;
+  top: 14%;
+  transform: rotate(32deg);
+}
+
+.activityPromoDecorationTwo {
+  right: 12%;
+  top: 30%;
+  width: 6px;
+  height: 12px;
+  background: #f1a18c;
+  animation-delay: -2.1s;
+}
+
+.activityPromoMain {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 720px);
+  min-width: 0;
+}
+
+.activityPromoTopline,
+.activityPromoActions,
+.activityPromoMeta,
+.activityPromoNavigation {
+  display: flex;
+  align-items: center;
+}
+
+.activityPromoTopline {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.activityPromoKicker,
+.activityPromoCategory,
+.activityPromoEmptyKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+
+.activityPromoKicker {
+  color: #ffe1aa;
+}
+
+.activityPromoPulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--promo-highlight);
+  box-shadow: 0 0 0 5px rgba(255, 226, 163, .13);
+  animation: activityPromoPulse 2.1s ease-in-out infinite;
+}
+
+.activityPromoCategory {
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 238, 204, .28);
+  border-radius: 999px;
+  color: #fff4db;
+  background: rgba(44, 17, 21, .17);
+  letter-spacing: .07em;
+}
+
+.activityPromoHostedBy {
+  margin: 0 0 6px;
+  color: rgba(255, 244, 224, .78);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.activityPromoShowcase h2 {
+  max-width: 710px;
+  margin: 0;
+  color: #fff8ec;
+  font-size: clamp(27px, 3.6vw, 44px);
+  font-weight: 820;
+  letter-spacing: -.045em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.activityPromoMessage {
+  max-width: 630px;
+  margin: 14px 0 16px;
+  color: rgba(255, 246, 231, .85);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.activityPromoMeta {
+  flex-wrap: wrap;
+  gap: 8px 19px;
+  margin-bottom: 20px;
+  color: #ffe5be;
+  font-size: 12px;
+}
+
+.activityPromoMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.activityPromoMeta strong {
+  color: var(--promo-highlight);
+  font-size: 17px;
+}
+
+.activityPromoActions {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.activityPromoCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 43px;
+  padding: 0 17px;
+  border: 1px solid rgba(255, 250, 232, .8);
+  border-radius: 999px;
+  color: #492027;
+  background: #fff0cb;
+  box-shadow: 0 7px 20px rgba(38, 10, 15, .13);
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+  cursor: pointer;
+}
+
+.activityPromoCta span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.activityPromoCta:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #fff8e8;
+  box-shadow: 0 10px 26px rgba(38, 10, 15, .19);
+}
+
+.activityPromoCta:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.activityPromoNavigation {
+  gap: 9px;
+  margin-left: 3px;
+  color: rgba(255, 245, 224, .88);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.activityPromoNavigation button {
+  width: 31px;
+  height: 31px;
+  border: 1px solid rgba(255, 243, 217, .43);
+  border-radius: 50%;
+  color: #fff6e6;
+  background: rgba(57, 19, 25, .2);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+
+.activityPromoNavigation button:hover {
+  transform: scale(1.06);
+  background: rgba(255, 241, 214, .18);
+}
+
+.activityPromoManageLink {
+  padding: 8px 4px;
+  border: 0;
+  color: #ffe8bd;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.activityPromoArt {
+  position: relative;
+  flex: 0 0 clamp(150px, 22vw, 250px);
+  height: 205px;
+  margin-right: clamp(0px, 1.6vw, 24px);
+  perspective: 500px;
+}
+
+.activityPromoArtOrb {
+  position: absolute;
+  display: block;
+  border: 1px solid rgba(255, 229, 177, .43);
+  border-radius: 50%;
+}
+
+.activityPromoArtOrbOne {
+  inset: 5px 10px 4px 12px;
+  transform: rotate(-20deg) scaleX(.77);
+  box-shadow: inset 0 0 35px rgba(255, 225, 166, .06), 0 0 40px rgba(255, 210, 130, .07);
+  animation: activityPromoOrbit 9s ease-in-out infinite;
+}
+
+.activityPromoArtOrbTwo {
+  inset: 24px 27px 22px 28px;
+  border-style: dashed;
+  transform: rotate(33deg) scaleX(.8);
+  animation: activityPromoOrbit 11s ease-in-out infinite reverse;
+}
+
+.activityPromoArtRibbon {
+  position: absolute;
+  inset: 56px 27px 55px 29px;
+  border: 1px solid rgba(255, 235, 191, .36);
+  border-radius: 18px;
+  background: linear-gradient(125deg, rgba(255, 221, 160, .26), rgba(255, 250, 226, .04));
+  transform: rotate(-8deg);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 15px 40px rgba(44, 13, 17, .18);
+}
+
+.activityPromoArtStar {
+  position: absolute;
+  top: 34px;
+  right: 26px;
+  color: var(--promo-highlight);
+  font-size: 29px;
+  text-shadow: 0 0 23px rgba(255, 222, 158, .7);
+  animation: activityPromoStar 3s ease-in-out infinite;
+}
+
+.activityPromoArtTitle {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  color: #fff1cf;
+  font-size: 28px;
+  font-weight: 950;
+  letter-spacing: -.065em;
+  line-height: .9;
+  text-align: center;
+  text-shadow: 0 6px 22px rgba(43, 12, 17, .3);
+  transform: rotate(-5deg);
+}
+
+.activityPromoEmpty {
+  min-height: 154px;
+  border: 1px dashed rgba(166, 100, 57, .42);
+  color: #3b2926;
+  background: linear-gradient(115deg, #fff9ee, #f8e7d0 58%, #f8d7bf);
+  box-shadow: 0 13px 30px rgba(83, 43, 22, .07);
+}
+
+.activityPromoEmptyMark {
+  display: grid;
+  flex: 0 0 55px;
+  width: 55px;
+  height: 55px;
+  place-items: center;
+  border-radius: 18px;
+  color: #fff3d6;
+  background: linear-gradient(135deg, #702e37, #c97748);
+  font-size: 26px;
+  box-shadow: 0 9px 22px rgba(125, 55, 47, .2);
+}
+
+.activityPromoEmpty > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.activityPromoEmptyKicker {
+  color: #9d5a37;
+  font-size: 9px;
+}
+
+.activityPromoEmpty h2 {
+  margin: 5px 0 4px;
+  color: #3d2927;
+  font-size: clamp(17px, 2.3vw, 25px);
+  letter-spacing: -.03em;
+}
+
+.activityPromoEmpty p {
+  max-width: 600px;
+  margin: 0;
+  color: #80665a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.activityPromoEmpty .activityPromoErrorInline {
+  margin-top: 7px;
+  color: #9c3434;
+}
+
+/* Small animated campaign badge inside each promoted club's card. */
+.activityClubCard--promoting .activityClubPoster {
+  position: relative;
+}
+
+.activityClubEventPromo {
+  position: absolute;
+  z-index: 3;
+  inset: auto 10px 10px 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 242, 215, .45);
+  border-radius: 13px;
+  color: #fff6e8;
+  background: linear-gradient(115deg, rgba(68, 24, 30, .96), rgba(156, 73, 51, .93));
+  box-shadow: 0 8px 22px rgba(24, 10, 12, .23);
+  text-align: left;
+  pointer-events: none;
+  animation: activityClubPromoRise .7s cubic-bezier(.2, .85, .3, 1) both;
+}
+
+.activityClubEventPromo--coral { background: linear-gradient(115deg, rgba(90, 27, 42, .97), rgba(198, 89, 67, .95)); }
+.activityClubEventPromo--gold { background: linear-gradient(115deg, rgba(77, 43, 15, .97), rgba(176, 123, 35, .95)); }
+.activityClubEventPromo--rose { background: linear-gradient(115deg, rgba(83, 30, 48, .97), rgba(177, 76, 104, .95)); }
+
+.activityClubEventPromo::after {
+  position: absolute;
+  inset: -50% auto -50% -35%;
+  width: 30%;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 246, 223, .23), transparent);
+  transform: skewX(-20deg);
+  animation: activityClubPromoShine 5s ease-in-out infinite;
+}
+
+.activityClubEventPromoSpark {
+  display: grid;
+  flex: 0 0 29px;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 1px solid rgba(255, 239, 202, .36);
+  border-radius: 9px;
+  color: #ffe1a3;
+  background: rgba(255, 226, 171, .1);
+  font-size: 16px;
+  animation: activityPromoStar 2.6s ease-in-out infinite;
+}
+
+.activityClubEventPromo > span:nth-child(2) {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.activityClubEventPromo small {
+  color: #ffdc9f;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.activityClubEventPromo strong {
+  overflow: hidden;
+  color: #fffaf0;
+  font-size: 11px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activityClubEventPromoArrow {
+  margin-left: auto;
+  color: #ffdda5;
+  font-size: 16px;
+}
+
+/* Admin/coordinator-only promotion manager. */
+.activityPromoManagerScrim {
+  position: fixed;
+  z-index: 13000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  overflow-y: auto;
+  background: rgba(35, 21, 20, .62);
+  backdrop-filter: blur(9px);
+  animation: activityPromoScrimIn .22s ease both;
+}
+
+.activityPromoManagerDialog {
+  width: min(100%, 900px);
+  max-height: min(90vh, 900px);
+  overflow: auto;
+  border: 1px solid rgba(158, 94, 60, .17);
+  border-radius: 24px;
+  color: #382a27;
+  background: #fffaf3;
+  box-shadow: 0 30px 100px rgba(24, 10, 10, .3);
+  animation: activityPromoDialogIn .3s cubic-bezier(.2, .9, .25, 1) both;
+}
+
+.activityPromoManagerHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 26px 20px;
+  border-bottom: 1px solid #eee2d4;
+  background: linear-gradient(115deg, #fff8ec, #f8e7d8);
+}
+
+.activityPromoManagerHeader > div > span {
+  color: #a45c3b;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.activityPromoManagerHeader h2 {
+  margin: 8px 0 5px;
+  color: #3d2726;
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -.04em;
+}
+
+.activityPromoManagerHeader p {
+  max-width: 580px;
+  margin: 0;
+  color: #8b7164;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.activityPromoCloseButton {
+  display: grid;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #e9d7c6;
+  border-radius: 12px;
+  color: #68433a;
+  background: #fffdf8;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.activityPromoManagerBody,
+.activityPromoForm {
+  padding: 22px 26px 26px;
+}
+
+.activityPromoManagerToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 17px;
+}
+
+.activityPromoManagerToolbar > div {
+  display: grid;
+  gap: 4px;
+}
+
+.activityPromoManagerToolbar strong {
+  color: #4a2e2a;
+  font-size: 14px;
+}
+
+.activityPromoManagerToolbar span {
+  color: #9a8073;
+  font-size: 11px;
+}
+
+.activityPromoManagerList {
+  display: grid;
+  gap: 10px;
+}
+
+.activityPromoManagerItem {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #ecdfd1;
+  border-radius: 16px;
+  background: #fffdf9;
+}
+
+.activityPromoManagerSwatch {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  color: #ffe7ac;
+  background: linear-gradient(135deg, #57222b, #c7744a);
+  font-size: 20px;
+}
+
+.activityPromoManagerSwatch--coral { background: linear-gradient(135deg, #672536, #e27a5b); }
+.activityPromoManagerSwatch--gold { background: linear-gradient(135deg, #53320e, #c7993c); }
+.activityPromoManagerSwatch--rose { background: linear-gradient(135deg, #592437, #c56582); }
+
+.activityPromoManagerItemCopy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+
+.activityPromoManagerItemCopy > strong {
+  overflow: hidden;
+  color: #432d28;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activityPromoManagerItemCopy > span {
+  overflow: hidden;
+  color: #8f7769;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activityPromoState {
+  color: #9a6251;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.activityPromoState--active { color: #a66a26; }
+
+.activityPromoManagerItemActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.activityPromoManagerItemActions button,
+.activityPromoFormActions > button:first-child {
+  min-height: 33px;
+  padding: 0 10px;
+  border: 1px solid #e7d8c9;
+  border-radius: 10px;
+  color: #745447;
+  background: #fffaf2;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.activityPromoManagerItemActions .activityPromoRemoveButton {
+  color: #a34f49;
+  border-color: #efd1c8;
+  background: #fff4ef;
+}
+
+.activityPromoManagerEmpty {
+  margin: 12px 0 0;
+  padding: 22px;
+  border: 1px dashed #e3ccb8;
+  border-radius: 15px;
+  color: #93796b;
+  background: #fffdf8;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.activityPromoFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.activityPromoFormGrid label {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  color: #815f50;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .025em;
+}
+
+.activityPromoFormGrid label > span { text-transform: uppercase; letter-spacing: .08em; }
+.activityPromoFormGrid .activityPromoWideField { grid-column: 1 / -1; }
+
+.activityPromoFormGrid input:not([type="checkbox"]):not([type="file"]),
+.activityPromoFormGrid select,
+.activityPromoFormGrid textarea {
+  width: 100%;
+  min-height: 41px;
+  padding: 10px 12px;
+  border: 1px solid #e5d4c3;
+  border-radius: 11px;
+  outline: none;
+  color: #49352e;
+  background: #fffefa;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.activityPromoFormGrid textarea { resize: vertical; }
+.activityPromoFormGrid input:focus,
+.activityPromoFormGrid select:focus,
+.activityPromoFormGrid textarea:focus { border-color: #bd7955; box-shadow: 0 0 0 3px rgba(189, 121, 85, .13); }
+
+.activityPromoFormGrid .activityPromoToggleField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  grid-column: 1 / -1;
+  padding: 12px;
+  border: 1px solid #ecd9c5;
+  border-radius: 12px;
+  background: #fff7e9;
+  text-transform: none;
+}
+
+.activityPromoToggleField input { accent-color: #a65c3d; }
+.activityPromoToggleField span { text-transform: none !important; letter-spacing: normal !important; }
+
+.activityPromoFormPreview {
+  display: grid;
+  gap: 7px;
+  margin-top: 17px;
+  padding: 16px 18px;
+  border-radius: 15px;
+  color: #fff7e8;
+  background: linear-gradient(115deg, var(--promo-ink, #461c21), var(--promo-primary, #be6b45));
+}
+
+.activityPromoFormPreview strong { font-size: 18px; letter-spacing: -.025em; }
+.activityPromoFormPreview p { margin: 0; color: rgba(255, 247, 232, .82); font-size: 12px; }
+.activityPromoFormPreview small { color: #ffe1aa; font-size: 10px; font-weight: 800; }
+
+.activityPromoFormActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 19px;
+}
+
+.activityPromoFormError,
+.activityPromoNotice {
+  margin: 15px 26px 0;
+  padding: 11px 13px;
+  border-radius: 11px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.activityPromoFormError { color: #903a36; border: 1px solid #f0d0c9; background: #fff4f0; }
+.activityPromoNotice { color: #6f4a21; border: 1px solid #eedbb8; background: #fff7e5; }
+
+@keyframes activityPromoPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(255, 226, 163, .1); transform: scale(.94); }
+  50% { box-shadow: 0 0 0 8px rgba(255, 226, 163, .06); transform: scale(1.08); }
+}
+
+@keyframes activityPromoRingFloat {
+  from { transform: translate3d(-8px, -6px, 0) scale(.97) rotate(-7deg); }
+  to { transform: translate3d(15px, 16px, 0) scale(1.04) rotate(10deg); }
+}
+
+@keyframes activityPromoSpotlight {
+  0%, 25% { background-position: 130% 0; }
+  75%, 100% { background-position: -30% 0; }
+}
+
+@keyframes activityPromoConfetti {
+  0%, 100% { transform: translateY(-5px) rotate(20deg); opacity: .35; }
+  50% { transform: translateY(24px) rotate(120deg); opacity: .9; }
+}
+
+@keyframes activityPromoOrbit {
+  0%, 100% { transform: rotate(-17deg) scaleX(.8) translateY(0); }
+  50% { transform: rotate(14deg) scaleX(.83) translateY(-4px); }
+}
+
+@keyframes activityPromoStar {
+  0%, 100% { transform: rotate(-7deg) scale(.94); opacity: .8; }
+  50% { transform: rotate(12deg) scale(1.1); opacity: 1; }
+}
+
+@keyframes activityClubPromoRise {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes activityClubPromoShine {
+  0%, 50% { transform: translateX(0) skewX(-20deg); opacity: 0; }
+  68% { opacity: .8; }
+  100% { transform: translateX(490%) skewX(-20deg); opacity: 0; }
+}
+
+@keyframes activityPromoScrimIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes activityPromoDialogIn { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+@media (max-width: 780px) {
+  .activityPromoShowcase,
+  .activityPromoEmpty { align-items: flex-start; gap: 15px; }
+  .activityPromoShowcase { min-height: 0; padding: 23px 20px; }
+  .activityPromoArt { flex-basis: 105px; height: 130px; margin: 25px -5px 0 0; opacity: .78; }
+  .activityPromoArtTitle { font-size: 20px; }
+  .activityPromoArtRibbon { inset: 39px 14px; }
+  .activityPromoArtStar { top: 15px; right: 10px; font-size: 20px; }
+  .activityPromoMessage { font-size: 12px; }
+  .activityPromoEmpty { flex-wrap: wrap; padding: 22px; }
+  .activityPromoEmpty > div:nth-child(2) { flex-basis: calc(100% - 72px); }
+  .activityPromoEmpty > .activityPromoCta { margin-left: 70px; }
+  .activityPromoManagerItem { align-items: flex-start; flex-wrap: wrap; }
+  .activityPromoManagerItemActions { width: 100%; justify-content: flex-start; padding-left: 55px; }
+}
+
+@media (max-width: 540px) {
+  .activityPromoShowcase { border-radius: 18px; padding: 20px 16px; }
+  .activityPromoArt { display: none; }
+  .activityPromoShowcase h2 { font-size: 28px; }
+  .activityPromoTopline { align-items: flex-start; flex-direction: column; }
+  .activityPromoNavigation { margin-left: 0; }
+  .activityPromoManagerScrim { padding: 8px; }
+  .activityPromoManagerDialog { max-height: 96vh; border-radius: 17px; }
+  .activityPromoManagerHeader { padding: 19px 17px; }
+  .activityPromoManagerBody,
+  .activityPromoForm { padding: 17px; }
+  .activityPromoFormGrid { grid-template-columns: minmax(0, 1fr); }
+  .activityPromoFormGrid .activityPromoWideField,
+  .activityPromoFormGrid .activityPromoToggleField { grid-column: auto; }
+  .activityPromoManagerToolbar { align-items: stretch; flex-direction: column; }
+  .activityPromoManagerItemActions { padding-left: 0; }
+  .activityPromoEmpty > .activityPromoCta { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activityPromoShowcase *,
+  .activityPromoShowcase::before,
+  .activityPromoShowcase::after,
+  .activityPromoDecoration,
+  .activityPromoPulse,
+  .activityPromoArtOrb,
+  .activityPromoArtStar,
+  .activityClubEventPromo,
+  .activityClubEventPromo::after,
+  .activityClubEventPromoSpark,
+  .activityPromoManagerScrim,
+  .activityPromoManagerDialog {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Activity event promotion sponsor logo cloud */
+.activityPromoSponsors {
+  position: relative;
+  width: 100%;
+  margin: 1.25rem 0 2rem;
+  padding: clamp(1.25rem, 3vw, 2.15rem);
+  overflow: hidden;
+  border: 1px solid rgba(166, 94, 59, 0.18);
+  border-radius: 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 249, 239, 0.96),
+    rgba(247, 229, 210, 0.82)
+  );
+  box-shadow: 0 16px 38px rgba(88, 44, 29, 0.07);
+}
+.activityPromoSponsorsHeading {
+  max-width: 42rem;
+  margin: 0 auto;
+  text-align: center;
+}
+.activityPromoSponsorsEyebrow {
+  color: #a65e3b;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+.activityPromoSponsorsHeading h2 {
+  margin: 0.45rem 0 0;
+  color: #4f3027;
+  font-size: clamp(1.25rem, 2.4vw, 1.8rem);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+.activityPromoSponsorsHeading p {
+  margin: 0.45rem 0 0;
+  color: #8c6e60;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.activityPromoSponsorsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem 2.25rem;
+  max-width: 68rem;
+  margin: 1.6rem auto 0;
+}
+.activityPromoSponsorItem {
+  display: flex;
+  width: 7.5rem;
+  flex: 0 0 auto;
+  cursor: default;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  text-align: center;
+}
+.activityPromoSponsorLogo {
+  display: flex;
+  width: 3.2rem;
+  height: 3.2rem;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(166, 94, 59, 0.16);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 5px 15px rgba(88, 44, 29, 0.07);
+  color: #925235;
+}
+.activityPromoSponsorLogo img {
+  width: 100%;
+  height: 100%;
+  padding: 0.35rem;
+  object-fit: contain;
+}
+.activityPromoSponsorMonogram {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  font-size: 1rem;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+}
+.activityPromoSponsorName {
+  max-width: 100%;
+  color: #725447;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.025em;
+  overflow-wrap: anywhere;
+}
+.activityPromoSponsorsEmpty {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  max-width: 43rem;
+  margin: 1.35rem auto 0;
+  padding: 1rem 1.1rem;
+  border: 1px dashed rgba(166, 94, 59, 0.32);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.45);
+}
+.activityPromoSponsorsEmptyMark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: #f3dfc7;
+  color: #a65e3b;
+}
+.activityPromoSponsorsEmpty strong {
+  display: block;
+  color: #634236;
+  font-size: 0.88rem;
+}
+.activityPromoSponsorsEmpty p {
+  margin: 0.3rem 0 0;
+  color: #8c6e60;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.activityPromoSponsorsEmpty code {
+  color: #7b452f;
+  font-size: 0.73rem;
+}
+@media (max-width: 640px) {
+  .activityPromoSponsors {
+    border-radius: 18px;
+  }
+  .activityPromoSponsorsGrid {
+    gap: 1rem 0.8rem;
+  }
+  .activityPromoSponsorItem {
+    width: 6rem;
+  }
+  .activityPromoSponsorLogo {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+}
+
+
+/* Activity event promotion sponsor ticker */
+.activityPromoShowcase { position: relative; overflow: hidden; padding-bottom: 84px; }
+.activityPromoSponsorTicker {
+  position: absolute; z-index: 8; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; gap: 1.25rem; min-height: 72px;
+  padding: 10px clamp(14px, 3vw, 34px);
+  border-top: 1px solid rgba(255, 232, 201, .24);
+  background: linear-gradient(90deg, rgba(81, 29, 35, .90), rgba(110, 47, 48, .80), rgba(81, 29, 35, .90));
+  color: #fff1dd; backdrop-filter: blur(12px);
+}
+.activityPromoSponsorTickerLabel { display: flex; flex: 0 0 auto; flex-direction: column; gap: 2px; min-width: 116px; }
+.activityPromoSponsorTickerEyebrow { color: #e7c49a; font-size: 9px; font-weight: 800; letter-spacing: .16em; }
+.activityPromoSponsorTickerLabel strong { color: #fff5e8; font-size: 11px; letter-spacing: .11em; }
+.activityPromoSponsorTickerViewport { min-width: 0; flex: 1; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
+.activityPromoSponsorTickerTrack { display: flex; width: max-content; align-items: center; animation: activityPromoSponsorTrain 34s linear infinite; will-change: transform; }
+.activityPromoSponsorTickerViewport:hover .activityPromoSponsorTickerTrack { animation-play-state: paused; }
+.activityPromoSponsorTickerItem { display: flex; flex: 0 0 auto; align-items: center; gap: 9px; min-width: 142px; padding: 0 24px; }
+.activityPromoSponsorTickerLogo { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; overflow: hidden; border: 1px solid rgba(255, 239, 216, .52); border-radius: 10px; background: rgba(255, 249, 239, .96); box-shadow: 0 4px 14px rgba(39, 12, 15, .13); }
+.activityPromoSponsorTickerLogo img { display: block; width: 100%; height: 100%; padding: 4px; object-fit: contain; }
+.activityPromoSponsorTickerName { max-width: 125px; overflow: hidden; color: #fff3e5; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.activityPromoSponsorTickerEmpty { color: #f1d4c5; font-size: 11px; white-space: nowrap; }
+.activityPromoSponsorManageButton { width: fit-content; margin-top: 4px; padding: 4px 8px; border: 1px solid rgba(255, 232, 201, .38); border-radius: 999px; background: rgba(255, 245, 232, .10); color: #fff1dd; font-size: 10px; font-weight: 650; cursor: pointer; }
+.activityPromoSponsorModalScrim { position: fixed; z-index: 10000; inset: 0; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 18px; background: rgba(36, 22, 21, .58); backdrop-filter: blur(8px); }
+.activityPromoSponsorModal { width: min(760px, 100%); max-height: min(90vh, 900px); overflow: auto; border: 1px solid rgba(166, 94, 59, .22); border-radius: 22px; background: #fff9f1; color: #4f3027; box-shadow: 0 28px 90px rgba(38, 18, 14, .32); }
+.activityPromoSponsorModalHeader { position: sticky; z-index: 1; top: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 22px 24px; border-bottom: 1px solid #ead8c7; background: linear-gradient(130deg, #fff8ec, #f7e5d3); }
+.activityPromoSponsorModalHeader h2 { margin: 6px 0; color: #4f3027; font-size: 24px; letter-spacing: -.035em; }
+.activityPromoSponsorModalHeader p { margin: 0; color: #8c6e60; font-size: 13px; line-height: 1.55; }
+.activityPromoSponsorModalClose { width: 36px; height: 36px; flex: 0 0 auto; border: 1px solid #e7d0bc; border-radius: 10px; background: #fffdf8; color: #674439; font-size: 24px; cursor: pointer; }
+.activityPromoSponsorModalBody { padding: 22px 24px 26px; }
+.activityPromoSponsorForm { display: grid; gap: 14px; padding: 16px; border: 1px solid #ead7c5; border-radius: 16px; background: #fffdf9; }
+.activityPromoSponsorForm label { display: grid; gap: 7px; color: #654638; font-size: 12px; font-weight: 750; }
+.activityPromoSponsorForm input:not([type="checkbox"]), .activityPromoSponsorForm input[type="file"] { width: 100%; min-width: 0; padding: 10px 11px; border: 1px solid #dfc4ad; border-radius: 10px; outline: none; background: white; color: #4f3027; font-size: 13px; }
+.activityPromoSponsorForm input:focus { border-color: #a65e3b; box-shadow: 0 0 0 3px rgba(166, 94, 59, .12); }
+.activityPromoSponsorForm small { color: #9a7b6a; font-size: 11px; font-weight: 500; }
+.activityPromoSponsorFormRow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; gap: 16px; }
+.activityPromoSponsorActiveLabel { display: flex !important; grid-template-columns: auto 1fr; align-items: center; min-height: 42px; gap: 9px !important; }
+.activityPromoSponsorActiveLabel input { accent-color: #a65e3b; }
+.activityPromoSponsorFormActions, .activityPromoSponsorListHeader { display: flex; align-items: center; justify-content: flex-end; gap: 9px; }
+.activityPromoSponsorPrimaryButton, .activityPromoSponsorSecondaryButton { padding: 9px 13px; border: 1px solid #dfc4ad; border-radius: 10px; background: #fff8ed; color: #754731; font-size: 12px; font-weight: 750; cursor: pointer; }
+.activityPromoSponsorPrimaryButton { border-color: #844334; background: #79333a; color: #fff1dd; }
+.activityPromoSponsorPrimaryButton:disabled { opacity: .6; cursor: wait; }
+.activityPromoSponsorListHeader { justify-content: space-between; margin: 24px 0 10px; }
+.activityPromoSponsorListHeader h3 { margin: 0; color: #57382d; font-size: 15px; }
+.activityPromoSponsorListEmpty { padding: 15px; border: 1px dashed #dfc4ad; border-radius: 12px; color: #987867; font-size: 12px; }
+.activityPromoSponsorAdminList { display: grid; gap: 8px; }
+.activityPromoSponsorAdminItem { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px; border: 1px solid #ecddcf; border-radius: 12px; background: #fffdf9; }
+.activityPromoSponsorAdminItem > img { width: 44px; height: 44px; border: 1px solid #ecddcf; border-radius: 9px; background: #fff; object-fit: contain; padding: 3px; }
+.activityPromoSponsorAdminCopy { display: grid; gap: 3px; min-width: 0; }
+.activityPromoSponsorAdminCopy strong { overflow: hidden; color: #563a30; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.activityPromoSponsorAdminCopy small { color: #987968; font-size: 10px; }
+.activityPromoSponsorAdminActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+.activityPromoSponsorAdminActions button { padding: 5px 7px; border: 1px solid #e6d2bf; border-radius: 7px; background: #fffaf3; color: #754a39; font-size: 10px; font-weight: 700; cursor: pointer; }
+.activityPromoSponsorAdminActions button:disabled { opacity: .35; cursor: not-allowed; }
+.activityPromoSponsorAdminActions button.is-danger { color: #a23632; }
+.activityPromoSponsorFeedback { margin: 0 0 12px; padding: 10px 12px; border: 1px solid #c9dfca; border-radius: 10px; background: #f1f8ef; color: #315d36; font-size: 12px; }
+.activityPromoSponsorFeedback.is-error { border-color: #f0c6bc; background: #fff2ee; color: #a6382b; }
+@keyframes activityPromoSponsorTrain { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (max-width: 700px) {
+  .activityPromoShowcase { padding-bottom: 0; }
+  .activityPromoSponsorTicker { position: relative; left: auto; right: auto; bottom: auto; margin-top: 18px; gap: 10px; min-height: 68px; padding: 9px 12px; }
+  .activityPromoSponsorTickerLabel { min-width: 90px; }
+  .activityPromoSponsorTickerEyebrow { font-size: 8px; }
+  .activityPromoSponsorTickerLabel strong { font-size: 9px; }
+  .activityPromoSponsorTickerItem { min-width: 118px; gap: 7px; padding: 0 11px; }
+  .activityPromoSponsorTickerLogo { width: 32px; height: 32px; }
+  .activityPromoSponsorTickerName { max-width: 82px; font-size: 10px; }
+  .activityPromoSponsorModalHeader, .activityPromoSponsorModalBody { padding: 16px; }
+  .activityPromoSponsorAdminItem { grid-template-columns: 38px minmax(0, 1fr); }
+  .activityPromoSponsorAdminItem > img { width: 38px; height: 38px; }
+  .activityPromoSponsorAdminActions { grid-column: 1 / -1; justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .activityPromoSponsorTickerTrack { animation: none; }
+}
+
+
+/* Sponsor website links and native dialog top layer */
+dialog.activityPromoSponsorNativeDialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  width: min(760px, calc(100vw - 24px));
+  max-width: none;
+  max-height: calc(100dvh - 24px);
+  overflow: visible;
+  border: 0;
+  border-radius: 22px;
+  background: transparent;
+  color: inherit;
+}
+dialog.activityPromoSponsorNativeDialog::backdrop {
+  background: rgba(36, 22, 21, .72);
+  backdrop-filter: blur(9px);
+}
+.activityPromoSponsorNativeDialog .activityPromoSponsorModal {
+  width: 100%;
+  max-height: calc(100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.activityPromoSponsorTickerLink {
+  display: block;
+  flex: 0 0 auto;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+}
+.activityPromoSponsorTickerLink:focus-visible {
+  outline: 2px solid #f1d29f;
+  outline-offset: 3px;
+}
+.activityPromoSponsorTickerLink:hover .activityPromoSponsorTickerLogo {
+  border-color: #f1d29f;
+  box-shadow: 0 0 0 3px rgba(241, 210, 159, .16);
+}
+.activityPromoSponsorTickerLink:hover .activityPromoSponsorTickerName {
+  color: #ffe0a8;
+}
+@media (max-width: 700px) {
+  dialog.activityPromoSponsorNativeDialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+  .activityPromoSponsorNativeDialog .activityPromoSponsorModal {
+    max-height: calc(100dvh - 20px);
+  }
+}

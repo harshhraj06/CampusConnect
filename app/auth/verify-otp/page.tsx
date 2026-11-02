@@ -205,7 +205,7 @@ export default function VerifyOtpPage() {
         window.setTimeout(
           () => {
             window.location.replace(
-              "/login"
+              "/"
             );
           },
           2200

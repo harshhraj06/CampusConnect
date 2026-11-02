@@ -1,0 +1,65 @@
+.heading.professionalHeading h1.ccGreetingReveal,
+.studentDashboard .studentDashboardHero h2.ccGreetingReveal {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: baseline !important;
+  gap: .08em .25em !important;
+  width: auto !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.04em !important;
+  text-transform: none !important;
+  overflow: visible !important;
+  background: none !important;
+}
+
+.heading.professionalHeading h1.ccGreetingReveal {
+  margin: 0 !important;
+  font-size: clamp(24px, 2.5vw, 34px) !important;
+}
+
+.studentDashboard .studentDashboardHero h2.ccGreetingReveal {
+  margin: 22px 0 18px !important;
+  font-size: clamp(32px, 3.8vw, 56px) !important;
+}
+
+.ccGreetingReveal .ccGreetingRevealLead,
+.ccGreetingReveal .ccGreetingRevealName {
+  display: inline-block !important;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  font: inherit !important;
+  background: none !important;
+  text-shadow: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  overflow-wrap: anywhere;
+}
+
+.ccGreetingReveal .ccGreetingRevealLead {
+  color: #786f63 !important;
+}
+
+.ccGreetingReveal .ccGreetingRevealName {
+  color: #2c2925 !important;
+  font-weight: 650 !important;
+}
+
+@media (max-width: 560px) {
+  .studentDashboard .studentDashboardHero h2.ccGreetingReveal {
+    font-size: clamp(28px, 7.5vw, 38px) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ccGreetingReveal > span,
+  .ccGreetingReveal > strong {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}

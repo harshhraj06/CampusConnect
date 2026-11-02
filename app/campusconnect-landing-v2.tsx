@@ -1,5 +1,7 @@
 "use client";
 
+import { LegalLinks } from "@/components/ui/legal-links";
+
 import {
   useEffect,
   useRef,
@@ -19,11 +21,10 @@ type LandingRole =
 
 
 type CampusConnectLandingProps = {
-  onEnter:
-    (
-      role:
-        LandingRole
-    ) => void;
+  onEnter: (
+    role: LandingRole,
+    mode?: "login" | "register"
+  ) => void;
 };
 
 
@@ -1036,12 +1037,12 @@ export default function CampusConnectLanding({
   );
 
 
-  const enter =
-    () => {
+  const enter = () => {
+    onEnter(selectedRole, "login");
+  };
 
-      onEnter(
-        selectedRole
-      );
+  const enterRegister = () => {
+    onEnter(selectedRole, "register");
   };
 
 
@@ -1360,16 +1361,26 @@ export default function CampusConnectLanding({
 
                 <button
                   type="button"
-                  className="ccLandingV2PrimaryButton"
+                  className="ccLandingV2PrimaryButton ccLandingV2LoginButton"
                   onClick={
                     enter
                   }
                 >
-                  Enter as {selectedRole}
+                  Login as {selectedRole}
 
                   <span>
                     →
                   </span>
+                </button>
+
+
+                <button
+                  type="button"
+                  className="ccLandingV2RegisterButton"
+                  onClick={enterRegister}
+                >
+                  Register
+                  <span aria-hidden="true">→</span>
                 </button>
 
 
@@ -2368,9 +2379,8 @@ export default function CampusConnectLanding({
               />
 
               <p>
-                One professional platform
-                for connected campus life,
-                academics and growth.
+                Your campus, connected. One workspace for
+                learning, community and the opportunities ahead.
               </p>
 
             </div>
@@ -2391,7 +2401,7 @@ export default function CampusConnectLanding({
                     )
                 }
               >
-                Why use it
+                Explore features
               </button>
 
               <button
@@ -2412,7 +2422,7 @@ export default function CampusConnectLanding({
             <div>
 
               <strong>
-                Inside
+                Campus workspace
               </strong>
 
               <button
@@ -2433,7 +2443,7 @@ export default function CampusConnectLanding({
                   enter
                 }
               >
-                Enter dashboard
+                Sign in to CampusConnect
               </button>
 
             </div>
@@ -2442,7 +2452,7 @@ export default function CampusConnectLanding({
             <div>
 
               <strong>
-                Platform
+                Trust & support
               </strong>
 
               <button
@@ -2457,9 +2467,8 @@ export default function CampusConnectLanding({
                 Security
               </button>
 
-              <span>
-                CampusConnect Pro
-              </span>
+              <a href="/privacy">Privacy policy</a>
+              <a href="/terms">Terms of use</a>
 
             </div>
 
@@ -2469,13 +2478,10 @@ export default function CampusConnectLanding({
           <div className="ccLandingV2FooterBottom">
 
             <span>
-              © 2026 CampusConnect
+              © {new Date().getFullYear()} CampusConnect. All rights reserved.
             </span>
 
-            <span>
-              <i />
-              Campus platform
-            </span>
+            <LegalLinks />
 
           </div>
 

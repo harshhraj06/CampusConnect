@@ -31,7 +31,9 @@ type UnifiedItem = {
     | "existing"
     | "task"
     | "notice"
-    | "attendance";
+    | "attendance"
+    | "personal"
+    | "promotion";
   category:
     Exclude<
       NotificationCategory,
@@ -55,6 +57,7 @@ type UnifiedItem = {
   connectionId?: string;
   noticeId?: string;
   attendanceNotificationId?: string;
+  promotionNotificationId?: string;
   actionUrl?: string;
   requiresAcknowledgement?: boolean;
   acknowledged?: boolean;
@@ -427,6 +430,8 @@ async function loadExternalUnreadCount() {
     noticeResult,
     receiptResult,
     attendanceResult,
+    personalResult,
+    promotionResult,
   ] =
     await Promise.all([
       client
@@ -490,7 +495,74 @@ async function loadExternalUnreadCount() {
           "is_read",
           false
         ),
+
+      client
+        .from(
+          "student_personal_announcements"
+        )
+        .select(
+          "id",
+          {
+            count:
+              "exact",
+            head:
+              true,
+          }
+        )
+        .eq(
+          "student_id",
+          auth.user.id
+        )
+        .is(
+          "read_at",
+          null
+        )
+        .is(
+          "archived_at",
+          null
+        )
+        .is(
+          "recipient_deleted_at",
+          null
+        ),
+
+      client
+        .from("student_academic_promotion_notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("student_id", auth.user.id)
+        .is("read_at", null),
     ]);
+
+  let personalCount = personalResult.count || 0;
+  if (!personalResult.count && (personalResult.error || personalResult.count === null)) {
+    // Fallback: if recipient_deleted_at column missing, retry without it then use API
+    try {
+      if (personalResult.error?.message?.includes('recipient_deleted_at')) {
+        const retryResult = await client
+          .from("student_personal_announcements")
+          .select("id", { count: "exact", head: true })
+          .eq("student_id", auth.user.id)
+          .is("read_at", null)
+          .is("archived_at", null);
+        if (!retryResult.error && retryResult.count) {
+          personalCount = retryResult.count;
+        }
+      }
+      if (!personalCount) {
+        const sessionRes = await client.auth.getSession();
+        const token = sessionRes?.data?.session?.access_token;
+        if (token) {
+          const res = await fetch("/api/personal-announcements?inbox=true", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const json = (await res.json()) as Record<string, any>;
+            personalCount = (json.announcements || []).filter((a: any) => !a.read_at).length;
+          }
+        }
+      }
+    } catch {}
+  }
 
   const viewed =
     new Set(
@@ -530,7 +602,9 @@ async function loadExternalUnreadCount() {
     (
       attendanceResult.count ||
       0
-    )
+    ) +
+    personalCount +
+    (promotionResult.count || 0)
   );
 }
 
@@ -611,6 +685,25 @@ UnifiedNotificationWatcher({
               schema: "public",
               table:
                 "campus_notice_rail",
+            },
+            handleRefresh
+          )
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table:
+                "student_personal_announcements",
+            },
+            handleRefresh
+          )
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "student_academic_promotion_notifications",
             },
             handleRefresh
           )
@@ -725,6 +818,8 @@ UnifiedNotificationCenter({
           noticeResult,
           receiptResult,
           attendanceResult,
+          personalResult,
+          promotionResult,
         ] =
           await Promise.all([
             client
@@ -788,6 +883,41 @@ UnifiedNotificationCenter({
                     false,
                 }
               )
+              .limit(100),
+
+            client
+              .from(
+                "student_personal_announcements"
+              )
+              .select(
+                "id,student_id,sender_id,sender_role,title,message,attachment_url,attachment_name,attachment_type,attachment_size,created_at,read_at,recipient_deleted_at"
+              )
+              .eq(
+                "student_id",
+                auth.user.id
+              )
+              .is(
+                "archived_at",
+                null
+              )
+              .is(
+                "recipient_deleted_at",
+                null
+              )
+              .order(
+                "created_at",
+                {
+                  ascending:
+                    false,
+                }
+              )
+              .limit(50),
+
+            client
+              .from("student_academic_promotion_notifications")
+              .select("id,student_id,source_semester,target_semester,source_academic_year,target_academic_year,created_at,read_at")
+              .eq("student_id", auth.user.id)
+              .order("created_at", { ascending: false })
               .limit(100),
           ]);
 
@@ -1083,10 +1213,108 @@ UnifiedNotificationCenter({
           );
 
 
+        let personalRows: any[] = personalResult.data || [];
+        if (!personalRows.length && (personalResult.error || !personalResult.data)) {
+          try {
+            const sessionRes = await client.auth.getSession();
+            const token = sessionRes?.data?.session?.access_token;
+            if (token) {
+              const res = await fetch("/api/personal-announcements?inbox=true", {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (res.ok) {
+                const json = (await res.json()) as Record<string, any>;
+                personalRows = json.announcements || [];
+              }
+            }
+          } catch {}
+        }
+
+        const personalItems:
+          UnifiedItem[] =
+          personalRows.map(
+            (row: any) => ({
+              id:
+                `personal-${row.id}`,
+
+              source:
+                "personal",
+
+              category:
+                "notices",
+
+              label:
+                row.attachment_url
+                  ? "DIRECT MESSAGE (📎 ATTACHMENT)"
+                  : "DIRECT MESSAGE",
+
+              title:
+                String(
+                  row.title ||
+                  "Private Message"
+                ),
+
+              message:
+                String(
+                  row.message ||
+                  ""
+                ),
+
+              createdAt:
+                String(
+                  row.created_at ||
+                  ""
+                ),
+
+              timeLabel:
+                relativeTime(
+                  String(
+                    row.created_at ||
+                    ""
+                  )
+                ),
+
+              target:
+                "Announcements",
+
+              priority:
+                "High",
+
+              unread:
+                !Boolean(
+                  row.read_at
+                ),
+
+              actionUrl:
+                "/announcements/personal",
+
+              original:
+                row,
+            })
+          );
+
+        const promotionItems: UnifiedItem[] = (promotionResult.data || []).map(row => ({
+          id: `promotion-${row.id}`,
+          source: "promotion",
+          category: "academic",
+          label: "ACADEMIC PROGRESSION",
+          title: `Promoted to ${row.target_semester}`,
+          message: `Your academic record has been moved from ${row.source_semester} to ${row.target_semester}.${row.target_academic_year ? ` Academic year: ${row.target_academic_year}.` : ""}`,
+          createdAt: row.created_at,
+          timeLabel: relativeTime(row.created_at),
+          target: "Dashboard",
+          priority: "Normal",
+          unread: !row.read_at,
+          promotionNotificationId: row.id,
+        }));
+
+
         setDatabaseItems([
           ...taskItems,
           ...noticeItems,
           ...attendanceItems,
+          ...personalItems,
+          ...promotionItems,
         ]);
 
         setLoading(
@@ -1157,6 +1385,24 @@ UnifiedNotificationCenter({
               schema: "public",
               table:
                 "student_attendance_notifications",
+            },
+            refresh
+          )
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "student_academic_promotion_notifications",
+            },
+            refresh
+          )
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "student_personal_announcements",
             },
             refresh
           )
@@ -1492,6 +1738,24 @@ UnifiedNotificationCenter({
   }
 
 
+  async function markPromotionNotificationRead(item: UnifiedItem) {
+    const client = getSupabaseClient();
+    if (!client || !item.promotionNotificationId) return;
+    const { data: auth } = await client.auth.getUser();
+    if (!auth.user) return;
+    const { error } = await client
+      .from("student_academic_promotion_notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("id", item.promotionNotificationId)
+      .eq("student_id", auth.user.id)
+      .is("read_at", null);
+    if (error) {
+      setStatus("Unable to mark this promotion notification as read.");
+      return;
+    }
+  }
+
+
   async function openItem(
     item: UnifiedItem
   ) {
@@ -1530,6 +1794,18 @@ UnifiedNotificationCenter({
           item.timeLabel,
         target:
           "Attendance",
+      });
+
+    } else if (item.source === "promotion") {
+      await markPromotionNotificationRead(item);
+      onOpen({
+        id: item.id,
+        kind: "academic",
+        label: item.label,
+        title: item.title,
+        message: item.message,
+        time: item.timeLabel,
+        target: "Dashboard",
       });
 
     } else if (
@@ -1636,6 +1912,39 @@ UnifiedNotificationCenter({
           );
         }
       }
+    } else if (
+      item.source ===
+      "personal"
+    ) {
+      if (item.original?.id) {
+        const client = getSupabaseClient();
+        if (client) {
+          await client
+            .from("student_personal_announcements")
+            .update({ read_at: new Date().toISOString() })
+            .eq("id", item.original.id);
+        }
+      }
+
+      try {
+        window.sessionStorage?.setItem("campusconnect-announcements-tab", "Private Messages");
+      } catch {}
+
+      onOpen({
+        id: item.id,
+        kind: "announcement",
+        label: item.label,
+        title: item.title,
+        message: item.message,
+        time: item.timeLabel,
+        target: "Announcements",
+      });
+
+      window.setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent("campus-announcements-tab", { detail: "Private Messages" })
+        );
+      }, 180);
     } else {
       await markNoticeViewed(
         item
@@ -1879,6 +2188,29 @@ UnifiedNotificationCenter({
             "is_read",
             false
           ),
+
+        client
+          .from(
+            "student_personal_announcements"
+          )
+          .update({
+            read_at:
+              timestamp,
+          })
+          .eq(
+            "student_id",
+            auth.user.id
+          )
+          .is(
+            "read_at",
+            null
+          ),
+
+        client
+          .from("student_academic_promotion_notifications")
+          .update({ read_at: timestamp })
+          .eq("student_id", auth.user.id)
+          .is("read_at", null),
       ]);
     }
 

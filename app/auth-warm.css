@@ -1489,8 +1489,14 @@ button {
   max-width: none !important;
   max-height: none !important;
 
-  object-fit: cover !important;
-  object-position: 50% 50% !important;
+  /* Render the ENTIRE RNSIT photograph.
+     The visual column is taller than the image's aspect
+     ratio, so `cover` used to scale by height and crop the
+     gate arch text off both sides. `contain` fits the whole
+     picture inside the column with no cropping. */
+
+  object-fit: contain !important;
+  object-position: center center !important;
 
   background: transparent !important;
 
@@ -1543,8 +1549,8 @@ button {
 @media (min-width: 721px) {
 
   .authPage .authVisual > img {
-    object-fit: cover !important;
-    object-position: 50% 50% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
   }
 
 }
@@ -1556,8 +1562,8 @@ button {
   }
 
   .authPage .authVisual > img {
-    object-fit: cover !important;
-    object-position: 50% 50% !important;
+    object-fit: contain !important;
+    object-position: center center !important;
   }
 
 }

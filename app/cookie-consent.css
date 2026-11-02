@@ -297,3 +297,35 @@
     padding-right: 32px;
   }
 }
+
+.ccCookieBanner {
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}
+.ccCookieHeader { padding-right: 28px; }
+.ccCookieHeader h2 { line-height: 1.2; }
+.ccCookiePolicyLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e1e5e2;
+}
+.ccCookiePolicyLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: #69591e;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.ccCookiePolicyLinks a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.ccCookiePolicyLinks a:focus-visible {
+  outline: 2px solid #8b6b35;
+  outline-offset: 3px;
+}
