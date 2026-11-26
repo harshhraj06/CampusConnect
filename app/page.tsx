@@ -3459,7 +3459,7 @@ function AuthScreen({initialRole, initialMode, onBack, onAuthenticated}: {
         return;
       }
       if (mode === "register") {
-        const redirectTo = "https://campusconnect-pro.in/auth/verified";
+        const redirectTo = `${window.location.origin}/auth/verified`;
 
         const {
           data,

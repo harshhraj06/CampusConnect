@@ -22,6 +22,7 @@ type VerificationState =
 
 
 const OTP_LENGTH = 8;
+const MAX_ATTEMPTS = 5;
 
 
 function maskEmail(
@@ -88,6 +89,9 @@ export default function VerifyOtpPage() {
     setRedirectSeconds,
   ] = useState(2);
 
+  const [attempts, setAttempts] = useState(0);
+  const requestPending = useRef(false);
+
   const inputRef =
     useRef<HTMLInputElement>(
       null
@@ -142,13 +146,11 @@ export default function VerifyOtpPage() {
   );
 
 
+  const coolingDown = resendSeconds > 0;
+
   useEffect(
     () => {
-      if (
-        resendSeconds <= 0
-      ) {
-        return;
-      }
+      if (!coolingDown) return;
 
       const timer =
         window.setInterval(
@@ -170,7 +172,7 @@ export default function VerifyOtpPage() {
         );
       };
     },
-    [resendSeconds]
+    [coolingDown]
   );
 
 
@@ -205,7 +207,7 @@ export default function VerifyOtpPage() {
         window.setTimeout(
           () => {
             window.location.replace(
-              "/"
+              "/dashboard"
             );
           },
           2200
@@ -262,6 +264,7 @@ export default function VerifyOtpPage() {
         FormEvent<HTMLFormElement>
     ) => {
       event.preventDefault();
+      if (requestPending.current || state === "success" || attempts >= MAX_ATTEMPTS) return;
 
       const cleanEmail =
         email.trim();
@@ -323,6 +326,7 @@ export default function VerifyOtpPage() {
       }
 
 
+      requestPending.current = true;
       setState(
         "verifying"
       );
@@ -332,6 +336,7 @@ export default function VerifyOtpPage() {
 
       try {
         const {
+          data,
           error,
         } =
           await supabase.auth
@@ -348,13 +353,25 @@ export default function VerifyOtpPage() {
 
 
         if (error) {
-          throw error;
+          if (error.status === 429) {
+            setMessage("Too many requests. Wait before trying again.");
+          } else if (error.code === "otp_expired" || error.status === 403) {
+            const nextAttempts = attempts + 1;
+            setAttempts(nextAttempts);
+            setToken("");
+            setMessage(nextAttempts >= MAX_ATTEMPTS
+              ? "Attempt limit reached. Resend to get a new code."
+              : "That code is incorrect, expired, or already used. Check the latest email or resend for a new code.");
+          } else {
+            setMessage("Verification is temporarily unavailable. Try again.");
+          }
+          setState("error");
+          return;
         }
 
-
-        await supabase.auth
-          .signOut();
-
+        if (!data.session?.user.email_confirmed_at) {
+          throw new Error("Could not establish a verified session. Request a new code and try again.");
+        }
 
         window.sessionStorage
           .removeItem(
@@ -380,8 +397,10 @@ export default function VerifyOtpPage() {
         setMessage(
           error instanceof Error
             ? error.message
-            : "The verification code is invalid or has expired."
+            : "Unable to verify your account. Try again."
         );
+      } finally {
+        requestPending.current = false;
       }
     };
 
@@ -390,7 +409,8 @@ export default function VerifyOtpPage() {
     async () => {
       if (
         resendSeconds > 0 ||
-        resending
+        requestPending.current ||
+        state === "success"
       ) {
         return;
       }
@@ -434,6 +454,7 @@ export default function VerifyOtpPage() {
       }
 
 
+      requestPending.current = true;
       setResending(true);
 
       setMessage("");
@@ -448,8 +469,8 @@ export default function VerifyOtpPage() {
               type:
                 "signup",
 
-              email:
-                cleanEmail,
+              email: cleanEmail,
+              options: { emailRedirectTo: `${window.location.origin}/auth/verified` },
             });
 
 
@@ -464,6 +485,7 @@ export default function VerifyOtpPage() {
 
         setToken("");
 
+        setAttempts(0);
         setResendSeconds(
           60
         );
@@ -493,6 +515,7 @@ export default function VerifyOtpPage() {
         );
 
       } finally {
+        requestPending.current = false;
         setResending(
           false
         );
@@ -576,7 +599,7 @@ export default function VerifyOtpPage() {
 
               <span>
                 Redirecting you securely to
-                CampusConnect sign in.
+                your CampusConnect dashboard.
               </span>
             </div>
 
@@ -815,7 +838,7 @@ export default function VerifyOtpPage() {
               className="ccOtpPrimary"
               disabled={
                 state ===
-                  "verifying" ||
+                  "verifying" || resending || attempts >= MAX_ATTEMPTS ||
                 token.length !==
                   OTP_LENGTH
               }
@@ -853,7 +876,7 @@ export default function VerifyOtpPage() {
                   void resend()
               }
               disabled={
-                resendSeconds > 0 ||
+                resendSeconds > 0 || state === "verifying" ||
                 resending
               }
             >

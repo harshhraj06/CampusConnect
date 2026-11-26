@@ -134,6 +134,7 @@ export default function EmailVerifyPage() {
       try {
 
         const {
+          data,
           error,
         } =
           await supabase.auth
@@ -154,8 +155,11 @@ export default function EmailVerifyPage() {
         }
 
 
-        await supabase.auth
-          .signOut();
+        if (!data.session?.user.email_confirmed_at) {
+          throw new Error("Could not establish a verified session. Request a new verification email.");
+        }
+
+        window.location.replace("/dashboard");
 
 
         setState(
@@ -285,14 +289,11 @@ export default function EmailVerifyPage() {
             </p>
 
             <div className="ccVerifyNotice">
-              Go to CampusConnect and sign in
-              using your email address and the
-              password you created during
-              registration.
+              Opening your CampusConnect dashboard.
             </div>
 
             <Link
-              href="/login"
+              href="/dashboard"
               className="ccVerifyPrimary ccVerifyLink"
             >
               Go to CampusConnect
