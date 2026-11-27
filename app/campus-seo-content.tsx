@@ -2,17 +2,19 @@ import Link from "next/link";
 import { publicPages, siteOrigin, type PublicPage } from "@/lib/campus-seo";
 
 export function JsonLd({ data }: { data: object }) {
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{
-    __html: JSON.stringify(data).replace(/</g, "\\u003c"),
-  }} />;
+  const json = JSON.stringify(data).replace(/</g, "\\u003c");
+  return <script type="application/ld+json">{json}</script>;
 }
 
 export function Breadcrumb({ path }: { path: Exclude<PublicPage, "/"> }) {
+  const page = Object.entries(publicPages).find(([url]) => url === path)?.[1];
+  if (!page) return null;
+
   return <JsonLd data={{
     "@context": "https://schema.org", "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: siteOrigin + "/" },
-      { "@type": "ListItem", position: 2, name: publicPages[path][0].split(" | ")[0], item: siteOrigin + path },
+      { "@type": "ListItem", position: 2, name: page[0].split(" | ")[0], item: siteOrigin + path },
     ],
   }} />;
 }

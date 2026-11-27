@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHmac, randomBytes } from "node:crypto";
 import { createServer } from "node:http";
 import { once } from "node:events";
 import { test } from "node:test";
@@ -16,13 +17,13 @@ const user = {
 };
 const confirmed = { ...user, email_confirmed_at: user.created_at };
 const encode = value => Buffer.from(JSON.stringify(value)).toString("base64url");
-const mockAccess = [
-  encode({ alg: "HS256", typ: "JWT" }),
-  encode({ sub: user.id, exp: Math.floor(Date.now() / 1000) + 3600 }),
-  "mock-signature",
-].join(".");
-
 test("student signup requires OTP and keeps the confirmed browser session", { timeout: 90000 }, async t => {
+  const payload = [
+    encode({ alg: "HS256", typ: "JWT" }),
+    encode({ sub: user.id, exp: Math.floor(Date.now() / 1000) + 3600 }),
+  ].join(".");
+  const signature = createHmac("sha256", randomBytes(32)).update(payload).digest("base64url");
+  const mockAccess = payload + "." + signature;
   let consumed = false;
   let resent = false;
   let signupCount = 0;
@@ -56,7 +57,7 @@ test("student signup requires OTP and keeps the confirmed browser session", { ti
       return send(200, {
         user: confirmed,
         access_token: mockAccess,
-        refresh_token: "mock-refresh",
+        refresh_token: randomBytes(32).toString("base64url"),
         token_type: "bearer",
         expires_in: 3600,
       });
