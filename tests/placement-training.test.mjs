@@ -236,13 +236,13 @@ test("Warm academic styling rules are present and free of blue/green/neon themes
   assert.doesNotMatch(css, /#3b82f6|#2563eb|#1d4ed8/, "Must not use standard Tailwind blue themes")
 })
 
-test("CampusConnect app/page.tsx integrates BranchPlacementTraining with workspace toggle", () => {
-  const pagePath = path.join(process.cwd(), "app/page.tsx")
+test("CampusConnect app/campusconnect-app.tsx integrates BranchPlacementTraining with workspace toggle", () => {
+  const pagePath = path.join(process.cwd(), "app/campusconnect-app.tsx")
   const code = fs.readFileSync(pagePath, "utf8")
 
-  assert.match(code, /const BranchPlacementTraining = lazy\(/, "app/page.tsx must lazy-load BranchPlacementTraining")
-  assert.match(code, /placementWorkspaceMode/, "app/page.tsx must track placementWorkspaceMode")
-  assert.match(code, /<BranchPlacementTraining/, "app/page.tsx must render BranchPlacementTraining")
+  assert.match(code, /const BranchPlacementTraining = lazy\(/, "app/campusconnect-app.tsx must lazy-load BranchPlacementTraining")
+  assert.match(code, /placementWorkspaceMode/, "app/campusconnect-app.tsx must track placementWorkspaceMode")
+  assert.match(code, /<BranchPlacementTraining/, "app/campusconnect-app.tsx must render BranchPlacementTraining")
   assert.match(code, /Placement Training Engine & Studio/, "Staff must have access to Placement Training Engine")
   assert.match(code, /Recruiter & Drive Operations Hub/, "Staff must have access to Operations Hub toggle")
 })

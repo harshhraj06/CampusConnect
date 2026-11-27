@@ -22,8 +22,8 @@ test('admin branding route allows unauthenticated GET for active asset', () => {
 })
 
 test('AuthScreen in page.tsx loads active hero image with fallbacks and caching', () => {
-  const pagePath = path.join(process.cwd(), 'app/page.tsx')
-  assert.ok(fs.existsSync(pagePath), 'app/page.tsx must exist')
+  const pagePath = path.join(process.cwd(), 'app/campusconnect-app.tsx')
+  assert.ok(fs.existsSync(pagePath), 'app/campusconnect-app.tsx must exist')
 
   const content = fs.readFileSync(pagePath, 'utf8')
   assert.match(content, /\/api\/branding/, 'AuthScreen must fetch from /api/branding')
