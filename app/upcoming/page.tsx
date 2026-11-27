@@ -1,3 +1,4 @@
+import { Breadcrumb } from "../campus-seo-content";
 import { publicMetadata } from "@/lib/campus-seo";
 import Link from "next/link";
 import "./upcoming.css";
@@ -83,6 +84,7 @@ function FeatureCard({
 export default function UpcomingPage() {
   return (
     <main className="upcomingPage">
+      <Breadcrumb path="/upcoming" />
       <header className="upcomingTopbar">
         <Link
           href="/"

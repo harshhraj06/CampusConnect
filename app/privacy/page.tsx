@@ -1,3 +1,4 @@
+import { Breadcrumb } from "../campus-seo-content";
 import { publicMetadata } from "@/lib/campus-seo";
 import LegalDocument from "../legal-document";
 import { getPublishedLegalDocument, privacyFallback } from "../legal-data";
@@ -9,6 +10,9 @@ export const metadata = publicMetadata("/privacy");
 export default async function PrivacyPage() {
   const content = await getPublishedLegalDocument("privacy", privacyFallback);
   return (
+    <>
+      <Breadcrumb path="/privacy" />
     <LegalDocument kind="privacy" content={content} />
+    </>
   );
 }

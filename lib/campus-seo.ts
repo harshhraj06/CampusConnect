@@ -29,3 +29,35 @@ export function publicMetadata(path: PublicPage): Metadata {
     twitter: { card: "summary_large_image", title, description, images: ["/og.png"] },
   };
 }
+
+export const foundingTeam = [
+  { name: "Harsh Raj", role: "Founder" },
+  { name: "Dhanush Madhyasta", role: "Co-founder" },
+  { name: "Gunashree S", role: "Co-founder" },
+] as const;
+export const collegeName = "RNS Institute of Technology";
+export const contactEmails = ["harshhraj06@gmail.com", "support@campusconnect-pro.in"] as const;
+
+export const socialLinks: Readonly<Record<string, string>> = {
+  LinkedIn: "[I will fill]",
+  GitHub: "[I will fill]",
+  Instagram: "[I will fill]",
+};
+export const publishedSocials = Object.entries(socialLinks).filter(([, url]) => /^https:\/\//i.test(url));
+
+export const brandStructuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite", "@id": siteOrigin + "/#website", name: siteName, url: siteOrigin + "/",
+      publisher: { "@id": siteOrigin + "/#organization" },
+    },
+    {
+      "@type": "Organization", "@id": siteOrigin + "/#organization", name: siteName, url: siteOrigin + "/",
+      logo: { "@type": "ImageObject", url: siteOrigin + "/icon-512.png", width: 512, height: 512 },
+      founder: foundingTeam.map(person => ({ "@type": "Person", name: person.name, jobTitle: person.role })),
+      contactPoint: contactEmails.map(email => ({ "@type": "ContactPoint", email })),
+      ...(publishedSocials.length ? { sameAs: publishedSocials.map(([, url]) => url) } : {}),
+    },
+  ],
+};
