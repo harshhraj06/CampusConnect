@@ -971,7 +971,9 @@ function SidebarProfileReminder({
 }
 
 
-export default function Home() {
+export default function Home({ publicContent }: { publicContent?: ReactNode }) {
+  const withPublicContent = (content: ReactNode) => <>{content}{publicContent}</>;
+
 
   /*
    * Development-only attendance email delivery tester.
@@ -2215,7 +2217,7 @@ export default function Home() {
   };
 
   if (showOpeningAnimation) {
-    return (
+    return withPublicContent((
       <div
         className="ccOpening"
         role="dialog"
@@ -2305,13 +2307,13 @@ export default function Home() {
           <span aria-hidden="true">→</span>
         </button>
       </div>
-    );
+    ));
   }
 
-  if (checkingSession) return <LoadingScreen/>;
+  if (checkingSession) return withPublicContent(<LoadingScreen/>);
 
   if (screen === "welcome") {
-    return <WelcomeDashboard onEnter={(nextRole, nextMode) => { setRole(nextMode === "register" ? "Student" : nextRole); setAuthMode(nextMode ?? "login"); setScreen("auth"); }} />;
+    return withPublicContent(<WelcomeDashboard onEnter={(nextRole, nextMode) => { setRole(nextMode === "register" ? "Student" : nextRole); setAuthMode(nextMode ?? "login"); setScreen("auth"); }} />);
   }
 
   if (screen === "auth") {
