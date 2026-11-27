@@ -113,3 +113,5 @@ service-account*.json
 # Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 
+
+/.backups/

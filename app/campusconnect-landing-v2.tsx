@@ -1138,6 +1138,8 @@ export default function CampusConnectLanding({
 
             <img
               src="/branding/campusconnect-logo.webp"
+              width={1200}
+              height={420}
               alt="CampusConnect Pro"
             />
 
@@ -2375,6 +2377,9 @@ export default function CampusConnectLanding({
 
               <img
                 src="/branding/campusconnect-logo.webp"
+                width={1200}
+                height={420}
+                loading="lazy"
                 alt="CampusConnect Pro"
               />
 

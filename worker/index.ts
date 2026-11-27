@@ -1,3 +1,4 @@
+import { publicPages, siteOrigin } from "../lib/campus-seo";
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
@@ -34,6 +35,13 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.hostname === "www.campusconnect-pro.in" ||
+        (url.hostname === "campusconnect-pro.in" && url.protocol === "http:")) {
+      return new Response(null, {
+        status: 308,
+        headers: { Location: siteOrigin + url.pathname + url.search },
+      });
+    }
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
@@ -46,7 +54,20 @@ const worker = {
       }, allowedWidths);
     }
 
-    return handler.fetch(request, env, ctx);
+    const path = url.pathname.replace(/\/+$/, "") || "/";
+    const isPublic = Object.prototype.hasOwnProperty.call(publicPages, path)
+      && !(path === "/" && url.searchParams.has("redirectTo"));
+    const isSearchAsset = /^\/(?:robots\.txt|sitemap\.xml|manifest\.json|favicon\.ico|og\.png|icon-(?:48|96|192|512|maskable-512)\.png|apple-touch-icon\.png)$/.test(path);
+    const response = await handler.fetch(request, env, ctx);
+    if (isSearchAsset || path.startsWith("/_next/")) return response;
+
+    const result = new Response(response.body, response);
+    result.headers.set("Cache-Control", "private, no-store, max-age=0");
+    if (!isPublic || response.status >= 400) {
+      result.headers.set("X-Robots-Tag",
+        /^(?:\/events\/pass(?:\/|$)|\/api(?:\/|$))/.test(path) ? "noindex, nofollow" : "noindex, follow");
+    }
+    return result;
   },
 
   /**

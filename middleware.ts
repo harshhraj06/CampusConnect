@@ -5,6 +5,8 @@ import { isWorkspacePathname } from './lib/workspace-route-slugs'
 const PUBLIC_ROUTES = [
   '/',
   '/upcoming',
+  '/about',
+  '/features',
   '/privacy',
   '/terms',
   '/login',
@@ -216,7 +218,7 @@ export async function middleware(
     )
 
     if (
-      isPublicRoute(pathname)
+      isPublicRoute(pathname) || !isWorkspacePathname(pathname)
     ) {
       return secureHeaders(
         response,

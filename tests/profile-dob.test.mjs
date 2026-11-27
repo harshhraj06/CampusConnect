@@ -4,8 +4,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 test('profile page contains dobSectionCard and edit functionality', () => {
-  const pagePath = path.join(process.cwd(), 'app/page.tsx')
-  assert.ok(fs.existsSync(pagePath), 'app/page.tsx must exist')
+  const pagePath = path.join(process.cwd(), 'app/campusconnect-app.tsx')
+  assert.ok(fs.existsSync(pagePath), 'app/campusconnect-app.tsx must exist')
 
   const content = fs.readFileSync(pagePath, 'utf8')
 

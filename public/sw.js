@@ -1,10 +1,8 @@
 const CACHE_VERSION =
-  "campusconnect-shell-v5";
+  "campusconnect-shell-v6";
 
 const STATIC_CACHE =
   CACHE_VERSION;
-
-const APP_SHELL_URL = "/";
 
 const OFFLINE_URL =
   "/offline.html";
@@ -25,9 +23,9 @@ const REQUIRED_PRECACHE = [
  * the entire service-worker install fail.
  */
 const OPTIONAL_PRECACHE = [
-  "/campusconnect-logo.png",
-  "/icons/campusconnect-192-v2.png",
-  "/icons/campusconnect-512-v2.png",
+  "/branding/campusconnect-logo.webp",
+  "/icon-192.png",
+  "/icon-512.png",
 ];
 
 async function cacheRequiredAssets(
@@ -159,32 +157,8 @@ async function handleNavigation(
     );
 
   try {
-    const response =
-      await fetch(request);
-
-    if (
-      response &&
-      response.ok &&
-      response.type === "basic" &&
-      new URL(request.url).pathname === APP_SHELL_URL
-    ) {
-      await cache.put(
-        APP_SHELL_URL,
-        response.clone()
-      );
-    }
-
-    return response;
+    return await fetch(request);
   } catch {
-    const shell =
-      await cache.match(
-        APP_SHELL_URL
-      );
-
-    if (shell) {
-      return shell;
-    }
-
     const offline =
       await cache.match(
         OFFLINE_URL
@@ -223,7 +197,8 @@ async function handleStaticAsset(
 
   if (
     !response ||
-    !response.ok
+    !response.ok ||
+    /(?:private|no-store)/i.test(response.headers.get("Cache-Control") || "")
   ) {
     return response;
   }
@@ -295,7 +270,7 @@ self.addEventListener(
 
     if (
       url.pathname.startsWith(
-        "/_next/"
+        "/_next/static/"
       ) ||
       url.pathname.startsWith(
         "/assets/"

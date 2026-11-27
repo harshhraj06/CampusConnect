@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   useEffect,
   useState,
@@ -95,26 +96,8 @@ export default function CampusConnectVerifiedPage() {
 
 
           try {
-            const code =
-              url.searchParams.get(
-                "code"
-              );
-
-
-            if (code) {
-              const {
-                error,
-              } =
-                await client.auth
-                  .exchangeCodeForSession(
-                    code
-                  );
-
-              if (error) {
-                throw error;
-              }
-            }
-
+            const { error: initializationError } = await client.auth.initialize();
+            if (initializationError) throw initializationError;
 
             const accessToken =
               hash.get(
@@ -149,15 +132,6 @@ export default function CampusConnectVerifiedPage() {
             }
 
 
-            await new Promise(
-              resolve =>
-                window.setTimeout(
-                  resolve,
-                  300
-                )
-            );
-
-
             const {
               data: sessionData,
             } =
@@ -165,43 +139,14 @@ export default function CampusConnectVerifiedPage() {
                 .getSession();
 
 
-            const {
-              data: userData,
-            } =
-              await client.auth
-                .getUser();
-
-
-            const user =
-              userData.user ||
-              sessionData.session
-                ?.user ||
-              null;
-
-
-            const verified =
-              Boolean(
-                user &&
-                (
-                  user.email_confirmed_at ||
-                  (
-                    user as {
-                      confirmed_at?: string;
-                    }
-                  ).confirmed_at
-                )
-              );
-
+            const { data: userData, error: userError } = await client.auth.getUser();
+            const verified = !userError && sessionData.session && userData.user?.email_confirmed_at;
 
             if (!verified) {
               throw new Error(
                 "This verification link is invalid, incomplete, or has expired. Please use the latest verification email sent by CampusConnect."
               );
             }
-
-
-            await client.auth
-              .signOut();
 
 
             window.history.replaceState(
@@ -223,6 +168,7 @@ export default function CampusConnectVerifiedPage() {
             setMessage(
               "Your email address has been verified successfully."
             );
+            window.location.replace("/dashboard");
 
           } catch (error) {
             if (!active) {
@@ -329,31 +275,7 @@ export default function CampusConnectVerifiedPage() {
             </p>
 
 
-            <div className="verifiedInstruction">
-
-              <strong>
-                Your CampusConnect account
-                is now active.
-              </strong>
-
-              <p>
-                Go to the CampusConnect
-                website and sign in using
-                the email address and
-                password you created during
-                registration.
-              </p>
-
-              <div className="verifiedWebsite">
-                campusconnect-pro.in
-              </div>
-
-            </div>
-
-
-            <p className="verifiedClose">
-              You may now close this page.
-            </p>
+            <Link href="/dashboard">Open CampusConnect dashboard</Link>
 
           </>
         )}
