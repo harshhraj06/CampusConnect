@@ -6,7 +6,7 @@ import {
   isWorkspaceSlug,
 } from "@/lib/workspace-route-slugs";
 
-import CampusConnectPage from "../page";
+import CampusConnectPage from "../campusconnect-app";
 
 type CatchAllPageProps = {
   params:
@@ -35,3 +35,5 @@ export default async function CatchAllPage({
     <CampusConnectPage />
   );
 }
+
+export const metadata = { robots: { index: false, follow: true } };

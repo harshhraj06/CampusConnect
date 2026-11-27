@@ -85,6 +85,6 @@ test("serves the built homepage with CampusConnect metadata", {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title\b[^>]*>[^<]*CampusConnect Pro/i);
+  assert.match(html, /<title\b[^>]*>[^<]*CampusConnect/i);
   assert.match(html, /<meta\b[^>]*name=["']viewport["'][^>]*>/i);
 });

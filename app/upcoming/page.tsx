@@ -1,36 +1,8 @@
-import type { Metadata } from "next";
+import { publicMetadata } from "@/lib/campus-seo";
 import Link from "next/link";
 import "./upcoming.css";
 
-export const metadata: Metadata = {
-  title: "Upcoming Features",
-  description:
-    "See what CampusConnect Pro is improving, building and exploring next.",
-  alternates: {
-    canonical:
-      "/upcoming",
-  },
-  openGraph: {
-    title:
-      "Upcoming Features | CampusConnect Pro",
-    description:
-      "A transparent view of improvements, planned capabilities and product directions for CampusConnect Pro.",
-    url:
-      "/upcoming",
-    images: [
-      {
-        url:
-          "/og.png",
-        width:
-          1200,
-        height:
-          630,
-        alt:
-          "CampusConnect Pro upcoming features",
-      },
-    ],
-  },
-};
+export const metadata = publicMetadata("/upcoming");
 
 const developing = [
   {

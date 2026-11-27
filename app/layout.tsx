@@ -1,3 +1,4 @@
+import { siteName, siteOrigin, publicMetadata } from "@/lib/campus-seo";
 import type {
   Metadata,
   Viewport,
@@ -56,36 +57,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase:
-    new URL(
-      "https://campusconnect-pro.in"
-    ),
-
-  title: {
-    default:
-      "CampusConnect Pro | College Campus Platform",
-    template:
-      "%s | CampusConnect Pro",
-  },
-
-  description:
-    "CampusConnect Pro is a college campus platform for academics, attendance, assignments, student collaboration, campus events and placement preparation. Built by Harsh Raj.",
-
-  applicationName:
-    "CampusConnect Pro",
-
-  authors: [{ name: "Harsh Raj", url: "https://github.com/harshhraj06" }],
-
-  creator: "Harsh Raj",
-
-  publisher:
-    "CampusConnect Pro",
-
-  alternates: {
-    canonical:
-      "/",
-  },
-
+  metadataBase: new URL(siteOrigin),
+  title: { default: "CampusConnect | College Campus Platform", template: "%s | CampusConnect" },
+  description: publicMetadata("/").description,
+  applicationName: siteName,
+  publisher: siteName,
   icons: {
     icon: [
       { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
@@ -95,81 +71,6 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
 
-  openGraph: {
-    title:
-      "CampusConnect Pro | College Campus Platform",
-
-    description:
-      "CampusConnect Pro is a college campus platform for academics, attendance, assignments, student collaboration, campus events and placement preparation. Built by Harsh Raj.",
-
-    url:
-      "https://campusconnect-pro.in/",
-
-    siteName:
-      "CampusConnect Pro",
-
-    type:
-      "website",
-
-    locale:
-      "en_IN",
-
-    images: [
-      {
-        url:
-          "/og.png",
-
-        width:
-          1200,
-
-        height:
-          630,
-
-        alt:
-          "CampusConnect Pro | College Campus Platform",
-      },
-    ],
-  },
-
-  twitter: {
-    card:
-      "summary_large_image",
-
-    title:
-      "CampusConnect Pro | College Campus Platform",
-
-    description:
-      "CampusConnect Pro is a college campus platform for academics, attendance, assignments, student collaboration, campus events and placement preparation. Built by Harsh Raj.",
-
-    images: [
-      "/og.png",
-    ],
-  },
-
-  robots: {
-    index:
-      true,
-
-    follow:
-      true,
-
-    googleBot: {
-      index:
-        true,
-
-      follow:
-        true,
-
-      "max-image-preview":
-        "large",
-
-      "max-snippet":
-        -1,
-
-      "max-video-preview":
-        -1,
-    },
-  },
 };
 
 export default function RootLayout({
