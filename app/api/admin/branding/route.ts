@@ -168,13 +168,13 @@ export const POST = withSecurity(
 )
 
 export const PATCH = withSecurity(
-  async (request: NextRequest, { session }) => {
+  async (_request, { session, body }) => {
     const { adminClient } = session
-    const body = await request.json()
+    const assetId = body && typeof body === 'object' && 'assetId' in body
+      ? body.assetId
+      : undefined
 
-    const { assetId } = body as { assetId?: string }
-
-    if (!assetId) {
+    if (typeof assetId !== 'string' || !assetId.trim()) {
       return NextResponse.json({ error: 'assetId is required.' }, { status: 400 })
     }
 

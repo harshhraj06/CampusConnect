@@ -2,10 +2,15 @@ import { NextResponse } from "next/server";
 import { withSecurity } from "@/lib/api-auth";
 
 export const POST = withSecurity(
-  async (request, { session }) => {
+  async (_request, { session, body }) => {
     const { adminClient, user } = session;
-    const body = (await request.json().catch(() => ({}))) as { dateOfBirth?: string };
-    const rawDob = typeof body.dateOfBirth === "string" ? body.dateOfBirth.trim() : "";
+    const dateOfBirth = body && typeof body === "object" && "dateOfBirth" in body
+      ? body.dateOfBirth
+      : undefined;
+    if (typeof dateOfBirth !== "string" && dateOfBirth !== null) {
+      return NextResponse.json({ error: "Provide a date of birth or null to clear it." }, { status: 400 });
+    }
+    const rawDob = dateOfBirth?.trim() ?? "";
 
     // Validate format if provided
     if (rawDob && !/^\d{4}-\d{2}-\d{2}$/.test(rawDob)) {
@@ -43,5 +48,6 @@ export const POST = withSecurity(
   {
     requireAuth: true,
     requireBody: true,
+    maxBodySize: 1024,
   }
 );
